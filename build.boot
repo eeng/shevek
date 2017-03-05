@@ -10,7 +10,8 @@
                     [org.clojure/tools.nrepl "0.2.12" :scope "test"] ; needed by boot-cljs-repl
                     [adzerk/boot-cljs-repl "0.3.3"]
                     [proto-repl "0.3.1"]
-                    [deraen/boot-less "0.6.2" :scope "test"]])
+                    [deraen/boot-less "0.6.2" :scope "test"]
+                    [reagent "0.6.0"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
