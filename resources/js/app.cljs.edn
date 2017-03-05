@@ -1,0 +1,3 @@
+{:require  [pivot.app]
+ :init-fns [pivot.app/init]
+ :compiler-options {:asset-path "js/app.out"}}
