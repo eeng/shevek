@@ -2,7 +2,7 @@
 
 (enable-console-print!)
 
-(println "yea")
+(println "yeaa")
 
 (defn init []
   (println "init"))
