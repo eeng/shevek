@@ -1,5 +1,5 @@
 (set-env!
-  :source-paths   #{"src/cljs"}
+  :source-paths   #{"src/cljs" "src/less"}
   :resource-paths #{"resources"}
   :dependencies   '[[org.clojure/clojurescript "1.9.494"]
                     [adzerk/boot-cljs "1.7.228-2"]
@@ -8,9 +8,9 @@
                     [com.cemerick/piggieback "0.2.1" :scope "test"] ; needed by boot-cljs-repl
                     [weasel "0.7.0" :scope "test"] ; needed by boot-cljs-repl
                     [org.clojure/tools.nrepl "0.2.12" :scope "test"] ; needed by boot-cljs-repl
-                    [deraen/boot-less "0.6.2" :scope "test"]
                     [adzerk/boot-cljs-repl "0.3.3"]
-                    [proto-repl "0.3.1"]])
+                    [proto-repl "0.3.1"]
+                    [deraen/boot-less "0.6.2" :scope "test"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
@@ -22,14 +22,16 @@
 (deftask build []
   (comp (notify :visual true :title "App")
         (cljs)
+        (less)
+        (sift :move {#"app.css" "css/app.css" #"app.main.css.map" "css/app.main.css.map"})
         (target :dir #{"target"})))
-        ;(less)))
-        ;(sift :move {#"less.css" "css/less.css" #"less.main.css.map" "css/less.main.css.map"})))
 
-(deftask frontend []
+(deftask frontend
+  "Profile setup for frontend development with cljs and less compilation and reloading."
+  []
   (task-options! cljs   {:optimizations :none :source-map true}
-                 reload {:on-jsload 'pivot.app/init})
-  ;less   {:source-map  true})
+                 reload {:on-jsload 'pivot.app/init}
+                 less   {:source-map  true})
   (comp (serve :dir "target")
         (watch)
         (reload)
@@ -49,3 +51,6 @@
   (eval '(apply clojure.tools.namespace.repl/set-refresh-dirs (get-env :directories)))
 
   identity)
+
+; Usar esto al conectar al nREPL del frontend para transformarlo en un brepl
+; (in-ns 'boot.user) (start-repl)
