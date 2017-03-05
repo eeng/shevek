@@ -19,7 +19,7 @@
  '[deraen.boot-less      :refer [less]])
 
 (deftask build []
-  (comp (notify)
+  (comp (notify :visual true :audible true :title "App")
         (cljs)
         (target :dir #{"target"})))
         ;(less)))
