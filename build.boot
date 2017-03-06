@@ -33,7 +33,7 @@
   (task-options! cljs   {:optimizations :none :source-map true}
                  reload {:on-jsload 'pivot.app/init}
                  less   {:source-map  true})
-  (comp (serve :dir "target")
+  (comp (serve :dir "target" :port 3100)
         (watch)
         (reload)
         (cljs-repl :nrepl-opts {:port 9009})
