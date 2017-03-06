@@ -5,13 +5,15 @@
                     [adzerk/boot-cljs "1.7.228-2"]
                     [pandeiro/boot-http "0.7.0"]
                     [adzerk/boot-reload "0.5.1"]
-                    [com.cemerick/piggieback "0.2.1" :scope "test"] ; needed by boot-cljs-repl
-                    [weasel "0.7.0" :scope "test"] ; needed by boot-cljs-repl
-                    [org.clojure/tools.nrepl "0.2.12" :scope "test"] ; needed by boot-cljs-repl
+                    [com.cemerick/piggieback "0.2.1" :scope "test"] ; Needed by boot-cljs-repl
+                    [weasel "0.7.0" :scope "test"] ; Needed by boot-cljs-repl
+                    [org.clojure/tools.nrepl "0.2.12" :scope "test"] ; Needed by boot-cljs-repl
                     [adzerk/boot-cljs-repl "0.3.3"]
                     [proto-repl "0.3.1"]
                     [deraen/boot-less "0.6.2" :scope "test"]
-                    [reagent "0.6.0"]])
+                    [reagent "0.6.0"]
+                    [clj-http "2.3.0"]
+                    [cheshire "5.7.0"]]) ; Needed for the :as :json option of clj-http
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
