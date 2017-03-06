@@ -17,7 +17,7 @@
         [:a.card {:href (str "/cubes/" name)}
          [:div.content
           [:div.ui.header
-           [:i.cubes.blue.icon]
+           [:i.cube.blue.icon]
            [:div.content title]]
           [:div.description description]]])
       [:div.ui.basic.segment "No hay cubos definidos."])]])

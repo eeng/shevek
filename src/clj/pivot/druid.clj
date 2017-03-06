@@ -10,22 +10,29 @@
 (defn- query [host q]
   (:body (http/post (str host "/") {:content-type :json :form-params q :as :json})))
 
+; TODO candidata a memoizar no?
+(defn- segment-metadata-query [host datasource]
+  (let [q {:queryType "segmentMetadata"
+           :dataSource {:type "table" :name datasource}
+           :merge true
+           :analysisTypes ["cardinality" "aggregators"]
+           :intervals ["2000/2100"]
+           :lenientAggregatorMerge true}]
+    (first (query host q))))
+
 (defn- druid-column-result-to-map [[column fields]]
   (merge (select-keys fields [:type :cardinality])
          {:name (name column)}))
 
 (defn dimensions [host datasource]
-  (let [q {:queryType "segmentMetadata"
-           :dataSource {:type "table" :name datasource}
-           :merge true}]
-    (->> (query host q) first :columns (map druid-column-result-to-map))))
+  (->> (segment-metadata-query host datasource)
+       :columns
+       (map druid-column-result-to-map)))
 
 (defn measures [host datasource]
-  (let [q {:queryType "segmentMetadata"
-           :dataSource {:type "table" :name datasource}
-           :merge true
-           :analysisTypes ["aggregators"]}]
-    (->> (query host q) first :aggregators (map druid-column-result-to-map))))
+  (->> (segment-metadata-query host datasource)
+       :aggregators
+       (map druid-column-result-to-map)))
 
 #_(datasources broker)
 #_(dimensions broker "vtol_stats")
