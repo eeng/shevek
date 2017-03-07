@@ -1,5 +1,5 @@
 (set-env!
-  :source-paths   #{"src/cljs" "src/less"}
+  :source-paths   #{"src/clj" "src/cljs" "src/less"}
   :resource-paths #{"resources"}
   :dependencies   '[[org.clojure/clojurescript "1.9.494"]
                     [adzerk/boot-cljs "1.7.228-2"]
@@ -9,8 +9,9 @@
                     [weasel "0.7.0" :scope "test"] ; Needed by boot-cljs-repl
                     [org.clojure/tools.nrepl "0.2.12" :scope "test"] ; Needed by boot-cljs-repl
                     [adzerk/boot-cljs-repl "0.3.3"]
-                    [proto-repl "0.3.1"]
                     [deraen/boot-less "0.6.2" :scope "test"]
+                    [samestep/boot-refresh "0.1.0" :scope "test"]
+                    [proto-repl "0.3.1"]
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]
                     [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
@@ -21,40 +22,25 @@
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
  '[pandeiro.boot-http    :refer [serve]]
- '[deraen.boot-less      :refer [less]])
+ '[deraen.boot-less      :refer [less]]
+ '[samestep.boot-refresh :refer [refresh]])
 
 (deftask build []
-  (comp (notify :visual true :title "App")
-        (cljs)
+  (comp (cljs)
         (less)
         (sift :move {#"app.css" "css/app.css" #"app.main.css.map" "css/app.main.css.map"})
-        (target :dir #{"target"})))
-
-(deftask frontend
-  "Profile setup for frontend development with cljs and less compilation and reloading."
-  []
-  (task-options! cljs   {:optimizations :none :source-map true}
-                 reload {:on-jsload 'pivot.app/init}
-                 less   {:source-map  true})
-  (comp (serve :dir "target" :port 3100)
-        (watch)
-        (reload)
-        (cljs-repl :nrepl-opts {:port 9009})
-        (build)))
+        (target)))
 
 (deftask dev
-  "Profile setup for development with Proto REPL"
+  "Starts the application in development mode."
   []
-  (println "Dev profile running")
-  (set-env!
-   :init-ns 'user
-   :source-paths #(into % ["dev"]))
-
-  ;; Makes clojure.tools.namespace.repl work per https://github.com/boot-clj/boot/wiki/Repl-reloading
-  (require 'clojure.tools.namespace.repl)
-  (eval '(apply clojure.tools.namespace.repl/set-refresh-dirs (get-env :directories)))
-
-  identity)
-
-; Usar esto al conectar al nREPL del frontend para transformarlo en un brepl
-; (in-ns 'boot.user) (start-repl)
+  (task-options! cljs {:optimizations :none :source-map true}
+                 less {:source-map  true})
+  (comp (serve :dir "target" :port 3100)
+        (watch)
+        (notify :visual true :title "App")
+        (refresh)
+        (repl :server true)
+        (reload)
+        (cljs-repl)
+        (build)))
