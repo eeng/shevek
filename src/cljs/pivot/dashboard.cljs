@@ -1,5 +1,6 @@
 (ns pivot.dashboard
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [pivot.i18n :refer [t]]))
 
 (def cubes
   (r/atom [{:name "vtol_stats" :title "VTOL Stats" :description "Estadísticas de uso del sistema VTOL."}
@@ -12,7 +13,7 @@
 
 (defn page []
   [:div
-   [:h1.ui.dividing.header "Cubos de Datos"]
+   [:h1.ui.dividing.header (t :cubes/title)]
    [:div.ui.cards
     (if (seq @cubes)
       (for [[i {:keys [name title description]}] (map-indexed vector @cubes)]
@@ -23,4 +24,4 @@
            [:i.cube.icon {:class (colors i)}]
            [:div.content title]]
           [:div.description description]]])
-      [:div.ui.basic.segment "No hay cubos definidos."])]])
+      [:div.ui.basic.segment (t :cubes/missing)])]])

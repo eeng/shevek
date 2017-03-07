@@ -13,7 +13,8 @@
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]
-                    [cheshire "5.7.0"]]) ; Needed for the :as :json option of clj-http
+                    [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
+                    [tongue "0.1.4"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
