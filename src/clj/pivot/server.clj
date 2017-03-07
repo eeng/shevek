@@ -1,6 +1,12 @@
 (ns pivot.server
-  (:require [mount.core :refer [defstate]]))
+  (:require [mount.core :refer [defstate]]
+            [org.httpkit.server :refer [run-server]]))
+
+(defn app [req]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "hello HTTP!"})
 
 (defstate web-server
-  :start (do (println ">>> starting web server") :started)
-  :stop (do (println "<<< stopping web server") :stopped))
+  :start (run-server app {:port 8080})
+  :stop (web-server :timeout 100))

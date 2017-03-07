@@ -16,7 +16,8 @@
                     [clj-http "2.3.0"]
                     [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
                     [tongue "0.1.4"]
-                    [mount "0.1.11"]])
+                    [mount "0.1.11"]
+                    [http-kit "2.2.0"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
