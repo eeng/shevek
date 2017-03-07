@@ -11,6 +11,8 @@
                     [adzerk/boot-cljs-repl "0.3.3"]
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [samestep/boot-refresh "0.1.0" :scope "test"]
+                    [environ "1.1.0"]
+                    [boot-environ "1.1.0"]
                     [proto-repl "0.3.1"]
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]
@@ -20,12 +22,13 @@
                     [http-kit "2.2.0"]])
 
 (require
- '[adzerk.boot-cljs      :refer [cljs]]
+ '[adzerk.boot-cljs :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
- '[adzerk.boot-reload    :refer [reload]]
- '[pandeiro.boot-http    :refer [serve]]
- '[deraen.boot-less      :refer [less]]
- '[samestep.boot-refresh :refer [refresh]])
+ '[adzerk.boot-reload :refer [reload]]
+ '[pandeiro.boot-http :refer [serve]]
+ '[deraen.boot-less :refer [less]]
+ '[samestep.boot-refresh :refer [refresh]]
+ '[environ.boot :refer [environ]])
 
 (deftask run
   "Run the -main function in some namespace with arguments."
@@ -50,7 +53,7 @@
   (set-env! :source-paths #(conj % "dev/clj"))
   (task-options! cljs {:optimizations :none :source-map true}
                  less {:source-map  true})
-  (comp (serve :dir "target" :port 3100)
+  (comp (environ :env {:http-port "3100"})
         (watch)
         (notify :visual true :title "App")
         (refresh)
@@ -62,6 +65,17 @@
 (deftask dev-run
   "Runs the app in development mode, without code reloading."
   []
-  (comp (build)
+  (comp (environ :env {:http-port "3101"})
+        (build)
+        (run :main-namespace "pivot.app")
+        (wait)))
+
+(deftask dev-run
+  "Runs the app in development mode, without code reloading."
+  []
+  (task-options! cljs {:optimizations :advanced :source-map false}
+                 less {:source-map  false})
+  (comp (environ :env {:http-port "3101"})
+        (build)
         (run :main-namespace "pivot.app")
         (wait)))
