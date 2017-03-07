@@ -1,16 +1,16 @@
 (set-env!
-  :source-paths   #{"src/clj" "src/cljs" "src/less"}
+  :source-paths   #{"src/clj" "src/cljs" "src/less" "test/clj"}
   :resource-paths #{"resources"}
   :dependencies   '[[org.clojure/clojurescript "1.9.494"]
-                    [adzerk/boot-cljs "1.7.228-2"]
-                    [pandeiro/boot-http "0.7.0"]
-                    [adzerk/boot-reload "0.5.1"]
+                    [adzerk/boot-cljs "1.7.228-2" :scope "test"]
+                    [adzerk/boot-reload "0.5.1" :scope "test"]
                     [com.cemerick/piggieback "0.2.1" :scope "test"] ; Needed by boot-cljs-repl
                     [weasel "0.7.0" :scope "test"] ; Needed by boot-cljs-repl
                     [org.clojure/tools.nrepl "0.2.12" :scope "test"] ; Needed by boot-cljs-repl
-                    [adzerk/boot-cljs-repl "0.3.3"]
+                    [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [samestep/boot-refresh "0.1.0" :scope "test"]
+                    [metosin/boot-alt-test "0.3.0" :scope "test"]
                     [proto-repl "0.3.1"]
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]
@@ -26,9 +26,9 @@
  '[adzerk.boot-cljs :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload :refer [reload]]
- '[pandeiro.boot-http :refer [serve]]
  '[deraen.boot-less :refer [less]]
- '[samestep.boot-refresh :refer [refresh]])
+ '[samestep.boot-refresh :refer [refresh]]
+ '[metosin.boot-alt-test :refer [alt-test]])
 
 (deftask run
   "Run the -main function in some namespace with arguments."
