@@ -15,7 +15,8 @@
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]
                     [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
-                    [tongue "0.1.4"]])
+                    [tongue "0.1.4"]
+                    [mount "0.1.11"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
@@ -34,6 +35,7 @@
 (deftask dev
   "Starts the application in development mode."
   []
+  (set-env! :source-paths #(conj % "dev/clj"))
   (task-options! cljs {:optimizations :none :source-map true}
                  less {:source-map  true})
   (comp (serve :dir "target" :port 3100)
