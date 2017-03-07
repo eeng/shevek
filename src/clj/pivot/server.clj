@@ -2,15 +2,7 @@
   (:require [mount.core :refer [defstate]]
             [org.httpkit.server :refer [run-server]]
             [pivot.config :refer [env]]
-            [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
-            [compojure.core :refer [defroutes GET]]
-            [compojure.route :refer [files not-found]]))
-
-(defroutes app-routes
-  (GET "/" [] "Res"))
-
-; TODO no se si hará falta el wrap-defaults
-(def app (wrap-defaults app-routes site-defaults))
+            [pivot.handler :refer [app]]))
 
 ; TODO reemplazar el println x logging
 (defn start-web-server [port]
