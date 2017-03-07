@@ -18,7 +18,9 @@
                     [tongue "0.1.4"]
                     [mount "0.1.11"]
                     [http-kit "2.2.0"]
-                    [cprop "0.1.10"]])
+                    [cprop "0.1.10"]
+                    [ring/ring-defaults "0.2.3"]
+                    [compojure "1.5.2"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

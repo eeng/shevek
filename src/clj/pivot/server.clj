@@ -1,12 +1,16 @@
 (ns pivot.server
   (:require [mount.core :refer [defstate]]
             [org.httpkit.server :refer [run-server]]
-            [pivot.config :refer [env]]))
+            [pivot.config :refer [env]]
+            [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
+            [compojure.core :refer [defroutes GET]]
+            [compojure.route :refer [files not-found]]))
 
-(defn app [req]
-  {:status  200
-   :headers {"Content-Type" "text/html"}
-   :body    "hello HTTP!"})
+(defroutes app-routes
+  (GET "/" [] "Res"))
+
+; TODO no se si hará falta el wrap-defaults
+(def app (wrap-defaults app-routes site-defaults))
 
 ; TODO reemplazar el println x logging
 (defn start-web-server [port]

@@ -3,6 +3,7 @@
 
 (def broker "http://kafka:8082/druid/v2")
 
+; TODO http-kit viene con un client, ver si no se puede usar para no tener q agregar otra dependencia
 (defn datasources [host]
   (:body (http/get (str host "/datasources") {:as :json})))
 
