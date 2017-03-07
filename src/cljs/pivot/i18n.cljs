@@ -10,10 +10,10 @@
             :missing "There aren't any data cubes defined."}}
    :es
    {:menu {:logout "Salir"}
-    :dashboard {:menu "Dashboard"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
-            :missing "No hay cubos definidos."}}})
+            :missing "No hay cubos definidos."}}
+   :tongue/fallback :en})
 
 ; TODO reemplazar aquí :en con algún dato de la UI y/o del browser
 (def t (partial (tongue/build-translate translations) :en))
