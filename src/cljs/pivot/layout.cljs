@@ -5,9 +5,9 @@
   [:div
    [:div.ui.fixed.inverted.menu
     [:div.ui.container
-      [:a.item {:href "#"} "Dashboard"]
-      [:a.item {:href "#"} (t :cubes/menu)]
+      [:a.item {:href "#"} [:i.block.layout.icon] (t :dashboard/menu)]
+      [:a.item {:href "#"} [:i.cubes.icon] (t :cubes/menu)]
       [:div.right.menu
-       [:a.item {:href "#"} (t :menu/logout)]]]]
+       [:a.item {:href "#"} [:i.sign.out.icon] (t :menu/logout)]]]]
    [:div.ui.page.container
     [page]]])

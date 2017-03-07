@@ -4,11 +4,13 @@
 (def translations
   {:en
    {:menu {:logout "Logout"}
+    :dashboard {:menu "Dashboard"}
     :cubes {:title "Data Cubes"
             :menu "Cubes"
             :missing "There aren't any data cubes defined."}}
    :es
    {:menu {:logout "Salir"}
+    :dashboard {:menu "Dashboard"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
             :missing "No hay cubos definidos."}}})
