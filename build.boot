@@ -20,7 +20,8 @@
                     [http-kit "2.2.0"]
                     [cprop "0.1.10"]
                     [ring/ring-defaults "0.2.3"]
-                    [compojure "1.5.2"]])
+                    [compojure "1.5.2"]
+                    [se.haleby/stub-http "0.2.1"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

@@ -1,15 +1,16 @@
 (ns pivot.druid
   (:require [clj-http.client :as http]))
 
-(def broker "http://kafka:8082/druid/v2")
+(def broker "http://kafka:8082")
 
 ; TODO http-kit viene con un client, ver si no se puede usar para no tener q agregar otra dependencia
 (defn datasources [host]
-  (:body (http/get (str host "/datasources") {:as :json})))
+  (->> (http/get (str host "/druid/v2/datasources") {:as :json})
+       :body (map (fn [name] {:name name}))))
 
 ; TODO en el :context de la q se le puede pasar un timeout
 (defn- query [host q]
-  (:body (http/post (str host "/") {:content-type :json :form-params q :as :json})))
+  (:body (http/post (str host "/druid/v2/") {:content-type :json :form-params q :as :json})))
 
 ; TODO candidata a memoizar no?
 (defn- segment-metadata-query [host datasource]
