@@ -1,0 +1,2 @@
+{:port 3100
+ :nrepl-port 3101}

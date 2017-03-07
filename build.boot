@@ -11,15 +11,14 @@
                     [adzerk/boot-cljs-repl "0.3.3"]
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [samestep/boot-refresh "0.1.0" :scope "test"]
-                    [environ "1.1.0"]
-                    [boot-environ "1.1.0"]
                     [proto-repl "0.3.1"]
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]
                     [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
                     [tongue "0.1.4"]
                     [mount "0.1.11"]
-                    [http-kit "2.2.0"]])
+                    [http-kit "2.2.0"]
+                    [cprop "0.1.10"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
@@ -27,8 +26,7 @@
  '[adzerk.boot-reload :refer [reload]]
  '[pandeiro.boot-http :refer [serve]]
  '[deraen.boot-less :refer [less]]
- '[samestep.boot-refresh :refer [refresh]]
- '[environ.boot :refer [environ]])
+ '[samestep.boot-refresh :refer [refresh]])
 
 (deftask run
   "Run the -main function in some namespace with arguments."
@@ -47,13 +45,16 @@
         (sift :move {#"app.css" "css/app.css" #"app.main.css.map" "css/app.main.css.map"})
         (target)))
 
-(deftask dev
-  "Runs the application in development mode with automatic code reloading."
-  []
+(deftask dev-config []
   (set-env! :source-paths #(conj % "dev/clj"))
   (task-options! cljs {:optimizations :none :source-map true}
                  less {:source-map  true})
-  (comp (environ :env {:http-port "3100"})
+  identity)
+
+(deftask dev
+  "Runs the application in development mode with REPL and automatic code reloading."
+  []
+  (comp (dev-config)
         (watch)
         (notify :visual true :title "App")
         (refresh)
@@ -63,19 +64,9 @@
         (build)))
 
 (deftask dev-run
-  "Runs the app in development mode, without code reloading."
+  "Runs the app in development mode, without REPL and code reloading."
   []
-  (comp (environ :env {:http-port "3101"})
-        (build)
-        (run :main-namespace "pivot.app")
-        (wait)))
-
-(deftask dev-run
-  "Runs the app in development mode, without code reloading."
-  []
-  (task-options! cljs {:optimizations :advanced :source-map false}
-                 less {:source-map  false})
-  (comp (environ :env {:http-port "3101"})
+  (comp (dev-config)
         (build)
         (run :main-namespace "pivot.app")
         (wait)))
