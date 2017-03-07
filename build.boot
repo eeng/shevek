@@ -27,6 +27,17 @@
  '[deraen.boot-less      :refer [less]]
  '[samestep.boot-refresh :refer [refresh]])
 
+(deftask run
+  "Run the -main function in some namespace with arguments."
+  [m main-namespace NAMESPACE str   "The namespace containing a -main function to invoke."
+   a arguments      EXPR      [edn] "An optional argument sequence to apply to the -main function."]
+  (with-pre-wrap fs
+    (require (symbol main-namespace) :reload)
+    (if-let [f (resolve (symbol main-namespace "-main"))]
+      (apply f arguments)
+      (throw (ex-info "No -main method found" {:main-namespace main-namespace})))
+    fs))
+
 (deftask build []
   (comp (cljs)
         (less)
@@ -34,7 +45,7 @@
         (target)))
 
 (deftask dev
-  "Starts the application in development mode."
+  "Runs the application in development mode with automatic code reloading."
   []
   (set-env! :source-paths #(conj % "dev/clj"))
   (task-options! cljs {:optimizations :none :source-map true}
@@ -47,3 +58,10 @@
         (reload)
         (cljs-repl)
         (build)))
+
+(deftask dev-run
+  "Runs the app in development mode, without code reloading."
+  []
+  (comp (build)
+        (run :main-namespace "pivot.app")
+        (wait)))

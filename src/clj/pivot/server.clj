@@ -8,5 +8,5 @@
    :body    "hello HTTP!"})
 
 (defstate web-server
-  :start (run-server app {:port 8080})
+  :start (run-server app {:port 3100})
   :stop (web-server :timeout 100))
