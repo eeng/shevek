@@ -7,17 +7,20 @@
 
 #_(def cubes (r/atom []))
 
+(defonce colors ["blue" "orange" "green" "olive" "teal" "red"
+                 "purple" "yellow" "violet" "brown" "pink" "grey"])
+
 (defn page []
   [:div
    [:h1.ui.dividing.header "Cubos de Datos"]
    [:div.ui.cards
     (if (seq @cubes)
-      (for [{:keys [name title description]} @cubes]
-        ^{:key name}
+      (for [[i {:keys [name title description]}] (map-indexed vector @cubes)]
+        ^{:key i}
         [:a.card {:href (str "/cubes/" name)}
          [:div.content
           [:div.ui.header
-           [:i.cube.blue.icon]
+           [:i.cube.icon {:class (colors i)}]
            [:div.content title]]
           [:div.description description]]])
       [:div.ui.basic.segment "No hay cubos definidos."])]])
