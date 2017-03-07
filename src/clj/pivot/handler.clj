@@ -5,9 +5,9 @@
             [clojure.java.io :as io]))
 
 (defroutes app-routes
-  (GET "/" [] "Res")
+  (GET "/" [] (-> "public/index.html" io/resource slurp))
   (resources "/")
-  (not-found (-> "404.html" io/resource slurp)))
+  (not-found (-> "public/404.html" io/resource slurp)))
 
 ; TODO no se si hará falta el wrap-defaults
 (def app (wrap-defaults app-routes site-defaults))

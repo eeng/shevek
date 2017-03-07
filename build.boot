@@ -44,7 +44,7 @@
 (deftask build []
   (comp (cljs)
         (less)
-        (sift :move {#"app.css" "css/app.css" #"app.main.css.map" "css/app.main.css.map"})
+        (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (target)))
 
 (deftask dev-config []

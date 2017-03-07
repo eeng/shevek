@@ -4,3 +4,4 @@
 /.lein-*
 /.nrepl-*
 /out
+.DS_Store
