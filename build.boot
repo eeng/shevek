@@ -67,9 +67,16 @@
         (build)))
 
 (deftask dev-run
-  "Runs the app in development mode, without REPL and code reloading."
+  "Runs the application in development mode, without REPL and code reloading."
   []
   (comp (dev-config)
         (build)
         (run :main-namespace "pivot.app")
         (wait)))
+
+(deftask testing
+  "Continuos automatic testing."
+  []
+  (set-env! :resource-paths #(conj % "test/resources"))
+  (comp (dev)
+        (alt-test)))

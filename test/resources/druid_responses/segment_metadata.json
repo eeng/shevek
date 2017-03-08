@@ -1,0 +1,52 @@
+[
+  {
+    "id": "wikiticker_2015-09-12T00:00:00.000Z_2015-09-13T00:00:00.000Z_2017-03-06T17:19:18.522Z",
+    "intervals": null,
+    "columns": {
+      "__time": {
+        "type": "LONG",
+        "hasMultipleValues": false,
+        "size": 0,
+        "cardinality": null,
+        "minValue": null,
+        "maxValue": null,
+        "errorMessage": null
+      },
+      "cityName": {
+        "type": "STRING",
+        "hasMultipleValues": false,
+        "size": 0,
+        "cardinality": 0,
+        "minValue": null,
+        "maxValue": null,
+        "errorMessage": null
+      },
+      "countryName": {
+        "type": "STRING",
+        "hasMultipleValues": false,
+        "size": 0,
+        "cardinality": 0,
+        "minValue": null,
+        "maxValue": null,
+        "errorMessage": null
+      }
+    },
+    "size": 0,
+    "numRows": 39244,
+    "aggregators": {
+      "added": {
+        "type": "longSum",
+        "name": "added",
+        "fieldName": "added"
+      },
+      "count": {
+        "type": "longSum",
+        "name": "count",
+        "fieldName": "count"
+      }
+    },
+    "timestampSpec": null,
+    "queryGranularity": null,
+    "rollup": null
+  }
+]
