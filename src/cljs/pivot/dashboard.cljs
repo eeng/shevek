@@ -1,6 +1,10 @@
 (ns pivot.dashboard
   (:require [reagent.core :as r]
-            [pivot.i18n :refer [t]]))
+            [pivot.i18n :refer [t]]
+            [ajax.core :refer [POST]]))
+
+(POST "/rpc" {:params {:a 1 :b "str" :c [2 3]}
+              :handler #(println (str %))})
 
 (def cubes
   (r/atom [{:name "vtol_stats" :title "VTOL Stats" :description "Estadísticas de uso del sistema VTOL."}
