@@ -1,13 +1,14 @@
-(ns reflow.handlers)
+(ns reflow.handlers
+  (:require [reflow.utils :refer [log]]))
 
 (defn identity-handler [state _]
   state)
 
 (defn logging-handler [handler]
   (fn [state event]
-    (println "> Firing event" event "with state" state)
+    (log "> Firing event" event "with state" state)
     (let [new-state (handler state event)]
-      (println "< Ending event" event "with state" new-state)
+      (log "< Ending event" event "with state" new-state)
       new-state)))
 
 (defn recording-handler [handler]
