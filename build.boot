@@ -1,5 +1,5 @@
 (set-env!
-  :source-paths   #{"src/clj" "src/cljs" "src/less" "test/clj"}
+  :source-paths   #{"src/clj" "src/cljs" "src/less"}
   :resource-paths #{"resources"}
   :dependencies   '[[org.clojure/clojurescript "1.9.494"]
                     [adzerk/boot-cljs "1.7.228-2" :scope "test"]
@@ -78,6 +78,7 @@
 (deftask testing
   "Continuos automatic testing."
   []
-  (set-env! :resource-paths #(conj % "test/resources"))
+  (set-env! :source-paths #(conj % "test/clj")
+            :resource-paths #(conj % "test/resources"))
   (comp (dev)
         (alt-test)))
