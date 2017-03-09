@@ -63,7 +63,6 @@
         (watch)
         (notify :visual true :title "App")
         (refresh)
-        (repl :server true)
         (reload :asset-path "public")
         (cljs-repl)
         (build)))
