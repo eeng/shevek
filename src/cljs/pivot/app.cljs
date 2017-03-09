@@ -3,8 +3,7 @@
             [pivot.layout :refer [layout]]
             [pivot.dashboard :as dashboard]))
 
-(enable-console-print!)
-
 (defn init []
+  (enable-console-print!)
   (r/render-component [layout dashboard/page]
                       (.getElementById js/document "app")))
