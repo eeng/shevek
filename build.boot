@@ -11,6 +11,8 @@
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [samestep/boot-refresh "0.1.0" :scope "test"]
                     [metosin/boot-alt-test "0.3.0" :scope "test"]
+                    [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
+                    [doo "0.1.7" :scope "test"] ; Needed by boot-cljs-test
                     [proto-repl "0.3.1"]
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]
@@ -31,7 +33,8 @@
  '[adzerk.boot-reload :refer [reload]]
  '[deraen.boot-less :refer [less]]
  '[samestep.boot-refresh :refer [refresh]]
- '[metosin.boot-alt-test :refer [alt-test]])
+ '[metosin.boot-alt-test :refer [alt-test]]
+ '[crisptrutski.boot-cljs-test :refer [test-cljs]])
 
 (deftask run
   "Run the -main function in some namespace with arguments."
@@ -51,7 +54,7 @@
         (target)))
 
 (deftask dev-config []
-  (set-env! :source-paths #(conj % "dev/clj"))
+  (merge-env! :source-paths #{"dev/clj"})
   (task-options! cljs {:optimizations :none :source-map true}
                  less {:source-map  true})
   identity)
@@ -75,10 +78,18 @@
         (run :main-namespace "pivot.app")
         (wait)))
 
-(deftask testing
-  "Continuos automatic testing."
+(deftask clj-testing
+  "Continuos automatic testing of the backend."
   []
-  (set-env! :source-paths #(conj % "test/clj")
-            :resource-paths #(conj % "test/resources"))
+  (merge-env! :source-paths #{"test/clj"}
+              :resource-paths #{"test/resources"})
   (comp (dev)
         (alt-test)))
+
+(deftask cljs-testing
+  "Continuos automatic testing of the frontend."
+  []
+  (merge-env! :source-paths #{"test/cljs"}
+              :resource-paths #{"test/resources"})
+  (comp (dev)
+        (test-cljs)))
