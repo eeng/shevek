@@ -2,7 +2,6 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan put! <!]]
             [reagent.core :as r]
-            [reflow.handlers :refer [identity-handler]]
             [reflow.utils :refer [log]]))
 
 (def ^:private events (chan))
@@ -23,5 +22,5 @@
         (recur new-state)))))
 
 (defn init [handler]
-  (log "Initializing reflow event loop...")
+  (log "Initializing reflow event loop")
   (start-coordinator app-state handler))

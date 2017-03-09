@@ -13,4 +13,11 @@
 
 (defn recording-handler [handler]
   (fn [state event]
-    (update state :events (fnil conj []) event)))
+    (log "Recording event" event)
+    (-> (handler state event)
+        (update :recorded-events (fnil conj []) event))))
+
+(defn router [event-handlers]
+  (fn [state [eid _ :as event]]
+    (when-let [handler (event-handlers eid)]
+      (handler state event))))
