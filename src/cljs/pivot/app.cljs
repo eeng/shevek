@@ -3,7 +3,7 @@
             [pivot.layout :refer [layout]]
             [pivot.dashboard :as dashboard]
             [reflow.core :as reflow :refer [dispatch]]
-            [reflow.handlers :refer [router logging-handler recording-handler]]))
+            [reflow.interceptors :as i]))
 
 (defn test-page []
   [:div
@@ -16,8 +16,8 @@
 
 (defn init []
   (enable-console-print!)
-  (reflow/init (-> (router event-handlers)
-                   (recording-handler)
-                   (logging-handler)))
+  (reflow/init (-> (i/router event-handlers)
+                   (i/recorder)
+                   (i/logger)))
   (r/render-component [layout test-page]
                       (.getElementById js/document "app")))
