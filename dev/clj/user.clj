@@ -16,3 +16,6 @@
   []
   (stop)
   (tn/refresh :after 'user/start))
+
+; Para transformar el REPL en bREPL:
+; (in-ns 'boot.user) (start-repl)
