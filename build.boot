@@ -12,6 +12,8 @@
                     [samestep/boot-refresh "0.1.0" :scope "test"]
                     [metosin/boot-alt-test "0.3.0" :scope "test"]
                     [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
+                    [binaryage/devtools "0.9.2" :scope "test"]
+                    [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
                     [doo "0.1.7" :scope "test"] ; Needed by boot-cljs-test
                     [proto-repl "0.3.1"]
                     [reagent "0.6.0"]
@@ -34,7 +36,8 @@
  '[deraen.boot-less :refer [less]]
  '[samestep.boot-refresh :refer [refresh]]
  '[metosin.boot-alt-test :refer [alt-test]]
- '[crisptrutski.boot-cljs-test :refer [test-cljs]])
+ '[crisptrutski.boot-cljs-test :refer [test-cljs]]
+ '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]])
 
 (deftask run
   "Run the -main function in some namespace with arguments."
@@ -68,6 +71,7 @@
         (refresh)
         (reload :asset-path "public")
         (cljs-repl)
+        (cljs-devtools)
         (build)))
 
 (deftask dev-run
