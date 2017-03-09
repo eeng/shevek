@@ -11,6 +11,15 @@
 (defn load-cubes []
   (rpc/call "handler/get-cubes" :handler #(reset! cubes %)))
 
+(defn- cube-card [i {:keys [name title description]}]
+  ^{:key i}
+  [:a.card {:href (str "/cubes/" name)}
+   [:div.content
+    [:div.ui.header
+     [:i.cube.icon {:class (colors i)}]
+     [:div.content title]]
+    [:div.description description]]])
+
 (defn page []
   (load-cubes)
   (fn []
@@ -18,12 +27,5 @@
      [:h1.ui.dividing.header (t :cubes/title)]
      [:div.ui.cards
       (if @cubes
-        (for [[i {:keys [name title description]}] (map-indexed vector @cubes)]
-          ^{:key i}
-          [:a.card {:href (str "/cubes/" name)}
-           [:div.content
-            [:div.ui.header
-             [:i.cube.icon {:class (colors i)}]
-             [:div.content title]]
-            [:div.description description]]])
+        (map-indexed cube-card @cubes)
         [:div.ui.basic.segment (t :cubes/missing)])]]))
