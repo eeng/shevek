@@ -23,7 +23,6 @@
 
 (defn init []
   (enable-console-print!)
-  (reflow/init (-> (i/router)
-                   (i/logger)))
+  (reflow/init (-> (i/router) (i/logger)))
   (r/render-component [layout test-page]
                       (.getElementById js/document "app")))
