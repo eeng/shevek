@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan put! <!]]
             [reagent.core :as r]
-            [reflow.utils :refer [log]]))
+            [reflow.utils :refer [log]]
+            [reflow.interceptors :as i]))
 
 (defonce events (chan))
 (defonce app-db (r/atom {}))
@@ -11,6 +12,8 @@
 (defn dispatch [eid & args]
   {:pre [(keyword? eid)]}
   (put! events (into [eid] args)))
+
+(def register-event-handler i/register-event-handler)
 
 (defn- start-coordinator [app-db handler]
   (go-loop [actual-db @app-db]

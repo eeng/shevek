@@ -2,7 +2,6 @@
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch db]]
-            [reflow.interceptors]
             [pivot.i18n :refer [t]]
             [pivot.rpc :as rpc]))
 
