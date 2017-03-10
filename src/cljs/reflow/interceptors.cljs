@@ -1,11 +1,16 @@
 (ns reflow.interceptors
-  (:require [reflow.utils :refer [log]]))
+  (:require [reflow.utils :refer [log]]
+            [clojure.data :as data]))
 
 (defn logger [interceptor]
   (fn [db event]
-    (log "> Firing event" event "with db" db)
-    (let [new-db (interceptor db event)]
-      (log "< Ending event" event "with db" new-db)
+    (log "Handling event" event)
+    (let [new-db (interceptor db event)
+          [only-before only-after] (data/diff db new-db)
+          db-changed? (or (some? only-before) (some? only-after))]
+      (if db-changed?
+        (log "Finished event" event "with changes: only before" only-before "only after" only-after)
+        (log "Finished event" event "with no changes."))
       new-db)))
 
 (defn recorder [interceptor]
@@ -16,5 +21,6 @@
 
 (defn router [event-handlers]
   (fn [db [eid _ :as event]]
-    (when-let [interceptor (event-handlers eid)]
+    (let [interceptor (event-handlers eid)]
+      (assert interceptor (str "No handler found for event " eid))
       (interceptor db event))))

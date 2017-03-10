@@ -8,16 +8,18 @@
 (defn test-page []
   [:div
    [:a {:on-click #(dispatch :add-todo "TODO")} "Add todo"]
-   [:a {:on-click #(dispatch :send-rocket)} "Send rocket"]])
+   [:a {:on-click #(dispatch :send-rocket)} "Send rocket"]
+   [:a {:on-click #(dispatch :no-changes)} "No changes"]])
 
 (def event-handlers
-  {:add-todo (fn [state [_ todo]] (update state :todos conj todo))
-   :send-rocket (fn [state _] (update state :rocket-sent not))})
+  {:add-todo (fn [db [_ todo]] (update db :todos conj todo))
+   :send-rocket (fn [db _] (update db :rocket-sent not))
+   :no-changes (fn [db _] db)})
 
 (defn init []
   (enable-console-print!)
   (reflow/init (-> (i/router event-handlers)
-                   (i/recorder)
+                  ;  (i/recorder)
                    (i/logger)))
   (r/render-component [layout test-page]
                       (.getElementById js/document "app")))
