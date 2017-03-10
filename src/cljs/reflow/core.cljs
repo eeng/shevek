@@ -1,12 +1,11 @@
 (ns reflow.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan put! <!]]
-            [reagent.core :as r]
+            [reflow.db :refer [app-db]]
             [reflow.utils :refer [log]]
             [reflow.interceptors :as i]))
 
 (defonce events (chan))
-(defonce app-db (r/atom {}))
 (defonce coordinator (atom nil))
 
 (defn dispatch [eid & args]
@@ -33,9 +32,3 @@
     (dispatch :shutdown))
   (log "Starting reflow coordinator")
   (reset! coordinator (start-coordinator app-db handler)))
-
-(defn debug-db []
-  [:pre (with-out-str (cljs.pprint/pprint @app-db))])
-
-(defn db [& ks]
-  (get-in @app-db ks))

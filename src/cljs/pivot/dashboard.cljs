@@ -1,7 +1,8 @@
 (ns pivot.dashboard
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
-            [reflow.core :refer [dispatch db]]
+            [reflow.core :refer [dispatch]]
+            [reflow.db :as db]
             [pivot.i18n :refer [t]]
             [pivot.rpc :as rpc]))
 
@@ -30,6 +31,6 @@
     [:div
      [:h1.ui.dividing.header (t :cubes/title)]
      [:div.ui.cards
-      (if (db :cubes)
-        (map-indexed cube-card (db :cubes))
+      (if (db/get :cubes)
+        (map-indexed cube-card (db/get :cubes))
         [:div.ui.basic.segment (t :cubes/missing)])]]))
