@@ -19,8 +19,13 @@
     (-> (interceptor db event)
         (update :recorded-events (fnil conj []) event))))
 
-(defn router [event-handlers]
+(def ^:private event-handlers (atom {}))
+
+(defn register-event-handler [eid fn]
+  (swap! event-handlers assoc eid fn))
+
+(defn router []
   (fn [db [eid _ :as event]]
-    (let [interceptor (event-handlers eid)]
+    (let [interceptor (@event-handlers eid)]
       (assert interceptor (str "No handler found for event " eid))
       (interceptor db event))))
