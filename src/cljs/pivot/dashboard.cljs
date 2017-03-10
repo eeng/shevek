@@ -1,15 +1,20 @@
 (ns pivot.dashboard
+  (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
+            [reflow.core :refer [dispatch db]]
+            [reflow.interceptors]
             [pivot.i18n :refer [t]]
             [pivot.rpc :as rpc]))
 
 (defonce colors ["blue" "orange" "green" "olive" "teal" "red"
                  "purple" "yellow" "violet" "brown" "pink" "grey"])
 
-(defonce cubes (r/atom nil))
+(defevh :load-cubes [db]
+  (rpc/call "handler/get-cubes" :handler #(dispatch :cubes-arrived %))
+  (assoc db :loading? true))
 
-(defn load-cubes []
-  (rpc/call "handler/get-cubes" :handler #(reset! cubes %)))
+(defevh :cubes-arrived [db cubes]
+  (assoc db :loading? false :cubes cubes))
 
 (defn- cube-card [i {:keys [name title description]}]
   ^{:key i}
@@ -21,11 +26,11 @@
     [:div.description description]]])
 
 (defn page []
-  (load-cubes)
+  (dispatch :load-cubes)
   (fn []
     [:div
      [:h1.ui.dividing.header (t :cubes/title)]
      [:div.ui.cards
-      (if @cubes
-        (map-indexed cube-card @cubes)
+      (if (db :cubes)
+        (map-indexed cube-card (db :cubes))
         [:div.ui.basic.segment (t :cubes/missing)])]]))

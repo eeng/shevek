@@ -33,3 +33,6 @@
 
 (defn debug-db []
   [:pre (with-out-str (cljs.pprint/pprint @app-db))])
+
+(defn db [& ks]
+  (get-in @app-db ks))

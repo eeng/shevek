@@ -22,11 +22,11 @@
 
 (def ^:private event-handlers (atom {}))
 
-(defn register-event-handler [eid fn]
-  (swap! event-handlers assoc eid fn))
+(defn register-event-handler [eid handler]
+  (swap! event-handlers assoc eid handler))
 
 (defn router []
-  (fn [db [eid _ :as event]]
+  (fn [db [eid & ev-data :as event]]
     (let [interceptor (@event-handlers eid)]
       (assert interceptor (str "No handler found for event " eid))
-      (interceptor db event))))
+      (apply interceptor db ev-data))))
