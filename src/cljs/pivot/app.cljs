@@ -12,13 +12,15 @@
 (defevh :add-todo [db [_ todo]]
   (update db :todos conj todo))
 
-(defevh :send-rocket [db _]
-  (update db :rocket-sent not))
+(defevh :double-dispatch [db _]
+  (dispatch :no-changes)
+  (update db :flag not))
 
 (defn test-page []
   [:div
+   [reflow/debug-db]
    [:a {:on-click #(dispatch :add-todo "TODO")} "Add todo"]
-   [:a {:on-click #(dispatch :send-rocket)} "Send rocket"]
+   [:a {:on-click #(dispatch :double-dispatch)} "Double dispatch"]
    [:a {:on-click #(dispatch :no-changes)} "No changes"]])
 
 (defn init []
