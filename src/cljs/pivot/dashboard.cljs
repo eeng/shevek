@@ -30,7 +30,9 @@
   (fn []
     [:div
      [:h1.ui.dividing.header (t :cubes/title)]
-     [:div.ui.cards
-      (if (db/get :cubes)
-        (map-indexed cube-card (db/get :cubes))
-        [:div.ui.basic.segment (t :cubes/missing)])]]))
+     (if (db/get :cubes)
+       [:div.ui.cards
+        (if (seq (db/get :cubes))
+          (map-indexed cube-card (db/get :cubes))
+          [:div.ui.basic.segment (t :cubes/missing)])]
+       [:div.ui.active.inline.loader])]))
