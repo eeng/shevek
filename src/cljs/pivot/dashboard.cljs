@@ -23,9 +23,9 @@
     [:div.ui.active.inline.loader]))
 
 (defn page []
-  (dispatch :load-data :cubes "handler/get-cubes")
+  (dispatch :data-requested :cubes "handler/get-cubes")
   (fn []
     [:div.ui.container
-     [page-title (t :cubes/title) (t :cubes/subtitle) "cubes"]
-     [cubes-cards]
-     [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]]))
+     [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]
+     [:h2.ui.dividing.header (t :cubes/title)]
+     [cubes-cards]]))

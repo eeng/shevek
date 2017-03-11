@@ -17,7 +17,7 @@
 (defn loaded [db key]
   (update db :loading disj key))
 
-(defevh :load-data [db db-key fid]
+(defevh :data-requested [db db-key fid]
   (call fid :handler #(dispatch :data-arrived db-key %))
   (loading db db-key))
 
