@@ -20,7 +20,7 @@
   [:div
    [:div.ui.fixed.inverted.menu
     [:div.ui.container
-      [:a.item {:href "/#/"} [:i.block.layout.icon] (t :dashboard/menu)]
+      [:a.item {:href "/#/"} [:i.block.layout.icon] (t :dashboard/title)]
       [:a.item {:href "/#/"} [:i.cubes.icon] (t :cubes/menu)]
       [:div.right.menu
        [:a.item {:href "/#/settings"} [:i.settings.icon] (t :settings/title)]
