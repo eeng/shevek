@@ -3,13 +3,15 @@
 
 (def translations
   {:en
-   {:menu {:logout "Logout"}
+   {:menu {:logout "Logout"
+           :settings "Settings"}
     :dashboard {:menu "Dashboard"}
     :cubes {:title "Data Cubes"
             :menu "Cubes"
             :missing "There aren't any data cubes defined."}}
    :es
-   {:menu {:logout "Salir"}
+   {:menu {:logout "Salir"
+           :settings "Configuración"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
             :missing "No hay cubos definidos."}}
