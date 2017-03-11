@@ -10,8 +10,8 @@
             [only-before only-after] (data/diff db new-db)
             db-changed? (or (some? only-before) (some? only-after))]
         (if db-changed?
-          (log "Finished event" event "with changes: only before" only-before "only after" only-after)
-          (log "Finished event" event "with no changes."))
+          (log "Finished event with changes: before" only-before "after" only-after)
+          (log "Finished event with no changes."))
         new-db))
     interceptor))
 
