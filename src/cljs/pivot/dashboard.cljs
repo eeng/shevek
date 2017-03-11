@@ -7,7 +7,7 @@
 
 (defn- cube-card [i {:keys [name title description]}]
   ^{:key i}
-  [:a.card {:href (str "/cubes/" name)}
+  [:a.card {:href (str "#/cubes/" name)}
    [:div.content
     [:div.ui.header
      [:i.cube.blue.icon]

@@ -6,10 +6,11 @@
             [reflow.db :as db]
             [pivot.rpc :refer [loading?]]
             [pivot.dashboard :as dashboard]
-            [pivot.settings :as settings]))
+            [pivot.settings :as settings]
+            [pivot.cube :as cube]))
 
-(defevh :navigate [db page]
-  (assoc db :page page))
+(defevh :navigate [db page & [params]]
+  (assoc db :page page :params params))
 
 (defroute home-path "/" []
   (dispatch :navigate #'dashboard/page))
@@ -17,15 +18,18 @@
 (defroute settings-path "/settings" []
   (dispatch :navigate #'settings/page))
 
+(defroute cube-path "/cubes/:cube" [cube]
+  (dispatch :navigate #'cube/page {:cube-name cube}))
+
 (defn layout []
   [:div
    [:div.ui.fixed.inverted.menu
     [:div.ui.container
-      [:a.item {:href "/#/"} [:i.block.layout.icon] (t :dashboard/title)]
-      [:a.item {:href "/#/"} [:i.cubes.icon] (t :cubes/menu)]
+      [:a.item {:href "#/"} [:i.block.layout.icon] (t :dashboard/title)]
+      [:a.item {:href "#/cubes/vtol_stats"} [:i.cubes.icon] (t :cubes/menu)]
       [:div.right.menu
        (when (loading?) [:div.item [:i.spinner.loading.icon]])
-       [:a.item {:href "/#/settings"} [:i.settings.icon] (t :settings/title)]
-       [:a.item {:href "/#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]]
+       [:a.item {:href "#/settings"} [:i.settings.icon] (t :settings/title)]
+       [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]]
    [:div.page
     [(db/get :page :div)]]])
