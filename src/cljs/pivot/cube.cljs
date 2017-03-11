@@ -1,15 +1,30 @@
-(ns pivot.cube)
+(ns pivot.cube
+  (:require [pivot.i18n :refer [t]]
+            [reflow.db :as db]
+            [reflow.core :refer [dispatch]]))
+
+(defn panel-header [t-key]
+  [:h2.ui.sub.grey.header (t t-key)])
 
 (defn page []
-  [:div#cube.ui.padded.grid
-   [:div.three.wide.column
-    [:div.ui.segments
-     [:div.ui.segment "Dimensions"]
-     [:div.ui.segment "Measures"]]]
-   [:div#middle-col.ten.wide.column
-    [:div.ui.segments
-     [:div.ui.segment "Filters"]
-     [:div.ui.segment "Split"]]
-    [:div.ui.segment "Content"]]
-   [:div.three.wide.column
-    [:div.ui.segment "Pinned"]]])
+  (let [cube-name (db/get-in [:params :cube-name])]
+    (dispatch :data-requested :dimensions "handler/get-dimensions" cube-name)
+    (dispatch :data-requested :measures "handler/get-measures" cube-name)
+    (fn []
+      [:div#cube
+       [:div.left-column
+        [:div.dimensions-measures.panel
+         [:div.dimensions.section.ui.basic.segment.
+          [panel-header :cubes/dimensions]]
+         [:div.measures.section.ui.basic.segment
+          [panel-header :cubes/measures]]]]
+       [:div.center-column
+        [:div.filters-splits.panel
+         [:div.filters.section
+          [panel-header :cubes/filters]]
+         [:div.section
+          [panel-header :cubes/split]]]
+        [:div.visualization.panel.section "Content"]]
+       [:div.right-column
+        [:div.pinboard.panel.section
+         [panel-header :cubes/pinboard]]]])))

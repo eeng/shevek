@@ -1,3 +1,5 @@
+@import "mixins";
+
 body {
   background-color: #F7F7F7;
 }
@@ -10,9 +12,68 @@ body {
   }
 
   #cube {
-    #middle-col {
+    @lateral-col-width: 250px;
+
+    position: absolute;
+    top: 40px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    .left-column, .center-column, .right-column {
+      top: 0;
+      bottom: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      .panel {
+        background-color: white;
+        .border-radius(3px);
+        .box-shadow(0px 0px 15px 0px rgba(0,0,0,0.07));
+      }
+      .section {
+        padding: 15px;
+        margin: 0;
+      }
+    }
+    .left-column {
+      width: @lateral-col-width;
+      left: 0;
+      .dimensions-measures {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        .dimensions {
+          flex: 71 1 0%;
+        }
+        .measures { flex: 29 1 0%; }
+      }
+    }
+    .center-column {
+      left: @lateral-col-width + 2px;
+      right: @lateral-col-width + 2px;
       padding-left: 0;
       padding-right: 0;
+      .visualization {
+        margin-top: 10px;
+        flex: 1;
+      }
+    }
+    .right-column {
+      width: @lateral-col-width;
+      right: 0px;
+      .pinboard {
+        flex: 1;
+      }
+    }
+    .dimensions, .filters {
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .sub.grey.header {
+      font-weight: normal;
+      color: #949494;
     }
   }
 }

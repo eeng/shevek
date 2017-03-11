@@ -10,7 +10,12 @@
                 :subtitle "Pin here your favorite reports for easy access"}
     :cubes {:title "Data Cubes"
             :menu "Cubes"
-            :missing "There aren't any data cubes defined."}
+            :missing "There aren't any data cubes defined."
+            :dimensions "Dimensions"
+            :measures "Measures"
+            :filters "Filters"
+            :split "Split"
+            :pinboard "Pinboard"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -22,7 +27,10 @@
     :dashboard {:subtitle "Esta sección muestra sus reportes favoritos"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
-            :missing "No hay cubos definidos."}
+            :missing "No hay cubos definidos."
+            :dimensions "Dimensiones"
+            :measures "Métricas"
+            :filters "Filtros"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"

@@ -27,15 +27,14 @@
 (defn layout []
   [:div
    [:div.ui.fixed.inverted.menu
-    [:div.ui.container
-      [:a.item {:href "#/" :class (active? #'dashboard/page)}
-       [:i.block.layout.icon] (t :dashboard/title)]
-      [:a.item {:href "#/cubes/vtol_stats" :class (active? #'cube/page)}
-       [:i.cubes.icon] (t :cubes/menu)]
-      [:div.right.menu
-       (when (loading?) [:div.item [:i.spinner.loading.icon]])
-       [:a.item {:href "#/settings" :class (active? #'settings/page)}
-        [:i.settings.icon] (t :settings/title)]
-       [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]]
+    [:a.item {:href "#/" :class (active? #'dashboard/page)}
+     [:i.block.layout.icon] (t :dashboard/title)]
+    [:a.item {:href "#/cubes/vtol_stats" :class (active? #'cube/page)}
+     [:i.cubes.icon] (t :cubes/menu)]
+    [:div.right.menu
+     (when (loading?) [:div.item [:i.spinner.loading.icon]])
+     [:a.item {:href "#/settings" :class (active? #'settings/page)}
+      [:i.settings.icon] (t :settings/title)]
+     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]
    [:div.page
     [(db/get :page :div)]]])
