@@ -27,7 +27,8 @@
                     [ring-middleware-format "0.7.2"]
                     [compojure "1.5.2"]
                     [se.haleby/stub-http "0.2.1"]
-                    [cljs-ajax "0.5.8"]])
+                    [cljs-ajax "0.5.8"]
+                    [secretary "1.2.3"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

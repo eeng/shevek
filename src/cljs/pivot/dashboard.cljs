@@ -1,7 +1,6 @@
 (ns pivot.dashboard
   (:require-macros [reflow.macros :refer [defevh]])
-  (:require [reagent.core :as r]
-            [reflow.core :refer [dispatch]]
+  (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [pivot.i18n :refer [t]]
             [pivot.rpc :as rpc]))

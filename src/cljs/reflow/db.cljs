@@ -1,6 +1,7 @@
 (ns reflow.db
   (:refer-clojure :exclude [get get-in])
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [cljs.pprint :refer [pprint]]))
 
 (defonce app-db (r/atom {}))
 
@@ -11,4 +12,4 @@
   (clojure.core/get-in @app-db ks))
 
 (defn debug-db []
-  [:pre (with-out-str (cljs.pprint/pprint @app-db))])
+  [:pre (with-out-str (pprint @app-db))])

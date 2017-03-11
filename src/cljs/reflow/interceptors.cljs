@@ -5,7 +5,7 @@
 (defn logger [interceptor]
   (if ^boolean goog.DEBUG
     (fn [db event]
-      (log "Handling event" event)
+      (log "Handling event" event "...")
       (let [new-db (interceptor db event)
             [only-before only-after] (data/diff db new-db)
             db-changed? (or (some? only-before) (some? only-after))]
