@@ -8,9 +8,9 @@
    [:div.content title
     [:div.sub.header subtitle]]])
 
-(defn- dropdown* [coll & [{:keys [placeholder]}]]
+(defn- dropdown* [coll & [{:keys [placeholder selected] :or {selected ""}}]]
   [:div.ui.selection.dropdown
-   [:input {:type "hidden"}]
+   [:input {:type "hidden" :value selected}]
    [:i.dropdown.icon]
    [:div.default.text placeholder]
    [:div.menu
@@ -18,9 +18,8 @@
       ^{:key val}
       [:div.item {:data-value val} title])]])
 
-(defn dropdown [_ & [{:keys [on-change selected] :or {on-change identity selected ""}}]]
+(defn dropdown [_ & [{:keys [on-change] :or {on-change identity}}]]
   (let [bind-events #(-> % dom-node js/$
-                         (.dropdown #js {:onChange on-change})
-                         (.dropdown "set selected" selected))]
+                         (.dropdown #js {:onChange on-change}))]
     (create-class {:reagent-render dropdown*
                    :component-did-mount bind-events})))
