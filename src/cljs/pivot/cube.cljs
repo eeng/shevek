@@ -1,5 +1,6 @@
 (ns pivot.cube
   (:require [pivot.i18n :refer [t]]
+            [pivot.rpc :refer [loading?]]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
 
@@ -14,9 +15,11 @@
       [:div#cube
        [:div.left-column
         [:div.dimensions-measures.panel
-         [:div.dimensions.section.ui.basic.segment.
+         [:div.dimensions.section.ui.basic.segment
+          {:class (when (loading? :dimensions) "loading")}
           [panel-header :cubes/dimensions]]
          [:div.measures.section.ui.basic.segment
+          {:class (when (loading? :measures) "loading")}
           [panel-header :cubes/measures]]]]
        [:div.center-column
         [:div.filters-splits.panel

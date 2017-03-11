@@ -8,8 +8,9 @@
   (POST "/rpc" {:params {:fn fid :args args}
                 :handler handler}))
 
-(defn loading? []
-  (seq (db/get :loading)))
+(defn loading?
+  ([] (seq (db/get :loading)))
+  ([k] (k (db/get :loading))))
 
 (defn loading [db key]
   (update db :loading (fnil conj #{}) key))
