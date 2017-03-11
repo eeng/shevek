@@ -1,11 +1,15 @@
 (ns pivot.rpc
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [ajax.core :refer [POST]]
-            [reflow.core :refer [dispatch]]))
+            [reflow.core :refer [dispatch]]
+            [reflow.db :as db]))
 
 (defn call [fid & {:keys [args handler] :or {args []}}]
   (POST "/rpc" {:params {:fn fid :args args}
                 :handler handler}))
+
+(defn loading? []
+  (seq (db/get :loading)))
 
 (defn loading [db key]
   (update db :loading (fnil conj #{}) key))
