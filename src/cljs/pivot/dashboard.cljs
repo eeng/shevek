@@ -4,22 +4,19 @@
             [pivot.i18n :refer [t]]
             [pivot.rpc]))
 
-(defonce colors ["blue" "orange" "green" "olive" "teal" "red"
-                 "purple" "yellow" "violet" "brown" "pink" "grey"])
-
 (defn- cube-card [i {:keys [name title description]}]
   ^{:key i}
   [:a.card {:href (str "/cubes/" name)}
    [:div.content
     [:div.ui.header
-     [:i.cube.icon {:class (colors i)}]
+     [:i.cube.blue.icon]
      [:div.content title]]
     [:div.description description]]])
 
 (defn page []
   (dispatch :load-data :cubes "handler/get-cubes")
   (fn []
-    [:div
+    [:div.ui.container
      [:h1.ui.dividing.header (t :cubes/title)]
      (if (db/get :cubes)
        [:div.ui.cards

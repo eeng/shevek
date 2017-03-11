@@ -23,7 +23,7 @@
       [:a.item {:href "/#/"} [:i.block.layout.icon] (t :dashboard/menu)]
       [:a.item {:href "/#/"} [:i.cubes.icon] (t :cubes/menu)]
       [:div.right.menu
-       [:a.item {:href "/#/settings"} [:i.settings.icon] (t :menu/settings)]
+       [:a.item {:href "/#/settings"} [:i.settings.icon] (t :settings/title)]
        [:a.item {:href "/#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]]
-   [:div.ui.page.container
+   [:div.page
     [(db/get :page :div)]]])
