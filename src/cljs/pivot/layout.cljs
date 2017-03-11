@@ -26,4 +26,4 @@
        [:a.item {:href "/#/settings"} [:i.settings.icon] (t :menu/settings)]
        [:a.item {:href "/#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]]
    [:div.ui.page.container
-    [(db/get :page #'dashboard/page)]]])
+    [(db/get :page :div)]]])

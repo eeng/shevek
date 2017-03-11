@@ -11,5 +11,5 @@
 (defn get-in [ks]
   (clojure.core/get-in @app-db ks))
 
-(defn debug-db []
+(defn debug []
   [:pre (with-out-str (pprint @app-db))])
