@@ -1,5 +1,6 @@
 (ns pivot.i18n
-  (:require [tongue.core :as tongue]))
+  (:require [tongue.core :as tongue]
+            [reflow.db :as db]))
 
 (def translations
   {:en
@@ -15,6 +16,7 @@
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
                :users "Users"}}
+
    :es
    {:menu {:logout "Salir"
            :settings "Configuración"}
@@ -27,7 +29,10 @@
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"
                :users "Usuarios"}}
+
    :tongue/fallback :en})
 
-; TODO reemplazar aquí :en con algún dato de la UI y/o del browser
-(def t (partial (tongue/build-translate translations) :en))
+(def translate (tongue/build-translate translations))
+
+(defn t [& args]
+  (apply translate (db/get :lang "en") args))
