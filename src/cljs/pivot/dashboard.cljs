@@ -3,11 +3,9 @@
             [reflow.db :as db]
             [pivot.i18n :refer [t]]
             [pivot.components :refer [page-title]]
-            [pivot.rpc]
-            [cuerdas.core :as str]))
+            [pivot.dw :as dw]))
 
-(defn- cube-card [i {:keys [name title description]
-                     :or {title (str/title name) description (t :cubes/no-desc)}}]
+(defn- cube-card [i {:keys [name title description] :or {description (t :cubes/no-desc)}}]
   ^{:key i}
   [:a.card {:href (str "#/cubes/" name)}
    [:div.content
@@ -25,7 +23,7 @@
     [:div.ui.active.inline.loader]))
 
 (defn page []
-  (dispatch :data-requested :cubes "dw/cubes")
+  (dw/fetch-cubes)
   (fn []
     [:div.ui.container
      [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]

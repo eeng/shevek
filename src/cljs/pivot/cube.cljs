@@ -15,7 +15,7 @@
   (some #(when (= (current-cube-name) (:name %)) %)
         (db/get :cubes)))
 
-(defn dimension-item [{:keys [name title cardinality] :or {title (str/title name)}}]
+(defn dimension-item [{:keys [name title cardinality]}]
   ^{:key name}
   [:div.item {:on-click console.log}
    [:i.font.icon] title])
