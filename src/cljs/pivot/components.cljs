@@ -27,7 +27,7 @@
 (defn dropdown [_ & [opts]]
   (make-dropdown opts dropdown*))
 
-(defn checkbox* [label & [{:keys [on-change] :or {on-change identity}}]]
+(defn- checkbox* [label & [{:keys [on-change] :or {on-change identity}}]]
   [:div.ui.checkbox
    [:input {:type "checkbox" :on-change on-change}]
    [:label label]])
@@ -35,3 +35,11 @@
 (defn checkbox []
   (create-class {:reagent-render checkbox*
                  :component-did-mount #(-> % dom-node js/$ .checkbox)}))
+
+(defn- popup* [activator popup-container _]
+  [:div activator popup-container])
+
+(defn popup [_ _ opts]
+  (create-class {:reagent-render popup*
+                 :component-did-mount #(-> % dom-node js/$ (.find ".item")
+                                           (.popup (clj->js (merge {:inline true} opts))))}))

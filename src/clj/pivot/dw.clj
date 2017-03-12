@@ -4,8 +4,8 @@
   [{:name "vtol_stats"
     :title "VTOL Stats"
     :description "Estadísticas de uso del sistema VTOL."
-    :dimensions [{:name "controller" :title "Controller" :cardinality 123}
-                 {:name "action" :title "Action" :cardinality 43}]
+    :dimensions [{:name "controller" :title "Controller" :cardinality 123 :description "Controller del request"}
+                 {:name "action" :title "Action" :cardinality 43 :description "Rails action"}]
     :measures [{:name "requests"}
                {:name "duration"}]}
    {:name "eventos_pedidos"

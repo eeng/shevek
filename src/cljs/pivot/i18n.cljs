@@ -13,8 +13,9 @@
             :missing "There aren't any data cubes defined."
             :dimensions "Dimensions"
             :measures "Measures"
-            :filters "Filters"
+            :filter "Filter"
             :split "Split"
+            :pin "Pin"
             :pinboard "Pinboard"
             :no-desc "No description."}
     :settings {:title "Settings"
@@ -32,7 +33,7 @@
             :missing "No hay cubos definidos."
             :dimensions "Dimensiones"
             :measures "Métricas"
-            :filters "Filtros"
+            :filter "Filtros"
             :no-desc "Sin descripción."}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"

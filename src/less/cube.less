@@ -31,7 +31,7 @@
         margin: 0;
       }
       .items {
-        .item {
+        .item:not(.ui) {
           padding: 5px 15px;
           .icon {
             color: #aaa;
@@ -46,6 +46,9 @@
             background-color: #b2d8a7;
             .icon { color: black; }
           }
+        }
+        .popup {
+          padding: 0;
         }
       }
     }
