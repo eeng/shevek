@@ -6,7 +6,7 @@
             [cuerdas.core :as str]))
 
 (defn panel-header [t-key]
-  [:h2.ui.sub.grey.header (t t-key)])
+  [:h2.ui.sub.header (t t-key)])
 
 (defn current-cube-name []
   (db/get-in [:params :current-cube]))
@@ -20,30 +20,30 @@
   [:div.item {:on-click console.log}
    [:i.font.icon] title])
 
-(defn dimensions-section []
+(defn dimensions-panel []
   (let [dimensions (:dimensions (current-cube))]
-    [:div.dimensions.section.ui.basic.segment
+    [:div.dimensions.panel.ui.basic.segment
      [panel-header :cubes/dimensions]
      [:div.items
       (map dimension-item dimensions)]]))
 
-(defn measures-section []
-  [:div.measures.section.ui.basic.segment
+(defn measures-panel []
+  [:div.measures.panel.ui.basic.segment
    [panel-header :cubes/measures]])
 
 (defn page []
   [:div#cube
    [:div.left-column
-    [:div.dimensions-measures.panel
-     [dimensions-section]
-     [measures-section]]]
+    [:div.dimensions-measures.zone
+     [dimensions-panel]
+     [measures-panel]]]
    [:div.center-column
-    [:div.filters-splits.panel
-     [:div.filters.section
+    [:div.filters-splits.zone
+     [:div.filters.panel
       [panel-header :cubes/filters]]
-     [:div.section
+     [:div.panel
       [panel-header :cubes/split]]]
-    [:div.visualization.panel.section "Content"]]
+    [:div.visualization.zone.panel "Content"]]
    [:div.right-column
-    [:div.pinboard.panel.section
+    [:div.pinboard.zone.panel
      [panel-header :cubes/pinboard]]]])
