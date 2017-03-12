@@ -28,7 +28,8 @@
                     [compojure "1.5.2"]
                     [se.haleby/stub-http "0.2.1"]
                     [cljs-ajax "0.5.8"]
-                    [secretary "1.2.3"]])
+                    [secretary "1.2.3"]
+                    [funcool/cuerdas "2.0.3"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

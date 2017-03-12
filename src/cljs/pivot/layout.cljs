@@ -8,7 +8,8 @@
             [pivot.components :refer [make-dropdown]]
             [pivot.dashboard :as dashboard]
             [pivot.settings :as settings]
-            [pivot.cube :as cube]))
+            [pivot.cube :as cube]
+            [cuerdas.core :as str]))
 
 (defevh :navigate [db page & [params]]
   (assoc db :page page :params params))
@@ -25,16 +26,17 @@
 (defn active? [page]
   (when (= (db/get :page) page) "active"))
 
+; TODO hay varios lugares donde tengo que hacer el str/title si no tiene el cube. Ver como refactorizar
 (defn cubes-menu []
   (let [cube-name (cube/current-cube-name)
-        cube-title (:title (cube/current-cube))]
+        cube-title (get (cube/current-cube) :title (str/title cube-name))]
     [make-dropdown {}
      [:div.ui.dropdown.item
       [:i.cubes.icon]
       [:div.text (or cube-title (t :cubes/menu))]
       [:i.dropdown.icon]
       [:div.menu
-       (for [{:keys [name title]} (db/get :cubes)]
+       (for [{:keys [name title] :or {title (str/title name)}} (db/get :cubes)]
          ^{:key name}
          [:a.item {:href (str "#/cubes/" name)
                    :class (when (= cube-name name) "active")}

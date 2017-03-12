@@ -3,9 +3,11 @@
             [reflow.db :as db]
             [pivot.i18n :refer [t]]
             [pivot.components :refer [page-title]]
-            [pivot.rpc]))
+            [pivot.rpc]
+            [cuerdas.core :as str]))
 
-(defn- cube-card [i {:keys [name title description]}]
+(defn- cube-card [i {:keys [name title description]
+                     :or {title (str/title name) description (t :cubes/no-desc)}}]
   ^{:key i}
   [:a.card {:href (str "#/cubes/" name)}
    [:div.content
@@ -18,7 +20,7 @@
   (if (db/get :cubes)
     [:div.ui.cards
      (if (seq (db/get :cubes))
-       (map-indexed cube-card (db/get :cubes))
+       (doall (map-indexed cube-card (db/get :cubes)))
        [:div.ui.basic.segment (t :cubes/missing)])]
     [:div.ui.active.inline.loader]))
 

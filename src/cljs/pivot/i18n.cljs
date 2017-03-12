@@ -15,7 +15,8 @@
             :measures "Measures"
             :filters "Filters"
             :split "Split"
-            :pinboard "Pinboard"}
+            :pinboard "Pinboard"
+            :no-desc "No description."}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -31,7 +32,8 @@
             :missing "No hay cubos definidos."
             :dimensions "Dimensiones"
             :measures "Métricas"
-            :filters "Filtros"}
+            :filters "Filtros"
+            :no-desc "Sin descripción."}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"
