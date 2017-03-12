@@ -20,15 +20,15 @@
   (dispatch :navigate #'settings/page))
 
 (defroute cube-path "/cubes/:cube" [cube]
-  (dispatch :navigate #'cube/page {:selected-cube cube}))
+  (dispatch :navigate #'cube/page {:current-cube cube}))
 
 (defn active? [page]
   (when (= (db/get :page) page) "active"))
 
 (defn cubes-menu []
-  [make-dropdown {}
-   (let [cube-name (db/get-in [:params :selected-cube])
-         cube-title (-> (filter #(= cube-name (:name %)) (db/get :cubes)) first :title)]
+  (let [cube-name (cube/current-cube-name)
+        cube-title (:title (cube/current-cube))]
+    [make-dropdown {}
      [:div.ui.dropdown.item
       [:i.cubes.icon]
       [:div.text (or cube-title (t :cubes/menu))]
@@ -36,7 +36,9 @@
       [:div.menu
        (for [{:keys [name title]} (db/get :cubes)]
          ^{:key name}
-         [:a.item {:href (str "#/cubes/" name) :class (when (= cube-name name) "active")} title])]])])
+         [:a.item {:href (str "#/cubes/" name)
+                   :class (when (= cube-name name) "active")}
+          title])]]]))
 
 (defn layout []
   [:div

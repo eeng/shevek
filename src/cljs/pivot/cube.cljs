@@ -7,10 +7,17 @@
 (defn panel-header [t-key]
   [:h2.ui.sub.grey.header (t t-key)])
 
+(defn current-cube-name []
+  (db/get-in [:params :current-cube]))
+
+(defn current-cube []
+  (some #(when (= (current-cube-name) (:name %)) %) 
+        (db/get :cubes)))
+
 (defn page []
-  (let [cube-name (db/get-in [:params :selected-cube])]
-    (dispatch :data-requested :dimensions "handler/get-dimensions" cube-name)
-    (dispatch :data-requested :measures "handler/get-measures" cube-name)
+  (let [cube (current-cube-name)]
+    (dispatch :data-requested :dimensions "handler/get-dimensions" cube)
+    (dispatch :data-requested :measures "handler/get-measures" cube)
     (fn []
       [:div#cube
        [:div.left-column
