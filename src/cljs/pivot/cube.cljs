@@ -1,6 +1,8 @@
 (ns pivot.cube
-  (:require [pivot.i18n :refer [t]]
+  (:require [reagent.core :as r]
+            [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading?]]
+            [pivot.react :refer [rmap]]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
@@ -16,19 +18,21 @@
   (some #(when (= (current-cube-name) (:name %)) %)
         (db/get :cubes)))
 
-(defn dimension-item [{:keys [name title cardinality]}]
-  ^{:key name}
-  [:div.item {:on-click console.log}
-   [:i.font.icon] title])
+(defn dimension-item [selected {:keys [name title cardinality]}]
+  (let [toggle-selected #(if (= % name) nil name)]
+    [:div.item {:on-click #(swap! selected toggle-selected)
+                :class (when (= @selected name) "active")}
+     [:i.font.icon] title]))
 
 (defn dimensions-panel []
-  [:div.dimensions.panel.ui.basic.segment
-   [panel-header :cubes/dimensions]
-   [:div.items
-    (map dimension-item (:dimensions (current-cube)))]])
+  (let [selected (r/atom nil)]
+    (fn []
+      [:div.dimensions.panel.ui.basic.segment
+       [panel-header :cubes/dimensions]
+       [:div.items
+        (rmap (partial dimension-item selected) (:dimensions (current-cube)))]])))
 
 (defn measure-item [{:keys [name title]}]
-  ^{:key name}
   [:div.item {:on-click console.log}
    [checkbox title]])
 
@@ -36,7 +40,7 @@
   [:div.measures.panel.ui.basic.segment
    [panel-header :cubes/measures]
    [:div.items
-    (map measure-item (:measures (current-cube)))]])
+    (rmap measure-item (:measures (current-cube)))]])
 
 (defn page []
   [:div#cube

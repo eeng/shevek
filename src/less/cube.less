@@ -24,14 +24,12 @@
     .panel {
       padding: 0;
       margin: 0;
-
       .sub.header {
         font-weight: normal;
         color: #949494;
         padding: 12px 15px;
         margin: 0;
       }
-
       .items {
         .item {
           padding: 5px 15px;
@@ -40,8 +38,12 @@
             margin-right: 7px;
           }
           &:hover {
-            background-color: #f5f5f5;
+            background-color: #f7f7f7;
             cursor: pointer;
+            .icon { color: black; }
+          }
+          &.active {
+            background-color: #b2d8a7;
             .icon { color: black; }
           }
         }
