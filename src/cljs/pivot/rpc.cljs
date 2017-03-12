@@ -18,10 +18,12 @@
 (defn loaded [db key]
   (update db :loading disj key))
 
-(defevh :data-requested [db db-key fid & [{:keys [args post-process] :or {post-process identity}}]]
-  (call fid :handler #(dispatch :data-arrived db-key post-process %) :args args)
+;; Generic events to make remote queries (doesn't allow to process them before storing in the db)
+
+(defevh :data-requested [db db-key fid & args]
+  (call fid :handler #(dispatch :data-arrived db-key %) :args args)
   (loading db db-key))
 
-(defevh :data-arrived [db db-key post-process data]
-  (-> (assoc db db-key (post-process data))
+(defevh :data-arrived [db db-key data]
+  (-> (assoc db db-key data)
       (loaded db-key)))
