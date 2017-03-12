@@ -24,7 +24,8 @@
    :es
    {:menu {:logout "Salir"
            :settings "Configuración"}
-    :dashboard {:subtitle "Esta sección muestra sus reportes favoritos"}
+    :dashboard {:title "Centro de Control"
+                :subtitle "Muestra las fuentes de datos disponibles y sus reportes favoritos"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
             :missing "No hay cubos definidos."

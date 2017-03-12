@@ -8,6 +8,12 @@
    [:div.content title
     [:div.sub.header subtitle]]])
 
+(defn make-dropdown [{:keys [on-change] :or {on-change identity}} content]
+  (let [bind-events #(-> % dom-node js/$
+                         (.dropdown #js {:onChange on-change}))]
+    (create-class {:reagent-render content
+                   :component-did-mount bind-events})))
+
 (defn- dropdown* [coll & [{:keys [placeholder selected] :or {selected ""}}]]
   [:div.ui.selection.dropdown
    [:input {:type "hidden" :value selected}]
@@ -18,8 +24,5 @@
       ^{:key val}
       [:div.item {:data-value val} title])]])
 
-(defn dropdown [_ & [{:keys [on-change] :or {on-change identity}}]]
-  (let [bind-events #(-> % dom-node js/$
-                         (.dropdown #js {:onChange on-change}))]
-    (create-class {:reagent-render dropdown*
-                   :component-did-mount bind-events})))
+(defn dropdown [_ & [opts]]
+  (make-dropdown opts dropdown*))

@@ -8,7 +8,7 @@
   [:h2.ui.sub.grey.header (t t-key)])
 
 (defn page []
-  (let [cube-name (db/get-in [:params :cube-name])]
+  (let [cube-name (db/get-in [:params :selected-cube])]
     (dispatch :data-requested :dimensions "handler/get-dimensions" cube-name)
     (dispatch :data-requested :measures "handler/get-measures" cube-name)
     (fn []
