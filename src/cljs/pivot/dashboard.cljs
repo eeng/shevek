@@ -25,7 +25,7 @@
     [:div.ui.active.inline.loader]))
 
 (defn page []
-  (dispatch :data-requested :cubes "handler/get-cubes")
+  (dispatch :data-requested :cubes "dw/cubes")
   (fn []
     [:div.ui.container
      [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]

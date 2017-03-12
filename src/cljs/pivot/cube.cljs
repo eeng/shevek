@@ -21,35 +21,29 @@
    [:i.font.icon] title])
 
 (defn dimensions-section []
-  (let [dimensions (db/get :dimensions)]
+  (let [dimensions (:dimensions (current-cube))]
     [:div.dimensions.section.ui.basic.segment
-     {:class (when (loading? :dimensions) "loading")}
      [panel-header :cubes/dimensions]
      [:div.items
       (map dimension-item dimensions)]]))
 
 (defn measures-section []
   [:div.measures.section.ui.basic.segment
-   {:class (when (loading? :measures) "loading")}
    [panel-header :cubes/measures]])
 
 (defn page []
-  (let [cube (current-cube-name)]
-    (dispatch :data-requested :dimensions "handler/get-dimensions" cube)
-    (dispatch :data-requested :measures "handler/get-measures" cube)
-    (fn []
-      [:div#cube
-       [:div.left-column
-        [:div.dimensions-measures.panel
-         [dimensions-section]
-         [measures-section]]]
-       [:div.center-column
-        [:div.filters-splits.panel
-         [:div.filters.section
-          [panel-header :cubes/filters]]
-         [:div.section
-          [panel-header :cubes/split]]]
-        [:div.visualization.panel.section "Content"]]
-       [:div.right-column
-        [:div.pinboard.panel.section
-         [panel-header :cubes/pinboard]]]])))
+  [:div#cube
+   [:div.left-column
+    [:div.dimensions-measures.panel
+     [dimensions-section]
+     [measures-section]]]
+   [:div.center-column
+    [:div.filters-splits.panel
+     [:div.filters.section
+      [panel-header :cubes/filters]]
+     [:div.section
+      [panel-header :cubes/split]]]
+    [:div.visualization.panel.section "Content"]]
+   [:div.right-column
+    [:div.pinboard.panel.section
+     [panel-header :cubes/pinboard]]]])

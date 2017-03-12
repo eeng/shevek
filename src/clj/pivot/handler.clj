@@ -6,28 +6,6 @@
             [clojure.java.io :as io]
             [clojure.string :refer [split]]))
 
-(defn get-cubes []
-  [{:name "vtol_stats" :title "VTOL Stats" :description "Estadísticas de uso del sistema VTOL."}
-   {:name "eventos_pedidos" :title "Eventos de Pedidos" :description "Info sobre eventos generados por el ruteo de pedidos."}
-   {:name "facturacion"}])
-
-(defn get-dimensions [cube]
-  (condp = cube
-    "vtol_stats" [{:name "controller" :title "Controller" :cardinality 123}
-                  {:name "action" :title "Action" :cardinality 43}]
-    "eventos_pedidos" [{:name "evento"}
-                       {:name "oficina"}
-                       {:name "adicion" :type "LONG"}]
-    "facturacion" [{:name "__time"}]))
-
-(defn get-measures [cube]
-  (condp = cube
-    "vtol_stats" [{:name "requests"}
-                  {:name "duration"}]
-    "eventos_pedidos" [{:name "pedidos"}
-                       {:name "usuarios"}]
-    "facturacion" []))
-
 (defn call-fn
   "Given a map like {:fn 'ns/func' :args [1 2]} calls (pivot.ns/func 1 2)"
   [{fid :fn args :args :or {args []}}]

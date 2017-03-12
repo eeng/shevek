@@ -23,6 +23,8 @@
 (defroute cube-path "/cubes/:cube" [cube]
   (dispatch :navigate #'cube/page {:current-cube cube}))
 
+; TODO faltan las rutas para errores
+
 (defn active? [page]
   (when (= (db/get :page) page) "active"))
 
@@ -43,15 +45,17 @@
           title])]]]))
 
 (defn layout []
-  [:div
-   [:div.ui.fixed.inverted.menu
-    [:a.item {:href "#/" :class (active? #'dashboard/page)}
-     [:i.block.layout.icon] (t :dashboard/title)]
-    [cubes-menu]
-    [:div.right.menu
-     (when (loading?) [:div.item [:i.spinner.loading.icon]])
-     [:a.item {:href "#/settings" :class (active? #'settings/page)}
-      [:i.settings.icon] (t :settings/title)]
-     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]
-   [:div.page
-    [(db/get :page :div)]]])
+  (dispatch :data-requested :cubes "dw/cubes")
+  (fn []
+    [:div
+     [:div.ui.fixed.inverted.menu
+      [:a.item {:href "#/" :class (active? #'dashboard/page)}
+       [:i.block.layout.icon] (t :dashboard/title)]
+      [cubes-menu]
+      [:div.right.menu
+       (when (loading?) [:div.item [:i.spinner.loading.icon]])
+       [:a.item {:href "#/settings" :class (active? #'settings/page)}
+        [:i.settings.icon] (t :settings/title)]
+       [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]
+     [:div.page
+      [(db/get :page :div)]]]))
