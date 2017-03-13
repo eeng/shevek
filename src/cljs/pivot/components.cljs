@@ -39,7 +39,9 @@
 (defn- popup* [activator popup-container _]
   [:div activator popup-container])
 
+; TODO hacer solo el reposition si on = manual, asi para los demas casos sigue normal
 (defn popup [_ _ opts]
   (create-class {:reagent-render popup*
                  :component-did-mount #(-> % dom-node js/$ (.find ".item")
-                                           (.popup (clj->js (merge {:inline true} opts))))}))
+                                           (.popup (clj->js (merge {:inline true} opts)))
+                                           (.popup "reposition"))}))

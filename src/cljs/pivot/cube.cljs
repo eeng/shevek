@@ -18,24 +18,26 @@
 (defn- panel-header [t-key]
   [:h2.ui.sub.header (t t-key)])
 
-(defn- dimension-popup [{:keys [name cardinality description]}]
-  [:div.ui.special.popup.card
+(defn- dimension-popup [{:keys [name cardinality description]} selected]
+  [:div.ui.special.popup.card {:style {:display (if @selected "block" "none")}}
    (when description
      [:div.content
       [:div.description description]])
    [:div.content
-    [:div
-     [:button.ui.circular.icon.blue.button [:i.filter.icon]]
-     [:button.ui.circular.icon.green.button [:i.square.icon]]
-     [:button.ui.circular.icon.orange.button [:i.plus.icon]]
-     [:button.ui.circular.icon.yellow.button [:i.pin.icon]]]]
+    [:button.ui.circular.icon.blue.button [:i.filter.icon]]
+    [:button.ui.circular.icon.green.button [:i.square.icon]]
+    [:button.ui.circular.icon.orange.button [:i.plus.icon]]
+    [:button.ui.circular.icon.yellow.button [:i.pin.icon]]]
    (when cardinality
      [:div.extra.content (str cardinality " values")])])
 
 (defn- dimension-item* [selected {:keys [name title] :as dimension}]
-  [:div.item {:on-click #(swap! selected not)
-              :class (when @selected "active")}
-   [:i.font.icon] title])
+  [popup
+   [:div.item.dimension {:on-click #(swap! selected not)
+                         :class (when @selected "active")}
+    [:i.font.icon] title]
+   [dimension-popup dimension selected]
+   {:on "manual" :position "right center" :distanceAway -20}])
 
 (defn- dimension-item [{:keys [name] :as dimension}]
   (let [selected (r/atom false)
