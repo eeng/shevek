@@ -1,6 +1,7 @@
 (ns pivot.components
-  (:require [reagent.core :refer [dom-node create-class]]
-            [pivot.i18n :refer [t]]))
+  (:require [reagent.core :as r :refer [dom-node create-class]]
+            [pivot.i18n :refer [t]]
+            [cuerdas.core :as str]))
 
 (defn page-title [title subtitle icon-class]
   [:h1.ui.header
@@ -27,14 +28,13 @@
 (defn dropdown [_ & [opts]]
   (make-dropdown opts dropdown*))
 
-(defn- checkbox* [label & _]
-  [:div.ui.checkbox
-   [:input {:type "checkbox"}]
-   [:label label]])
-
-(defn checkbox [_ & [{:keys [on-change] :or {on-change identity}}]]
-  (create-class {:reagent-render checkbox*
-                 :component-did-mount #(-> % dom-node js/$ (.checkbox (clj->js {:onChange on-change})))}))
+(defn- checkbox [label & [{:keys [on-change name] :or {on-change identity name (str/slug label)}}]]
+  (let [selected (r/atom false)]
+    (fn []
+      [:div.ui.checkbox
+       [:input {:type "checkbox" :id name :checked @selected
+                :on-change #(on-change (swap! selected not))}]
+       [:label {:for name} label]])))
 
 (defn- popup* [activator popup-container _]
   [:div activator popup-container])

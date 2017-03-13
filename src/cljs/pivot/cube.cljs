@@ -9,12 +9,8 @@
             [cuerdas.core :as str]
             [pivot.components :refer [checkbox popup]]))
 
-(defn toggle [seq x]
-  "Add x to seq if not exists, otherwise removes it"
-  ((if (some #{x} seq) disj conj) seq x))
-
-(defevh :measure-toggled [db name]
-  (update-in db [:query :measures] (fnil toggle #{}) name))
+(defevh :measure-toggled [db name selected]
+  (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))
 
 (defn current-cube-name []
   (db/get-in [:params :current-cube]))
@@ -66,8 +62,8 @@
     (rmap dimension-item (:dimensions (current-cube)))]])
 
 (defn- measure-item [{:keys [name title]}]
-  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox") .click)}
-   [checkbox title {:on-change #(dispatch :measure-toggled name)}]])
+  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)}
+   [checkbox title {:on-change #(dispatch :measure-toggled name %)}]])
 
 (defn- measures-panel []
   [:div.measures.panel.ui.basic.segment
