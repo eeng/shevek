@@ -16,5 +16,6 @@
 
 (defn init []
   (enable-console-print!)
-  (reflow/init (load-settings) (-> (i/router) (i/logger)))
+  (reflow/init (-> (i/router) (i/logger)))
+  (load-settings)
   (r/render-component [layout] (.getElementById js/document "app")))

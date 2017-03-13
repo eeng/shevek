@@ -27,9 +27,8 @@
 (defn stop-coordinator []
   (dispatch :shutdown))
 
-(defn init [db handler]
+(defn init [handler]
   (when @coordinator
     (dispatch :shutdown))
   (log "Starting reflow coordinator")
-  (reset! app-db db)
   (reset! coordinator (start-coordinator app-db handler)))

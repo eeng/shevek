@@ -6,21 +6,24 @@
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
 
+(defn load-settings []
+  (dispatch :settings-loaded))
+
 (defn save-settings! [db]
   (local-storage/store! "pivot.settings" (select-keys db [:lang]))
   db)
 
-(defn load-settings []
-  (local-storage/retrieve "pivot.settings"))
+(defevh :settings-loaded [db]
+  (merge db (local-storage/retrieve "pivot.settings")))
 
-(defevh :lang-changed [db lang]
-  (-> db (assoc :lang lang) save-settings!))
+(defevh :settings-saved [db settings]
+  (-> db (merge settings) save-settings!))
 
 (defn page []
  [:div.ui.container
   [page-title (t :settings/title) (t :settings/subtitle) "settings"]
   [:h2.ui.dividing.header (t :settings/language)]
   [dropdown [["English" "en"] ["Español" "es"]]
-   {:selected (db/get :lang "en") :on-change #(dispatch :lang-changed %)}]
+   {:selected (db/get :lang "en") :on-change #(dispatch :settings-saved {:lang %})}]
   [:h2.ui.dividing.header (t :settings/users)]
   [:div "TODO Tabla de users"]])
