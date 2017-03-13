@@ -41,6 +41,7 @@
                  (dispatch event name))}
    [:i.icon {:class icon}]])
 
+; TODO Pivot hace una query para traer la cardinality, supongo q x si se actualiza desde que se trajo toda la metadata
 (defn- dimension-popup [{:keys [name cardinality description]} selected]
   [:div.ui.special.popup.card {:style {:display (if @selected "block" "none")}}
    (when description

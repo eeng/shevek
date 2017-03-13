@@ -8,7 +8,7 @@
        :body (map (fn [name] {:name name}))))
 
 ; TODO en el :context de la q se le puede pasar un timeout
-(defn- query [host q]
+(defn- raw-query [host q]
   (:body (http/post (str host "/druid/v2") {:content-type :json :form-params q :as :json})))
 
 ; TODO candidata a memoizar no?
@@ -19,7 +19,7 @@
            :analysisTypes ["cardinality" "aggregators"]
            :intervals ["2000/2100"]
            :lenientAggregatorMerge true}]
-    (first (query host q))))
+    (first (raw-query host q))))
 
 (defn- druid-column-result-to-map [[column fields]]
   (merge (select-keys fields [:type :cardinality])
@@ -35,6 +35,10 @@
        :aggregators
        (map druid-column-result-to-map)))
 
+(defn time-boundary [host ds]
+  (-> (raw-query host {:queryType "timeBoundary" :dataSource ds})
+      first :result))
+
 (defn- with-dimensions-and-measures [host {:keys [name] :as datasource}]
   (assoc datasource
          :dimensions (dimensions host name)
@@ -45,8 +49,18 @@
   (cubes [_] (map (partial with-dimensions-and-measures broker-url)
                (datasources broker-url))))
 
-#_(def broker "http://kafka:8082")
+(def broker "http://kafka:8082")
 #_(datasources broker)
 #_(dimensions broker "vtol_stats")
 #_(dimensions broker "wikiticker")
 #_(metrics broker "vtol_stats")
+#_(time-boundary broker "wikiticker")
+
+(defn totals [host ds])
+#_(raw-query broker
+             {:queryType "timeseries"
+              :dataSource {:type "table" :name "wikiticker"}
+              :granularity {:type "all"}
+              :intervals ["2015-09-12T00:00:00.000Z/2015-09-13T00:00:00.000Z"]
+              :aggregations [{:fieldName "count" :name "sum_count" :type "longSum"}
+                             {:fieldName "added" :name "sum_added" :type "longSum"}]})
