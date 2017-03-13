@@ -1,6 +1,7 @@
-(ns pivot.dw)
+(ns pivot.dw
+  (:require [pivot.druid :as druid]))
 
-(defn cubes []
+#_(defn cubes [])
   [{:name "vtol_stats"
     :title "VTOL Stats"
     :description "Estadísticas de uso del sistema VTOL."
@@ -18,4 +19,13 @@
                {:name "usuarios"}]}
    {:name "facturacion"
     :dimensions [{:name "__time"}]
-    :measures []}])
+    :measures []}]
+
+; TODO Ver como manejar este druid/broker, no me convence como esta ahora
+(defn- with-dimensions-and-measures [{:keys [name] :as datasource}]
+  (assoc datasource
+         :dimensions (druid/dimensions druid/broker name)
+         :measures (druid/metrics druid/broker name)))
+
+(defn cubes []
+  (map with-dimensions-and-measures (druid/datasources druid/broker)))

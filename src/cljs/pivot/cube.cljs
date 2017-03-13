@@ -85,6 +85,7 @@
    [checkbox title {:on-change #(dispatch :measure-toggled name %)}]])
 
 (defn- measures-panel []
+  ^{:key (current-cube-name)}
   [:div.measures.panel.ui.basic.segment
    [panel-header :cubes/measures]
    [:div.items

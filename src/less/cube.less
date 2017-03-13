@@ -60,10 +60,13 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      .dimensions {
-        flex: 71 1 0%;
-      }
+      .dimensions { flex: 71 1 0%;  }
       .measures { flex: 29 1 0%; }
+      .dimensions, .measures { // This is for the scroll within the .items
+        display: flex;
+        flex-direction: column;
+        .items { overflow-y: auto; }
+      }
     }
   }
   .center-column {
