@@ -11,17 +11,22 @@
             [pivot.cube :as cube]
             [pivot.dw :as dw]))
 
+(def pages
+  {:dashboard #'dashboard/page
+   :settings #'settings/page
+   :cube #'cube/page})
+
 (defevh :navigate [db page & [params]]
   (assoc db :page page :params params))
 
-(defroute home-path "/" []
-  (dispatch :navigate #'dashboard/page))
+(defroute "/" []
+  (dispatch :navigate :dashboard))
 
-(defroute settings-path "/settings" []
-  (dispatch :navigate #'settings/page))
+(defroute "/settings" []
+  (dispatch :navigate :settings))
 
-(defroute cube-path "/cubes/:cube" [cube]
-  (dispatch :navigate #'cube/page {:current-cube cube}))
+(defroute "/cubes/:cube" [cube]
+  (dispatch :navigate :cube {:current-cube cube}))
 
 ; TODO faltan las rutas para errores
 
@@ -48,13 +53,13 @@
   (fn []
     [:div
      [:div.ui.fixed.inverted.menu
-      [:a.item {:href "#/" :class (active? #'dashboard/page)}
+      [:a.item {:href "#/" :class (active? :dashboard)}
        [:i.block.layout.icon] (t :dashboard/title)]
       [cubes-menu]
       [:div.right.menu
        (when (loading?) [:div.item [:i.spinner.loading.icon]])
-       [:a.item {:href "#/settings" :class (active? #'settings/page)}
+       [:a.item {:href "#/settings" :class (active? :settings)}
         [:i.settings.icon] (t :settings/title)]
        [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]
      [:div.page
-      [(db/get :page :div)]]]))
+      [(get pages (db/get :page) :div)]]]))
