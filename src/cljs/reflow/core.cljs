@@ -20,15 +20,16 @@
       (when (and event (not= event [:shutdown]))
         (let [new-db (handler actual-db event)]
           (assert (map? new-db)
-                  (str "Handler should return the new db as a map. Instead returned: " (pr-str new-db)))
+                  (str "Handler for event " event " should've returned the new db as a map. Instead returned: " (pr-str new-db)))
           (reset! app-db new-db)
           (recur new-db))))))
 
 (defn stop-coordinator []
   (dispatch :shutdown))
 
-(defn init [handler]
+(defn init [db handler]
   (when @coordinator
     (dispatch :shutdown))
   (log "Starting reflow coordinator")
+  (reset! app-db db)
   (reset! coordinator (start-coordinator app-db handler)))

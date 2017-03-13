@@ -2,11 +2,19 @@
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [pivot.i18n :refer [t]]
             [pivot.components :refer [page-title dropdown]]
+            [pivot.lib.local-storage :as local-storage]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
 
+(defn save-settings! [db]
+  (local-storage/store! "pivot.settings" (select-keys db [:lang]))
+  db)
+
+(defn load-settings []
+  (local-storage/retrieve "pivot.settings"))
+
 (defevh :lang-changed [db lang]
-  (assoc db :lang lang))
+  (-> db (assoc :lang lang) save-settings!))
 
 (defn page []
  [:div.ui.container

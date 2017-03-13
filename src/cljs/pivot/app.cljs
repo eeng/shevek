@@ -1,6 +1,7 @@
 (ns pivot.app
   (:require [reagent.core :as r]
             [pivot.layout :refer [layout]]
+            [pivot.settings :refer [load-settings]]
             [reflow.core :as reflow]
             [reflow.interceptors :as i]
             [secretary.core :as secretary]
@@ -15,5 +16,5 @@
 
 (defn init []
   (enable-console-print!)
-  (reflow/init (-> (i/router) (i/logger)))
+  (reflow/init (load-settings) (-> (i/router) (i/logger)))
   (r/render-component [layout] (.getElementById js/document "app")))
