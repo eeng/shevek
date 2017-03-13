@@ -1,7 +1,6 @@
-(ns pivot.druid
-  (:require [clj-http.client :as http]))
-
-(def broker "http://kafka:8082")
+(ns pivot.engines.druid
+  (:require [clj-http.client :as http]
+            [pivot.engines.engine :refer [DwEngine]]))
 
 ; TODO http-kit viene con un client, ver si no se puede usar para no tener q agregar otra dependencia
 (defn datasources [host]
@@ -36,6 +35,17 @@
        :aggregators
        (map druid-column-result-to-map)))
 
+(defn- with-dimensions-and-measures [host {:keys [name] :as datasource}]
+  (assoc datasource
+         :dimensions (dimensions host name)
+         :measures (metrics host name)))
+
+(defrecord DruidEngine [broker-url]
+  DwEngine
+  (cubes [_] (map (partial with-dimensions-and-measures broker-url)
+               (datasources broker-url))))
+
+#_(def broker "http://kafka:8082")
 #_(datasources broker)
 #_(dimensions broker "vtol_stats")
 #_(dimensions broker "wikiticker")

@@ -1,8 +1,8 @@
-(ns pivot.druid-test
+(ns pivot.engines.druid-test
   (:require [clojure.test :refer :all]
             [stub-http.core :refer :all]
             [pivot.asserts :refer [submaps?]]
-            [pivot.druid :refer [datasources dimensions metrics]]
+            [pivot.engines.druid :refer [datasources dimensions metrics]]
             [clojure.java.io :as io]))
 
 (defn druid-res [name]
