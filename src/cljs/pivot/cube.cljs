@@ -1,4 +1,5 @@
 (ns pivot.cube
+  (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading?]]
@@ -7,6 +8,13 @@
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [pivot.components :refer [checkbox popup]]))
+
+(defn toggle [seq x]
+  "Add x to seq if not exists, otherwise removes it"
+  ((if (some #{x} seq) disj conj) seq x))
+
+(defevh :measure-toggled [db name]
+  (update-in db [:query :measures] (fnil toggle #{}) name))
 
 (defn current-cube-name []
   (db/get-in [:params :current-cube]))
@@ -58,8 +66,8 @@
     (rmap dimension-item (:dimensions (current-cube)))]])
 
 (defn- measure-item [{:keys [name title]}]
-  [:div.item {:on-click console.log}
-   [checkbox title]])
+  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox") .click)}
+   [checkbox title {:on-change #(dispatch :measure-toggled name)}]])
 
 (defn- measures-panel []
   [:div.measures.panel.ui.basic.segment
