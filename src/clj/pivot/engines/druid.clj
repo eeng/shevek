@@ -1,6 +1,7 @@
 (ns pivot.engines.druid
   (:require [clj-http.client :as http]
-            [pivot.engines.engine :refer [DwEngine]]))
+            [pivot.engines.engine :refer [DwEngine]]
+            [clojure.string :as str]))
 
 ; TODO http-kit viene con un client, ver si no se puede usar para no tener q agregar otra dependencia
 (defn datasources [host]
@@ -35,9 +36,11 @@
        :aggregators
        (map druid-column-result-to-map)))
 
+(defn run-query-single [& args]
+  (-> (apply raw-query args) first :result))
+
 (defn time-boundary [host ds]
-  (-> (raw-query host {:queryType "timeBoundary" :dataSource ds})
-      first :result))
+  (run-query-single host {:queryType "timeBoundary" :dataSource ds}))
 
 (defn- with-dimensions-and-measures [host {:keys [name] :as datasource}]
   (assoc datasource
@@ -56,11 +59,27 @@
 #_(metrics broker "vtol_stats")
 #_(time-boundary broker "wikiticker")
 
-(defn totals [host ds])
-#_(raw-query broker
-             {:queryType "timeseries"
-              :dataSource {:type "table" :name "wikiticker"}
-              :granularity {:type "all"}
-              :intervals ["2015-09-12T00:00:00.000Z/2015-09-13T00:00:00.000Z"]
-              :aggregations [{:fieldName "count" :name "sum_count" :type "longSum"}
-                             {:fieldName "added" :name "sum_added" :type "longSum"}]})
+(defn- to-druid-agg [{:keys [name type]}]
+  {:fieldName name :name name :type type})
+
+(defn to-druid-query [{:keys [cube measures interval]}]
+  {:queryType "timeseries"
+   :dataSource {:type "table" :name cube}
+   :granularity {:type "all"}
+   :intervals (str/join "/" interval)
+   :aggregations (map to-druid-agg measures)})
+
+(defn query [host q]
+  (run-query-single host (to-druid-query q)))
+
+; Totals query
+#_(query broker {:cube "wikiticker"
+                 :measures [{:name "count" :type "longSum"}
+                            {:name "added" :type "doubleSum"}]
+                 :interval ["2015-09-12" "2015-09-13"]})
+
+; One dimension and one measure query
+#_(query broker {:cube "wikiticker"
+                 :measures [{:name "count" :type "longSum"}
+                            {:name "added" :type "doubleSum"}]
+                 :interval ["2015-09-12" "2015-09-13"]})
