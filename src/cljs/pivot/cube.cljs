@@ -12,6 +12,18 @@
 (defevh :measure-toggled [db name selected]
   (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))
 
+(defevh :dimension-added-to-filter [db name]
+  db)
+
+(defevh :dimension-added-to-split [db name]
+  db)
+
+(defevh :dimension-replaced-split [db name]
+  db)
+
+(defevh :dimension-pinned [db name]
+  (update-in db [:query :pinned] (fnil conj #{}) name))
+
 (defn current-cube-name []
   (db/get-in [:params :current-cube]))
 
@@ -22,16 +34,23 @@
 (defn- panel-header [t-key]
   [:h2.ui.sub.header (t t-key)])
 
+(defn dimension-popup-button [color icon event selected name]
+  [:button.ui.circular.icon.button
+   {:class color
+    :on-click #(do (reset! selected false)
+                 (dispatch event name))}
+   [:i.icon {:class icon}]])
+
 (defn- dimension-popup [{:keys [name cardinality description]} selected]
   [:div.ui.special.popup.card {:style {:display (if @selected "block" "none")}}
    (when description
      [:div.content
       [:div.description description]])
    [:div.content
-    [:button.ui.circular.icon.blue.button [:i.filter.icon]]
-    [:button.ui.circular.icon.green.button [:i.square.icon]]
-    [:button.ui.circular.icon.orange.button [:i.plus.icon]]
-    [:button.ui.circular.icon.yellow.button [:i.pin.icon]]]
+    [dimension-popup-button "blue" "filter" :dimension-added-to-filter selected name]
+    [dimension-popup-button "green" "square" :dimension-replaced-split selected name]
+    [dimension-popup-button "orange" "plus" :dimension-added-to-split selected name]
+    [dimension-popup-button "yellow" "pin" :dimension-pinned selected name]]
    (when cardinality
      [:div.extra.content (str cardinality " values")])])
 
