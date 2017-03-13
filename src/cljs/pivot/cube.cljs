@@ -32,22 +32,28 @@
    (when cardinality
      [:div.extra.content (str cardinality " values")])])
 
-(defn- dimension-item [selected {:keys [name title] :as dimension}]
-  (let [toggle-selected #(if (= % name) nil name)]
-    [popup
-     [:div.item {:on-click #(swap! selected toggle-selected)
-                 :class (when (= @selected name) "active")}
-      [:i.font.icon] title]
-     [dimension-popup dimension]
-     {:on "click" :position "right center" :distanceAway -20}]))
+(defn- dimension-item* [selected {:keys [name title] :as dimension}]
+  [:div.item {:on-click #(swap! selected not)
+              :class (when @selected "active")}
+   [:i.font.icon] title])
+
+(defn- dimension-item [{:keys [name] :as dimension}]
+  (let [selected (r/atom false)
+        handle-click-outside (fn [dim-item e]
+                               (when-not (.contains (r/dom-node dim-item) (.-target e))
+                                 (reset! selected false)))
+        node-listener (atom nil)]
+    (r/create-class {:reagent-render (partial dimension-item* selected)
+                     :component-did-mount #(do
+                                             (reset! node-listener (partial handle-click-outside %))
+                                             (.addEventListener js/document "click" @node-listener true))
+                     :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)})))
 
 (defn- dimensions-panel []
-  (let [selected (r/atom nil)]
-    (fn []
-      [:div.dimensions.panel.ui.basic.segment
-       [panel-header :cubes/dimensions]
-       [:div.items
-        (rmap (partial dimension-item selected) (:dimensions (current-cube)))]])))
+  [:div.dimensions.panel.ui.basic.segment
+   [panel-header :cubes/dimensions]
+   [:div.items
+    (rmap dimension-item (:dimensions (current-cube)))]])
 
 (defn- measure-item [{:keys [name title]}]
   [:div.item {:on-click console.log}
