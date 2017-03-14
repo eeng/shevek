@@ -42,7 +42,7 @@
       [:div.text (or cube-title (t :cubes/menu))]
       [:i.dropdown.icon]
       [:div.menu
-       (for [{:keys [name title]} (db/get :cubes)]
+       (for [{:keys [name title]} (dw/cubes-list)]
          ^{:key name}
          [:a.item {:href (str "#/cubes/" name)
                    :class (when (= cube-name name) "active")}

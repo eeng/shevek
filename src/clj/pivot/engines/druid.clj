@@ -12,7 +12,6 @@
 (defn- raw-query [host q]
   (:body (http/post (str host "/druid/v2") {:content-type :json :form-params q :as :json})))
 
-; TODO candidata a memoizar no?
 (defn- segment-metadata-query [host datasource]
   (let [q {:queryType "segmentMetadata"
            :dataSource {:type "table" :name datasource}
@@ -42,15 +41,13 @@
 (defn time-boundary [host ds]
   (run-query-single host {:queryType "timeBoundary" :dataSource ds}))
 
-(defn- with-dimensions-and-measures [host {:keys [name] :as datasource}]
-  (assoc datasource
-         :dimensions (dimensions host name)
-         :measures (metrics host name)))
-
+; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [broker-url]
   DwEngine
-  (cubes [_] (map (partial with-dimensions-and-measures broker-url)
-               (datasources broker-url))))
+  (cubes [_] (datasources broker-url))
+  (cube [_ name] (assoc {:name name}
+                        :dimensions (dimensions broker-url name)
+                        :measures (metrics broker-url name))))
 
 (def broker "http://kafka:8082")
 #_(datasources broker)

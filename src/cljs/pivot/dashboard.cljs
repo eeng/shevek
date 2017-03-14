@@ -15,17 +15,16 @@
     [:div.description description]]])
 
 (defn- cubes-cards []
-  (if (db/get :cubes)
-    [:div.ui.cards
-     (if (seq (db/get :cubes))
-       (doall (map-indexed cube-card (db/get :cubes)))
-       [:div.ui.basic.segment (t :cubes/missing)])]
-    [:div.ui.active.inline.loader]))
+  (let [cubes (dw/cubes-list)]
+    (if cubes
+      [:div.ui.cards
+       (if (seq cubes)
+         (doall (map-indexed cube-card cubes))
+         [:div.ui.basic.segment (t :cubes/missing)])]
+      [:div.ui.active.inline.loader])))
 
 (defn page []
-  (dw/fetch-cubes)
-  (fn []
-    [:div.ui.container
-     [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]
-     [:h2.ui.dividing.header (t :cubes/title)]
-     [cubes-cards]]))
+  [:div.ui.container
+   [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]
+   [:h2.ui.dividing.header (t :cubes/title)]
+   [cubes-cards]])

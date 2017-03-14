@@ -4,14 +4,11 @@
             [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading?]]
             [pivot.react :refer [rmap]]
+            [pivot.rpc :as rpc]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [pivot.components :refer [checkbox popup]]))
-
-(defevh :cube-selected [db cube]
-  (dispatch :navigate :cube)
-  (assoc db :query {:cube cube}))
 
 (defevh :measure-toggled [db name selected]
   (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))
@@ -32,8 +29,7 @@
   (db/get-in [:query :cube]))
 
 (defn current-cube []
-  (some #(when (= (current-cube-name) (:name %)) %)
-        (db/get :cubes)))
+  (get (db/get :cubes) (current-cube-name)))
 
 (defn- panel-header [t-key]
   [:h2.ui.sub.header (t t-key)])
