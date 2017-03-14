@@ -55,11 +55,18 @@
    (when cardinality
      [:div.extra.content (str cardinality " values")])])
 
-(defn- dimension-item* [selected {:keys [name title] :as dimension}]
+(defn- type-icon [type name]
+  (let [effective-type (if (= name "__time") "TIME" type)]
+    (condp = effective-type
+      "TIME" "wait"
+      "LONG" "hashtag"
+      "font")))
+
+(defn- dimension-item* [selected {:keys [name title type] :as dimension}]
   [popup
    [:div.item.dimension {:on-click #(swap! selected not)
                          :class (when @selected "active")}
-    [:i.font.icon] title]
+    [:i.icon {:class (type-icon type name)}] title]
    [dimension-popup dimension selected]
    {:on "manual" :position "right center" :distanceAway -20}])
 
