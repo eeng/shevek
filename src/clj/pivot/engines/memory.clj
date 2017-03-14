@@ -9,7 +9,8 @@
     :dimensions [{:name "controller" :title "Controller" :cardinality 123 :description "Controller del request"}
                  {:name "action" :title "Action" :cardinality 43 :description "Rails action"}]
     :measures [{:name "requests"}
-               {:name "duration"}]}
+               {:name "duration"}]
+    :time-boundary {:max-time "2017-03-06T17:27:30.563Z"}}
    "eventos_pedidos"
    {:name "eventos_pedidos"
     :title "Eventos de Pedidos"
@@ -18,7 +19,8 @@
                  {:name "oficina"}
                  {:name "adicion" :type "LONG"}]
     :measures [{:name "pedidos"}
-               {:name "usuarios"}]}
+               {:name "usuarios"}]
+    :time-boundary {:max-time "2016-12-02T10:27:30.563Z"}}
    "facturacion"
    {:name "facturacion"
     :dimensions [{:name "__time"}]

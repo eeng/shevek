@@ -38,16 +38,19 @@
 (defn run-query-single [& args]
   (-> (apply raw-query args) first :result))
 
+; TODO usar specter para transformar las keys de forma general
 (defn time-boundary [host ds]
-  (run-query-single host {:queryType "timeBoundary" :dataSource ds}))
+  (-> (run-query-single host {:queryType "timeBoundary" :dataSource ds})
+      (clojure.set/rename-keys {:minTime :min-time :maxTime :max-time})))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
-(defrecord DruidEngine [broker-url]
+(defrecord DruidEngine [host]
   DwEngine
-  (cubes [_] (datasources broker-url))
+  (cubes [_] (datasources host))
   (cube [_ name] (assoc {:name name}
-                        :dimensions (dimensions broker-url name)
-                        :measures (metrics broker-url name))))
+                        :dimensions (dimensions host name)
+                        :measures (metrics host name)
+                        :time-boundary (time-boundary host name))))
 
 (def broker "http://kafka:8082")
 #_(datasources broker)
@@ -55,6 +58,7 @@
 #_(dimensions broker "wikiticker")
 #_(metrics broker "vtol_stats")
 #_(time-boundary broker "wikiticker")
+#_(pivot.engines.engine/cube (DruidEngine. broker) "vtol_stats")
 
 (defn- to-druid-agg [{:keys [name type]}]
   {:fieldName name :name name :type type})
