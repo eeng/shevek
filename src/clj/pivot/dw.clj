@@ -5,8 +5,8 @@
   (:import [pivot.engines.memory InMemoryEngine]
            [pivot.engines.druid DruidEngine]))
 
-#_(def engine (InMemoryEngine.))
-(def engine (DruidEngine. "http://kafka:8082"))
+(def engine (InMemoryEngine.))
+#_(def engine (DruidEngine. "http://kafka:8082"))
 
 (defn cubes []
   (e/cubes engine))

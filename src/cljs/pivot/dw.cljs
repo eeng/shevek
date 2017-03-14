@@ -9,7 +9,7 @@
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
 
-(defn- set-cube-defaults [{:keys [dimensions measures] :as cube}]
+(defn set-cube-defaults [{:keys [dimensions measures] :as cube}]
   (-> cube
       set-default-title
       (assoc :dimensions (map set-default-title dimensions))
@@ -36,13 +36,3 @@
 
 (defn cubes-list []
   (vals (db/get :cubes)))
-
-(defevh :cube-arrived [db {:keys [name] :as cube}]
-  (-> (assoc-in db [:cubes name] (set-cube-defaults cube))
-      (rpc/loaded :cube)))
-
-(defevh :cube-selected [db cube]
-  (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (dispatch :navigate :cube)
-  (-> (assoc db :query {:cube cube})
-      (rpc/loading :cube)))

@@ -5,10 +5,21 @@
             [pivot.rpc :refer [loading?]]
             [pivot.react :refer [rmap]]
             [pivot.rpc :as rpc]
+            [pivot.dw :as dw]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [pivot.components :refer [checkbox popup]]))
+
+(defevh :cube-selected [db cube]
+  (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
+  (dispatch :navigate :cube)
+  (-> (assoc db :query {:cube cube})
+      (rpc/loading :cube)))
+
+(defevh :cube-arrived [db {:keys [name] :as cube}]
+  (-> (assoc-in db [:cubes name] (dw/set-cube-defaults cube))
+      (rpc/loaded :cube)))
 
 (defevh :measure-toggled [db name selected]
   (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))
