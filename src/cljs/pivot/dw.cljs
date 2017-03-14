@@ -38,9 +38,11 @@
   (vals (db/get :cubes)))
 
 (defevh :cube-arrived [db {:keys [name] :as cube}]
-  (assoc-in db [:cubes name] (set-cube-defaults cube)))
+  (-> (assoc-in db [:cubes name] (set-cube-defaults cube))
+      (rpc/loaded :cube)))
 
 (defevh :cube-selected [db cube]
   (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
   (dispatch :navigate :cube)
-  (assoc db :query {:cube cube}))
+  (-> (assoc db :query {:cube cube})
+      (rpc/loading :cube)))

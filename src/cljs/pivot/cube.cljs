@@ -76,7 +76,7 @@
                      :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)})))
 
 (defn- dimensions-panel []
-  [:div.dimensions.panel.ui.basic.segment
+  [:div.dimensions.panel.ui.basic.segment {:class (when (rpc/loading? :cube) "loading")}
    [panel-header :cubes/dimensions]
    [:div.items
     (rmap dimension-item (:dimensions (current-cube)))]])
@@ -87,7 +87,7 @@
 
 (defn- measures-panel []
   ^{:key (current-cube-name)}
-  [:div.measures.panel.ui.basic.segment
+  [:div.measures.panel.ui.basic.segment {:class (when (rpc/loading? :cube) "loading")}
    [panel-header :cubes/measures]
    [:div.items
     (rmap measure-item (:measures (current-cube)))]])
