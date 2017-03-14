@@ -9,6 +9,10 @@
             [cuerdas.core :as str]
             [pivot.components :refer [checkbox popup]]))
 
+(defevh :cube-selected [db cube]
+  (dispatch :navigate :cube)
+  (assoc db :query {:cube cube}))
+
 (defevh :measure-toggled [db name selected]
   (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))
 
@@ -25,7 +29,7 @@
   (update-in db [:query :pinned] (fnil conj #{}) name))
 
 (defn current-cube-name []
-  (db/get-in [:params :current-cube]))
+  (db/get-in [:query :cube]))
 
 (defn current-cube []
   (some #(when (= (current-cube-name) (:name %)) %)

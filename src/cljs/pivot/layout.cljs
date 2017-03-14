@@ -16,8 +16,8 @@
    :settings #'settings/page
    :cube #'cube/page})
 
-(defevh :navigate [db page & [params]]
-  (assoc db :page page :params params))
+(defevh :navigate [db page]
+  (assoc db :page page))
 
 (defroute "/" []
   (dispatch :navigate :dashboard))
@@ -26,7 +26,7 @@
   (dispatch :navigate :settings))
 
 (defroute "/cubes/:cube" [cube]
-  (dispatch :navigate :cube {:current-cube cube}))
+  (dispatch :cube-selected cube))
 
 ; TODO faltan las rutas para errores
 
