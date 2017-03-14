@@ -106,7 +106,14 @@
       }
     }
   }
-  .dimensions, .filters {
+  .dimensions {
     border-bottom: @panel-separator;
+  }
+  .filter, .split {
+    border-bottom: @panel-separator;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    h2 { width: 67px; }
   }
 }

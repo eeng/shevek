@@ -17,25 +17,46 @@
   (-> (assoc db :query {:cube cube})
       (rpc/loading :cube)))
 
+(defn- init-query [db cube]
+  (-> db
+      (assoc-in [:query :filter] [(dw/main-time-dimension cube)])
+      (assoc-in [:query :split] [])))
+
 (defevh :cube-arrived [db {:keys [name] :as cube}]
-  (-> (assoc-in db [:cubes name] (dw/set-cube-defaults cube))
-      (rpc/loaded :cube)
-      (assoc-in [:query :filter] [(dw/main-time-dimension cube)])))
+  (let [cube (dw/set-cube-defaults cube)]
+    (-> (assoc-in db [:cubes name] cube)
+        (init-query cube)
+        (rpc/loaded :cube))))
+
+(defn add-dimension [coll dim]
+  (let [coll (or coll [])]
+    (if (some #(dw/dim=? % dim) coll)
+      coll
+      (conj coll dim))))
+
+(defn remove-dimension [coll dim]
+  (vec (remove #(dw/dim=? dim %) coll)))
+
+(defevh :dimension-added-to-filter [db dim]
+  (update-in db [:query :filter] add-dimension dim))
+
+(defevh :dimension-removed-from-filter [db dim]
+  (update-in db [:query :filter] remove-dimension dim))
+
+(defevh :dimension-added-to-split [db dim]
+  (update-in db [:query :split] add-dimension dim))
+
+(defevh :dimension-replaced-split [db dim]
+  (assoc-in db [:query :split] [dim]))
+
+(defevh :dimension-removed-from-split [db dim]
+  (update-in db [:query :split] remove-dimension dim))
+
+(defevh :dimension-pinned [db dim]
+  (update-in db [:query :pinned] add-dimension dim))
 
 (defevh :measure-toggled [db name selected]
   (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))
-
-(defevh :dimension-added-to-filter [db name]
-  db)
-
-(defevh :dimension-added-to-split [db name]
-  db)
-
-(defevh :dimension-replaced-split [db name]
-  db)
-
-(defevh :dimension-pinned [db name]
-  (update-in db [:query :pinned] (fnil conj #{}) name))
 
 (defn current-cube-name []
   (db/get-in [:query :cube]))
@@ -54,18 +75,19 @@
    [:i.icon {:class icon}]])
 
 ; TODO Pivot hace una query para traer la cardinality, supongo q x si se actualiza desde que se trajo toda la metadata
-(defn- dimension-popup [{:keys [name cardinality description]} selected]
-  [:div.ui.special.popup.card {:style {:display (if @selected "block" "none")}}
-   (when description
+(defn- dimension-popup [{:keys [cardinality description] :as dim} selected]
+  (let [dim (select-keys dim [:name :title])]
+    [:div.ui.special.popup.card {:style {:display (if @selected "block" "none")}}
+     (when description
+       [:div.content
+        [:div.description description]])
      [:div.content
-      [:div.description description]])
-   [:div.content
-    [dimension-popup-button "blue" "filter" :dimension-added-to-filter selected name]
-    [dimension-popup-button "green" "square" :dimension-replaced-split selected name]
-    [dimension-popup-button "orange" "plus" :dimension-added-to-split selected name]
-    [dimension-popup-button "yellow" "pin" :dimension-pinned selected name]]
-   (when cardinality
-     [:div.extra.content (str cardinality " values")])])
+      [dimension-popup-button "green" "filter" :dimension-added-to-filter selected dim]
+      [dimension-popup-button "orange" "square" :dimension-replaced-split selected dim]
+      [dimension-popup-button "orange" "plus" :dimension-added-to-split selected dim]
+      [dimension-popup-button "yellow" "pin" :dimension-pinned selected dim]]
+     (when cardinality
+       [:div.extra.content (str cardinality " values")])]))
 
 (defn- type-icon [type name]
   (let [effective-type (if (= name "__time") "TIME" type)]
@@ -80,7 +102,7 @@
                          :class (when @selected "active")}
     [:i.icon {:class (type-icon type name)}] title]
    [dimension-popup dimension selected]
-   {:on "manual" :position "right center" :distanceAway -20}])
+   {:on "manual" :position "right center" :distanceAway -30}])
 
 (defn- dimension-item [{:keys [name] :as dimension}]
   (let [selected (r/atom false)
@@ -111,6 +133,28 @@
    [:div.items
     (rmap measure-item (:measures (current-cube)))]])
 
+(defn- filter-item [{:keys [title] :as dim}]
+  [:button.ui.green.compact.button {:class (when-not (dw/main-time-dimension? dim) "right labeled icon")}
+   (when-not (dw/main-time-dimension? dim)
+     [:i.close.icon {:on-click #(dispatch :dimension-removed-from-filter dim)}])
+   title])
+
+
+(defn- filter-panel []
+  [:div.filter.panel
+   [panel-header :cubes/filter]
+   (rmap filter-item (:filter (db/get :query)))])
+
+(defn- split-item [{:keys [title] :as dim}]
+  [:button.ui.orange.compact.right.labeled.icon.button
+   [:i.close.icon {:on-click #(dispatch :dimension-removed-from-split dim)}]
+   title])
+
+(defn- split-panel []
+  [:div.split.panel
+   [panel-header :cubes/split]
+   (rmap split-item (:split (db/get :query)))])
+
 (defn- pinboard-panel []
   [:div.pinboard.zone
    [panel-header :cubes/pinboard]
@@ -128,11 +172,9 @@
      [dimensions-panel]
      [measures-panel]]]
    [:div.center-column
-    [:div.filters-splits.zone
-     [:div.filters.panel
-      [panel-header :cubes/filter]]
-     [:div.panel
-      [panel-header :cubes/split]]]
+    [:div.zone
+     [filter-panel]
+     [split-panel]]
     [:div.visualization.zone.panel]]
    [:div.right-column
     [pinboard-panel]]])

@@ -39,6 +39,12 @@
 (defn cubes-list []
   (vals (db/get :cubes)))
 
+(defn main-time-dimension? [{:keys [name]}]
+  (= name "__time"))
+
 ; TODO esto fallaría si no hay una dimension __time
 (defn main-time-dimension [{:keys [dimensions]}]
-  (some #(when (= (:name %) "__time") %) dimensions))
+  (some #(when (main-time-dimension? %) %) dimensions))
+
+(defn dim=? [dim1 dim2]
+  (= (:name dim1) (:name dim2)))
