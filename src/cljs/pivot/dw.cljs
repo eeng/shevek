@@ -4,7 +4,7 @@
             [cuerdas.core :as str]
             [pivot.rpc :as rpc]
             [pivot.lib.collections :refer [reverse-merge]]
-            [pivot.lib.dates :refer [parse-time]]
+            [pivot.lib.dates :refer [parse-time day-interval now yesterday to-iso8601]]
             [reflow.db :as db]))
 
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
@@ -39,12 +39,25 @@
 (defn cubes-list []
   (vals (db/get :cubes)))
 
-(defn main-time-dimension? [{:keys [name]}]
+(defn time-dimension? [{:keys [name]}]
   (= name "__time"))
 
 ; TODO esto fallaría si no hay una dimension __time
-(defn main-time-dimension [{:keys [dimensions]}]
-  (some #(when (main-time-dimension? %) %) dimensions))
+(defn time-dimension [dimensions]
+  (some #(when (time-dimension? %) %) dimensions))
 
 (defn dim=? [dim1 dim2]
   (= (:name dim1) (:name dim2)))
+
+(defn- to-interval [{:keys [selected-period max-time]}]
+  (condp = selected-period
+    :latest-day (day-interval (or max-time (now)))
+    :current-day (day-interval (now))
+    :previous-day (day-interval (yesterday))))
+
+; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
+(defn to-dw-query [{:keys [filter split] :as query}]
+  (-> query
+      (assoc :interval (mapv to-iso8601 (to-interval (time-dimension filter))))
+      (assoc :filter (mapv #(select-keys % [:name]) filter))
+      (assoc :split (mapv #(select-keys % [:name]) split))))

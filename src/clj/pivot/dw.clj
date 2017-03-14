@@ -13,3 +13,6 @@
 
 (defn cube [name]
   (e/cube engine name))
+
+(defn query [q]
+  (e/query engine q))

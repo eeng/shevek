@@ -31,4 +31,5 @@
 (defrecord InMemoryEngine []
   DwEngine
   (cubes [_] (map #(dissoc % :dimensions :measures) (vals test-cubes)))
-  (cube [_ name] (test-cubes name)))
+  (cube [_ name] (test-cubes name))
+  (query [_ q] ["the results"]))

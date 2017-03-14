@@ -3,17 +3,11 @@
             [cljs-time.core :as t]
             [cljs-time.extend]))
 
-; So the goog.date's are serialized as iso8601 strings
-(extend-protocol IPrintWithWriter
-  goog.date.UtcDateTime
-  (-pr-writer [obj writer opts]
-    (pr-writer (f/unparse (:date-time f/formatters) obj) writer opts)))
-
 ;; TODO todas estas funciones van a trabajar con el timezone en UTC. Ver como influye eso al usar la local
 
 (def parse-time f/parse)
 
-(def today t/now)
+(def now t/now)
 
 (def yesterday t/yesterday)
 
@@ -25,5 +19,15 @@
       (t/minus (t/millis 1))))
 
 ; TODO hacer testing de esto
-(defn- day-period [time]
+(defn- day-interval [time]
   [(beginning-of-day time) (end-of-day time)])
+
+(defn to-iso8601 [time]
+  (f/unparse (:date-time f/formatters) time))
+
+; So the goog.date's are serialized as iso8601 strings with pr-str
+(extend-protocol IPrintWithWriter
+  goog.date.UtcDateTime
+  (-pr-writer [obj writer opts]
+    (-write writer "#inst ")
+    (pr-writer (to-iso8601 obj) writer opts)))

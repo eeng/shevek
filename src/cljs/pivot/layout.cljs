@@ -57,7 +57,7 @@
        [:i.block.layout.icon] (t :dashboard/title)]
       [cubes-menu]
       [:div.right.menu
-       (when (loading?) [:div.item [:i.spinner.loading.icon]])
+       (when (loading?) [:div.item [:i.repeat.loading.icon]])
        [:a.item {:href "#/settings" :class (active? :settings)}
         [:i.settings.icon] (t :settings/title)]
        [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]

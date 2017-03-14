@@ -6,7 +6,6 @@
             [pivot.react :refer [rmap]]
             [pivot.rpc :as rpc]
             [pivot.dw :as dw]
-            [pivot.lib.dates :refer [day-period today yesterday]]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
@@ -18,11 +17,13 @@
   (-> (assoc db :query {:cube cube})
       (rpc/loading :cube)))
 
-(defn- build-time-filter [{:keys [time-boundary] :as cube}]
-  (assoc (dw/main-time-dimension cube)
-         :latest-day (day-period (:max-time time-boundary))
-         :current-day (day-period (today))
-         :previous-day (day-period (yesterday))
+(defevh :query-executed [db results]
+  (-> (assoc db :results results)
+      (rpc/loaded :query)))
+
+(defn- build-time-filter [{:keys [dimensions time-boundary] :as cube}]
+  (assoc (dw/time-dimension dimensions)
+         :max-time (:max-time time-boundary)
          :selected-period :latest-day))
 
 (defn- init-query [{:keys [query] :as db} cube]
@@ -31,11 +32,16 @@
       (assoc :split [])
       (->> (assoc db :query))))
 
+(defn- send-query [{:keys [query] :as db}]
+  (rpc/call "dw/query" :args [(dw/to-dw-query query)] :handler #(dispatch :query-executed %))
+  (rpc/loading db :query))
+
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (let [cube (dw/set-cube-defaults cube)]
     (-> (assoc-in db [:cubes name] cube)
         (init-query cube)
-        (rpc/loaded :cube))))
+        (rpc/loaded :cube)
+        (send-query))))
 
 (defn add-dimension [coll dim]
   (let [coll (or coll [])]
@@ -47,25 +53,31 @@
   (vec (remove #(dw/dim=? dim %) coll)))
 
 (defevh :dimension-added-to-filter [db dim]
-  (update-in db [:query :filter] add-dimension dim))
+  (-> (update-in db [:query :filter] add-dimension dim)
+      (send-query)))
 
 (defevh :dimension-removed-from-filter [db dim]
-  (update-in db [:query :filter] remove-dimension dim))
+  (-> (update-in db [:query :filter] remove-dimension dim)
+      (send-query)))
 
 (defevh :dimension-added-to-split [db dim]
-  (update-in db [:query :split] add-dimension dim))
+  (-> (update-in db [:query :split] add-dimension dim)
+      (send-query)))
 
 (defevh :dimension-replaced-split [db dim]
-  (assoc-in db [:query :split] [dim]))
+  (-> (assoc-in db [:query :split] [dim])
+      (send-query)))
 
 (defevh :dimension-removed-from-split [db dim]
-  (update-in db [:query :split] remove-dimension dim))
+  (-> (update-in db [:query :split] remove-dimension dim)
+      (send-query)))
 
 (defevh :dimension-pinned [db dim]
   (update-in db [:query :pinned] add-dimension dim))
 
 (defevh :measure-toggled [db name selected]
-  (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))
+  (-> (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name)
+      (send-query)))
 
 (defn current-cube-name []
   (db/get-in [:query :cube]))
@@ -143,8 +155,8 @@
     (rmap measure-item (:measures (current-cube)))]])
 
 (defn- filter-item [{:keys [title] :as dim}]
-  [:button.ui.green.compact.button {:class (when-not (dw/main-time-dimension? dim) "right labeled icon")}
-   (when-not (dw/main-time-dimension? dim)
+  [:button.ui.green.compact.button {:class (when-not (dw/time-dimension? dim) "right labeled icon")}
+   (when-not (dw/time-dimension? dim)
      [:i.close.icon {:on-click #(dispatch :dimension-removed-from-filter dim)}])
    title])
 
