@@ -99,6 +99,16 @@
    [:div.items
     (rmap measure-item (:measures (current-cube)))]])
 
+(defn- pinboard-panel []
+  [:div.pinboard.zone
+   [panel-header :cubes/pinboard]
+   (if (seq (db/get-in [:query :pinned]))
+     [:div.panel.ui.basic.segment "Uno de estos por cada pinned dim"]
+     [:div.panel.ui.basic.segment.no-pinned
+      [:div.ui.icon.header
+       [:i.pin.icon]
+       [:div.text (t :cubes/no-pinned)]]])])
+
 (defn page []
   [:div#cube
    [:div.left-column
@@ -113,5 +123,4 @@
       [panel-header :cubes/split]]]
     [:div.visualization.zone.panel]]
    [:div.right-column
-    [:div.pinboard.zone.panel
-     [panel-header :cubes/pinboard]]]])
+    [pinboard-panel]]])

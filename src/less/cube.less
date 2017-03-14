@@ -2,6 +2,7 @@
 
 #cube {
   @lateral-col-width: 250px;
+  @panel-separator: 1px solid #f0f0f0;
 
   position: absolute;
   top: 40px;
@@ -20,16 +21,16 @@
       background-color: white;
       .border-radius(3px);
       .box-shadow(0px 0px 15px 0px rgba(0,0,0,0.1));
-    }
-    .panel {
-      padding: 0;
-      margin: 0;
       .sub.header {
         font-weight: normal;
         color: #949494;
         padding: 12px 15px;
         margin: 0;
       }
+    }
+    .panel {
+      padding: 0;
+      margin: 0;
       .items {
         .item:not(.ui) {
           padding: 5px 15px;
@@ -83,10 +84,29 @@
     width: @lateral-col-width;
     right: 0px;
     .pinboard {
-      flex: 1;
+      .panel {
+        border-top: @panel-separator;
+        &.no-pinned {
+          display: flex;
+          align-items: center;
+          height: @lateral-col-width;
+          .ui.icon.header {
+            color: #ccc;
+            font-size: 110%;
+            font-style: italic;
+            font-weight: normal;
+            width: 100%;
+            margin: 1em 2em 2em 2em;
+            i {
+              font-size: 3em;
+              display: block;
+            }
+          }
+        }
+      }
     }
   }
   .dimensions, .filters {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: @panel-separator;
   }
 }

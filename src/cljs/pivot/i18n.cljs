@@ -17,7 +17,8 @@
             :split "Split"
             :pin "Pin"
             :pinboard "Pinboard"
-            :no-desc "No description."}
+            :no-desc "No description."
+            :no-pinned "Drag or click dimensions to pin them"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -34,7 +35,8 @@
             :dimensions "Dimensiones"
             :measures "Métricas"
             :filter "Filtros"
-            :no-desc "Sin descripción."}
+            :no-desc "Sin descripción."
+            :no-pinned "Arrastre o clickee dimensiones para fijarlas aquí"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"
