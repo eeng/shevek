@@ -19,7 +19,8 @@
 
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (-> (assoc-in db [:cubes name] (dw/set-cube-defaults cube))
-      (rpc/loaded :cube)))
+      (rpc/loaded :cube)
+      (assoc-in [:query :filter] [(dw/main-time-dimension cube)])))
 
 (defevh :measure-toggled [db name selected]
   (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name))

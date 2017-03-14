@@ -4,16 +4,18 @@
             [cuerdas.core :as str]
             [pivot.rpc :as rpc]
             [pivot.lib.collections :refer [reverse-merge]]
+            [pivot.lib.dates :refer [parse-time]]
             [reflow.db :as db]))
 
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
 
-(defn set-cube-defaults [{:keys [dimensions measures] :as cube}]
+(defn set-cube-defaults [{:keys [dimensions measures time-boundary] :as cube}]
   (-> cube
       set-default-title
       (assoc :dimensions (map set-default-title dimensions))
-      (assoc :measures (map set-default-title measures))))
+      (assoc :measures (map set-default-title measures))
+      (assoc-in [:time-boundary :max-time] (parse-time (:max-time time-boundary)))))
 
 (defn- set-defaults [cubes]
   (map set-cube-defaults cubes))
@@ -36,3 +38,7 @@
 
 (defn cubes-list []
   (vals (db/get :cubes)))
+
+; TODO esto fallaría si no hay una dimension __time
+(defn main-time-dimension [{:keys [dimensions]}]
+  (some #(when (= (:name %) "__time") %) dimensions))

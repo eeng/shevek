@@ -29,7 +29,8 @@
                     [se.haleby/stub-http "0.2.1"]
                     [cljs-ajax "0.5.8"]
                     [secretary "1.2.3"]
-                    [funcool/cuerdas "2.0.3"]])
+                    [funcool/cuerdas "2.0.3"]
+                    [com.andrewmcveigh/cljs-time "0.5.0-alpha2"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
