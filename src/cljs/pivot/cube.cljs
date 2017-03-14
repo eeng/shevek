@@ -6,6 +6,7 @@
             [pivot.react :refer [rmap]]
             [pivot.rpc :as rpc]
             [pivot.dw :as dw]
+            [pivot.lib.dates :refer [day-period today yesterday]]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
@@ -17,10 +18,18 @@
   (-> (assoc db :query {:cube cube})
       (rpc/loading :cube)))
 
-(defn- init-query [db cube]
-  (-> db
-      (assoc-in [:query :filter] [(dw/main-time-dimension cube)])
-      (assoc-in [:query :split] [])))
+(defn- build-time-filter [{:keys [time-boundary] :as cube}]
+  (assoc (dw/main-time-dimension cube)
+         :latest-day (day-period (:max-time time-boundary))
+         :current-day (day-period (today))
+         :previous-day (day-period (yesterday))
+         :selected-period :latest-day))
+
+(defn- init-query [{:keys [query] :as db} cube]
+  (-> query
+      (assoc :filter [(build-time-filter cube)])
+      (assoc :split [])
+      (->> (assoc db :query))))
 
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (let [cube (dw/set-cube-defaults cube)]
