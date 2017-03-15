@@ -40,7 +40,7 @@
 
 (defn- send-query [{:keys [cube-view] :as db}]
   (rpc/call "dw/query" :args [(dw/to-dw-query cube-view)] :handler #(dispatch :query-executed %))
-  (rpc/loading db :query-results))
+  (rpc/loading db :main-results))
 
 (defevh :cube-selected [db cube]
   (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
@@ -197,14 +197,16 @@
    (if (seq (cube-view-get :pinned))
      [:div.panel.ui.basic.segment "Uno de estos por cada pinned dim"]
      [:div.panel.ui.basic.segment.no-pinned
-      [:div.ui.icon.header
+      [:div.icon-hint
        [:i.pin.icon]
        [:div.text (t :cubes/no-pinned)]]])])
 
 (defn- visualization-panel []
   [:div.visualization.zone.panel
    (if (empty? (cube-view-get :measures))
-     [:div "Please select at least one measure"]
+     [:div.icon-hint
+      [:i.warning.circle.icon]
+      [:div.text (t :cubes/no-measures)]]
      (if (empty? (cube-view-get :split))
        [:div "TODO totals"]
        [:div "TODO lista"]))])

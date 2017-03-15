@@ -57,63 +57,76 @@
   .left-column {
     width: @lateral-col-width;
     left: 0;
-    .dimensions-measures {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      .dimensions { flex: 71 1 0%;  }
-      .measures { flex: 29 1 0%; }
-      .dimensions, .measures { // This is for the scroll within the .items
-        display: flex;
-        flex-direction: column;
-        .items { overflow-y: auto; }
-      }
-    }
   }
   .center-column {
     left: @lateral-col-width + 2px;
     right: @lateral-col-width + 2px;
     padding-left: 0;
     padding-right: 0;
-    .visualization {
-      margin-top: 10px;
-      flex: 1;
-    }
   }
   .right-column {
     width: @lateral-col-width;
     right: 0px;
-    .pinboard {
-      .panel {
-        border-top: @panel-separator;
-        &.no-pinned {
-          display: flex;
-          align-items: center;
-          height: @lateral-col-width;
-          .ui.icon.header {
-            color: #ccc;
-            font-size: 110%;
-            font-style: italic;
-            font-weight: normal;
-            width: 100%;
-            margin: 1em 2em 2em 2em;
-            i {
-              font-size: 3em;
-              display: block;
-            }
-          }
-        }
-      }
+  }
+
+  .icon-hint {
+    color: #ccc;
+    text-align: center;
+    .icon {
+      line-height: 1;
+      font-size: 3em;
+      margin-bottom: 7px;
+    }
+    .text {
+      font-style: italic;
+      font-weight: normal;
+      font-size: 12pt;
     }
   }
-  .dimensions {
-    border-bottom: @panel-separator;
+
+  .dimensions-measures {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .dimensions {
+      flex: 71 1 0%;
+      border-bottom: @panel-separator;
+    }
+    .measures { flex: 29 1 0%; }
+    .dimensions, .measures { // This is for the scroll within the .items
+      display: flex;
+      flex-direction: column;
+      .items { overflow-y: auto; }
+    }
   }
+
   .filter, .split {
     border-bottom: @panel-separator;
     display: flex;
     flex-direction: row;
     align-items: center;
     h2 { width: 67px; }
+  }
+
+  .visualization {
+    flex: 1;
+    margin-top: 10px;
+    padding: 10px 15px;
+    .icon-hint { margin-top: 30px; }
+  }
+
+  .pinboard {
+    .panel {
+      border-top: @panel-separator;
+      &.no-pinned {
+        display: flex;
+        align-items: center;
+        height: @lateral-col-width;
+        .icon-hint {
+          width: 100%;
+          margin: 1em 2em 2em 2em;
+        }
+      }
+    }
   }
 }
