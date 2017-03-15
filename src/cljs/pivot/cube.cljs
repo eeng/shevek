@@ -208,6 +208,14 @@
        [:i.pin.icon]
        [:div.text (t :cubes/no-pinned)]]])])
 
+(defn- totals-visualization []
+  [:div.ui.statistics
+    (for [[measure-name value] (-> (cube-view :main-results) first :result)]
+      ^{:key measure-name}
+      [:div.statistic
+       [:div.label (str/title measure-name)]
+       [:div.value value]])])
+
 (defn- visualization-panel []
   [:div.visualization.zone.panel
    (if (empty? (cube-view :measures))
@@ -215,7 +223,7 @@
       [:i.warning.circle.icon]
       [:div.text (t :cubes/no-measures)]]
      (if (empty? (cube-view :split))
-       [:div "TODO totals"]
+       [totals-visualization]
        [:div "TODO lista"]))])
 
 (defn page []
