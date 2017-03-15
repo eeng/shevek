@@ -91,8 +91,11 @@
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
       (send-query)))
 
+(defn- cube-view-get [key]
+  (db/get-in [:cube-view key]))
+
 (defn current-cube-name []
-  (db/get-in [:cube-view :cube]))
+  (cube-view-get :cube))
 
 (defn current-cube []
   (get (db/get :cubes) (current-cube-name)))
@@ -191,12 +194,20 @@
 (defn- pinboard-panel []
   [:div.pinboard.zone
    [panel-header :cubes/pinboard]
-   (if (seq (db/get-in [:cube-view :pinned]))
+   (if (seq (cube-view-get :pinned))
      [:div.panel.ui.basic.segment "Uno de estos por cada pinned dim"]
      [:div.panel.ui.basic.segment.no-pinned
       [:div.ui.icon.header
        [:i.pin.icon]
        [:div.text (t :cubes/no-pinned)]]])])
+
+(defn- visualization-panel []
+  [:div.visualization.zone.panel
+   (if (empty? (cube-view-get :measures))
+     [:div "Please select at least one measure"]
+     (if (empty? (cube-view-get :split))
+       [:div "TODO totals"]
+       [:div "TODO lista"]))])
 
 (defn page []
   [:div#cube
@@ -208,6 +219,6 @@
     [:div.zone
      [filter-panel]
      [split-panel]]
-    [:div.visualization.zone.panel]]
+    [visualization-panel]]
    [:div.right-column
     [pinboard-panel]]])
