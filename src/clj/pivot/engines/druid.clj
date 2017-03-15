@@ -49,12 +49,24 @@
 (defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
   {:fieldName name :name name :type type})
 
-(defn to-druid-query [{:keys [cube measures interval]}]
-  {:queryType "timeseries"
-   :dataSource {:type "table" :name cube}
-   :granularity {:type "all"}
-   :intervals (str/join "/" interval)
-   :aggregations (map to-druid-agg measures)})
+(defn- calculate-query-type [{:keys [split]}]
+  (if (seq split)
+    "topN"
+    "timeseries"))
+
+(defn- add-query-type-dependant-fields [dq {:keys [split measures limit] :or {limit 100} :as q}]
+  (let [query-type (calculate-query-type q)]
+    (cond-> (assoc dq :queryType (calculate-query-type q))
+            (= query-type "topN") (assoc :dimension (-> split first :name)
+                                         :metric (-> measures first :name)
+                                         :threshold limit))))
+
+(defn to-druid-query [{:keys [cube measures interval] :as q}]
+  (-> {:dataSource {:type "table" :name cube}
+       :granularity {:type "all"}
+       :intervals (str/join "/" interval)
+       :aggregations (mapv to-druid-agg measures)}
+      (add-query-type-dependant-fields q)))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
@@ -71,7 +83,9 @@
            (clojure.pprint/pprint dq) ; TODO pasar a logging
            (send-query host dq))))
 
+; Manual testing
 (def broker "http://kafka:8082")
+
 #_(datasources broker)
 #_(dimensions broker "vtol_stats")
 #_(dimensions broker "wikiticker")
@@ -86,8 +100,9 @@
                        {:name "added" :type "doubleSum"}]
             :interval ["2015-09-12" "2015-09-13"]})
 
-; One dimension and one measure query
-#_(query broker {:cube "wikiticker"
-                 :measures [{:name "count" :type "longSum"}
-                            {:name "added" :type "doubleSum"}]
-                 :interval ["2015-09-12" "2015-09-13"]})
+; One no-time dimension and one measure (for pinned dimensions)
+#_(e/query (DruidEngine. broker)
+           {:cube "wikiticker"
+            :split [{:name "page"}]
+            :measures [{:name "count" :type "longSum"}]
+            :interval ["2015-09-12" "2015-09-13"]})

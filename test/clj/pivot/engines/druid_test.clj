@@ -38,7 +38,23 @@
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]}))))
 
-  (testing "measure type should be doubleSum when empty")
+  (testing "measure type should be doubleSum when empty"
+    (is (= "doubleSum"
+           (-> (to-druid-query {:measures [{:name "count"}]})
+               (get-in [:aggregations 0 :type])))))
+
+  (testing "query with one no-time dimension and one measure should generate a topN query"
+    (is (submap? {:queryType "topN"
+                  :dataSource {:type "table" :name "wikiticker"}
+                  :granularity {:type "all"}
+                  :dimension "page"
+                  :metric "count"
+                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
+                  :threshold 10}
+                 (to-druid-query {:cube "wikiticker"
+                                  :split [{:name "page"}]
+                                  :measures [{:name "count" :type "longSum"}]
+                                  :limit 10}))))
 
   (testing "query with one time dimension and one measure"
     #_(is (submap? {:queryType "timeseries"
