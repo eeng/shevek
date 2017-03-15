@@ -210,7 +210,7 @@
        [:div "TODO lista"]))])
 
 (defn page []
-  [:div#cube
+  [:div#cube-view
    [:div.left-column
     [:div.dimensions-measures.zone
      [dimensions-panel]
