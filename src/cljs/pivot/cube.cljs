@@ -11,36 +11,47 @@
             [cuerdas.core :as str]
             [pivot.components :refer [checkbox popup]]))
 
-(defevh :cube-selected [db cube]
-  (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (dispatch :navigate :cube)
-  (-> (assoc db :query {:cube cube})
-      (rpc/loading :cube)))
+;; DB model example
+#_{:cubes {"wikiticker"
+           {:dimensions [{:name "page"}]
+            :measures [{:name "added"} {:name "deleted"}]
+            :time-boundary {:max-time "..."}}}
+   :cube-view {:cube "wikitiker"
+               :filter [{:name "__time" :selected-period :latest-day}]
+               :split [{:name "region"}]
+               :measures [{:name "added"}]
+               :pinned [{:name "channel"}]}}
 
 (defevh :query-executed [db results]
-  (-> (assoc db :results results)
-      (rpc/loaded :query)))
+  (-> (assoc-in db [:cube-view :main-results] results)
+      (rpc/loaded :main-results)))
 
 (defn- build-time-filter [{:keys [dimensions time-boundary] :as cube}]
   (assoc (dw/time-dimension dimensions)
          :max-time (:max-time time-boundary)
          :selected-period :latest-day))
 
-(defn- init-query [{:keys [query] :as db} cube]
-  (-> query
+(defn- init-cube-view [{:keys [cube-view] :as db} cube]
+  (-> cube-view
       (assoc :filter [(build-time-filter cube)])
       (assoc :split [])
-      (->> (assoc db :query))))
+      (->> (assoc db :cube-view))))
 
-(defn- send-query [{:keys [query] :as db}]
-  (rpc/call "dw/query" :args [(dw/to-dw-query query)] :handler #(dispatch :query-executed %))
-  (rpc/loading db :query))
+(defn- send-query [{:keys [cube-view] :as db}]
+  (rpc/call "dw/query" :args [(dw/to-dw-query cube-view)] :handler #(dispatch :query-executed %))
+  (rpc/loading db :query-results))
+
+(defevh :cube-selected [db cube]
+  (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
+  (dispatch :navigate :cube)
+  (-> (assoc db :cube-view {:cube cube})
+      (rpc/loading :cube-metadata)))
 
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (let [cube (dw/set-cube-defaults cube)]
     (-> (assoc-in db [:cubes name] cube)
-        (init-query cube)
-        (rpc/loaded :cube)
+        (init-cube-view cube)
+        (rpc/loaded :cube-metadata)
         (send-query))))
 
 (defn add-dimension [coll dim]
@@ -53,34 +64,34 @@
   (vec (remove #(dw/dim=? dim %) coll)))
 
 (defevh :dimension-added-to-filter [db dim]
-  (-> (update-in db [:query :filter] add-dimension dim)
+  (-> (update-in db [:cube-view :filter] add-dimension dim)
       (send-query)))
 
 (defevh :dimension-removed-from-filter [db dim]
-  (-> (update-in db [:query :filter] remove-dimension dim)
+  (-> (update-in db [:cube-view :filter] remove-dimension dim)
       (send-query)))
 
 (defevh :dimension-added-to-split [db dim]
-  (-> (update-in db [:query :split] add-dimension dim)
+  (-> (update-in db [:cube-view :split] add-dimension dim)
       (send-query)))
 
 (defevh :dimension-replaced-split [db dim]
-  (-> (assoc-in db [:query :split] [dim])
+  (-> (assoc-in db [:cube-view :split] [dim])
       (send-query)))
 
 (defevh :dimension-removed-from-split [db dim]
-  (-> (update-in db [:query :split] remove-dimension dim)
+  (-> (update-in db [:cube-view :split] remove-dimension dim)
       (send-query)))
 
 (defevh :dimension-pinned [db dim]
-  (update-in db [:query :pinned] add-dimension dim))
+  (update-in db [:cube-view :pinned] add-dimension dim))
 
-(defevh :measure-toggled [db name selected]
-  (-> (update-in db [:query :measures] (fnil (if selected conj disj) #{}) name)
+(defevh :measure-toggled [db dim selected]
+  (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
       (send-query)))
 
 (defn current-cube-name []
-  (db/get-in [:query :cube]))
+  (db/get-in [:cube-view :cube]))
 
 (defn current-cube []
   (get (db/get :cubes) (current-cube-name)))
@@ -138,18 +149,18 @@
                      :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)})))
 
 (defn- dimensions-panel []
-  [:div.dimensions.panel.ui.basic.segment {:class (when (rpc/loading? :cube) "loading")}
+  [:div.dimensions.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
    [panel-header :cubes/dimensions]
    [:div.items
     (rmap dimension-item (:dimensions (current-cube)))]])
 
-(defn- measure-item [{:keys [name title]}]
+(defn- measure-item [{:keys [title] :as dim}]
   [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)}
-   [checkbox title {:on-change #(dispatch :measure-toggled name %)}]])
+   [checkbox title {:on-change #(dispatch :measure-toggled dim %)}]])
 
 (defn- measures-panel []
   ^{:key (current-cube-name)}
-  [:div.measures.panel.ui.basic.segment {:class (when (rpc/loading? :cube) "loading")}
+  [:div.measures.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
    [panel-header :cubes/measures]
    [:div.items
     (rmap measure-item (:measures (current-cube)))]])
@@ -164,7 +175,7 @@
 (defn- filter-panel []
   [:div.filter.panel
    [panel-header :cubes/filter]
-   (rmap filter-item (:filter (db/get :query)))])
+   (rmap filter-item (:filter (db/get :cube-view)))])
 
 (defn- split-item [{:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
@@ -174,12 +185,12 @@
 (defn- split-panel []
   [:div.split.panel
    [panel-header :cubes/split]
-   (rmap split-item (:split (db/get :query)))])
+   (rmap split-item (:split (db/get :cube-view)))])
 
 (defn- pinboard-panel []
   [:div.pinboard.zone
    [panel-header :cubes/pinboard]
-   (if (seq (db/get-in [:query :pinned]))
+   (if (seq (db/get-in [:cube-view :pinned]))
      [:div.panel.ui.basic.segment "Uno de estos por cada pinned dim"]
      [:div.panel.ui.basic.segment.no-pinned
       [:div.ui.icon.header

@@ -50,7 +50,8 @@
   (cube [_ name] (assoc {:name name}
                         :dimensions (dimensions host name)
                         :measures (metrics host name)
-                        :time-boundary (time-boundary host name))))
+                        :time-boundary (time-boundary host name)))
+  (query [_ q] ["Results DRUID"]))
 
 (def broker "http://kafka:8082")
 #_(datasources broker)

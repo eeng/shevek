@@ -55,9 +55,13 @@
     :current-day (day-interval (now))
     :previous-day (day-interval (yesterday))))
 
+(defn- only-dw-query-keys [dim]
+  (select-keys dim [:name]))
+
 ; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
-(defn to-dw-query [{:keys [filter split] :as query}]
-  (-> query
-      (assoc :interval (mapv to-iso8601 (to-interval (time-dimension filter))))
-      (assoc :filter (mapv #(select-keys % [:name]) filter))
-      (assoc :split (mapv #(select-keys % [:name]) split))))
+(defn to-dw-query [{:keys [cube filter split measures]}]
+  {:cube cube
+   :interval (mapv to-iso8601 (to-interval (time-dimension filter)))
+   :filter (mapv only-dw-query-keys filter)
+   :split (mapv only-dw-query-keys split)
+   :measures (mapv only-dw-query-keys measures)})
