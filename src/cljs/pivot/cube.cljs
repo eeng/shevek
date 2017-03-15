@@ -21,10 +21,12 @@
                :split [{:name "region"}]
                :measures [{:name "added"}]
                :pinboard [{:name "channel"}]
-               :main-results [{:timestamp "..." :result []}]}}
+               :results {:main {...druid response...}
+                         :pinboard {"dim1-name" {...druid response...}
+                                    "dim2-name" {...druid response...}}}}}
 
-(defn- cube-view [key]
-  (db/get-in [:cube-view key]))
+(defn- cube-view [& keys]
+  (db/get-in (into [:cube-view] keys)))
 
 (defn current-cube-name []
   (cube-view :cube))
@@ -34,9 +36,18 @@
       (get (current-cube-name))
       cube-key))
 
-(defevh :query-executed [db results]
-  (-> (assoc-in db [:cube-view :main-results] results)
-      (rpc/loaded :main-results)))
+(defn pinboard-measure []
+  (first (current-cube :measures)))
+
+(defevh :query-executed2 [db results results-keys]
+  (-> (assoc-in db (into [:cube-view] results-keys) results)
+      (rpc/loaded results-keys)))
+
+(defn send-query [db q results-keys]
+  (rpc/call "dw/query"
+            :args [(dw/to-dw-query q)]
+            :handler #(dispatch :query-executed2 % results-keys))
+  (rpc/loading db results-keys))
 
 (defn- build-time-filter [{:keys [dimensions time-boundary] :as cube}]
   (assoc (dw/time-dimension dimensions)
@@ -50,9 +61,8 @@
              :measures (->> measures (take 3) vec))
       (->> (assoc db :cube-view))))
 
-(defn- send-query [{:keys [cube-view] :as db}]
-  (rpc/call "dw/query" :args [(dw/to-dw-query cube-view)] :handler #(dispatch :query-executed %))
-  (rpc/loading db :main-results))
+(defn- send-main-query [{:keys [cube-view] :as db}]
+  (send-query db cube-view [:results :main]))
 
 (defevh :cube-selected [db cube]
   (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
@@ -65,7 +75,7 @@
     (-> (assoc-in db [:cubes name] cube)
         (init-cube-view cube)
         (rpc/loaded :cube-metadata)
-        (send-query))))
+        (send-main-query))))
 
 (defn includes-dim? [coll dim]
   (some #(dw/dim=? % dim) coll))
@@ -81,30 +91,36 @@
 
 (defevh :dimension-added-to-filter [db dim]
   (-> (update-in db [:cube-view :filter] add-dimension dim)
-      (send-query)))
+      #_(send-main-query)))
 
 (defevh :dimension-removed-from-filter [db dim]
   (-> (update-in db [:cube-view :filter] remove-dimension dim)
-      (send-query)))
+      #_(send-main-query)))
 
 (defevh :dimension-added-to-split [db dim]
   (-> (update-in db [:cube-view :split] add-dimension dim)
-      (send-query)))
+      #_(send-main-query)))
 
 (defevh :dimension-replaced-split [db dim]
   (-> (assoc-in db [:cube-view :split] [dim])
-      (send-query)))
+      #_(send-main-query)))
 
 (defevh :dimension-removed-from-split [db dim]
   (-> (update-in db [:cube-view :split] remove-dimension dim)
-      (send-query)))
+      #_(send-main-query)))
 
-(defevh :dimension-pinned [db dim]
-  (update-in db [:cube-view :pinboard] add-dimension dim))
+(defevh :dimension-pinned [{:keys [cube-view] :as db} {:keys [name] :as dim}]
+  (-> (update-in db [:cube-view :pinboard] add-dimension dim)
+      (send-query {:cube (:cube cube-view)
+                   :filter (:filter cube-view)
+                   :split [dim]
+                   :measures (vector (pinboard-measure)) ; TODO permitir seleccionar la measure a usar en el pinboard
+                   :limit 100}
+                  [:results :pinboard name])))
 
 (defevh :measure-toggled [db dim selected]
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
-      (send-query)))
+      (send-main-query)))
 
 (defn- panel-header [text]
   [:h2.ui.sub.header text])
@@ -182,7 +198,6 @@
      [:i.close.icon {:on-click #(dispatch :dimension-removed-from-filter dim)}])
    title])
 
-
 (defn- filter-panel []
   [:div.filter.panel
    [panel-header (t :cubes/filter)]
@@ -198,9 +213,17 @@
    [panel-header (t :cubes/split)]
    (rmap split-item (cube-view :split))])
 
-(defn- pinned-dimension-panel [{:keys [name title]}]
-  [:div.panel
-   [panel-header title]])
+(defn- pinned-dimension-item [dim-name result]
+  [:div.item
+   [:div.segment-value (-> dim-name keyword result)]
+   [:div.measure-value (-> (pinboard-measure) :name keyword result)]])
+
+(defn- pinned-dimension-panel [{:keys [title name] :as dim}]
+  [:div.panel.ui.basic.segment {:class (when (rpc/loading? [:results :pinboard name]) "loading")}
+   [panel-header title]
+   [:div.items
+    (rmap (partial pinned-dimension-item name)
+          (-> (cube-view :results :pinboard name) first :result))]])
 
 (defn- pinboard-panel []
   [:div.pinboard.zone
@@ -221,7 +244,7 @@
          (map #(assoc % :value (get-value-for-measure % result))))))
 
 (defn- totals-visualization []
-  (let [result (-> (cube-view :main-results) first :result
+  (let [result (-> (cube-view :results :main) first :result
                    sort-results-according-to-selected-measures)]
     [:div.ui.statistics
      (for [{:keys [name title value]} result]
@@ -231,14 +254,15 @@
         [:div.value value]])]))
 
 (defn- visualization-panel []
-  [:div.visualization.zone.panel.ui.basic.segment {:class (when (rpc/loading? :main-results) "loading")}
-   (if (and (empty? (cube-view :measures)) (cube-view :main-results))
-     [:div.icon-hint
-      [:i.warning.circle.icon]
-      [:div.text (t :cubes/no-measures)]]
-     (if (empty? (cube-view :split))
-       [totals-visualization]
-       [:div "TODO lista"]))])
+  [:div.visualization.zone.panel.ui.basic.segment {:class (when (rpc/loading? [:results :main]) "loading")}
+   (when (cube-view :results :main)
+     (if (empty? (cube-view :measures))
+       [:div.icon-hint
+        [:i.warning.circle.icon]
+        [:div.text (t :cubes/no-measures)]]
+       (if (empty? (cube-view :split))
+         [totals-visualization]
+         [:div "TODO lista"])))])
 
 (defn page []
   [:div#cube-view

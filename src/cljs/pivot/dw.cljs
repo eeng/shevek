@@ -52,7 +52,7 @@
 
 (defn- to-interval [{:keys [selected-period max-time]}]
   (let [now (now)
-        max-time (round-to-next-second (or max-time (now)))]
+        max-time (round-to-next-second (or max-time now))]
     (condp = selected-period
       :latest-day [(t/minus max-time (t/days 1)) max-time]
       :latest-month [(t/minus max-time (t/months 1)) max-time]

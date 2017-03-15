@@ -10,7 +10,7 @@
 
 (defn loading?
   ([] (seq (db/get :loading)))
-  ([k] (k (db/get :loading))))
+  ([k] (get (db/get :loading) k)))
 
 (defn loading [db key]
   (update db :loading (fnil conj #{}) key))
