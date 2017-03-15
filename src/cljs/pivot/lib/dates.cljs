@@ -18,9 +18,8 @@
       (t/plus (t/days 1))
       (t/minus (t/millis 1))))
 
-; TODO hacer testing de esto
-(defn- day-interval [time]
-  [(beginning-of-day time) (end-of-day time)])
+(def beginning-of-month t/first-day-of-the-month)
+(def end-of-month (comp end-of-day t/last-day-of-the-month))
 
 (defn to-iso8601 [time]
   (f/unparse (:date-time f/formatters) time))

@@ -4,7 +4,8 @@
             [cuerdas.core :as str]
             [pivot.rpc :as rpc]
             [pivot.lib.collections :refer [reverse-merge]]
-            [pivot.lib.dates :refer [parse-time day-interval now yesterday to-iso8601]]
+            [pivot.lib.dates :refer [parse-time now yesterday to-iso8601 beginning-of-day end-of-day beginning-of-month end-of-month]]
+            [cljs-time.core :as t]
             [reflow.db :as db]))
 
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
@@ -50,10 +51,14 @@
   (= (:name dim1) (:name dim2)))
 
 (defn- to-interval [{:keys [selected-period max-time]}]
-  (condp = selected-period
-    :latest-day (day-interval (or max-time (now)))
-    :current-day (day-interval (now))
-    :previous-day (day-interval (yesterday))))
+  (let [now (now)
+        max-time (or max-time (now))]
+    (condp = selected-period
+      :latest-day [(t/minus max-time (t/days 1)) max-time]
+      :latest-month [(t/minus max-time (t/months 1)) max-time]
+      :latest-week [(t/minus max-time (t/weeks 1)) max-time]
+      :current-day [(beginning-of-day now) (end-of-day now)]
+      :current-month [(beginning-of-month now) (end-of-month now)])))
 
 (defn- only-dw-query-keys [dim]
   (select-keys dim [:name :type]))
