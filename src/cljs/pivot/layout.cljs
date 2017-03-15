@@ -35,7 +35,7 @@
 
 (defn cubes-menu []
   (let [cube-name (cube/current-cube-name)
-        cube-title (:title (cube/current-cube))]
+        cube-title (cube/current-cube :title)]
     [make-dropdown {}
      [:div.ui.dropdown.item
       [:i.cubes.icon]

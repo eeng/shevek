@@ -23,6 +23,17 @@
                :pinned [{:name "channel"}]
                :main-results [{:timestamp "..." :result []}]}}
 
+(defn- cube-view [key]
+  (db/get-in [:cube-view key]))
+
+(defn current-cube-name []
+  (cube-view :cube))
+
+(defn current-cube [cube-key]
+  (-> (db/get :cubes)
+      (get (current-cube-name))
+      cube-key))
+
 (defevh :query-executed [db results]
   (-> (assoc-in db [:cube-view :main-results] results)
       (rpc/loaded :main-results)))
@@ -34,8 +45,8 @@
 
 (defn- init-cube-view [{:keys [cube-view] :as db} cube]
   (-> cube-view
-      (assoc :filter [(build-time-filter cube)])
-      (assoc :split [])
+      (assoc :filter [(build-time-filter cube)]
+             :split [])
       (->> (assoc db :cube-view))))
 
 (defn- send-query [{:keys [cube-view] :as db}]
@@ -55,9 +66,12 @@
         (rpc/loaded :cube-metadata)
         (send-query))))
 
+(defn includes-dim? [coll dim]
+  (some #(dw/dim=? % dim) coll))
+
 (defn add-dimension [coll dim]
   (let [coll (or coll [])]
-    (if (some #(dw/dim=? % dim) coll)
+    (if (includes-dim? coll dim)
       coll
       (conj coll dim))))
 
@@ -90,15 +104,6 @@
 (defevh :measure-toggled [db dim selected]
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
       (send-query)))
-
-(defn- cube-view-get [key]
-  (db/get-in [:cube-view key]))
-
-(defn current-cube-name []
-  (cube-view-get :cube))
-
-(defn current-cube []
-  (get (db/get :cubes) (current-cube-name)))
 
 (defn- panel-header [t-key]
   [:h2.ui.sub.header (t t-key)])
@@ -156,18 +161,20 @@
   [:div.dimensions.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
    [panel-header :cubes/dimensions]
    [:div.items
-    (rmap dimension-item (:dimensions (current-cube)))]])
+    (rmap dimension-item (current-cube :dimensions))]])
 
+; TODO Falta implementar el checked
 (defn- measure-item [{:keys [title] :as dim}]
   [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)}
-   [checkbox title {:on-change #(dispatch :measure-toggled dim %)}]])
+   [checkbox title {:checked (includes-dim? (cube-view :measures) dim)
+                    :on-change #(dispatch :measure-toggled dim %)}]])
 
 (defn- measures-panel []
   ^{:key (current-cube-name)}
   [:div.measures.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
    [panel-header :cubes/measures]
    [:div.items
-    (rmap measure-item (:measures (current-cube)))]])
+    (rmap measure-item (current-cube :measures))]])
 
 (defn- filter-item [{:keys [title] :as dim}]
   [:button.ui.green.compact.button {:class (when-not (dw/time-dimension? dim) "right labeled icon")}
@@ -179,7 +186,7 @@
 (defn- filter-panel []
   [:div.filter.panel
    [panel-header :cubes/filter]
-   (rmap filter-item (:filter (db/get :cube-view)))])
+   (rmap filter-item (cube-view :filter))])
 
 (defn- split-item [{:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
@@ -189,12 +196,12 @@
 (defn- split-panel []
   [:div.split.panel
    [panel-header :cubes/split]
-   (rmap split-item (:split (db/get :cube-view)))])
+   (rmap split-item (cube-view :split))])
 
 (defn- pinboard-panel []
   [:div.pinboard.zone
    [panel-header :cubes/pinboard]
-   (if (seq (cube-view-get :pinned))
+   (if (seq (cube-view :pinned))
      [:div.panel.ui.basic.segment "Uno de estos por cada pinned dim"]
      [:div.panel.ui.basic.segment.no-pinned
       [:div.icon-hint
@@ -203,11 +210,11 @@
 
 (defn- visualization-panel []
   [:div.visualization.zone.panel
-   (if (empty? (cube-view-get :measures))
+   (if (empty? (cube-view :measures))
      [:div.icon-hint
       [:i.warning.circle.icon]
       [:div.text (t :cubes/no-measures)]]
-     (if (empty? (cube-view-get :split))
+     (if (empty? (cube-view :split))
        [:div "TODO totals"]
        [:div "TODO lista"]))])
 
