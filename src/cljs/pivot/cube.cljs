@@ -43,10 +43,11 @@
          :max-time (:max-time time-boundary)
          :selected-period :latest-day))
 
-(defn- init-cube-view [{:keys [cube-view] :as db} cube]
+(defn- init-cube-view [{:keys [cube-view] :as db} {:keys [measures] :as cube}]
   (-> cube-view
       (assoc :filter [(build-time-filter cube)]
-             :split [])
+             :split []
+             :measures (->> measures (take 3) vec))
       (->> (assoc db :cube-view))))
 
 (defn- send-query [{:keys [cube-view] :as db}]
@@ -163,7 +164,6 @@
    [:div.items
     (rmap dimension-item (current-cube :dimensions))]])
 
-; TODO Falta implementar el checked
 (defn- measure-item [{:keys [title] :as dim}]
   [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)}
    [checkbox title {:checked (includes-dim? (cube-view :measures) dim)
@@ -228,7 +228,7 @@
 
 (defn- visualization-panel []
   [:div.visualization.zone.panel.ui.basic.segment {:class (when (rpc/loading? :main-results) "loading")}
-   (if (empty? (cube-view :measures))
+   (if (and (empty? (cube-view :measures)) (cube-view :main-results))
      [:div.icon-hint
       [:i.warning.circle.icon]
       [:div.text (t :cubes/no-measures)]]

@@ -28,13 +28,12 @@
 (defn dropdown [_ & [opts]]
   (make-dropdown opts dropdown*))
 
-(defn- checkbox [label & [{:keys [on-change name] :or {on-change identity name (str/slug label)}}]]
-  (let [selected (r/atom false)]
-    (fn []
-      [:div.ui.checkbox
-       [:input {:type "checkbox" :id name :checked @selected
-                :on-change #(on-change (swap! selected not))}]
-       [:label {:for name} label]])))
+(defn- checkbox [label & [{:keys [checked on-change name]
+                           :or {on-change identity name (str/slug label)}}]]
+  [:div.ui.checkbox
+   [:input {:type "checkbox" :id name :checked (or checked false)
+            :on-change #(on-change (not checked))}]
+   [:label {:for name} label]])
 
 (defn- popup* [activator popup-container _]
   [:div activator popup-container])
