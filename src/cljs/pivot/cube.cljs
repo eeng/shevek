@@ -20,7 +20,8 @@
                :filter [{:name "__time" :selected-period :latest-day}]
                :split [{:name "region"}]
                :measures [{:name "added"}]
-               :pinned [{:name "channel"}]}}
+               :pinned [{:name "channel"}]
+               :main-results [{:timestamp "..." :result []}]}}
 
 (defevh :query-executed [db results]
   (-> (assoc-in db [:cube-view :main-results] results)

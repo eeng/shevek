@@ -38,6 +38,8 @@
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]}))))
 
+  (testing "measure type should be doubleSum when empty")
+
   (testing "query with one time dimension and one measure"
     #_(is (submap? {:queryType "timeseries"
                     :dataSource {:type "table" :name "wikiticker"}
