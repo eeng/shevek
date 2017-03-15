@@ -20,7 +20,7 @@
                :filter [{:name "__time" :selected-period :latest-day}]
                :split [{:name "region"}]
                :measures [{:name "added"}]
-               :pinned [{:name "channel"}]
+               :pinboard [{:name "channel"}]
                :main-results [{:timestamp "..." :result []}]}}
 
 (defn- cube-view [key]
@@ -100,14 +100,14 @@
       (send-query)))
 
 (defevh :dimension-pinned [db dim]
-  (update-in db [:cube-view :pinned] add-dimension dim))
+  (update-in db [:cube-view :pinboard] add-dimension dim))
 
 (defevh :measure-toggled [db dim selected]
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
       (send-query)))
 
-(defn- panel-header [t-key]
-  [:h2.ui.sub.header (t t-key)])
+(defn- panel-header [text]
+  [:h2.ui.sub.header text])
 
 (defn dimension-popup-button [color icon event selected name]
   [:button.ui.circular.icon.button
@@ -160,7 +160,7 @@
 
 (defn- dimensions-panel []
   [:div.dimensions.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
-   [panel-header :cubes/dimensions]
+   [panel-header (t :cubes/dimensions)]
    [:div.items
     (rmap dimension-item (current-cube :dimensions))]])
 
@@ -172,7 +172,7 @@
 (defn- measures-panel []
   ^{:key (current-cube-name)}
   [:div.measures.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
-   [panel-header :cubes/measures]
+   [panel-header (t :cubes/measures)]
    [:div.items
     (rmap measure-item (current-cube :measures))]])
 
@@ -185,7 +185,7 @@
 
 (defn- filter-panel []
   [:div.filter.panel
-   [panel-header :cubes/filter]
+   [panel-header (t :cubes/filter)]
    (rmap filter-item (cube-view :filter))])
 
 (defn- split-item [{:keys [title] :as dim}]
@@ -195,14 +195,18 @@
 
 (defn- split-panel []
   [:div.split.panel
-   [panel-header :cubes/split]
+   [panel-header (t :cubes/split)]
    (rmap split-item (cube-view :split))])
+
+(defn- pinned-dimension-panel [{:keys [name title]}]
+  [:div.panel
+   [panel-header title]])
 
 (defn- pinboard-panel []
   [:div.pinboard.zone
-   [panel-header :cubes/pinboard]
-   (if (seq (cube-view :pinned))
-     [:div.panel.ui.basic.segment "Uno de estos por cada pinned dim"]
+   [panel-header (t :cubes/pinboard)]
+   (if (seq (cube-view :pinboard))
+     (rmap pinned-dimension-panel (cube-view :pinboard))
      [:div.panel.ui.basic.segment.no-pinned
       [:div.icon-hint
        [:i.pin.icon]
