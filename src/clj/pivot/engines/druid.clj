@@ -25,9 +25,12 @@
   (merge (select-keys fields [:type :cardinality])
          {:name (name column)}))
 
+(defn- no-metric-columns [{:keys [columns aggregators] :as result}]
+  (remove #(some #{(first %)} (keys aggregators)) columns))
+
 (defn dimensions [host datasource]
   (->> (segment-metadata-query host datasource)
-       :columns
+       no-metric-columns
        (map druid-column-result-to-map)))
 
 (defn metrics [host datasource]
