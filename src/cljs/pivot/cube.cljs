@@ -208,16 +208,26 @@
        [:i.pin.icon]
        [:div.text (t :cubes/no-pinned)]]])])
 
+(defn- sort-results-according-to-selected-measures [result]
+  (let [get-value-for-measure (fn [measure result]
+                                (some #(when (= (:name measure) (name (first %)))
+                                         (last %))
+                                      result))]
+    (->> (cube-view :measures)
+         (map #(assoc % :value (get-value-for-measure % result))))))
+
 (defn- totals-visualization []
-  [:div.ui.statistics
-    (for [[measure-name value] (-> (cube-view :main-results) first :result)]
-      ^{:key measure-name}
-      [:div.statistic
-       [:div.label (str/title measure-name)]
-       [:div.value value]])])
+  (let [result (-> (cube-view :main-results) first :result
+                   sort-results-according-to-selected-measures)]
+    [:div.ui.statistics
+     (for [{:keys [name title value]} result]
+       ^{:key name}
+       [:div.statistic
+        [:div.label title]
+        [:div.value value]])]))
 
 (defn- visualization-panel []
-  [:div.visualization.zone.panel
+  [:div.visualization.zone.panel.ui.basic.segment {:class (when (rpc/loading? :main-results) "loading")}
    (if (empty? (cube-view :measures))
      [:div.icon-hint
       [:i.warning.circle.icon]
