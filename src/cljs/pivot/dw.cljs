@@ -4,7 +4,7 @@
             [cuerdas.core :as str]
             [pivot.rpc :as rpc]
             [pivot.lib.collections :refer [reverse-merge]]
-            [pivot.lib.dates :refer [parse-time now yesterday to-iso8601 beginning-of-day end-of-day beginning-of-month end-of-month]]
+            [pivot.lib.dates :refer [parse-time now yesterday to-iso8601 beginning-of-day end-of-day beginning-of-month end-of-month round-to-next-second]]
             [cljs-time.core :as t]
             [reflow.db :as db]))
 
@@ -52,7 +52,7 @@
 
 (defn- to-interval [{:keys [selected-period max-time]}]
   (let [now (now)
-        max-time (or max-time (now))]
+        max-time (round-to-next-second (or max-time (now)))]
     (condp = selected-period
       :latest-day [(t/minus max-time (t/days 1)) max-time]
       :latest-month [(t/minus max-time (t/months 1)) max-time]

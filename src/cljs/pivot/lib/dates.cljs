@@ -21,6 +21,11 @@
 (def beginning-of-month t/first-day-of-the-month)
 (def end-of-month (comp end-of-day t/last-day-of-the-month))
 
+(defn round-to-next-second [time]
+  (if (zero? (t/milli time))
+    time
+    (t/date-time (t/year time) (t/month time) (t/day time) (t/hour time) (t/minute time) (inc (t/second time)))))
+
 (defn to-iso8601 [time]
   (f/unparse (:date-time f/formatters) time))
 

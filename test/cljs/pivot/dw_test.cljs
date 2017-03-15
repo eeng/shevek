@@ -6,7 +6,9 @@
 (deftest to-interval-test []
   (testing "period :latest-day"
     (is (= [(parse-time "2017-03-05T17:28") (parse-time "2017-03-06T17:28")]
-           (dw/to-interval {:selected-period :latest-day :max-time (parse-time "2017-03-06T17:28")}))))
+           (dw/to-interval {:selected-period :latest-day :max-time (parse-time "2017-03-06T17:28:00")})))
+    (is (= [(parse-time "2017-03-05T17:28:01") (parse-time "2017-03-06T17:28:01")]
+           (dw/to-interval {:selected-period :latest-day :max-time (parse-time "2017-03-06T17:28:00.563Z")}))))
 
   (testing "period :latest-month"
     (is (= [(parse-time "2017-02-06T17:28") (parse-time "2017-03-06T17:28")]
