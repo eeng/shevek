@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading?]]
-            [pivot.react :refer [rmap]]
+            [pivot.lib.react :refer [rmap with-react-keys]]
             [pivot.rpc :as rpc]
             [pivot.dw :as dw]
             [reflow.db :as db]
@@ -118,12 +118,16 @@
                    :limit 100}
                   [:results :pinboard name])))
 
+(defevh :dimension-unpinned [db dim]
+  (update-in db [:cube-view :pinboard] remove-dimension dim))
+
 (defevh :measure-toggled [db dim selected]
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
       (send-main-query)))
 
-(defn- panel-header [text]
-  [:h2.ui.sub.header text])
+(defn- panel-header [text & actions]
+  [:h2.ui.sub.header text
+   (when (seq actions) [:div.actions (with-react-keys actions)])])
 
 (defn dimension-popup-button [color icon event selected name]
   [:button.ui.circular.icon.button
@@ -175,7 +179,7 @@
                      :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)})))
 
 (defn- dimensions-panel []
-  [:div.dimensions.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
+  [:div.dimensions.panel.ui.basic.segment (rpc/loading-class :cube-metadata)
    [panel-header (t :cubes/dimensions)]
    [:div.items
     (rmap dimension-item (current-cube :dimensions))]])
@@ -187,7 +191,7 @@
 
 (defn- measures-panel []
   ^{:key (current-cube-name)}
-  [:div.measures.panel.ui.basic.segment {:class (when (rpc/loading? :cube-metadata) "loading")}
+  [:div.measures.panel.ui.basic.segment (rpc/loading-class :cube-metadata)
    [panel-header (t :cubes/measures)]
    [:div.items
     (rmap measure-item (current-cube :measures))]])
@@ -219,11 +223,12 @@
    [:div.measure-value (-> (pinboard-measure) :name keyword result)]])
 
 (defn- pinned-dimension-panel [{:keys [title name] :as dim}]
-  [:div.panel.ui.basic.segment {:class (when (rpc/loading? [:results :pinboard name]) "loading")}
-   [panel-header title]
-   [:div.items
-    (rmap (partial pinned-dimension-item name)
-          (-> (cube-view :results :pinboard name) first :result))]])
+  (let [results (-> (cube-view :results :pinboard name) first :result)]
+    [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
+     [panel-header title
+      [:i.close.link.large.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
+     [:div.items {:class (when (empty? results) "empty")}
+      (rmap (partial pinned-dimension-item name) results)]]))
 
 (defn- pinboard-panel []
   [:div.pinboard.zone
@@ -254,7 +259,7 @@
         [:div.value value]])]))
 
 (defn- visualization-panel []
-  [:div.visualization.zone.panel.ui.basic.segment {:class (when (rpc/loading? [:results :main]) "loading")}
+  [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
    (when (cube-view :results :main)
      (if (empty? (cube-view :measures))
        [:div.icon-hint

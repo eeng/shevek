@@ -27,6 +27,15 @@
         font-weight: normal;
         padding: 12px @panel-horizontal-padding;
         margin: 0;
+        .actions {
+          position: absolute;
+          top: 11px;
+          right: 11px;
+          .icon {
+            margin: 0;
+            margin-left: 5px;
+          }
+        }
       }
     }
     .panel {
@@ -131,6 +140,7 @@
         height: @lateral-col-width;
         .icon-hint { margin-top: -1em }
       }
+      .items.empty { height: 100px; }
       .item {
         display: flex;
         flex-direction: row;

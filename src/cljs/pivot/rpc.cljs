@@ -27,3 +27,6 @@
 (defevh :data-arrived [db db-key data]
   (-> (assoc db db-key data)
       (loaded db-key)))
+
+(defn- loading-class [loading-key]
+  {:class (when (loading? loading-key) "loading")})
