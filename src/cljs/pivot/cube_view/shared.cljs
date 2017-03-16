@@ -5,7 +5,8 @@
             [reflow.db :as db]
             [pivot.lib.react :refer [with-react-keys]]
             [pivot.rpc :as rpc]
-            [pivot.dw :as dw]))
+            [pivot.dw :as dw]
+            [goog.string :as str]))
 
 ; Shared helpers
 
@@ -44,6 +45,12 @@
 
 (defn remove-dimension [coll dim]
   (vec (remove #(dw/dim=? dim %) coll)))
+
+(defn format-measure [value {:keys [type]}]
+  (condp = type
+    "doubleSum" (str/format "%.2f" value)
+    "hyperUnique" (str/format "%d" value)
+    value))
 
 ; Shared components
 

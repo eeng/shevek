@@ -4,15 +4,15 @@
             [pivot.dw :as dw]
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
-            [pivot.cube-view.shared :refer [panel-header cube-view]]))
+            [pivot.cube-view.shared :refer [panel-header cube-view format-measure]]))
 
 (defn- sort-results-according-to-selected-measures [result]
   (let [get-value-for-measure (fn [measure result]
                                 (some #(when (= (:name measure) (name (first %)))
-                                         (last %))
+                                         (format-measure (last %) measure))
                                       result))]
-    (->> (cube-view :measures)
-         (map #(assoc % :value (get-value-for-measure % result))))))
+    (map #(assoc % :value (get-value-for-measure % result))
+         (cube-view :measures))))
 
 (defn- totals-visualization []
   (let [result (-> (cube-view :results :main) first :result

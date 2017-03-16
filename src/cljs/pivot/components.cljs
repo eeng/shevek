@@ -9,11 +9,11 @@
    [:div.content title
     [:div.sub.header subtitle]]])
 
-(defn- dropdown* [coll & [{:keys [placeholder selected class] :or {selected ""}}]]
+(defn- dropdown* [coll & [{:keys [placeholder selected class]}]]
   (let [select? (= class "selection")]
     [:div.ui.dropdown {:class class}
      (when-not select? [:div.text])
-     [:input {:type "hidden" :value selected}]
+     [:input {:type "hidden" :value (or selected "")}]
      [:i.dropdown.icon]
      (when select? [:div.default.text placeholder])
      [:div.menu

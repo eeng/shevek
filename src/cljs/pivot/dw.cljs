@@ -50,6 +50,7 @@
 (defn dim=? [dim1 dim2]
   (= (:name dim1) (:name dim2)))
 
+; TODO algunos de estos metodos no corresponderian en el shared?
 (defn find-dimension [name dimensions]
   (detect #(= (:name %) name) dimensions))
 
