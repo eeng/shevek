@@ -8,7 +8,8 @@
             [pivot.components :refer [make-dropdown]]
             [pivot.dashboard :as dashboard]
             [pivot.settings :as settings]
-            [pivot.cube :as cube]
+            [pivot.cube-view.page :as cube]
+            [pivot.cube-view.shared :refer [current-cube-name current-cube]]
             [pivot.dw :as dw]))
 
 (def pages
@@ -34,8 +35,8 @@
   (when (= (db/get :page) page) "active"))
 
 (defn cubes-menu []
-  (let [cube-name (cube/current-cube-name)
-        cube-title (cube/current-cube :title)]
+  (let [cube-name (current-cube-name)
+        cube-title (current-cube :title)]
     [make-dropdown {}
      [:div.ui.dropdown.item
       [:i.cubes.icon]
