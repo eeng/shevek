@@ -2,6 +2,7 @@
   (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [pivot.i18n :refer [t]]
+            [pivot.rpc :as rpc]
             [pivot.components :refer [page-title]]
             [pivot.dw :as dw]))
 
@@ -16,12 +17,12 @@
 
 (defn- cubes-cards []
   (let [cubes (dw/cubes-list)]
-    (if cubes
+    (if (rpc/loading? :cubes)
+      [:div.ui.active.inline.loader]
       [:div.ui.cards
        (if (seq cubes)
          (doall (map-indexed cube-card cubes))
-         [:div.ui.basic.segment (t :cubes/missing)])]
-      [:div.ui.active.inline.loader])))
+         [:div.ui.basic.segment (t :cubes/missing)])])))
 
 (defn page []
   [:div.ui.container

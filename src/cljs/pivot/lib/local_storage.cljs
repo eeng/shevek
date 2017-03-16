@@ -15,4 +15,4 @@
   (->> value pr-str (set-item! key)))
 
 (defn retrieve [key]
-  (-> key get-item read-string))
+  (-> key get-item str read-string))
