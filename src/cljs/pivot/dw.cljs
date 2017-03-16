@@ -3,7 +3,7 @@
   (:require [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [pivot.rpc :as rpc]
-            [pivot.lib.collections :refer [reverse-merge]]
+            [pivot.lib.collections :refer [reverse-merge detect]]
             [pivot.lib.dates :refer [parse-time now yesterday to-iso8601 beginning-of-day end-of-day beginning-of-month end-of-month round-to-next-second]]
             [cljs-time.core :as t]
             [reflow.db :as db]))
@@ -49,6 +49,9 @@
 
 (defn dim=? [dim1 dim2]
   (= (:name dim1) (:name dim2)))
+
+(defn find-dimension [name dimensions]
+  (detect #(= (:name %) name) dimensions))
 
 (defn- to-interval [{:keys [selected-period max-time]}]
   (let [now (now)

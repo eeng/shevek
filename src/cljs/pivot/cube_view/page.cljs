@@ -34,7 +34,8 @@
   (-> cube-view
       (assoc :filter [(build-time-filter cube)]
              :split []
-             :measures (->> measures (take 3) vec))
+             :measures (->> measures (take 3) vec)
+             :pinboard {:measure (first measures)})
       (->> (assoc db :cube-view))))
 
 (defevh :cube-selected [db cube]

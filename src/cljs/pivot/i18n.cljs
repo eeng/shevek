@@ -19,7 +19,8 @@
             :pinboard "Pinboard"
             :no-desc "No description."
             :no-pinned "Drag or click dimensions to pin them"
-            :no-measures "Please select at least one measure"}
+            :no-measures "Please select at least one measure"
+            :null-value "No Value"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -38,7 +39,8 @@
             :filter "Filtros"
             :no-desc "Sin descripción."
             :no-pinned "Arrastre o clickee dimensiones para fijarlas aquí"
-            :no-measures "Por favor seleccione al menos una métrica"}
+            :no-measures "Por favor seleccione al menos una métrica"
+            :null-value "No Disponible"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"

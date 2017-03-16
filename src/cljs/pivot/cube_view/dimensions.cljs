@@ -29,9 +29,6 @@
   (-> (update-in db [:cube-view :split] remove-dimension dim)
       #_(send-main-query)))
 
-(defevh :dimension-unpinned [db dim]
-  (update-in db [:cube-view :pinboard] remove-dimension dim))
-
 (defn dimension-popup-button [color icon event selected name]
   [:button.ui.circular.icon.button
    {:class color
