@@ -1,6 +1,7 @@
 (ns pivot.components
   (:require [reagent.core :as r :refer [dom-node create-class]]
             [pivot.i18n :refer [t]]
+            [pivot.lib.collections :refer [detect]]
             [cuerdas.core :as str]))
 
 (defn page-title [title subtitle icon-class]
@@ -9,10 +10,12 @@
    [:div.content title
     [:div.sub.header subtitle]]])
 
+; El selected-title es necesario xq semantic muestra la opción seleccionada en el on-change nomás, y en el mount inicial sólo si selected no es nil. En el pinboard measure por ej. el selected arranca en nil y luego cuando llega la metadata se updatea con el selected, pero no se reflejaba en el dropdown xq ya se había ejecutado el $(..).dropdown() antes.
 (defn- dropdown* [coll & [{:keys [placeholder selected class]}]]
-  (let [select? (= class "selection")]
+  (let [select? (= class "selection")
+        selected-title (first (detect #(= selected (second %)) coll))]
     [:div.ui.dropdown {:class class}
-     (when-not select? [:div.text])
+     (when-not select? [:div.text selected-title])
      [:input {:type "hidden" :value (or selected "")}]
      [:i.dropdown.icon]
      (when select? [:div.default.text placeholder])
