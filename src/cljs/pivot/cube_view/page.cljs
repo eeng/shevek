@@ -19,8 +19,9 @@
    :cube-view {:cube "wikitiker"
                :filter [{:name "__time" :selected-period :latest-day}]
                :split [{:name "region"}]
-               :measures [{:name "added"}]
-               :pinboard [{:name "channel"}]
+               :measures [{:name "added"}] ; Selected measures in the left panel
+               :pinboard {:measure "channel" ; Selected measure for the pinboard
+                          :dimensions [{:name "channel"}]} ; Pinned dimensions
                :results {:main {...druid response...}
                          :pinboard {"dim1-name" {...druid response...}
                                     "dim2-name" {...druid response...}}}}}
