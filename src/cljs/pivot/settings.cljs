@@ -1,7 +1,7 @@
 (ns pivot.settings
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [pivot.i18n :refer [t]]
-            [pivot.components :refer [page-title dropdown]]
+            [pivot.components :refer [page-title select]]
             [pivot.lib.local-storage :as local-storage]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
@@ -23,7 +23,7 @@
  [:div.ui.container
   [page-title (t :settings/title) (t :settings/subtitle) "settings"]
   [:h2.ui.dividing.header (t :settings/language)]
-  [dropdown [["English" "en"] ["Español" "es"]]
+  [select [["English" "en"] ["Español" "es"]]
    {:selected (db/get :lang "en") :on-change #(dispatch :settings-saved {:lang %})}]
   [:h2.ui.dividing.header (t :settings/users)]
   [:div "TODO Tabla de users"]])

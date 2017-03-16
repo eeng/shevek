@@ -27,13 +27,20 @@
         font-weight: normal;
         padding: 12px @panel-horizontal-padding;
         margin: 0;
+        position: relative;
         .actions {
           position: absolute;
           top: 11px;
-          right: 11px;
+          right: @panel-horizontal-padding;
+          text-transform: none;
+          font-size: 110%;
           .icon {
             margin: 0;
             margin-left: 5px;
+          }
+          .large.icon {
+            margin-right: -4px;
+            margin-top: -1px;
           }
         }
       }

@@ -6,6 +6,7 @@
             [pivot.rpc :refer [loading?]]
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
+            [pivot.components :refer [dropdown]]
             [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query]]))
 
 (defn pinboard-measure []
@@ -39,7 +40,9 @@
 
 (defn pinboard-panel []
   [:div.pinboard.zone
-   [panel-header (t :cubes/pinboard)]
+   [panel-header (t :cubes/pinboard)
+    [dropdown (map (juxt :title :name) (cube-view :measures))
+     {:selected "count" :class "top right pointing"}]]
    (if (seq (cube-view :pinboard))
      (rmap pinned-dimension-panel (cube-view :pinboard))
      [:div.panel.ui.basic.segment.no-pinned

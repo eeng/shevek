@@ -9,24 +9,29 @@
    [:div.content title
     [:div.sub.header subtitle]]])
 
-(defn make-dropdown [{:keys [on-change] :or {on-change identity}} content]
+(defn- dropdown* [coll & [{:keys [placeholder selected class] :or {selected ""}}]]
+  (let [select? (= class "selection")]
+    [:div.ui.dropdown {:class class}
+     (when-not select? [:div.text])
+     [:input {:type "hidden" :value selected}]
+     [:i.dropdown.icon]
+     (when select? [:div.default.text placeholder])
+     [:div.menu
+      (for [[title val] coll]
+        ^{:key val}
+        [:div.item {:data-value val} title])]]))
+
+(defn make-dropdown [{:keys [on-change class] :or {on-change identity}} content]
   (let [bind-events #(-> % dom-node js/$
                          (.dropdown #js {:onChange on-change}))]
     (create-class {:reagent-render content
                    :component-did-mount bind-events})))
 
-(defn- dropdown* [coll & [{:keys [placeholder selected] :or {selected ""}}]]
-  [:div.ui.selection.dropdown
-   [:input {:type "hidden" :value selected}]
-   [:i.dropdown.icon]
-   [:div.default.text placeholder]
-   [:div.menu
-    (for [[title val] coll]
-      ^{:key val}
-      [:div.item {:data-value val} title])]])
-
-(defn dropdown [_ & [opts]]
+(defn dropdown [coll opts]
   (make-dropdown opts dropdown*))
+
+(defn select [_ opts]
+  (make-dropdown opts (fn [coll opts] [dropdown* coll (assoc opts :class "selection")])))
 
 (defn- checkbox [label & [{:keys [checked on-change name]
                            :or {on-change identity name (str/slug label)}}]]
