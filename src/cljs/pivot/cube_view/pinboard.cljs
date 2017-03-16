@@ -8,7 +8,7 @@
             [pivot.rpc :as rpc]
             [pivot.dw :refer [find-dimension]]
             [pivot.components :refer [dropdown]]
-            [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query]]))
+            [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query format-measure]]))
 
 (defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim}]
   (send-query db
@@ -34,10 +34,12 @@
     (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions))))
 
 (defn- pinned-dimension-item [dim-name result]
-  (let [segment-value (-> dim-name keyword result (or (t :cubes/null-value)))]
+  (let [segment-value (-> dim-name keyword result (or (t :cubes/null-value)))
+        measure (cube-view :pinboard :measure)
+        measure-value (-> measure :name keyword result (or 0) (format-measure measure))]
     [:div.item {:title segment-value}
      [:div.segment-value segment-value]
-     [:div.measure-value (-> (cube-view :pinboard :measure) :name keyword result)]]))
+     [:div.measure-value measure-value]]))
 
 (defn- pinned-dimension-panel [{:keys [title name] :as dim}]
   (let [results (-> (cube-view :results :pinboard name) first :result)]

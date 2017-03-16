@@ -46,11 +46,12 @@
 (defn remove-dimension [coll dim]
   (vec (remove #(dw/dim=? dim %) coll)))
 
-(defn format-measure [value {:keys [type]}]
-  (condp = type
-    "doubleSum" (str/format "%.2f" value)
-    "hyperUnique" (str/format "%d" value)
-    value))
+(defn format-measure [value {:keys [type] :as m}]
+  (when value
+    (condp = type
+      "doubleSum" (str/format "%.2f" value)
+      "hyperUnique" (str/format "%.0f" value)
+      value)))
 
 ; Shared components
 
