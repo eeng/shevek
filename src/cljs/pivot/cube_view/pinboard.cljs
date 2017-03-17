@@ -8,7 +8,7 @@
             [pivot.rpc :as rpc]
             [pivot.dw :refer [find-dimension time-dimension?]]
             [pivot.components :refer [dropdown]]
-            [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query format-measure]]))
+            [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query format-measure format-dimension]]))
 
 (defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name descending] :as dim}]
   (send-query db
@@ -39,8 +39,8 @@
     db
     (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions))))
 
-(defn- pinned-dimension-item [dim-name result]
-  (let [segment-value (-> dim-name keyword result (or (t :cubes/null-value)))
+(defn- pinned-dimension-item [dim result]
+  (let [segment-value (-> (dim :name) keyword result (format-dimension dim) (or (t :cubes/null-value)))
         measure (cube-view :pinboard :measure)
         measure-value (-> measure :name keyword result (format-measure measure))]
     [:div.item {:title segment-value}
@@ -53,7 +53,7 @@
      [panel-header title
       [:i.close.link.large.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
      [:div.items {:class (when (empty? results) "empty")}
-      (rmap (partial pinned-dimension-item name) results)]]))
+      (rmap (partial pinned-dimension-item dim) results)]]))
 
 ; TODO revisar el dropdown q la primera vez q entro a la pag no muestra el selected
 (defn pinboard-panel []

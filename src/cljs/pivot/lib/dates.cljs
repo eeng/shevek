@@ -1,7 +1,9 @@
 (ns pivot.lib.dates
   (:require [cljs-time.format :as f]
             [cljs-time.core :as t]
-            [cljs-time.extend]))
+            [cljs-time.extend]
+            [clojure.string :as str]
+            [pivot.i18n :refer [translation]]))
 
 ;; TODO todas estas funciones van a trabajar con el timezone en UTC. Ver como influye eso al usar la local
 
@@ -35,3 +37,14 @@
   (-pr-writer [obj writer opts]
     (-write writer "#inst ")
     (pr-writer (to-iso8601 obj) writer opts)))
+
+(defn formatter [i18n-key]
+  (f/formatter (translation :date-formats i18n-key)))
+
+; TODO agregar formato week
+(defn format-time-according-to-period [time period]
+  (let [formatter (condp #(str/ends-with? %2 %1) period
+                    "H" (formatter :hour)
+                    "D" (formatter :day)
+                    "M" (formatter :month))]
+    (f/unparse formatter (f/parse time))))

@@ -24,7 +24,10 @@
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
-               :users "Users"}}
+               :users "Users"}
+    :date-formats {:hour "MMM d yyyy, ha"
+                   :day "MMM d yyyy"
+                   :month "MMM yyyy"}}
 
    :es
    {:menu {:logout "Salir"
@@ -44,11 +47,20 @@
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"
-               :users "Usuarios"}}
+               :users "Usuarios"}
+    :date-formats {:hour "dd/MM/yyyy, H 'hs'"
+                   :day "dd/MM/yyyy"
+                   :month "MM/yyyy"}}
 
    :tongue/fallback :en})
 
 (def translate (tongue/build-translate translations))
 
+(defn lang []
+  (keyword (db/get :lang "en")))
+
 (defn t [& args]
-  (apply translate (db/get :lang "en") args))
+  (apply translate (lang) args))
+
+(defn translation [& args]
+  (get-in translations (into [(lang)] args)))

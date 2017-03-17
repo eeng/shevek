@@ -4,6 +4,7 @@
             [reflow.db :as db]
             [reflow.db :as db]
             [pivot.lib.react :refer [with-react-keys]]
+            [pivot.lib.dates :refer [format-time-according-to-period]]
             [pivot.rpc :as rpc]
             [pivot.dw :as dw]
             [goog.string :as str]))
@@ -52,6 +53,11 @@
       "doubleSum" (str/format "%.2f" value)
       "hyperUnique" (str/format "%.0f" value)
       value)))
+
+(defn format-dimension [value {:keys [granularity] :as dim}]
+  (if (dw/time-dimension? dim)
+    (format-time-according-to-period value granularity)
+    value))
 
 ; Shared components
 
