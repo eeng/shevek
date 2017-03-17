@@ -25,7 +25,6 @@
 (defevh :dimension-unpinned [db dim]
   (update-in db [:cube-view :pinboard :dimensions] remove-dimension dim))
 
-; TODO cuando se pinnea una dim como Page carga rapido igual que pivot pero cdo selecciono una measure aca no. Por que será? UPDATE: tb pasa al pinnear pero si se cambia la pinboard measure antes.
 (defevh :pinboard-measure-selected [db measure-name]
   (let [db (assoc-in db [:cube-view :pinboard :measure]
                      (find-dimension measure-name (current-cube :measures)))]
@@ -35,7 +34,7 @@
 (defn- pinned-dimension-item [dim-name result]
   (let [segment-value (-> dim-name keyword result (or (t :cubes/null-value)))
         measure (cube-view :pinboard :measure)
-        measure-value (-> measure :name keyword result (or 0) (format-measure measure))]
+        measure-value (-> measure :name keyword result (format-measure measure))]
     [:div.item {:title segment-value}
      [:div.segment-value segment-value]
      [:div.measure-value measure-value]]))

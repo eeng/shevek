@@ -48,6 +48,7 @@
     .panel {
       padding: 0;
       margin: 0;
+      &.loading { color: inherit !important; } // Semantic le pone un color transparent y hace que no se vea el texto que queda debajo del loading
       .items {
         overflow-y: auto;
         padding-bottom: 8px;
@@ -173,9 +174,7 @@
           overflow: hidden;
           padding-right: 10px;
         }
-        .measure-value {
-          .dim;
-        }
+        .measure-value { .dim; }
       }
     }
   }
