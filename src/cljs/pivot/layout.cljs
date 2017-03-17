@@ -40,7 +40,7 @@
     [make-dropdown {}
      [:div.ui.dropdown.item
       [:i.cubes.icon]
-      [:div.text (or cube-title (t :cubes/menu))]
+      [:div.text (if (active? :cube) cube-title (t :cubes/menu))]
       [:i.dropdown.icon]
       [:div.menu
        (for [{:keys [name title]} (dw/cubes-list)]
