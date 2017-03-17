@@ -15,14 +15,13 @@
 (def register-event-handler i/register-event-handler)
 
 (defn- start-coordinator [app-db handler]
-  (go-loop [actual-db @app-db]
+  (go-loop []
     (let [event (<! events)]
       (when (and event (not= event [:shutdown]))
-        (let [new-db (handler actual-db event)]
+        (let [new-db (swap! app-db handler event)]
           (assert (map? new-db)
                   (str "Handler for event " event " should've returned the new db as a map. Instead returned: " (pr-str new-db)))
-          (reset! app-db new-db)
-          (recur new-db))))))
+          (recur))))))
 
 (defn stop-coordinator []
   (dispatch :shutdown))

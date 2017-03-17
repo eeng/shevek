@@ -64,6 +64,7 @@
    [dimension-popup dimension selected]
    {:on "manual" :position "right center" :distanceAway -30}])
 
+; TODO esto se podria hacer un poquito mas corto con la macro r/with-let
 (defn- dimension-item [{:keys [name] :as dimension}]
   (let [selected (r/atom false)
         handle-click-outside (fn [dim-item e]
