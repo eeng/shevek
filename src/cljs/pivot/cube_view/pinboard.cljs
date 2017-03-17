@@ -51,7 +51,8 @@
   (let [results (cube-view :results :pinboard name)]
     [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
      [panel-header title
-      [:i.close.link.large.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
+      [:i.ellipsis.horizontal.large.link.icon]
+      [:i.close.link.large.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
      [:div.items {:class (when (empty? results) "empty")}
       (rmap (partial pinned-dimension-item dim) results)]]))
 
