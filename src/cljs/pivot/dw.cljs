@@ -5,6 +5,7 @@
             [pivot.rpc :as rpc]
             [pivot.lib.collections :refer [reverse-merge detect]]
             [pivot.lib.dates :refer [parse-time now yesterday to-iso8601 beginning-of-day end-of-day beginning-of-month end-of-month round-to-next-second]]
+            [pivot.lib.collections :refer [detect]]
             [cljs-time.core :as t]
             [reflow.db :as db]))
 

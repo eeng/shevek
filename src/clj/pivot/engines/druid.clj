@@ -1,6 +1,7 @@
 (ns pivot.engines.druid
   (:require [clj-http.client :as http]
             [pivot.engines.engine :as e :refer [DwEngine]]
+            [pivot.lib.collections :refer [detect]]
             [clojure.string :as str]))
 
 ; TODO http-kit viene con un client, ver si no se puede usar para no tener q agregar otra dependencia
@@ -49,24 +50,40 @@
 (defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
   {:fieldName name :name name :type type})
 
+; TODO estas dos estan duplicadas en el client
+(defn time-dimension? [{:keys [name]}]
+  (= name "__time"))
+
+(defn time-dimension [dimensions]
+  (detect #(time-dimension? %) dimensions))
+
 (defn- calculate-query-type [{:keys [split]}]
-  (if (seq split)
+  (if (and (seq split) (not (time-dimension split)))
     "topN"
     "timeseries"))
 
-(defn- add-query-type-dependant-fields [dq {:keys [split measures limit] :or {limit 100} :as q}]
-  (let [query-type (calculate-query-type q)]
-    (cond-> (assoc dq :queryType (calculate-query-type q))
-            (= query-type "topN") (assoc :dimension (-> split first :name)
-                                         :metric (-> measures first :name)
-                                         :threshold limit))))
+(defn- add-query-type-dependant-fields [{:keys [split measures limit] :or {limit 100} :as q}
+                                        {:keys [queryType] :as dq}]
+  (condp = queryType
+    "topN"
+    (assoc dq
+           :granularity {:type "all"}
+           :dimension (-> split first :name)
+           :metric (-> measures first :name)
+           :threshold limit)
+    "timeseries"
+    (assoc dq
+           :granularity (if (time-dimension split)
+                          {:type "period" :period (:period (time-dimension split))}
+                          {:type "all"}))))
 
+; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
 (defn to-druid-query [{:keys [cube measures interval] :as q}]
-  (-> {:dataSource {:type "table" :name cube}
-       :granularity {:type "all"}
-       :intervals (str/join "/" interval)
-       :aggregations (mapv to-druid-agg measures)}
-      (add-query-type-dependant-fields q)))
+  (->> {:queryType (calculate-query-type q)
+        :dataSource {:type "table" :name cube}
+        :intervals (str/join "/" interval)
+        :aggregations (mapv to-druid-agg measures)}
+       (add-query-type-dependant-fields q)))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
@@ -104,5 +121,12 @@
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "page"}]
+            :measures [{:name "count" :type "longSum"}]
+            :interval ["2015-09-12" "2015-09-13"]})
+
+; One time dimension and one measure (for pinned time dimension)
+#_(e/query (DruidEngine. broker)
+           {:cube "wikiticker"
+            :split [{:name "__time" :period "PT6H"}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})

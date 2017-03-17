@@ -43,7 +43,7 @@
            (-> (to-druid-query {:measures [{:name "count"}]})
                (get-in [:aggregations 0 :type])))))
 
-  (testing "query with one no-time dimension and one measure should generate a topN query"
+  (testing "query with one no-time dimension should generate a topN query"
     (is (submap? {:queryType "topN"
                   :dataSource {:type "table" :name "wikiticker"}
                   :granularity {:type "all"}
@@ -56,17 +56,14 @@
                                   :measures [{:name "count" :type "longSum"}]
                                   :limit 10}))))
 
-  (testing "query with one time dimension and one measure"
-    #_(is (submap? {:queryType "timeseries"
-                    :dataSource {:type "table" :name "wikiticker"}
-                    :intervals "2015/2016"
-                    :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
-                    :granularity {:type "period"
-                                  :period "P1D"
-                                  :typeZone "Etc/UTC"}}
+  (testing "query with one time dimension should generate a timeseries query"
+    (is (submap? {:queryType "timeseries"
+                  :dataSource {:type "table" :name "wikiticker"}
+                  :intervals "2015/2016"
+                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
+                  :granularity {:type "period"
+                                :period "P1D"}}
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]
-                                  :split [{:name "__time"}]
-                                  :granularity {:period "P1D"
-                                                :time-zone "Etc/UTC"}})))))
+                                  :split [{:name "__time" :period "P1D"}]})))))
