@@ -74,16 +74,24 @@
     "timeseries"
     (assoc dq
            :granularity (if (time-dimension split)
-                          {:type "period" :period (:period (time-dimension split))}
+                          {:type "period" :period (:granularity (time-dimension split))}
                           {:type "all"}))))
 
 ; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
-(defn to-druid-query [{:keys [cube measures interval] :as q}]
+(defn to-druid-query [{:keys [cube measures interval descending] :as q}]
   (->> {:queryType (calculate-query-type q)
         :dataSource {:type "table" :name cube}
         :intervals (str/join "/" interval)
-        :aggregations (mapv to-druid-agg measures)}
+        :aggregations (mapv to-druid-agg measures)
+        :descending (or descending false)}
        (add-query-type-dependant-fields q)))
+
+(defn from-druid-results [{:keys [queryType]} results]
+  (condp = queryType
+    "topN" (-> results first :result)
+    "timeseries" (map (fn [{:keys [result timestamp]}]
+                        (assoc result :__time timestamp))
+                      results)))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
@@ -98,7 +106,7 @@
   (query [_ q]
          (let [dq (to-druid-query q)]
            (clojure.pprint/pprint dq) ; TODO pasar a logging
-           (send-query host dq))))
+           (from-druid-results dq (send-query host dq)))))
 
 ; Manual testing
 (def broker "http://kafka:8082")
@@ -122,11 +130,12 @@
            {:cube "wikiticker"
             :split [{:name "page"}]
             :measures [{:name "count" :type "longSum"}]
+            :limit 5
             :interval ["2015-09-12" "2015-09-13"]})
 
 ; One time dimension and one measure (for pinned time dimension)
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
-            :split [{:name "__time" :period "PT6H"}]
+            :split [{:name "__time" :granularity "PT6H"}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})

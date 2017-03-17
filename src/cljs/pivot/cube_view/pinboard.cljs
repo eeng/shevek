@@ -6,21 +6,29 @@
             [pivot.rpc :refer [loading?]]
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
-            [pivot.dw :refer [find-dimension]]
+            [pivot.dw :refer [find-dimension time-dimension?]]
             [pivot.components :refer [dropdown]]
             [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query format-measure]]))
 
-(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim}]
+(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name descending] :as dim}]
   (send-query db
               (assoc cube-view
                      :split [dim]
                      :measures (vector (get-in cube-view [:pinboard :measure]))
+                     :descending descending
                      :limit 50)
               [:results :pinboard name]))
 
+(defn init-pinned-dimension [dim]
+  (if (time-dimension? dim)
+    (assoc dim :granularity "PT6H" :descending true) ; Default granularity
+    dim))
+
 (defevh :dimension-pinned [db dim]
-  (-> (update-in db [:cube-view :pinboard :dimensions] add-dimension dim)
-      (send-pinned-dim-query dim)))
+  (let [dim (init-pinned-dimension dim)]
+    (println dim)
+    (-> (update-in db [:cube-view :pinboard :dimensions] add-dimension dim)
+        (send-pinned-dim-query dim))))
 
 (defevh :dimension-unpinned [db dim]
   (update-in db [:cube-view :pinboard :dimensions] remove-dimension dim))
@@ -40,7 +48,7 @@
      [:div.measure-value measure-value]]))
 
 (defn- pinned-dimension-panel [{:keys [title name] :as dim}]
-  (let [results (-> (cube-view :results :pinboard name) first :result)]
+  (let [results (cube-view :results :pinboard name)]
     [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
      [panel-header title
       [:i.close.link.large.icon {:on-click #(dispatch :dimension-unpinned dim)}]]

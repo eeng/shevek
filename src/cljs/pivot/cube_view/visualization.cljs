@@ -15,8 +15,7 @@
          (cube-view :measures))))
 
 (defn- totals-visualization []
-  (let [result (-> (cube-view :results :main) first :result
-                   sort-results-according-to-selected-measures)]
+  (let [result (sort-results-according-to-selected-measures (first (cube-view :results :main)))]
     [:div.ui.statistics
      (for [{:keys [name title value]} result]
        ^{:key name}

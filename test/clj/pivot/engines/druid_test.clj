@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [stub-http.core :refer :all]
             [pivot.asserts :refer [submaps? submap?]]
-            [pivot.engines.druid :refer [datasources dimensions metrics to-druid-query]]
+            [pivot.engines.druid :refer [datasources dimensions metrics to-druid-query from-druid-results]]
             [clojure.java.io :as io]))
 
 (defn druid-res [name]
@@ -62,8 +62,27 @@
                   :intervals "2015/2016"
                   :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
                   :granularity {:type "period"
-                                :period "P1D"}}
+                                :period "P1D"}
+                  :descending true}
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]
-                                  :split [{:name "__time" :period "P1D"}]})))))
+                                  :split [{:name "__time" :granularity "P1D"}]
+                                  :descending true})))))
+
+(deftest from-druid-results-test
+  (testing "topN results"
+    (is (submaps? [{:page "P1" :count 1}
+                   {:page "P2" :count 2}]
+                  (from-druid-results
+                    {:queryType "topN"}
+                    [{:result [{:page "P1" :count 1}
+                               {:page "P2" :count 2}]}]))))
+
+  (testing "timeseries results"
+    (is (submaps? [{:__time "2015" :count 1}
+                   {:__time "2016" :count 2}]
+                  (from-druid-results
+                   {:queryType "timeseries"}
+                   [{:result {:count 1}, :timestamp "2015"}
+                    {:result {:count 2}, :timestamp "2016"}])))))
