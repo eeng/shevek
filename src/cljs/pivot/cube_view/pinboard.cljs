@@ -51,7 +51,10 @@
   (let [results (cube-view :results :pinboard name)]
     [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
      [panel-header title
-      [:i.ellipsis.horizontal.large.link.icon]
+      ; TODO traducir esto
+      [dropdown [["1 hora" "PT1H"] ["6 horas" "PT6H"] ["12 horas" "PT12H"] ["1 día" "P1D"] ["1 mes" "P1M"]]
+       {:class "top right pointing"}
+       [:i.ellipsis.horizontal.large.link.icon]]
       [:i.close.link.large.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
      [:div.items {:class (when (empty? results) "empty")}
       (rmap (partial pinned-dimension-item dim) results)]]))
