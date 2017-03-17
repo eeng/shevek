@@ -6,7 +6,8 @@
             [pivot.rpc :refer [loading?]]
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
-            [pivot.dw :refer [find-dimension time-dimension?]]
+            [pivot.dw :refer [find-dimension time-dimension? dim=?]]
+            [pivot.lib.collections :refer [replace-matching]]
             [pivot.components :refer [dropdown]]
             [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query format-measure format-dimension]]))
 
@@ -26,7 +27,6 @@
 
 (defevh :dimension-pinned [db dim]
   (let [dim (init-pinned-dimension dim)]
-    (println dim)
     (-> (update-in db [:cube-view :pinboard :dimensions] add-dimension dim)
         (send-pinned-dim-query dim))))
 
@@ -38,6 +38,12 @@
                      (find-dimension measure-name (current-cube :measures)))]
     db
     (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions))))
+
+(defevh :pinned-time-granularity-changed [db dim granularity]
+  (let [new-time-dim (assoc dim :granularity granularity)]
+    (-> (update-in db [:cube-view :pinboard :dimensions]
+                   #(replace-matching (partial dim=? new-time-dim) new-time-dim %))
+        (send-pinned-dim-query new-time-dim))))
 
 (defn- pinned-dimension-item [dim result]
   (let [segment-value (-> (dim :name) keyword result (format-dimension dim) (or (t :cubes/null-value)))
@@ -53,7 +59,7 @@
      [panel-header title
       ; TODO traducir esto
       [dropdown [["1 hora" "PT1H"] ["6 horas" "PT6H"] ["12 horas" "PT12H"] ["1 día" "P1D"] ["1 mes" "P1M"]]
-       {:class "top right pointing"}
+       {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
        [:i.ellipsis.horizontal.large.link.icon]]
       [:i.close.link.large.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
      [:div.items {:class (when (empty? results) "empty")}
