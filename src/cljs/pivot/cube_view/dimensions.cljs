@@ -37,12 +37,9 @@
    [:i.icon {:class icon}]])
 
 ; TODO Pivot hace una query para traer la cardinality, supongo q x si se actualiza desde que se trajo toda la metadata
-(defn- dimension-popup [{:keys [cardinality description] :as dim} selected]
+(defn- dimension-popup [{:keys [cardinality] :as dim} selected]
   (let [dim (select-keys dim [:name :title])]
     [:div.ui.special.popup.card {:style {:display (if @selected "block" "none")}}
-     (when description
-       [:div.content
-        [:div.description description]])
      [:div.content
       [dimension-popup-button "green" "filter" :dimension-added-to-filter selected dim]
       [dimension-popup-button "orange" "square" :dimension-replaced-split selected dim]
@@ -58,10 +55,11 @@
       "LONG" "hashtag"
       "font")))
 
-(defn- dimension-item* [selected {:keys [name title type] :as dimension}]
+(defn- dimension-item* [selected {:keys [name title type description] :as dimension}]
   [popup
    [:div.item.dimension {:on-click #(swap! selected not)
-                         :class (when @selected "active")}
+                         :class (when @selected "active")
+                         :title description}
     [:i.icon {:class (type-icon type name)}] title]
    [dimension-popup dimension selected]
    {:on "manual" :position "right center" :distanceAway -30}])

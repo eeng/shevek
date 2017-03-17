@@ -13,8 +13,9 @@
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
       (send-main-query)))
 
-(defn- measure-item [{:keys [title] :as dim}]
-  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)}
+(defn- measure-item [{:keys [title description] :as dim}]
+  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)
+              :title description}
    [checkbox title {:checked (includes-dim? (cube-view :measures) dim)
                     :on-change #(dispatch :measure-toggled dim %)}]])
 
