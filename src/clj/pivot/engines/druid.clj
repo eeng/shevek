@@ -64,7 +64,7 @@
     "topN"
     "timeseries"))
 
-(defn- add-query-type-dependant-fields [{:keys [split measures limit] :or {limit 100} :as q}
+(defn- add-query-type-dependant-fields [{:keys [split measures] :as q}
                                         {:keys [queryType] :as dq}]
   (condp = queryType
     "topN"
@@ -72,7 +72,7 @@
            :granularity {:type "all"}
            :dimension (-> split first :name)
            :metric (-> measures first :name)
-           :threshold limit)
+           :threshold (-> split first :limit (or 100)))
     "timeseries"
     (assoc dq
            :granularity (if (time-dimension split)
@@ -130,9 +130,8 @@
 ; One no-time dimension and one measure (for pinned dimensions)
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
-            :split [{:name "page"}]
+            :split [{:name "page" :limit 5}]
             :measures [{:name "count" :type "longSum"}]
-            :limit 5
             :interval ["2015-09-12" "2015-09-13"]})
 
 ; One time dimension and one measure (for pinned time dimension)

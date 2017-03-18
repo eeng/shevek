@@ -66,7 +66,7 @@
       :current-month [(beginning-of-month now) (end-of-month now)])))
 
 (defn- only-dw-query-keys [dim]
-  (select-keys dim [:name :type :granularity]))
+  (select-keys dim [:name :type :granularity :limit]))
 
 ; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
 (defn to-dw-query [{:keys [filter split measures] :as q}]

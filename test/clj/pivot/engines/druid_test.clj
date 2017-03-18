@@ -52,9 +52,8 @@
                   :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
                   :threshold 10}
                  (to-druid-query {:cube "wikiticker"
-                                  :split [{:name "page"}]
-                                  :measures [{:name "count" :type "longSum"}]
-                                  :limit 10}))))
+                                  :split [{:name "page" :limit 10}]
+                                  :measures [{:name "count" :type "longSum"}]}))))
 
   (testing "query with one time dimension should generate a timeseries query"
     (is (submap? {:queryType "timeseries"
