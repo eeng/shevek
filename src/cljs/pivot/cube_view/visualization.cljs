@@ -25,24 +25,25 @@
         [:div.label title]
         [:div.value value]])]))
 
-; FIXME el :let es xq solo anda para una dim x ahora
-; TODO refactorizar
+; FIXME solo anda para una dim x ahora
+(defn- pivot-table-row [result split]
+  (let [dimension (first split)
+        dimension-value (-> dimension :name keyword result)]
+    [:tr
+     [:td (format-dimension dimension-value dimension)]
+     (rfor [measure (cube-view :measures)
+            :let [measure-value (-> measure :name keyword result)]]
+       [:td.right.aligned (format-measure measure-value measure)])]))
+
 (defn- pivot-table-visualization []
   (let [split (cube-view :split-arrived)]
-    [:table.ui.very.basic.table
+    [:table.ui.very.basic.compact.table
      [:thead
       [:tr
        [:th (->> split (map :title) (str/join ", "))]
        (rmap (fn [{:keys [title]}] [:th.right.aligned title]) (cube-view :measures))]]
      [:tbody
-      (rfor [result (cube-view :results :main)
-             :let [dimension (first split)
-                   dimension-value (-> dimension :name keyword result)]]
-        [:tr
-         [:td (format-dimension dimension-value dimension)]
-         (rfor [measure (cube-view :measures)
-                :let [measure-value (-> measure :name keyword result)]]
-           [:td.right.aligned (format-measure measure-value measure)])])]]))
+      (rmap (fn [result] [pivot-table-row result split]) (cube-view :results :main))]]))
 
 (defn visualization-panel []
   [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])

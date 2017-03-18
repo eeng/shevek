@@ -59,15 +59,7 @@
             color: #ccc;
             margin-right: 7px;
           }
-          &:hover {
-            background-color: #f7f7f7;
-            cursor: pointer;
-            .icon { color: black; }
-          }
-          &.active {
-            background-color: #dcdcdc;
-            .icon { color: black; }
-          }
+          #cube-view .selectable;
         }
         .popup {
           padding: 0;
@@ -153,6 +145,11 @@
       justify-content: center;
       margin: 0;
     }
+    .table {
+      tbody tr {
+        #cube-view .selectable;
+      }
+    }
   }
 
   .pinboard {
@@ -180,10 +177,21 @@
           overflow: hidden;
           padding-right: 10px;
         }
-        .measure-value { .dimmed; }
       }
     }
   }
 
   .ui.checkbox label { cursor: pointer; }
+
+  .selectable {
+    &:hover {
+      background-color: #f7f7f7;
+      cursor: pointer;
+      .icon { color: black; }
+    }
+    &.active {
+      background-color: #dcdcdc;
+      .icon { color: black; }
+    }
+  }
 }
