@@ -52,14 +52,24 @@
      [:div.segment-value segment-value]
      [:div.measure-value measure-value]]))
 
+(def periods {"PT1H" "1H"
+              "PT6H" "6H"
+              "PT12H" "12H"
+              "P1D" "1D"
+              "P1M" "1M"})
+
+(defn- title-according-to-dim-type [{:keys [granularity] :as dim}]
+  (when (time-dimension? dim)
+    (str "(" (periods granularity) ")")))
+
 (defn- pinned-dimension-panel [{:keys [title name] :as dim}]
   (let [results (cube-view :results :pinboard name)]
     [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
-     [panel-header title
-      ; TODO traducir esto
-      [dropdown [["1 hora" "PT1H"] ["6 horas" "PT6H"] ["12 horas" "PT12H"] ["1 día" "P1D"] ["1 mes" "P1M"]]
-       {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
-       [:i.ellipsis.horizontal.large.link.icon]]
+     [panel-header (str title " " (title-according-to-dim-type dim))
+      (when (time-dimension? dim)
+        [dropdown (map (juxt second first) periods)
+         {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
+         [:i.ellipsis.horizontal.large.link.icon]])
       [:i.close.link.large.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
      [:div.items {:class (when (empty? results) "empty")}
       (rmap (partial pinned-dimension-item dim) results)]]))
