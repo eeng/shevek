@@ -4,12 +4,13 @@
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
-            [clojure.string :refer [split]]))
+            [clojure.string :refer [split]]
+            [taoensso.timbre :as log]))
 
 (defn call-fn
   "Given a map like {:fn 'ns/func' :args [1 2]} calls (pivot.ns/func 1 2)"
   [{fid :fn args :args :or {args []}}]
-  (println "Calling fn" fid "with args" args)
+  (log/info "Calling fn" fid "with args" args)
   (let [[namespace-suffix fn-name] (split fid #"/")
         namespace (str "pivot." namespace-suffix)
         f (ns-resolve (symbol namespace) (symbol fn-name))]

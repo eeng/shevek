@@ -2,7 +2,9 @@
   (:require [clj-http.client :as http]
             [pivot.engines.engine :as e :refer [DwEngine]]
             [pivot.lib.collections :refer [detect]]
-            [clojure.string :as str]))
+            [pivot.lib.logging :refer [pp-str]]
+            [clojure.string :as str]
+            [taoensso.timbre :as log]))
 
 ; TODO http-kit viene con un client, ver si no se puede usar para no tener q agregar otra dependencia
 (defn datasources [host]
@@ -105,7 +107,7 @@
                :time-boundary (time-boundary host name)))
   (query [_ q]
          (let [dq (to-druid-query q)]
-           (clojure.pprint/pprint dq) ; TODO pasar a logging
+           (log/debug "Sending query to druid:\n" (pp-str dq))
            (from-druid-results dq (send-query host dq)))))
 
 ; Manual testing
