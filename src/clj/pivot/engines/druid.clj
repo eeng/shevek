@@ -80,12 +80,12 @@
                           {:type "all"}))))
 
 ; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
-(defn to-druid-query [{:keys [cube measures interval descending] :as q}]
+(defn to-druid-query [{:keys [cube measures interval split] :as q}]
   (->> {:queryType (calculate-query-type q)
         :dataSource {:type "table" :name cube}
         :intervals (str/join "/" interval)
         :aggregations (mapv to-druid-agg measures)
-        :descending (or descending false)}
+        :descending (or (:descending (time-dimension split)) false)}
        (add-query-type-dependant-fields q)))
 
 (defn from-druid-results [{:keys [queryType]} results]

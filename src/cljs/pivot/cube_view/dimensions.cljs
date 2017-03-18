@@ -7,7 +7,12 @@
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
             [pivot.components :refer [popup]]
+            [pivot.dw :refer [time-dimension?]]
             [pivot.cube-view.shared :refer [current-cube panel-header add-dimension remove-dimension send-main-query]]))
+
+(defn- set-split-defaults [dim]
+  (cond-> dim
+          (time-dimension? dim) (assoc :granularity "PT1H")))
 
 (defevh :dimension-added-to-filter [db dim]
   (-> (update-in db [:cube-view :filter] add-dimension dim)
@@ -18,16 +23,16 @@
       #_(send-main-query)))
 
 (defevh :dimension-added-to-split [db dim]
-  (-> (update-in db [:cube-view :split] add-dimension dim)
-      #_(send-main-query)))
+  (-> (update-in db [:cube-view :split] add-dimension (set-split-defaults dim))
+      (send-main-query)))
 
 (defevh :dimension-replaced-split [db dim]
-  (-> (assoc-in db [:cube-view :split] [dim])
-      #_(send-main-query)))
+  (-> (assoc-in db [:cube-view :split] [(set-split-defaults dim)])
+      (send-main-query)))
 
 (defevh :dimension-removed-from-split [db dim]
   (-> (update-in db [:cube-view :split] remove-dimension dim)
-      #_(send-main-query)))
+      (send-main-query)))
 
 (defn dimension-popup-button [color icon event selected name]
   [:button.ui.circular.icon.button

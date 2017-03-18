@@ -144,11 +144,15 @@
   }
 
   .panel.visualization {
+    overflow-y: auto;
     flex: 1;
     margin-top: 10px;
     padding: 10px 15px;
     .icon-hint, .statistics { padding: 40px }
-    .statistics { justify-content: center; }
+    .statistics {
+      justify-content: center;
+      margin: 0;
+    }
   }
 
   .pinboard {

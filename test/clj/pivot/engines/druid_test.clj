@@ -66,8 +66,7 @@
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]
-                                  :split [{:name "__time" :granularity "P1D"}]
-                                  :descending true})))))
+                                  :split [{:name "__time" :granularity "P1D" :descending true}]})))))
 
 (deftest from-druid-results-test
   (testing "topN results"

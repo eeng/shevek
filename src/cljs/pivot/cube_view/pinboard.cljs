@@ -11,12 +11,11 @@
             [pivot.components :refer [dropdown]]
             [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query format-measure format-dimension]]))
 
-(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name descending] :as dim}]
+(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim}]
   (send-query db
               (assoc cube-view
                      :split [(assoc dim :limit 50)]
-                     :measures (vector (get-in cube-view [:pinboard :measure]))
-                     :descending descending)
+                     :measures (vector (get-in cube-view [:pinboard :measure])))
               [:results :pinboard name]))
 
 (defn init-pinned-dimension [dim]
@@ -45,7 +44,7 @@
         (send-pinned-dim-query new-time-dim))))
 
 (defn- pinned-dimension-item [dim result]
-  (let [segment-value (-> (dim :name) keyword result (format-dimension dim) (or (t :cubes/null-value)))
+  (let [segment-value (-> (dim :name) keyword result (format-dimension dim))
         measure (cube-view :pinboard :measure)
         measure-value (-> measure :name keyword result (format-measure measure))]
     [:div.item {:title segment-value}

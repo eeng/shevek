@@ -5,6 +5,7 @@
             [reflow.db :as db]
             [pivot.lib.react :refer [with-react-keys]]
             [pivot.lib.dates :refer [format-time-according-to-period]]
+            [pivot.i18n :refer [t]]
             [pivot.rpc :as rpc]
             [pivot.dw :as dw]
             [goog.string :as str]))
@@ -22,15 +23,20 @@
       (get (current-cube-name))
       cube-key))
 
+; Copio el split a split-arrived asi sólo se rerenderiza la table cuando llegan los resultados. Sino se re-renderizaría dos veces, primero inmediatamente luego de splitear y despues cuando llegan los resultados, provocando un pantallazo molesto.
 (defevh :query-executed [db results results-keys]
   (-> (assoc-in db (into [:cube-view] results-keys) results)
+      (assoc-in [:cube-view :split-arrived] (-> db :cube-view :split))
       (rpc/loaded results-keys)))
 
-(defn send-query [db q results-keys]
-  (rpc/call "dw/query"
-            :args [(dw/to-dw-query q)]
-            :handler #(dispatch :query-executed % results-keys))
-  (rpc/loading db results-keys))
+(defn send-query [db {:keys [measures] :as cube-view} results-keys]
+  (if (seq measures)
+    (do
+      (rpc/call "dw/query"
+                :args [(dw/to-dw-query cube-view)]
+                :handler #(dispatch :query-executed % results-keys))
+      (rpc/loading db results-keys))
+    db))
 
 (defn- send-main-query [{:keys [cube-view] :as db}]
   (send-query db cube-view [:results :main]))
@@ -55,9 +61,10 @@
       value)))
 
 (defn format-dimension [value {:keys [granularity] :as dim}]
-  (if (dw/time-dimension? dim)
-    (format-time-according-to-period value granularity)
-    value))
+  (cond
+    (nil? value) (t :cubes/null-value)
+    (dw/time-dimension? dim) (format-time-according-to-period value granularity)
+    :else value))
 
 ; Shared components
 
