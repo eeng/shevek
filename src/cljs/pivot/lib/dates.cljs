@@ -1,13 +1,16 @@
 (ns pivot.lib.dates
   (:require [cljs-time.format :as f]
             [cljs-time.core :as t]
+            [cljs-time.coerce :as c]
             [cljs-time.extend]
             [clojure.string :as str]
             [pivot.i18n :refer [translation]]))
 
 ;; TODO todas estas funciones van a trabajar con el timezone en UTC. Ver como influye eso al usar la local
 
-(def parse-time f/parse)
+; El f/unparse es lentísimo supongo que xq prueba con varios formatos, pero aca por ahora solo parseamos iso8601 asi que con esto basta.
+(defn parse-time [time]
+  (c/from-long (.parse js/Date time)))
 
 (def now t/now)
 
@@ -47,4 +50,4 @@
                     "H" (formatter :hour)
                     "D" (formatter :day)
                     "M" (formatter :month))]
-    (f/unparse formatter (f/parse time))))
+    (f/unparse formatter (parse-time time))))
