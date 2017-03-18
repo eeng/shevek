@@ -5,12 +5,11 @@
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
             [clojure.string :refer [split]]
-            [taoensso.timbre :as log]))
+            [pivot.lib.logging :refer [wrap-request-logging]]))
 
 (defn call-fn
   "Given a map like {:fn 'ns/func' :args [1 2]} calls (pivot.ns/func 1 2)"
   [{fid :fn args :args :or {args []}}]
-  (log/info "Calling fn" fid "with args" args)
   (let [[namespace-suffix fn-name] (split fid #"/")
         namespace (str "pivot." namespace-suffix)
         f (ns-resolve (symbol namespace) (symbol fn-name))]
@@ -26,5 +25,6 @@
 
 ; TODO Para habilitar el anti-forgery habría que setearlo en una var en el index con (anti-forgery-field) y luego en los POST de cljs-ajax agregarlo al header X-CSRF-Token
 (def app (-> app-routes
+             (wrap-request-logging)
              (wrap-restful-format)
              (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))
