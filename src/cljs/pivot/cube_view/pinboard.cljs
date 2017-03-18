@@ -65,7 +65,6 @@
      [:div.items {:class (when (empty? results) "empty")}
       (rmap (partial pinned-dimension-item dim) results)]]))
 
-; TODO revisar el dropdown q la primera vez q entro a la pag no muestra el selected
 (defn pinboard-panel []
   [:div.pinboard.zone
    [panel-header (t :cubes/pinboard)

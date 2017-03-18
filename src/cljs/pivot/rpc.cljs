@@ -10,13 +10,13 @@
 
 (defn loading?
   ([] (seq (db/get :loading)))
-  ([k] (get (db/get :loading) k)))
+  ([key] (db/get-in [:loading key])))
 
 (defn loading [db key]
-  (update db :loading (fnil conj #{}) key))
+  (assoc-in db [:loading key] true))
 
 (defn loaded [db key]
-  (update db :loading disj key))
+  (update db :loading dissoc key))
 
 ;; Generic events to make remote queries (doesn't allow to process them before storing in the db)
 
