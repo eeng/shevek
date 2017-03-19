@@ -48,26 +48,26 @@
             :on-change #(on-change (not checked))}]
    [:label {:for name} label]])
 
-(defn- popup* [activator popup-container _]
-  [:div activator popup-container])
+; TODO el reposition solo se deberia hacer :on "manual"
+(defn make-popup [activator popup-opts]
+  (with-meta activator
+    {:component-did-mount #(-> % dom-node js/$
+                               (.popup (clj->js (assoc popup-opts :inline true)))
+                               (.popup "reposition"))
+     :component-did-update #(-> % dom-node js/$
+                                (.popup "reposition"))}))
 
-; TODO hacer solo el reposition si on = manual, asi para los demas casos sigue normal
-(defn popup [_ _ opts]
-  (create-class {:reagent-render popup*
-                 :component-did-mount #(-> % dom-node js/$ (.find ".item")
-                                           (.popup (clj->js (merge {:inline true} opts)))
-                                           (.popup "reposition"))}))
-
-(defn outside-deselectable
-  "Allows a react component to be deselected when clicked outside."
-  [component]
+(defn with-controlled-popup [activator popup-content popup-opts]
   (fn [& _]
     (let [selected (r/atom false)
           handle-click-outside (fn [c e]
                                  (when (and @selected (not (.contains (r/dom-node c) (.-target e))))
                                    (reset! selected false)))
           node-listener (atom nil)]
-      (r/create-class {:reagent-render (partial component selected)
+      (r/create-class {:reagent-render (fn [& args]
+                                         [:div
+                                          (into [(make-popup activator (assoc popup-opts :on "manual")) selected] args)
+                                          (into [popup-content selected] args)])
                        :component-did-mount #(do
                                                (reset! node-listener (partial handle-click-outside %))
                                                (.addEventListener js/document "click" @node-listener true))

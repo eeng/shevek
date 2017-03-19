@@ -6,7 +6,7 @@
             [pivot.rpc :refer [loading?]]
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
-            [pivot.components :refer [popup outside-deselectable]]
+            [pivot.components :refer [with-controlled-popup]]
             [pivot.dw :refer [time-dimension? add-dimension remove-dimension]]
             [pivot.cube-view.shared :refer [current-cube panel-header send-main-query]]))
 
@@ -61,16 +61,14 @@
       "font")))
 
 (defn- dimension-item [selected {:keys [name title type description] :as dimension}]
-  [popup
-   [:div.item {:class (when @selected "active")
-               :on-click #(swap! selected not)
-               :title description}
-    [:i.icon {:class (type-icon type name)}] title]
-   [dimension-popup selected dimension]
-   {:on "manual" :position "right center" :distanceAway -30}])
+  [:div.item {:class (when @selected "active")
+              :on-click #(swap! selected not)
+              :title description}
+   [:i.icon {:class (type-icon type name)}] title])
 
 (defn dimensions-panel []
   [:div.dimensions.panel.ui.basic.segment (rpc/loading-class :cube-metadata)
    [panel-header (t :cubes/dimensions)]
    [:div.items
-    (rmap (outside-deselectable dimension-item) (current-cube :dimensions))]])
+    (rmap (with-controlled-popup dimension-item dimension-popup {:position "right center" :distanceAway -30})
+          (current-cube :dimensions))]])
