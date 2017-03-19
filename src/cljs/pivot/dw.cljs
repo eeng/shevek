@@ -55,6 +55,18 @@
 (defn find-dimension [name dimensions]
   (detect #(= (:name %) name) dimensions))
 
+(defn includes-dim? [coll dim]
+  (some #(dim=? % dim) coll))
+
+(defn add-dimension [coll dim]
+  (let [coll (or coll [])]
+    (if (includes-dim? coll dim)
+      coll
+      (conj coll dim))))
+
+(defn remove-dimension [coll dim]
+  (vec (remove #(dim=? dim %) coll)))
+
 (defn- to-interval [{:keys [selected-period max-time]}]
   (let [now (now)
         max-time (round-to-next-second (or max-time now))]

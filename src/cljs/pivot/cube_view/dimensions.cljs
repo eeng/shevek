@@ -7,8 +7,8 @@
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
             [pivot.components :refer [popup]]
-            [pivot.dw :refer [time-dimension?]]
-            [pivot.cube-view.shared :refer [current-cube panel-header add-dimension remove-dimension send-main-query]]))
+            [pivot.dw :refer [time-dimension? add-dimension remove-dimension]]
+            [pivot.cube-view.shared :refer [current-cube panel-header send-main-query]]))
 
 (defn- set-split-defaults [dim]
   (cond-> dim

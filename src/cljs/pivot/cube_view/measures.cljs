@@ -7,7 +7,8 @@
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
             [pivot.components :refer [checkbox]]
-            [pivot.cube-view.shared :refer [current-cube cube-view panel-header add-dimension remove-dimension send-main-query includes-dim?]]))
+            [pivot.dw :refer [add-dimension remove-dimension includes-dim?]]
+            [pivot.cube-view.shared :refer [current-cube cube-view panel-header send-main-query]]))
 
 (defevh :measure-toggled [db dim selected]
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)

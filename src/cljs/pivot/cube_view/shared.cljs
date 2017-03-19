@@ -10,8 +10,6 @@
             [pivot.dw :as dw]
             [goog.string :as str]))
 
-; Shared helpers
-
 (defn- cube-view [& keys]
   (db/get-in (into [:cube-view] keys)))
 
@@ -41,18 +39,6 @@
 (defn- send-main-query [{:keys [cube-view] :as db}]
   (send-query db cube-view [:results :main]))
 
-(defn includes-dim? [coll dim]
-  (some #(dw/dim=? % dim) coll))
-
-(defn add-dimension [coll dim]
-  (let [coll (or coll [])]
-    (if (includes-dim? coll dim)
-      coll
-      (conj coll dim))))
-
-(defn remove-dimension [coll dim]
-  (vec (remove #(dw/dim=? dim %) coll)))
-
 (defn format-measure [value {:keys [type] :as m}]
   (when value
     (condp = type
@@ -65,8 +51,6 @@
     (nil? value) (t :cubes/null-value)
     (dw/time-dimension? dim) (format-time-according-to-period value granularity)
     :else value))
-
-; Shared components
 
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text

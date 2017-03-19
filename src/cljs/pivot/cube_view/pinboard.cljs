@@ -6,10 +6,10 @@
             [pivot.rpc :refer [loading?]]
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
-            [pivot.dw :refer [find-dimension time-dimension? dim=?]]
+            [pivot.dw :refer [find-dimension time-dimension? dim=? add-dimension remove-dimension]]
             [pivot.lib.collections :refer [replace-matching]]
             [pivot.components :refer [dropdown]]
-            [pivot.cube-view.shared :refer [current-cube panel-header cube-view add-dimension remove-dimension send-query format-measure format-dimension]]))
+            [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension]]))
 
 (defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim}]
   (send-query db
