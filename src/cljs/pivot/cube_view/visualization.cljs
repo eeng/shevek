@@ -25,15 +25,14 @@
         [:div.label title]
         [:div.value value]])]))
 
-(defn- calculate-rate [measure-value measure-name results]
-  (let [rate (->> (map measure-name results)
-                  (apply max)
+(defn- calculate-rate [measure-value measure-name max-values]
+  (let [rate (->> (max-values measure-name)
                   (/ measure-value)
                   (* 100))]
     (str rate "%")))
 
 ; FIXME solo anda para una dim x ahora
-(defn- pivot-table-row [result results split]
+(defn- pivot-table-row [result split max-values]
   (let [dimension (first split)
         dimension-value (-> dimension :name keyword result)]
     [:tr
@@ -42,19 +41,27 @@
             :let [measure-name (-> measure :name keyword)
                   measure-value (measure-name result)]]
        [:td.right.aligned
-        [:div.bg {:style {:width (calculate-rate measure-value measure-name results)}}]
+        [:div.bg {:style {:width (calculate-rate measure-value measure-name max-values)}}]
         (format-measure measure-value measure)])]))
+
+(defn- calculate-max-values [measures results]
+  (reduce (fn [max-values measure-name]
+            (assoc max-values measure-name (apply max (map measure-name results))))
+          {}
+          (map (comp keyword :name) measures)))
 
 (defn- pivot-table-visualization []
   (let [split (cube-view :split-arrived)
-        results (cube-view :results :main)]
-    [:table.ui.very.basic.compact.table
+        measures (cube-view :measures)
+        results (cube-view :results :main)
+        max-values (calculate-max-values measures results)]
+    [:table.ui.very.basic.compact.fixed.single.line.table
      [:thead
       [:tr
        [:th (->> split (map :title) (str/join ", "))]
-       (rmap (fn [{:keys [title]}] [:th.right.aligned title]) (cube-view :measures))]]
+       (rmap (fn [{:keys [title]}] [:th.right.aligned title]) measures)]]
      [:tbody
-      (rmap (fn [result] [pivot-table-row result results split]) results)]]))
+      (rmap (fn [result] [pivot-table-row result split max-values]) results)]]))
 
 (defn visualization-panel []
   [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
