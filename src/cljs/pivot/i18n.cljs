@@ -21,6 +21,11 @@
             :no-pinned "Drag or click dimensions to pin them"
             :no-measures "Please select at least one measure"
             :null-value "No Value"}
+    :cubes.time-period {:relative "Relative"
+                        :specific "Specific"
+                        :latest "Latest"
+                        :current "Current"
+                        :previous "Previous"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -44,6 +49,11 @@
             :no-pinned "Arrastre o clickee dimensiones para fijarlas aquí"
             :no-measures "Por favor seleccione al menos una métrica"
             :null-value "No Disponible"}
+    :cubes.time-period {:relative "Relativo"
+                        :specific "Específico"
+                        :latest "Último/a"
+                        :current "Actual"
+                        :previous "Previo/a"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"

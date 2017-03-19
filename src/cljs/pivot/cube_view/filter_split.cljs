@@ -1,4 +1,6 @@
 (ns pivot.cube-view.filter-split
+  (:require-macros [pivot.lib.reagent :refer [rfor]]
+                   [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
@@ -8,9 +10,55 @@
             [pivot.cube-view.shared :refer [panel-header cube-view]]
             [pivot.components :refer [with-controlled-popup]]))
 
+(defevh :time-period-changed [db period]
+  (update-in db [:cube-view :filter]
+             (fn [dims] (map #(if (dw/time-dimension? %)
+                                (assoc % :selected-period period)
+                                %)
+                             dims))))
+
+(def available-relative-periods
+  {:latest-hour "1H" :latest-6hours "6H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D"
+   :current-day "D" :current-week "W" :current-month "M" :current-quarter "Q" :current-year "Y"
+   :previous-day "D" :previous-week "W" :previous-month "M" :previous-quarter "Q" :previous-year "Y"})
+
+(defn- period-buttons [header {:keys [selected-period]} periods]
+  [:div.periods
+   [:h2.ui.sub.header header]
+   [:div.ui.five.small.basic.buttons
+     (rfor [period periods]
+       [:button.ui.button {:class (when (= period selected-period) "active")
+                           :on-click #(when-not (= period selected-period)
+                                        (dispatch :time-period-changed period))}
+        (available-relative-periods period)])]])
+
+(defn- relative-period-time-filter [dim]
+  [:div.relative.period-type
+   [period-buttons (t :cubes.time-period/latest) dim
+    [:latest-hour :latest-6hours :latest-day :latest-7days :latest-30days]]
+   [period-buttons (t :cubes.time-period/current) dim
+    [:current-day :current-week :current-month :current-quarter :current-year]]
+   [period-buttons (t :cubes.time-period/previous) dim
+    [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]])
+
+(defn- specific-period-time-filter []
+  [:div.specific.period-type "Specific..."])
+
+(defn- menu-item-for-period-type [period-type period-type-value]
+  [:a.item {:class (when (= @period-type period-type-value) "active")
+            :on-click #(reset! period-type period-type-value)}
+   (->> (name period-type-value) (str "cubes.time-period/") keyword t)])
+
 (defn- filter-popup [selected dim]
-  [:div.ui.special.popup.card {:style {:display (if @selected "block" "none")}}
-   [:div.content "popup for" (str dim)]])
+  (let [period-type (r/atom :relative)] ; TODO aca habria que tomar el valor de la dim pero solo al abrirse el popup... mm
+    (fn []
+      [:div.ui.special.popup.time-filter {:style {:display (if @selected "block" "none")}}
+       [:div.ui.secondary.pointing.fluid.two.item.menu
+        [menu-item-for-period-type period-type :relative]
+        [menu-item-for-period-type period-type :specific]]
+       (if (= @period-type :relative)
+         [relative-period-time-filter dim]
+         [specific-period-time-filter dim])])))
 
 (defn- filter-item [selected {:keys [title] :as dim}]
   [:button.ui.green.compact.button.item
