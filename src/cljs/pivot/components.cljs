@@ -57,3 +57,18 @@
                  :component-did-mount #(-> % dom-node js/$ (.find ".item")
                                            (.popup (clj->js (merge {:inline true} opts)))
                                            (.popup "reposition"))}))
+
+(defn outside-deselectable
+  "Allows a react component to be deselected when clicked outside."
+  [component]
+  (fn [& _]
+    (let [selected (r/atom false)
+          handle-click-outside (fn [c e]
+                                 (when (and @selected (not (.contains (r/dom-node c) (.-target e))))
+                                   (reset! selected false)))
+          node-listener (atom nil)]
+      (r/create-class {:reagent-render (partial component selected)
+                       :component-did-mount #(do
+                                               (reset! node-listener (partial handle-click-outside %))
+                                               (.addEventListener js/document "click" @node-listener true))
+                       :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)}))))
