@@ -146,8 +146,23 @@
       margin: 0;
     }
     .table {
+      th:first-child, td:first-child { padding-left: 0.5em }
+      th:last-child, td:last-child { padding-right: 0.5em }
+
       tbody tr {
         #cube-view .selectable;
+        opacity: .999;
+        td {
+          position: relative;
+          .bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(187, 181, 0, 0.12);
+            z-index: -1;
+          }
+        }
       }
     }
   }
