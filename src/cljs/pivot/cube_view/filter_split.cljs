@@ -48,10 +48,10 @@
             :on-click #(reset! period-type period-type-value)}
    (->> (name period-type-value) (str "cubes.period/") keyword t)])
 
-(defn- filter-popup [selected dim]
+(defn- time-filter-popup [dim]
   (let [period-type (r/atom :relative)] ; TODO aca habria que tomar el valor de la dim pero solo al abrirse el popup... mm
     (fn []
-      [:div.ui.special.popup.time-filter {:style {:display (if @selected "block" "none")}}
+      [:div.time-filter
        [:div.ui.secondary.pointing.fluid.two.item.menu
         [menu-item-for-period-type period-type :relative]
         [menu-item-for-period-type period-type :specific]]
@@ -59,13 +59,27 @@
          [relative-period-time-filter dim]
          [specific-period-time-filter dim])])))
 
-(defn- filter-item [selected {:keys [title] :as dim}]
+(defn- other-filter-popup [dim]
+  [:div (pr-str dim)])
+
+(defn- filter-popup [selected dim]
+  [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
+   (if (dw/time-dimension? dim)
+     [time-filter-popup dim]
+     [other-filter-popup dim])])
+
+(defn- filter-title [{:keys [title] :as dim}]
+  (if (dw/time-dimension? dim)
+    title
+    title))
+
+(defn- filter-item [selected dim]
   [:button.ui.green.compact.button.item
    {:class (when-not (dw/time-dimension? dim) "right labeled icon")
     :on-click #(swap! selected not)}
    (when-not (dw/time-dimension? dim)
      [:i.close.icon {:on-click #(dispatch :dimension-removed-from-filter dim)}])
-   title])
+   (filter-title dim)])
 
 (defn filter-panel []
   [:div.filter.panel
