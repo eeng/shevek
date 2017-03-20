@@ -68,9 +68,9 @@
      [time-filter-popup dim]
      [other-filter-popup dim])])
 
-(defn- filter-title [{:keys [title] :as dim}]
+(defn- filter-title [{:keys [title selected-period] :as dim}]
   (if (dw/time-dimension? dim)
-    title
+    (->> (name selected-period) (str "cubes.period/") keyword t)
     title))
 
 (defn- filter-item [selected dim]
