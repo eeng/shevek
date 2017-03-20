@@ -5,14 +5,14 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :as dw]
             [pivot.lib.react :refer [rmap]]
+            [pivot.lib.collections :refer [detect]]
             [pivot.rpc :as rpc]
             [pivot.cube-view.shared :refer [panel-header cube-view format-measure format-dimension]]))
 
 (defn- sort-results-according-to-selected-measures [result]
   (let [get-value-for-measure (fn [measure result]
-                                (some #(when (= (:name measure) (name (first %)))
-                                         (format-measure (last %) measure))
-                                      result))]
+                                (let [measure-value (last (detect #(= (:name measure) (name (first %))) result))]
+                                  (format-measure (or measure-value 0) measure)))]
     (map #(assoc % :value (get-value-for-measure % result))
          (cube-view :measures))))
 

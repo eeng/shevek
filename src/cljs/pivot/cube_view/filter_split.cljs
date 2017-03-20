@@ -33,11 +33,11 @@
 
 (defn- relative-period-time-filter [dim]
   [:div.relative.period-type
-   [period-buttons (t :cubes.time-period/latest) dim
+   [period-buttons (t :cubes.period/latest) dim
     [:latest-hour :latest-6hours :latest-day :latest-7days :latest-30days]]
-   [period-buttons (t :cubes.time-period/current) dim
+   [period-buttons (t :cubes.period/current) dim
     [:current-day :current-week :current-month :current-quarter :current-year]]
-   [period-buttons (t :cubes.time-period/previous) dim
+   [period-buttons (t :cubes.period/previous) dim
     [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]])
 
 (defn- specific-period-time-filter []
@@ -46,7 +46,7 @@
 (defn- menu-item-for-period-type [period-type period-type-value]
   [:a.item {:class (when (= @period-type period-type-value) "active")
             :on-click #(reset! period-type period-type-value)}
-   (->> (name period-type-value) (str "cubes.time-period/") keyword t)])
+   (->> (name period-type-value) (str "cubes.period/") keyword t)])
 
 (defn- filter-popup [selected dim]
   (let [period-type (r/atom :relative)] ; TODO aca habria que tomar el valor de la dim pero solo al abrirse el popup... mm
