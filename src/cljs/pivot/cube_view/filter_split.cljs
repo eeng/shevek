@@ -6,16 +6,14 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :as dw]
             [pivot.lib.react :refer [rmap]]
+            [pivot.lib.collections :refer [replace-when]]
             [pivot.rpc :as rpc]
             [pivot.cube-view.shared :refer [panel-header cube-view]]
             [pivot.components :refer [with-controlled-popup]]))
 
 (defevh :time-period-changed [db period]
   (update-in db [:cube-view :filter]
-             (fn [dims] (map #(if (dw/time-dimension? %)
-                                (assoc % :selected-period period)
-                                %)
-                             dims))))
+             (fn [dims] (replace-when dw/time-dimension? #(assoc % :selected-period period) dims))))
 
 (def available-relative-periods
   {:latest-hour "1H" :latest-6hours "6H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D"

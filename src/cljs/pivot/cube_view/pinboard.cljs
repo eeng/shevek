@@ -7,7 +7,7 @@
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
             [pivot.dw :refer [find-dimension time-dimension? dim=? add-dimension remove-dimension]]
-            [pivot.lib.collections :refer [replace-matching]]
+            [pivot.lib.collections :refer [replace-when]]
             [pivot.components :refer [dropdown]]
             [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension]]))
 
@@ -40,7 +40,7 @@
 (defevh :pinned-time-granularity-changed [db dim granularity]
   (let [new-time-dim (assoc dim :granularity granularity)]
     (-> (update-in db [:cube-view :pinboard :dimensions]
-                   #(replace-matching (partial dim=? new-time-dim) new-time-dim %))
+                   #(replace-when (partial dim=? new-time-dim) (constantly new-time-dim) %))
         (send-pinned-dim-query new-time-dim))))
 
 (defn- pinned-dimension-item [dim result]
