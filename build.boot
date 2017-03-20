@@ -101,3 +101,12 @@
               :resource-paths #{"test/resources"})
   (comp (dev)
         (test-cljs)))
+
+(deftask testing
+  "Continuos automatic testing."
+  []
+  (merge-env! :source-paths #{"test/clj" "test/cljs"}
+              :resource-paths #{"test/resources"})
+  (comp (dev)
+        (alt-test)
+        (test-cljs)))

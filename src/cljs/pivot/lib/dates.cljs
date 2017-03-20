@@ -14,7 +14,8 @@
 
 (def now t/now)
 
-(def yesterday t/yesterday)
+(defn yesterday []
+  (t/minus (now) (t/days 1)))
 
 (def beginning-of-day t/at-midnight)
 
@@ -25,6 +26,32 @@
 
 (def beginning-of-month t/first-day-of-the-month)
 (def end-of-month (comp end-of-day t/last-day-of-the-month))
+
+(defn plus-days [time days]
+  (t/plus time (t/days days)))
+
+(defn beginning-of-week [time]
+  (let [days-to-bow (-> time t/day-of-week dec)]
+    (-> time (t/minus (t/days days-to-bow)) beginning-of-day)))
+
+(defn end-of-week [time]
+  (let [days-to-eow (->> time t/day-of-week (- 7))]
+    (-> time (t/plus (t/days days-to-eow)) end-of-day)))
+
+(defn quarter [time]
+  (-> time t/month (/ 3) Math.ceil))
+
+(defn beginning-of-quarter [time]
+  (t/date-time (t/year time) (- (* (quarter time) 3) 2)))
+
+(defn end-of-quarter [time]
+  (end-of-month (t/date-time (t/year time) (* (quarter time) 3))))
+
+(defn beginning-of-year [time]
+  (t/date-time (t/year time)))
+
+(defn end-of-year [time]
+  (end-of-month (t/date-time (t/year time) 12)))
 
 (defn round-to-next-second [time]
   (if (zero? (t/milli time))
