@@ -18,6 +18,9 @@
                      :measures (vector (get-in cube-view [:pinboard :measure])))
               [:results :pinboard name]))
 
+(defn send-pinned-dims-queries [db]
+  (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions)))
+
 (defn init-pinned-dimension [dim]
   (if (time-dimension? dim)
     (assoc dim :granularity "PT6H" :descending true) ; Default granularity
@@ -32,10 +35,9 @@
   (update-in db [:cube-view :pinboard :dimensions] remove-dimension dim))
 
 (defevh :pinboard-measure-selected [db measure-name]
-  (let [db (assoc-in db [:cube-view :pinboard :measure]
-                     (find-dimension measure-name (current-cube :measures)))]
-    db
-    (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions))))
+  (-> (assoc-in db [:cube-view :pinboard :measure]
+                (find-dimension measure-name (current-cube :measures)))
+      (send-pinned-dims-queries)))
 
 (defevh :pinned-time-granularity-changed [db dim granularity]
   (let [new-time-dim (assoc dim :granularity granularity)]

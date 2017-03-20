@@ -9,12 +9,14 @@
             [pivot.lib.collections :refer [replace-when]]
             [pivot.rpc :as rpc]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
+            [pivot.cube-view.pinboard :refer [send-pinned-dims-queries]]
             [pivot.components :refer [with-controlled-popup]]))
 
 (defevh :time-period-changed [db period]
   (-> (update-in db [:cube-view :filter]
                  (fn [dims] (replace-when dw/time-dimension? #(assoc % :selected-period period) dims)))
-      (send-main-query)))
+      (send-main-query)
+      (send-pinned-dims-queries)))
 
 (def available-relative-periods
   {:latest-hour "1H" :latest-6hours "6H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D"
