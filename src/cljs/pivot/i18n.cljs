@@ -45,7 +45,8 @@
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
                :users "Users"}
-    :date-formats {:hour "MMM d yyyy, ha"
+    :date-formats {:minute "MMM d, h:mma"
+                   :hour "MMM d yyyy, ha"
                    :day "MMM d yyyy"
                    :month "MMM yyyy"}}
 
@@ -88,7 +89,8 @@
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"
                :users "Usuarios"}
-    :date-formats {:hour "dd/MM/yyyy, H 'hs'"
+    :date-formats {:minute "dd/MM HH:mm"
+                   :hour "dd/MM/yyyy H 'hs'"
                    :day "dd/MM/yyyy"
                    :month "MM/yyyy"}}
 

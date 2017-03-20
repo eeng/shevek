@@ -7,6 +7,7 @@
             [pivot.lib.dates :as d :refer [parse-time to-iso8601]]
             [pivot.lib.collections :refer [detect]]
             [cljs-time.core :as t]
+            [cljs-time.format :as f]
             [reflow.db :as db]))
 
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
@@ -67,7 +68,7 @@
 (defn remove-dimension [coll dim]
   (vec (remove #(dim=? dim %) coll)))
 
-(defn- to-interval [{:keys [selected-period max-time]}]
+(defn to-interval [selected-period max-time]
   (let [now (d/now)
         max-time (d/round-to-next-second (or max-time now))
         day-of-last-week (t/minus (d/beginning-of-week now) (t/days 1))
@@ -91,13 +92,22 @@
       :previous-quarter [(d/beginning-of-quarter day-of-last-quarter) (d/end-of-quarter day-of-last-quarter)]
       :previous-year [(d/beginning-of-year day-of-last-year) (d/end-of-year day-of-last-year)])))
 
+(defn format-period [period max-time]
+  (let [formatter (d/formatter
+                   (if (str/starts-with? (name period) "latest") :minute :day))]
+    (->> (to-interval period max-time)
+         (map #(f/unparse formatter %))
+         distinct
+         (str/join " - "))))
+
 (defn- only-dw-query-keys [dim]
   (select-keys dim [:name :type :granularity :limit :descending]))
 
 ; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
 (defn to-dw-query [{:keys [filter split measures] :as q}]
-  (-> (select-keys q [:cube])
-      (assoc :interval (mapv to-iso8601 (to-interval (time-dimension filter)))
-             :filter (mapv only-dw-query-keys filter)
-             :split (mapv only-dw-query-keys split)
-             :measures (mapv only-dw-query-keys measures))))
+  (let [time-dim (time-dimension filter)]
+    (-> (select-keys q [:cube])
+        (assoc :interval (mapv to-iso8601 (to-interval (time-dim :selected-period) (time-dim :max-time)))
+               :filter (mapv only-dw-query-keys filter)
+               :split (mapv only-dw-query-keys split)
+               :measures (mapv only-dw-query-keys measures)))))

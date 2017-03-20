@@ -21,27 +21,32 @@
    :current-day "D" :current-week "W" :current-month "M" :current-quarter "Q" :current-year "Y"
    :previous-day "D" :previous-week "W" :previous-month "M" :previous-quarter "Q" :previous-year "Y"})
 
-(defn- period-buttons [header {:keys [selected-period]} periods]
+(defn- period-buttons [{:keys [selected-period]} showed-period header periods]
   [:div.periods
    [:h2.ui.sub.header header]
    [:div.ui.five.small.basic.buttons
      (rfor [period periods]
        [:button.ui.button {:class (when (= period selected-period) "active")
                            :on-click #(when-not (= period selected-period)
-                                        (dispatch :time-period-changed period))}
+                                        (dispatch :time-period-changed period))
+                           :on-mouse-over #(reset! showed-period period)
+                           :on-mouse-out #(reset! showed-period selected-period)}
         (available-relative-periods period)])]])
 
-(defn- relative-period-time-filter [dim]
-  [:div.relative.period-type
-   [period-buttons (t :cubes.period/latest) dim
-    [:latest-hour :latest-6hours :latest-day :latest-7days :latest-30days]]
-   [period-buttons (t :cubes.period/current) dim
-    [:current-day :current-week :current-month :current-quarter :current-year]]
-   [period-buttons (t :cubes.period/previous) dim
-    [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]])
+(defn- relative-period-time-filter [{:keys [selected-period max-time] :as dim}]
+  (let [showed-period (r/atom selected-period)]
+    (fn []
+      [:div.relative.period-type
+       [period-buttons dim showed-period (t :cubes.period/latest)
+        [:latest-hour :latest-6hours :latest-day :latest-7days :latest-30days]]
+       [period-buttons dim showed-period (t :cubes.period/current)
+        [:current-day :current-week :current-month :current-quarter :current-year]]
+       [period-buttons dim showed-period (t :cubes.period/previous)
+        [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]
+       [:div.ui.label (dw/format-period @showed-period max-time)]])))
 
 (defn- specific-period-time-filter []
-  [:div.specific.period-type "Specific..."])
+  [:div.specific.period-type "TODO"])
 
 (defn- menu-item-for-period-type [period-type period-type-value]
   [:a.item {:class (when (= @period-type period-type-value) "active")
