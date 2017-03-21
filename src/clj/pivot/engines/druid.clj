@@ -100,6 +100,16 @@
         dr (send-query host dq)]
     (from-druid-results q dq dr)))
 
+(defn- assoc-not-nil [map key val]
+  (cond-> map
+          val (assoc key val)))
+
+(defn- send-queries-for-split [host {:keys [split] :as q}]
+  (let [[dim & dims] split]
+    (when dim
+      (->> (send-query-and-simplify-results host (assoc q :dimension dim))
+           (map #(assoc-not-nil % :results (send-queries-for-split host (assoc q :split dims))))))))
+
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
   DwEngine
@@ -110,14 +120,13 @@
                :dimensions (dimensions host name)
                :measures (metrics host name)
                :time-boundary (time-boundary host name)))
-  (query [_ {:keys [totals split] :as q}]
-         (let [[dim & dims] split
-               results (send-query-and-simplify-results host (assoc q :dimension dim))]
-           (if (and totals dim)
+  (query [_ {:keys [totals] :as q}]
+         (let [results (send-queries-for-split host q)]
+           (if totals
              (concat (send-query-and-simplify-results host q) results)
              results))))
 
-; Manual testing
+;;;; Manual testing
 (def broker "http://kafka:8082")
 
 #_(datasources broker)
@@ -133,7 +142,7 @@
             :measures [{:name "count" :type "longSum"}
                        {:name "added" :type "doubleSum"}]
             :interval ["2015-09-12" "2015-09-13"]
-            :totals true}) ; Con o sin totals true devolver dar lo mismo
+            :totals true})
 
 ; One no-time dimension and one measure
 #_(e/query (DruidEngine. broker)
@@ -160,6 +169,6 @@
 ; Two no-time dimensions
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
-            :split [{:name "isMinor"} {:name "isRobot"}]
+            :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})
