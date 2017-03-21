@@ -4,7 +4,7 @@
             [clojure.string :as str]
             [pivot.i18n :refer [t]]
             [pivot.dw :as dw]
-            [pivot.lib.react :refer [rmap]]
+            [pivot.lib.react :refer [rmap with-react-keys]]
             [pivot.lib.collections :refer [detect]]
             [pivot.rpc :as rpc]
             [pivot.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result?]]))
@@ -28,18 +28,24 @@
                   (* 100))]
     (str rate "%")))
 
-; FIXME solo anda para una dim x ahora
-(defn- pivot-table-row [result split max-values]
-  (let [dimension (first split)]
-    [:tr
-     [:td (format-dimension dimension result)]
-     (rfor [measure (cube-view :measures)
-            :let [measure-name (-> measure :name keyword)
-                  measure-value (measure-name result)]]
-       [:td.right.aligned
-        [:div.bg (when-not (totals-result? result dimension)
-                   {:style {:width (calculate-rate measure-value measure-name max-values)}})]
-        (format-measure measure result)])]))
+(defn- pivot-table-row [result dim depth measures max-values]
+  [:tr
+    [:td
+     [:div {:class (str "depth-" depth)}
+      (format-dimension dim result)]]
+    (rfor [measure measures
+           :let [measure-name (-> measure :name keyword)
+                 measure-value (measure-name result)]]
+      [:td.right.aligned
+       [:div.bg (when-not (totals-result? result dim)
+                  {:style {:width (calculate-rate measure-value measure-name max-values)}})]
+       (format-measure measure result)])])
+
+(defn- pivot-table-rows [results [dim & dims] depth measures max-values]
+  (when dim
+    (mapcat #(into [(pivot-table-row % dim depth measures max-values)]
+                   (pivot-table-rows (:results %) dims (inc depth) measures max-values))
+            results)))
 
 (defn- calculate-max-values [measures results]
   (reduce (fn [max-values measure-name]
@@ -58,7 +64,7 @@
        [:th (->> split (map :title) (str/join ", "))]
        (rmap (fn [{:keys [title]}] [:th.right.aligned title]) measures)]]
      [:tbody
-      (rmap (fn [result] [pivot-table-row result split max-values]) results)]]))
+      (with-react-keys (pivot-table-rows results split 0 measures max-values))]]))
 
 (defn visualization-panel []
   [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])

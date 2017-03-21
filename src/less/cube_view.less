@@ -188,6 +188,12 @@
             background-color: rgba(187, 181, 0, 0.12);
             z-index: -1;
           }
+
+          .generate-depths(@i) when (@i > 0) {
+            .generate-depths(@i - 1);
+            .depth-@{i} { margin-left: (@i * 1.5em); }
+          }
+          .generate-depths(5);
         }
       }
     }

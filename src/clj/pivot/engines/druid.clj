@@ -116,6 +116,7 @@
   (let [dim-value (result (keyword name))]
     (conj filter {:name name :is dim-value})))
 
+; TODO no me convencen los nombres de algunas de estas funciones
 (defn- send-queries-for-split [host {:keys [split filter] :as q}]
   (let [[dim & dims] split]
     (when dim
@@ -186,4 +187,5 @@
            {:cube "wikiticker"
             :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2}]
             :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]})
+            :interval ["2015-09-12" "2015-09-13"]
+            :totals true})
