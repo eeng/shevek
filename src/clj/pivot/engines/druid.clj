@@ -57,43 +57,40 @@
 (defn time-dimension? [{:keys [name]}]
   (= name "__time"))
 
-(defn time-dimension [dimensions]
-  (detect #(time-dimension? %) dimensions))
-
-(defn- calculate-query-type [{:keys [split]}]
-  (if (and (seq split) (not (time-dimension split)))
+(defn- calculate-query-type [{:keys [dimension]}]
+  (if (and dimension (not (time-dimension? dimension)))
     "topN"
     "timeseries"))
 
-(defn- add-query-type-dependant-fields [{:keys [split measures] :as q}
+(defn- add-query-type-dependant-fields [{:keys [dimension measures] :as q}
                                         {:keys [queryType] :as dq}]
   (condp = queryType
     "topN"
     (assoc dq
            :granularity {:type "all"}
-           :dimension (-> split first :name)
+           :dimension (dimension :name)
            :metric (-> measures first :name)
-           :threshold (-> split first :limit (or 100)))
+           :threshold (dimension :limit (or 100)))
     "timeseries"
     (assoc dq
-           :granularity (if (time-dimension split)
-                          {:type "period" :period (:granularity (time-dimension split))}
+           :granularity (if dimension
+                          {:type "period" :period (:granularity dimension)}
                           {:type "all"}))))
 
 ; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
-(defn to-druid-query [{:keys [cube measures interval split] :as q}]
+(defn to-druid-query [{:keys [cube measures interval dimension] :as q}]
   (->> {:queryType (calculate-query-type q)
         :dataSource {:type "table" :name cube}
         :intervals (str/join "/" interval)
         :aggregations (mapv to-druid-agg measures)
-        :descending (or (:descending (time-dimension split)) false)}
+        :descending (or (:descending dimension) false)}
        (add-query-type-dependant-fields q)))
 
-(defn from-druid-results [results {:keys [split]} {:keys [queryType]}]
+(defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]
   (condp = queryType
     "topN" (-> results first :result)
     "timeseries" (map (fn [{:keys [result timestamp]}]
-                        (if (seq split)
+                        (if dimension
                           (assoc result :__time timestamp)
                           result))
                       results)))
@@ -101,7 +98,7 @@
 (defn- send-query-and-simplify-results [host q]
   (let [dq (to-druid-query q)
         dr (send-query host dq)]
-    (from-druid-results dr q dq)))
+    (from-druid-results q dq dr)))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
@@ -114,9 +111,10 @@
                :measures (metrics host name)
                :time-boundary (time-boundary host name)))
   (query [_ {:keys [totals split] :as q}]
-         (let [results (send-query-and-simplify-results host q)]
-           (if (and totals (seq split))
-             (concat (send-query-and-simplify-results host (dissoc q :split)) results)
+         (let [[dim & dims] split
+               results (send-query-and-simplify-results host (assoc q :dimension dim))]
+           (if (and totals dim)
+             (concat (send-query-and-simplify-results host q) results)
              results))))
 
 ; Manual testing
@@ -158,3 +156,10 @@
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]
             :totals true})
+
+; Two no-time dimensions
+#_(e/query (DruidEngine. broker)
+           {:cube "wikiticker"
+            :split [{:name "isMinor"} {:name "isRobot"}]
+            :measures [{:name "count" :type "longSum"}]
+            :interval ["2015-09-12" "2015-09-13"]})

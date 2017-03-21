@@ -52,7 +52,7 @@
                   :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
                   :threshold 10}
                  (to-druid-query {:cube "wikiticker"
-                                  :split [{:name "page" :limit 10}]
+                                  :dimension {:name "page" :limit 10}
                                   :measures [{:name "count" :type "longSum"}]}))))
 
   (testing "query with one time dimension should generate a timeseries query"
@@ -66,13 +66,14 @@
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]
-                                  :split [{:name "__time" :granularity "P1D" :descending true}]})))))
+                                  :dimension {:name "__time" :granularity "P1D" :descending true}})))))
 
 (deftest from-druid-results-test
   (testing "topN results"
     (is (submaps? [{:page "P1" :count 1}
                    {:page "P2" :count 2}]
                   (from-druid-results
+                    {:dimension {:name "page"}}
                     {:queryType "topN"}
                     [{:result [{:page "P1" :count 1}
                                {:page "P2" :count 2}]}]))))
@@ -81,6 +82,7 @@
     (is (submaps? [{:__time "2015" :count 1}
                    {:__time "2016" :count 2}]
                   (from-druid-results
+                   {:dimension {:name "__time"}}
                    {:queryType "timeseries"}
-                   [{:result {:count 1}, :timestamp "2015"}
-                    {:result {:count 2}, :timestamp "2016"}])))))
+                   [{:result {:count 1} :timestamp "2015"}
+                    {:result {:count 2} :timestamp "2016"}])))))
