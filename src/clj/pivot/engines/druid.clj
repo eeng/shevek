@@ -77,14 +77,26 @@
                           {:type "period" :period (:granularity dimension)}
                           {:type "all"}))))
 
+(defn- to-druid-filter [[{:keys [name is]} :as filter]]
+  (when (seq filter)
+    {:type "selector"
+     :dimension name
+     :value is}))
+
+(defn- assoc-if-seq [map key val]
+  (cond-> map
+          (seq val) (assoc key val)))
+
 ; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
-(defn to-druid-query [{:keys [cube measures interval dimension] :as q}]
-  (->> {:queryType (calculate-query-type q)
-        :dataSource {:type "table" :name cube}
-        :intervals (str/join "/" interval)
-        :aggregations (mapv to-druid-agg measures)
-        :descending (or (:descending dimension) false)}
-       (add-query-type-dependant-fields q)))
+(defn to-druid-query [{:keys [cube measures interval dimension filter] :as q}]
+  (as-> {:queryType (calculate-query-type q)
+         :dataSource {:type "table" :name cube}
+         :intervals (str/join "/" interval)
+         :aggregations (mapv to-druid-agg measures)
+         :descending (or (:descending dimension) false)}
+        dq
+        (add-query-type-dependant-fields q dq)
+        (assoc-if-seq dq :filter (to-druid-filter (remove time-dimension? filter)))))
 
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]
   (condp = queryType
@@ -100,15 +112,18 @@
         dr (send-query host dq)]
     (from-druid-results q dq dr)))
 
-(defn- assoc-not-nil [map key val]
-  (cond-> map
-          val (assoc key val)))
+(defn- add-filter-for-dim [filter {:keys [name]} result]
+  (let [dim-value (result (keyword name))]
+    (conj filter {:name name :is dim-value})))
 
-(defn- send-queries-for-split [host {:keys [split] :as q}]
+(defn- send-queries-for-split [host {:keys [split filter] :as q}]
   (let [[dim & dims] split]
     (when dim
       (->> (send-query-and-simplify-results host (assoc q :dimension dim))
-           (map #(assoc-not-nil % :results (send-queries-for-split host (assoc q :split dims))))))))
+           (map #(assoc-if-seq % :results
+                               (send-queries-for-split host (assoc q
+                                                                   :split dims
+                                                                   :filter (add-filter-for-dim filter dim %)))))))))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]

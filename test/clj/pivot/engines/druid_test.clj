@@ -66,7 +66,15 @@
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]
-                                  :dimension {:name "__time" :granularity "P1D" :descending true}})))))
+                                  :dimension {:name "__time" :granularity "P1D" :descending true}}))))
+
+  (testing "query with one filter"
+    (is (submap? {:filter {:type "selector"
+                           :dimension "isRobot"
+                           :value "true"}}
+                 (to-druid-query {:cube "wikiticker"
+                                  :measures [{:name "count" :type "longSum"}]
+                                  :filter [{:name "__time"} {:name "isRobot" :is "true"}]})))))
 
 (deftest from-druid-results-test
   (testing "topN results"
