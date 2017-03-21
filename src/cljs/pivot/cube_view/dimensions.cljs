@@ -10,8 +10,8 @@
             [pivot.dw :refer [time-dimension? add-dimension remove-dimension]]
             [pivot.cube-view.shared :refer [current-cube panel-header send-main-query]]))
 
-(defn- set-split-defaults [dim]
-  (cond-> dim
+(defn- set-split-defaults [dim {:keys [cube-view]}]
+  (cond-> (assoc dim :limit (if (seq (:split cube-view)) 5 50))
           (time-dimension? dim) (assoc :granularity "PT1H")))
 
 (defevh :dimension-added-to-filter [db dim]
@@ -23,11 +23,11 @@
       #_(send-main-query)))
 
 (defevh :dimension-added-to-split [db dim]
-  (-> (update-in db [:cube-view :split] add-dimension (set-split-defaults dim))
+  (-> (update-in db [:cube-view :split] add-dimension (set-split-defaults dim db))
       (send-main-query)))
 
 (defevh :dimension-replaced-split [db dim]
-  (-> (assoc-in db [:cube-view :split] [(set-split-defaults dim)])
+  (-> (assoc-in db [:cube-view :split] [(set-split-defaults dim db)])
       (send-main-query)))
 
 (defevh :dimension-removed-from-split [db dim]
