@@ -37,20 +37,25 @@
     db))
 
 (defn- send-main-query [{:keys [cube-view] :as db}]
-  (send-query db cube-view [:results :main]))
+  (send-query db (assoc cube-view :totals true) [:results :main]))
 
-(defn format-measure [value {:keys [type] :as m}]
-  (when value
+(defn format-measure [{:keys [name type]} result]
+  (let [value (or (->> name keyword (get result)) 0)]
     (condp = type
       "doubleSum" (str/format "%.2f" value)
       "hyperUnique" (str/format "%.0f" value)
       value)))
 
-(defn format-dimension [value {:keys [granularity] :as dim}]
-  (cond
-    (nil? value) (t :cubes/null-value)
-    (dw/time-dimension? dim) (format-time-according-to-period value granularity)
-    :else value))
+(defn- totals-result? [result dim]
+  (not (contains? result (-> dim :name keyword))))
+
+(defn format-dimension [{:keys [granularity name] :as dim} result]
+  (let [value (-> name keyword result)]
+    (cond
+      (totals-result? result dim) "Total"
+      (nil? value) (t :cubes/null-value)
+      (dw/time-dimension? dim) (format-time-according-to-period value granularity)
+      :else value)))
 
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text

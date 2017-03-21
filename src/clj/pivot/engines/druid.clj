@@ -13,6 +13,7 @@
 
 ; TODO en el :context de la q se le puede pasar un timeout
 (defn- send-query [host q]
+  (log/debug "Sending query to druid:\n" (pp-str q))
   (:body (http/post (str host "/druid/v2") {:content-type :json :form-params q :as :json})))
 
 (defn- segment-metadata-query [host datasource]
@@ -88,12 +89,19 @@
         :descending (or (:descending (time-dimension split)) false)}
        (add-query-type-dependant-fields q)))
 
-(defn from-druid-results [{:keys [queryType]} results]
+(defn from-druid-results [results {:keys [split]} {:keys [queryType]}]
   (condp = queryType
     "topN" (-> results first :result)
     "timeseries" (map (fn [{:keys [result timestamp]}]
-                        (assoc result :__time timestamp))
+                        (if (seq split)
+                          (assoc result :__time timestamp)
+                          result))
                       results)))
+
+(defn- send-query-and-simplify-results [host q]
+  (let [dq (to-druid-query q)
+        dr (send-query host dq)]
+    (from-druid-results dr q dq)))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
@@ -105,10 +113,11 @@
                :dimensions (dimensions host name)
                :measures (metrics host name)
                :time-boundary (time-boundary host name)))
-  (query [_ q]
-         (let [dq (to-druid-query q)]
-           (log/debug "Sending query to druid:\n" (pp-str dq))
-           (from-druid-results dq (send-query host dq)))))
+  (query [_ {:keys [totals split] :as q}]
+         (let [results (send-query-and-simplify-results host q)]
+           (if (and totals (seq split))
+             (concat (send-query-and-simplify-results host (dissoc q :split)) results)
+             results))))
 
 ; Manual testing
 (def broker "http://kafka:8082")
@@ -125,18 +134,27 @@
            {:cube "wikiticker"
             :measures [{:name "count" :type "longSum"}
                        {:name "added" :type "doubleSum"}]
-            :interval ["2015-09-12" "2015-09-13"]})
+            :interval ["2015-09-12" "2015-09-13"]
+            :totals true}) ; Con o sin totals true devolver dar lo mismo
 
-; One no-time dimension and one measure (for pinned dimensions)
+; One no-time dimension and one measure
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "page" :limit 5}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})
 
-; One time dimension and one measure (for pinned time dimension)
+; One time dimension and one measure
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "__time" :granularity "PT6H"}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})
+
+; One no-time dimension with totals
+#_(e/query (DruidEngine. broker)
+           {:cube "wikiticker"
+            :split [{:name "page" :limit 5}]
+            :measures [{:name "count" :type "longSum"}]
+            :interval ["2015-09-12" "2015-09-13"]
+            :totals true})

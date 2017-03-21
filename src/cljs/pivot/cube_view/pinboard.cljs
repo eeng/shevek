@@ -46,12 +46,11 @@
         (send-pinned-dim-query new-time-dim))))
 
 (defn- pinned-dimension-item [dim result]
-  (let [segment-value (-> (dim :name) keyword result (format-dimension dim))
-        measure (cube-view :pinboard :measure)
-        measure-value (-> measure :name keyword result (format-measure measure))]
+  (let [segment-value (format-dimension dim result)
+        measure (cube-view :pinboard :measure)]
     [:div.item {:title segment-value}
      [:div.segment-value segment-value]
-     [:div.measure-value measure-value]]))
+     [:div.measure-value (format-measure measure result)]]))
 
 (def periods {"PT1H" "1H"
               "PT6H" "6H"

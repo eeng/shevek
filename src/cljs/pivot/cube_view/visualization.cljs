@@ -7,14 +7,11 @@
             [pivot.lib.react :refer [rmap]]
             [pivot.lib.collections :refer [detect]]
             [pivot.rpc :as rpc]
-            [pivot.cube-view.shared :refer [panel-header cube-view format-measure format-dimension]]))
+            [pivot.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result?]]))
 
 (defn- sort-results-according-to-selected-measures [result]
-  (let [get-value-for-measure (fn [measure result]
-                                (let [measure-value (last (detect #(= (:name measure) (name (first %))) result))]
-                                  (format-measure (or measure-value 0) measure)))]
-    (map #(assoc % :value (get-value-for-measure % result))
-         (cube-view :measures))))
+  (map #(assoc % :value (format-measure % result))
+       (cube-view :measures)))
 
 (defn- totals-visualization []
   (let [result (sort-results-according-to-selected-measures (first (cube-view :results :main)))]
@@ -33,20 +30,20 @@
 
 ; FIXME solo anda para una dim x ahora
 (defn- pivot-table-row [result split max-values]
-  (let [dimension (first split)
-        dimension-value (-> dimension :name keyword result)]
+  (let [dimension (first split)]
     [:tr
-     [:td (format-dimension dimension-value dimension)]
+     [:td (format-dimension dimension result)]
      (rfor [measure (cube-view :measures)
             :let [measure-name (-> measure :name keyword)
                   measure-value (measure-name result)]]
        [:td.right.aligned
-        [:div.bg {:style {:width (calculate-rate measure-value measure-name max-values)}}]
-        (format-measure measure-value measure)])]))
+        [:div.bg (when-not (totals-result? result dimension)
+                   {:style {:width (calculate-rate measure-value measure-name max-values)}})]
+        (format-measure measure result)])]))
 
 (defn- calculate-max-values [measures results]
   (reduce (fn [max-values measure-name]
-            (assoc max-values measure-name (apply max (map measure-name results))))
+            (assoc max-values measure-name (->> results rest (map measure-name) (apply max))))
           {}
           (map (comp keyword :name) measures)))
 
