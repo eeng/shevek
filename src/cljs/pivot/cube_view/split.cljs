@@ -5,7 +5,7 @@
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension]]
-            [pivot.lib.react :refer [rmap]]
+            [pivot.lib.react :refer [rmap without-propagation]]
             [pivot.cube-view.shared :refer [panel-header current-cube cube-view send-main-query]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [with-controlled-popup select]]))
@@ -61,7 +61,7 @@
 (defn- split-item [selected {:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
    {:on-click #(swap! selected not)}
-   [:i.close.icon {:on-click #(dispatch :dimension-removed-from-split dim)}]
+   [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-split dim)}]
    title])
 
 (defn split-panel []
