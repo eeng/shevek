@@ -7,12 +7,13 @@
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
             [pivot.components :refer [with-controlled-popup]]
-            [pivot.dw :refer [time-dimension? add-dimension remove-dimension]]
+            [pivot.dw :refer [time-dimension? add-dimension remove-dimension dim=?]]
             [pivot.cube-view.shared :refer [current-cube panel-header send-main-query]]))
 
 (defn- set-split-defaults [dim {:keys [cube-view]}]
-  (cond-> (assoc dim :limit (if (seq (:split cube-view)) 5 50))
-          (time-dimension? dim) (assoc :granularity "PT1H")))
+  (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
+    (cond-> (assoc dim :limit (if (seq other-dims-in-split) 5 50))
+            (time-dimension? dim) (assoc :granularity "PT1H"))))
 
 (defevh :dimension-added-to-filter [db dim]
   (-> (update-in db [:cube-view :filter] add-dimension dim)
