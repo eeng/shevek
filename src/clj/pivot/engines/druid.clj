@@ -121,11 +121,10 @@
   (let [[dim & dims] split]
     (when dim
       (->> (send-query-and-simplify-results host (assoc q :dimension dim))
-           (map #(assoc-if-seq % :_results
-                               (send-queries-for-split host
-                                                       (assoc q
-                                                              :split dims
-                                                              :filter (add-filter-for-dim filter dim %)))))))))
+           (pmap #(assoc-if-seq % :_results
+                    (send-queries-for-split host
+                      (assoc q :split dims
+                               :filter (add-filter-for-dim filter dim %)))))))))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
