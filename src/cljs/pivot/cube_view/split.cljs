@@ -1,0 +1,38 @@
+(ns pivot.cube-view.split
+  (:require-macros [pivot.lib.reagent :refer [rfor]]
+                   [reflow.macros :refer [defevh]])
+  (:require [reagent.core :as r]
+            [reflow.core :refer [dispatch]]
+            [pivot.i18n :refer [t]]
+            [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension?]]
+            [pivot.lib.react :refer [rmap]]
+            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
+            [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
+            [pivot.components :refer [with-controlled-popup]]))
+
+(defn- init-splitted-dim [dim {:keys [cube-view]}]
+  (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
+    (cond-> (assoc dim :limit (if (seq other-dims-in-split) 5 50))
+            (time-dimension? dim) (assoc :granularity "PT1H"))))
+
+(defevh :dimension-added-to-split [db dim]
+  (-> (update-in db [:cube-view :split] add-dimension (init-splitted-dim dim db))
+      (send-main-query)))
+
+(defevh :dimension-replaced-split [db dim]
+  (-> (assoc-in db [:cube-view :split] [(init-splitted-dim dim db)])
+      (send-main-query)))
+
+(defevh :dimension-removed-from-split [db dim]
+  (-> (update-in db [:cube-view :split] remove-dimension dim)
+      (send-main-query)))
+
+(defn- split-item [{:keys [title] :as dim}]
+  [:button.ui.orange.compact.right.labeled.icon.button
+   [:i.close.icon {:on-click #(dispatch :dimension-removed-from-split dim)}]
+   title])
+
+(defn split-panel []
+  [:div.split.panel
+   [panel-header (t :cubes/split)]
+   (rmap split-item (cube-view :split))])

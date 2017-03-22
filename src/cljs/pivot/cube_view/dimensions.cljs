@@ -3,37 +3,10 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
-            [pivot.rpc :refer [loading?]]
+            [pivot.rpc :refer [loading-class]]
             [pivot.lib.react :refer [rmap]]
-            [pivot.rpc :as rpc]
             [pivot.components :refer [with-controlled-popup]]
-            [pivot.dw :refer [time-dimension? add-dimension remove-dimension dim=?]]
             [pivot.cube-view.shared :refer [current-cube panel-header send-main-query]]))
-
-(defn- set-split-defaults [dim {:keys [cube-view]}]
-  (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
-    (cond-> (assoc dim :limit (if (seq other-dims-in-split) 5 50))
-            (time-dimension? dim) (assoc :granularity "PT1H"))))
-
-(defevh :dimension-added-to-filter [db dim]
-  (-> (update-in db [:cube-view :filter] add-dimension dim)
-      #_(send-main-query)))
-
-(defevh :dimension-removed-from-filter [db dim]
-  (-> (update-in db [:cube-view :filter] remove-dimension dim)
-      #_(send-main-query)))
-
-(defevh :dimension-added-to-split [db dim]
-  (-> (update-in db [:cube-view :split] add-dimension (set-split-defaults dim db))
-      (send-main-query)))
-
-(defevh :dimension-replaced-split [db dim]
-  (-> (assoc-in db [:cube-view :split] [(set-split-defaults dim db)])
-      (send-main-query)))
-
-(defevh :dimension-removed-from-split [db dim]
-  (-> (update-in db [:cube-view :split] remove-dimension dim)
-      (send-main-query)))
 
 (defn dimension-popup-button [color icon event selected name]
   [:button.ui.circular.icon.button
@@ -68,7 +41,7 @@
    [:i.icon {:class (type-icon type name)}] title])
 
 (defn dimensions-panel []
-  [:div.dimensions.panel.ui.basic.segment (rpc/loading-class :cube-metadata)
+  [:div.dimensions.panel.ui.basic.segment (loading-class :cube-metadata)
    [panel-header (t :cubes/dimensions)]
    [:div.items
     (rmap (with-controlled-popup dimension-item dimension-popup {:position "right center" :distanceAway -30})

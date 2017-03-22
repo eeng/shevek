@@ -7,7 +7,8 @@
             [pivot.cube-view.shared :refer [send-main-query]]
             [pivot.cube-view.dimensions :refer [dimensions-panel]]
             [pivot.cube-view.measures :refer [measures-panel]]
-            [pivot.cube-view.filter-split :refer [filter-panel split-panel]]
+            [pivot.cube-view.filter :refer [filter-panel]]
+            [pivot.cube-view.split :refer [split-panel]]
             [pivot.cube-view.visualization :refer [visualization-panel]]
             [pivot.cube-view.pinboard :refer [pinboard-panel]]))
 
