@@ -6,14 +6,16 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension]]
             [pivot.lib.react :refer [rmap]]
-            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
+            [pivot.cube-view.shared :refer [panel-header current-cube cube-view send-main-query]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [with-controlled-popup select]]))
 
 (defn- init-splitted-dim [dim {:keys [cube-view]}]
   (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
     (cond-> (assoc dim
-                   :limit (if (seq other-dims-in-split) 5 50))
+                   :limit (if (seq other-dims-in-split) 5 50)
+                   :sort-by (-> cube-view :measures first :name)
+                   :descending (not (time-dimension? dim)))
             (time-dimension? dim) (assoc :granularity "PT1H"))))
 
 (defevh :dimension-added-to-split [db dim]
@@ -33,16 +35,17 @@
       (send-main-query)))
 
 (defn- split-popup [selected dim]
-  (let [opts (r/atom (select-keys dim [:limit :descending]))
-        close-popup #(reset! selected false)]
+  (let [opts (r/atom (select-keys dim [:limit :sort-by :descending]))
+        close-popup #(reset! selected false)
+        measures (current-cube :measures)]
     (fn []
       [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
        [:div.ui.form
         [:div.field
          [:label (t :cubes/sort-by)]
          [:div.flex.field
-          [select (map (juxt identity identity) ["Page" "Count"])
-           {:class "fluid selection" :selected nil :on-change identity}]
+          [select (map (juxt :title :name) measures)
+           {:class "fluid selection" :selected (:sort-by @opts) :on-change #(swap! opts assoc :sort-by %)}]
           [:button.ui.basic.icon.button
            {:on-click #(swap! opts update :descending not)}
            [:i.long.arrow.icon {:class (if (@opts :descending) "down" "up")}]]]]

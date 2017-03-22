@@ -104,7 +104,7 @@
          (str/join " - "))))
 
 (defn- only-dw-query-keys [dim]
-  (select-keys dim [:name :type :granularity :limit :descending]))
+  (select-keys dim [:name :type :granularity :limit :sort-by :descending]))
 
 ; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
 (defn to-dw-query [{:keys [filter split measures] :as cube-view}]

@@ -12,6 +12,7 @@
        :body (map (fn [name] {:name name}))))
 
 ; TODO en el :context de la q se le puede pasar un timeout
+; TODO ver como hacer para no loggear en testing
 (defn- send-query [host q]
   (log/debug "Sending query to druid:\n" (pp-str q))
   (:body (http/post (str host "/druid/v2") {:content-type :json :form-params q :as :json})))
@@ -57,6 +58,20 @@
 (defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
   {:fieldName name :name name :type type})
 
+; TODO repetida en el client
+(defn dim=? [dim1 dim2]
+  (= (:name dim1) (:name dim2)))
+
+; TODO repetida en el client
+(defn includes-dim? [coll dim]
+  (some #(dim=? % dim) coll))
+
+(defn- add-sort-by-dim-to-aggregations [{:keys [sort-by] :as dim} measures aggregations]
+  "If we sort by a not selected metric we should send the field as an aggregation, otherwise Druid complains"
+  (if (or (not sort-by) (includes-dim? measures {:name sort-by}))
+    aggregations
+    (conj aggregations (to-druid-agg {:name sort-by}))))
+
 (defn- to-druid-filter [[{:keys [name is]} :as filters]]
   (condp = (count filters)
     0 nil
@@ -81,7 +96,7 @@
            :granularity {:type "all"}
            :dimension (dimension :name)
            :metric {:type (if (get dimension :descending true) "numeric" "inverted")
-                    :metric (-> measures first :name)}
+                    :metric (get dimension :sort-by (-> measures first :name))}
            :threshold (dimension :limit (or 100)))
     "timeseries"
     (assoc dq
@@ -95,7 +110,7 @@
   (as-> {:queryType (calculate-query-type q)
          :dataSource {:type "table" :name cube}
          :intervals (str/join "/" interval)
-         :aggregations (mapv to-druid-agg measures)}
+         :aggregations (->> measures (mapv to-druid-agg) (add-sort-by-dim-to-aggregations dimension measures))}
         dq
         (add-query-type-dependant-fields q dq)
         (assoc-if-seq dq :filter (to-druid-filter (remove time-dimension? filter)))))

@@ -55,13 +55,6 @@
                                   :dimension {:name "page" :limit 10}
                                   :measures [{:name "count" :type "longSum"}]}))))
 
-  (testing "query with one no-time dimension in ascending order"
-    (is (submap? {:queryType "topN"
-                  :metric {:type "inverted" :metric "count"}}
-                 (to-druid-query {:cube "wikiticker"
-                                  :dimension {:name "page" :descending false}
-                                  :measures [{:name "count" :type "longSum"}]}))))
-
   (testing "query with one time dimension should generate a timeseries query"
     (is (submap? {:queryType "timeseries"
                   :dataSource {:type "table" :name "wikiticker"}
@@ -90,7 +83,24 @@
                                   :measures [{:name "count" :type "longSum"}]
                                   :filter [{:name "__time"} ; Este se ignora xq se manda en el interval
                                            {:name "isRobot" :is "true"}
-                                           {:name "isNew" :is "false"}]})))))
+                                           {:name "isNew" :is "false"}]}))))
+
+  (testing "query with one no-time dimension sorting by other selected metric in ascending order"
+    (is (submap? {:queryType "topN"
+                  :metric {:type "inverted" :metric "added"}}
+                 (to-druid-query {:cube "wikiticker"
+                                  :dimension {:name "page" :sort-by "added" :descending false}
+                                  :measures [{:name "count" :type "longSum"}
+                                             {:name "added" :type "longSum"}]}))))
+
+  (testing "query with one no-time dimension sorting by other non selected metric should add it to the aggregations"
+    (is (submap? {:queryType "topN"
+                  :metric {:type "inverted" :metric "added"}
+                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}
+                                 {:name "added" :fieldName "added" :type "doubleSum"}]}
+                 (to-druid-query {:cube "wikiticker"
+                                  :dimension {:name "page" :sort-by "added" :descending false}
+                                  :measures [{:name "count" :type "longSum"}]})))))
 
 (deftest from-druid-results-test
   (testing "topN results"
