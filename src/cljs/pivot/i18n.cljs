@@ -20,7 +20,8 @@
             :no-desc "No description."
             :no-pinned "Drag or click dimensions to pin them"
             :no-measures "Please select at least one measure"
-            :null-value "No Value"}
+            :null-value "No Value"
+            :limit "Limit"}
     :cubes.period {:relative "Relative"
                    :specific "Specific"
                    :latest "Latest"
@@ -48,7 +49,9 @@
     :date-formats {:minute "MMM d, h:mma"
                    :hour "MMM d yyyy, ha"
                    :day "MMM d yyyy"
-                   :month "MMM yyyy"}}
+                   :month "MMM yyyy"}
+    :answer {:ok "Accept"
+             :cancel "Cancel"}}
 
    :es
    {:menu {:logout "Salir"
@@ -64,7 +67,8 @@
             :no-desc "Sin descripción."
             :no-pinned "Arrastre o clickee dimensiones para fijarlas aquí"
             :no-measures "Por favor seleccione al menos una métrica"
-            :null-value "No Disponible"}
+            :null-value "No Disponible"
+            :limit "Límite"}
     :cubes.period {:relative "Relativo"
                    :specific "Específico"
                    :latest "Ultimo"
@@ -92,7 +96,9 @@
     :date-formats {:minute "dd/MM HH:mm"
                    :hour "dd/MM/yyyy H 'hs'"
                    :day "dd/MM/yyyy"
-                   :month "MM/yyyy"}}
+                   :month "MM/yyyy"}
+    :answer {:ok "Aceptar"
+             :cancel "Cancelar"}}
 
    :tongue/fallback :en})
 

@@ -6,9 +6,10 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension?]]
             [pivot.lib.react :refer [rmap]]
+            [pivot.lib.collections :refer [replace-when]]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
-            [pivot.components :refer [with-controlled-popup]]))
+            [pivot.components :refer [with-controlled-popup select]]))
 
 (defn- init-splitted-dim [dim {:keys [cube-view]}]
   (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
@@ -27,12 +28,33 @@
   (-> (update-in db [:cube-view :split] remove-dimension dim)
       (send-main-query)))
 
-(defn- split-item [{:keys [title] :as dim}]
+(defevh :split-options-changed [db dim {:keys [limit]}]
+  (-> (update-in db [:cube-view :split]
+                 (fn [dims] (replace-when (partial dim=? dim) #(assoc % :limit limit) dims)))
+      (send-main-query)))
+
+(defn- split-popup [selected {:keys [limit] :as dim}]
+  (let [form-state (r/atom {:limit limit})
+        close-popup #(reset! selected false)]
+    (fn []
+      [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
+       [:div.ui.form
+        [:div.field
+         [:label (t :cubes/limit)]
+         [select (map (juxt identity identity) [5 10 25 50 100])
+          {:selected (:limit @form-state) :on-change #(swap! form-state assoc :limit %)}]]
+        [:button.ui.primary.button {:on-click #(do (close-popup)
+                                                 (dispatch :split-options-changed dim @form-state))} (t :answer/ok)]
+        [:button.ui.button {:on-click close-popup} (t :answer/cancel)]]])))
+
+(defn- split-item [selected {:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
+   {:on-click #(swap! selected not)}
    [:i.close.icon {:on-click #(dispatch :dimension-removed-from-split dim)}]
    title])
 
 (defn split-panel []
   [:div.split.panel
    [panel-header (t :cubes/split)]
-   (rmap split-item (cube-view :split))])
+   (rmap (with-controlled-popup split-item split-popup {:position "bottom center"})
+         (cube-view :split))])

@@ -133,11 +133,10 @@
     flex-direction: row;
     align-items: center;
     h2 { width: 67px; }
+    @content-width: 230px;
 
     .popup .time-filter {
-      .period-type {
-        width: 230px;
-      }
+      .period-type { width: @content-width; }
       .relative.period-type {
         .periods {
           margin-bottom: .7em;
@@ -158,6 +157,7 @@
         }
       }
     }
+    .popup .ui.form { width: @content-width; }
   }
 
   .panel.visualization {
