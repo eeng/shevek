@@ -21,7 +21,8 @@
             :no-pinned "Drag or click dimensions to pin them"
             :no-measures "Please select at least one measure"
             :null-value "No Value"
-            :limit "Limit"}
+            :limit "Limit"
+            :sort-by "Sort By"}
     :cubes.period {:relative "Relative"
                    :specific "Specific"
                    :latest "Latest"
@@ -68,7 +69,8 @@
             :no-pinned "Arrastre o clickee dimensiones para fijarlas aquí"
             :no-measures "Por favor seleccione al menos una métrica"
             :null-value "No Disponible"
-            :limit "Límite"}
+            :limit "Límite"
+            :sort-by "Ordenar Por"}
     :cubes.period {:relative "Relativo"
                    :specific "Específico"
                    :latest "Ultimo"

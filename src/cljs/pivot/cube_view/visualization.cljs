@@ -23,7 +23,10 @@
         [:div.value value]])]))
 
 (defn- calculate-rate [measure-value max-value]
-  (str (* (/ measure-value max-value) 100) "%"))
+  (let [rate (if (zero? max-value)
+               0
+               (/ measure-value max-value))]
+    (str (* rate 100) "%")))
 
 (defn- pivot-table-row [result dim depth measures max-values]
   [:tr

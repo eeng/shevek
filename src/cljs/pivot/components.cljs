@@ -37,7 +37,7 @@
 
 (defn select [_ opts]
   (make-dropdown opts (fn [coll {:keys [placeholder] :as opts}]
-                        [dropdown* coll (assoc opts :class "selection")
+                        [dropdown* coll (merge {:class "selection"} opts)
                          [:i.dropdown.icon]
                          [:div.default.text placeholder]])))
 

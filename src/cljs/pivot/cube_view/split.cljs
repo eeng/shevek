@@ -6,7 +6,6 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension]]
             [pivot.lib.react :refer [rmap]]
-            [pivot.lib.collections :refer [replace-when]]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [with-controlled-popup select]]))
@@ -29,22 +28,30 @@
   (-> (update-in db [:cube-view :split] remove-dimension dim)
       (send-main-query)))
 
-(defevh :split-options-changed [db dim {:keys [limit]}]
-  (-> (update-in db [:cube-view :split] replace-dimension (assoc dim :limit limit))
+(defevh :split-options-changed [db dim opts]
+  (-> (update-in db [:cube-view :split] replace-dimension (merge dim opts))
       (send-main-query)))
 
-(defn- split-popup [selected {:keys [limit] :as dim}]
-  (let [form-state (r/atom {:limit limit})
+(defn- split-popup [selected dim]
+  (let [opts (r/atom (select-keys dim [:limit :descending]))
         close-popup #(reset! selected false)]
     (fn []
       [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
        [:div.ui.form
         [:div.field
+         [:label (t :cubes/sort-by)]
+         [:div.flex.field
+          [select (map (juxt identity identity) ["Page" "Count"])
+           {:class "fluid selection" :selected nil :on-change identity}]
+          [:button.ui.basic.icon.button
+           {:on-click #(swap! opts update :descending not)}
+           [:i.long.arrow.icon {:class (if (@opts :descending) "down" "up")}]]]]
+        [:div.field
          [:label (t :cubes/limit)]
          [select (map (juxt identity identity) [5 10 25 50 100])
-          {:selected (:limit @form-state) :on-change #(swap! form-state assoc :limit %)}]]
+          {:selected (:limit @opts) :on-change #(swap! opts assoc :limit %)}]]
         [:button.ui.primary.button {:on-click #(do (close-popup)
-                                                 (dispatch :split-options-changed dim @form-state))} (t :answer/ok)]
+                                                 (dispatch :split-options-changed dim @opts))} (t :answer/ok)]
         [:button.ui.button {:on-click close-popup} (t :answer/cancel)]]])))
 
 (defn- split-item [selected {:keys [title] :as dim}]
