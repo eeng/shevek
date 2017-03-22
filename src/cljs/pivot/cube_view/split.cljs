@@ -44,8 +44,9 @@
         [:div.field
          [:label (t :cubes/sort-by)]
          [:div.flex.field
-          [select (map (juxt :title :name) measures)
-           {:class "fluid selection" :selected (:sort-by @opts) :on-change #(swap! opts assoc :sort-by %)}]
+          [select (map (juxt :title :name) (conj measures dim))
+           {:class "fluid selection" :selected (:sort-by @opts)
+            :on-change #(swap! opts assoc :sort-by %)}]
           [:button.ui.basic.icon.button
            {:on-click #(swap! opts update :descending not)}
            [:i.long.arrow.icon {:class (if (@opts :descending) "down" "up")}]]]]

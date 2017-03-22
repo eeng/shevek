@@ -66,9 +66,12 @@
 (defn includes-dim? [coll dim]
   (some #(dim=? % dim) coll))
 
+(defn- sort-by-same? [{:keys [name sort-by]}]
+  (= name sort-by))
+
 (defn- add-sort-by-dim-to-aggregations [{:keys [sort-by] :as dim} measures aggregations]
   "If we sort by a not selected metric we should send the field as an aggregation, otherwise Druid complains"
-  (if (or (not sort-by) (includes-dim? measures {:name sort-by}))
+  (if (or (not sort-by) (sort-by-same? dim) (includes-dim? measures {:name sort-by}))
     aggregations
     (conj aggregations (to-druid-agg {:name sort-by}))))
 
@@ -87,6 +90,16 @@
     "topN"
     "timeseries"))
 
+(defn- generate-metric-field [{:keys [name sort-by descending] :as dim} measures]
+  (let [descending (or (nil? descending) descending)
+        field (if (sort-by-same? dim)
+                {:type "dimension" :ordering "lexicographic"}
+                {:type "numeric" :metric (or sort-by (-> measures first :name))})]
+    (if (or (and (sort-by-same? dim) (not descending))
+            (and (not (sort-by-same? dim)) descending))
+      field
+      {:type "inverted" :metric field})))
+
 ; TODO el threshold en las timeseries query no existe, quizas habria que limitar en mem nomas
 (defn- add-query-type-dependant-fields [{:keys [dimension measures] :as q}
                                         {:keys [queryType] :as dq}]
@@ -95,8 +108,7 @@
     (assoc dq
            :granularity {:type "all"}
            :dimension (dimension :name)
-           :metric {:type (if (get dimension :descending true) "numeric" "inverted")
-                    :metric (get dimension :sort-by (-> measures first :name))}
+           :metric (generate-metric-field dimension measures)
            :threshold (dimension :limit (or 100)))
     "timeseries"
     (assoc dq
@@ -175,7 +187,7 @@
             :interval ["2015-09-12" "2015-09-13"]
             :totals true})
 
-; One no-time dimension and one measure
+; One atemporal dimension and one measure
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "page" :limit 5}]
@@ -189,7 +201,7 @@
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})
 
-; One no-time dimension with totals
+; One atemporal dimension with totals
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "page" :limit 5}]
@@ -197,7 +209,7 @@
             :interval ["2015-09-12" "2015-09-13"]
             :totals true})
 
-; Two no-time dimensions
+; Two atemporal dimensions
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2}]
@@ -205,7 +217,7 @@
             :interval ["2015-09-12" "2015-09-13"]
             :totals true})
 
-; Three no-time dimensions
+; Three atemporal dimensions
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2} {:name "isNew" :limit 2}]
