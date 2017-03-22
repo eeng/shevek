@@ -77,11 +77,11 @@
                           {:type "period" :period (:granularity dimension)}
                           {:type "all"}))))
 
-(defn- to-druid-filter [[{:keys [name is]} :as filter]]
-  (when (seq filter)
-    {:type "selector"
-     :dimension name
-     :value is}))
+(defn- to-druid-filter [[{:keys [name is]} :as filters]]
+  (condp = (count filters)
+    0 nil
+    1 {:type "selector" :dimension name :value is}
+    {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
 
 (defn- assoc-if-seq [map key val]
   (cond-> map
@@ -121,10 +121,11 @@
   (let [[dim & dims] split]
     (when dim
       (->> (send-query-and-simplify-results host (assoc q :dimension dim))
-           (map #(assoc-if-seq % :results
-                               (send-queries-for-split host (assoc q
-                                                                   :split dims
-                                                                   :filter (add-filter-for-dim filter dim %)))))))))
+           (map #(assoc-if-seq % :_results
+                               (send-queries-for-split host
+                                                       (assoc q
+                                                              :split dims
+                                                              :filter (add-filter-for-dim filter dim %)))))))))
 
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
@@ -186,6 +187,14 @@
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2}]
+            :measures [{:name "count" :type "longSum"}]
+            :interval ["2015-09-12" "2015-09-13"]
+            :totals true})
+
+; Three no-time dimensions
+#_(e/query (DruidEngine. broker)
+           {:cube "wikiticker"
+            :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2} {:name "isNew" :limit 2}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]
             :totals true})

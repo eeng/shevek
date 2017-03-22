@@ -73,8 +73,17 @@
                            :dimension "isRobot"
                            :value "true"}}
                  (to-druid-query {:cube "wikiticker"
+                                  :filter [{:name "__time"} {:name "isRobot" :is "true"}]}))))
+
+  (testing "query with two filters"
+    (is (submap? {:filter {:type "and"
+                           :fields [{:type "selector" :dimension "isRobot" :value "true"}
+                                    {:type "selector" :dimension "isNew" :value "false"}]}}
+                 (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
-                                  :filter [{:name "__time"} {:name "isRobot" :is "true"}]})))))
+                                  :filter [{:name "__time"} ; Este se ignora xq se manda en el interval
+                                           {:name "isRobot" :is "true"}
+                                           {:name "isNew" :is "false"}]})))))
 
 (deftest from-druid-results-test
   (testing "topN results"

@@ -6,4 +6,4 @@
       ^{:key i} [component-fn x])))
 
 (defn with-react-keys [coll]
-  (map #(with-meta %2 {:key %1}) (range) coll))
+  (doall (map #(with-meta %2 {:key %1}) (range) coll)))

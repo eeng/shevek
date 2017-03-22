@@ -22,11 +22,8 @@
         [:div.label title]
         [:div.value value]])]))
 
-(defn- calculate-rate [measure-value measure-name max-values]
-  (let [rate (->> (max-values measure-name)
-                  (/ measure-value)
-                  (* 100))]
-    (str rate "%")))
+(defn- calculate-rate [measure-value max-value]
+  (str (* (/ measure-value max-value) 100) "%"))
 
 (defn- pivot-table-row [result dim depth measures max-values]
   [:tr
@@ -38,13 +35,13 @@
                  measure-value (measure-name result)]]
       [:td.right.aligned
        [:div.bg (when-not (totals-result? result dim)
-                  {:style {:width (calculate-rate measure-value measure-name max-values)}})]
+                  {:style {:width (calculate-rate measure-value (max-values measure-name))}})]
        (format-measure measure result)])])
 
 (defn- pivot-table-rows [results [dim & dims] depth measures max-values]
   (when dim
     (mapcat #(into [(pivot-table-row % dim depth measures max-values)]
-                   (pivot-table-rows (:results %) dims (inc depth) measures max-values))
+                   (pivot-table-rows (:_results %) dims (inc depth) measures max-values))
             results)))
 
 (defn- calculate-max-values [measures results]
