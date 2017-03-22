@@ -4,7 +4,7 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
-            [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension?]]
+            [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension]]
             [pivot.lib.react :refer [rmap]]
             [pivot.lib.collections :refer [replace-when]]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
@@ -29,8 +29,7 @@
       (send-main-query)))
 
 (defevh :split-options-changed [db dim {:keys [limit]}]
-  (-> (update-in db [:cube-view :split]
-                 (fn [dims] (replace-when (partial dim=? dim) #(assoc % :limit limit) dims)))
+  (-> (update-in db [:cube-view :split] replace-dimension (assoc dim :limit limit))
       (send-main-query)))
 
 (defn- split-popup [selected {:keys [limit] :as dim}]

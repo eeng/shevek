@@ -3,7 +3,7 @@
   (:require [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [pivot.rpc :as rpc]
-            [pivot.lib.collections :refer [reverse-merge detect]]
+            [pivot.lib.collections :refer [reverse-merge detect replace-when]]
             [pivot.lib.dates :as d :refer [parse-time to-iso8601]]
             [pivot.lib.collections :refer [detect]]
             [cljs-time.core :as t]
@@ -67,6 +67,9 @@
 
 (defn remove-dimension [coll dim]
   (vec (remove #(dim=? dim %) coll)))
+
+(defn replace-dimension [coll dim]
+  (vec (replace-when (partial dim=? dim) (constantly dim) coll)))
 
 (defn to-interval [selected-period max-time]
   (let [now (d/now)

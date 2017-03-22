@@ -4,9 +4,8 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
-            [pivot.dw :refer [add-dimension remove-dimension time-dimension? format-period]]
+            [pivot.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
             [pivot.lib.react :refer [rmap]]
-            [pivot.lib.collections :refer [replace-when]]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [with-controlled-popup]]))
@@ -19,9 +18,8 @@
   (-> (update-in db [:cube-view :filter] remove-dimension dim)
       #_(send-main-query)))
 
-(defevh :time-period-changed [db period]
-  (-> (update-in db [:cube-view :filter]
-                 (fn [dims] (replace-when time-dimension? #(assoc % :selected-period period) dims)))
+(defevh :time-period-changed [db dim period]
+  (-> (update-in db [:cube-view :filter] replace-dimension (assoc dim :selected-period period))
       (send-main-query)
       (send-pinboard-queries)))
 
@@ -30,14 +28,14 @@
    :current-day "D" :current-week "W" :current-month "M" :current-quarter "Q" :current-year "Y"
    :previous-day "D" :previous-week "W" :previous-month "M" :previous-quarter "Q" :previous-year "Y"})
 
-(defn- period-buttons [{:keys [selected-period]} showed-period header periods]
+(defn- period-buttons [{:keys [selected-period] :as dim} showed-period header periods]
   [:div.periods
    [:h2.ui.sub.header header]
    [:div.ui.five.small.basic.buttons
      (rfor [period periods]
        [:button.ui.button {:class (when (= period selected-period) "active")
                            :on-click #(when-not (= period selected-period)
-                                        (dispatch :time-period-changed period))
+                                        (dispatch :time-period-changed dim period))
                            :on-mouse-over #(reset! showed-period period)
                            :on-mouse-out #(reset! showed-period selected-period)}
         (available-relative-periods period)])]])
