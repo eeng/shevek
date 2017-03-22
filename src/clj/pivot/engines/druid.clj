@@ -50,8 +50,18 @@
   (-> (send-query-with-single-result host {:queryType "timeBoundary" :dataSource ds})
       (clojure.set/rename-keys {:minTime :min-time :maxTime :max-time})))
 
+(defn- assoc-if-seq [map key val]
+  (cond-> map
+          (seq val) (assoc key val)))
+
 (defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
   {:fieldName name :name name :type type})
+
+(defn- to-druid-filter [[{:keys [name is]} :as filters]]
+  (condp = (count filters)
+    0 nil
+    1 {:type "selector" :dimension name :value is}
+    {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
 
 ; TODO estas dos estan duplicadas en el client
 (defn time-dimension? [{:keys [name]}]
@@ -70,31 +80,22 @@
     (assoc dq
            :granularity {:type "all"}
            :dimension (dimension :name)
-           :metric (-> measures first :name)
+           :metric {:type (if (get dimension :descending true) "numeric" "inverted")
+                    :metric (-> measures first :name)}
            :threshold (dimension :limit (or 100)))
     "timeseries"
     (assoc dq
            :granularity (if dimension
                           {:type "period" :period (:granularity dimension)}
-                          {:type "all"}))))
-
-(defn- to-druid-filter [[{:keys [name is]} :as filters]]
-  (condp = (count filters)
-    0 nil
-    1 {:type "selector" :dimension name :value is}
-    {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
-
-(defn- assoc-if-seq [map key val]
-  (cond-> map
-          (seq val) (assoc key val)))
+                          {:type "all"})
+           :descending (get dimension :descending false))))
 
 ; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
 (defn to-druid-query [{:keys [cube measures interval dimension filter] :as q}]
   (as-> {:queryType (calculate-query-type q)
          :dataSource {:type "table" :name cube}
          :intervals (str/join "/" interval)
-         :aggregations (mapv to-druid-agg measures)
-         :descending (or (:descending dimension) false)}
+         :aggregations (mapv to-druid-agg measures)}
         dq
         (add-query-type-dependant-fields q dq)
         (assoc-if-seq dq :filter (to-druid-filter (remove time-dimension? filter)))))
@@ -138,10 +139,8 @@
                :measures (metrics host name)
                :time-boundary (time-boundary host name)))
   (query [_ {:keys [totals] :as q}]
-         (let [results (send-queries-for-split host q)]
-           (if totals
-             (concat (send-query-and-simplify-results host q) results)
-             results))))
+         (concat (if totals (send-query-and-simplify-results host q) [])
+                 (send-queries-for-split host q))))
 
 ;;;; Manual testing
 (def broker "http://kafka:8082")

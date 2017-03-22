@@ -13,7 +13,8 @@
 
 (defn- init-splitted-dim [dim {:keys [cube-view]}]
   (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
-    (cond-> (assoc dim :limit (if (seq other-dims-in-split) 5 50))
+    (cond-> (assoc dim
+                   :limit (if (seq other-dims-in-split) 5 50))
             (time-dimension? dim) (assoc :granularity "PT1H"))))
 
 (defevh :dimension-added-to-split [db dim]

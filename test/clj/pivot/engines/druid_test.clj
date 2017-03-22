@@ -48,11 +48,18 @@
                   :dataSource {:type "table" :name "wikiticker"}
                   :granularity {:type "all"}
                   :dimension "page"
-                  :metric "count"
+                  :metric {:type "numeric" :metric "count"}
                   :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
                   :threshold 10}
                  (to-druid-query {:cube "wikiticker"
                                   :dimension {:name "page" :limit 10}
+                                  :measures [{:name "count" :type "longSum"}]}))))
+
+  (testing "query with one no-time dimension in ascending order"
+    (is (submap? {:queryType "topN"
+                  :metric {:type "inverted" :metric "count"}}
+                 (to-druid-query {:cube "wikiticker"
+                                  :dimension {:name "page" :descending false}
                                   :measures [{:name "count" :type "longSum"}]}))))
 
   (testing "query with one time dimension should generate a timeseries query"
