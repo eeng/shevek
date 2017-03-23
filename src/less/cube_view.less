@@ -180,10 +180,16 @@
       justify-content: center;
       margin: 0;
     }
-    .table {
+    .pivot-table {
       th:first-child, td:first-child { padding-left: 0.5em }
       th:last-child, td:last-child { padding-right: 0.5em }
-
+      thead {
+        th {
+          cursor: pointer;
+          .icon { margin-right: 0; }
+          span + .icon, .icon + span { margin-left: .25rem; }
+        }
+      }
       tbody tr {
         #cube-view .selectable;
         opacity: .999;

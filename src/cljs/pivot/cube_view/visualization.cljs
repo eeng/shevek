@@ -53,16 +53,30 @@
           {}
           (map (comp keyword :name) measures)))
 
+; FIXME creo que seria mas facil de implementar el on-click si el sort-by la propia dim usaria un name "self" o algo asi
+(defn- sortable-th [title icon-when-sorted-by split opts]
+  (let [sort-bys (->> split (map :sort-by) distinct)
+        descendings (->> split (map :descending) distinct)
+        show-icon? (and (= sort-bys icon-when-sorted-by)
+                        (= (count descendings) 1))
+        icon-after? (= (:class opts) "right aligned")]
+    [:th opts
+     (when-not icon-after? [:span title])
+     (when show-icon?
+       [:i.icon.caret {:class (if (first descendings) "down" "up")}])
+     (when icon-after? [:span title])]))
+
 (defn- pivot-table-visualization []
   (let [split (cube-view :split-arrived)
         measures (cube-view :measures)
         results (cube-view :results :main)
         max-values (calculate-max-values measures results)]
-    [:table.ui.very.basic.compact.fixed.single.line.table
+    [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
      [:thead
       [:tr
-       [:th (->> split (map :title) (str/join ", "))]
-       (rmap (fn [{:keys [title]}] [:th.right.aligned title]) measures)]]
+       [sortable-th (->> split (map :title) (str/join ", ")) (map :name split) split]
+       (rfor [{:keys [title name]} measures]
+         [sortable-th title [name] split {:class "right aligned"}])]]
      [:tbody
       (with-react-keys (pivot-table-rows results split 0 measures max-values))]]))
 

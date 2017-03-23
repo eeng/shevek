@@ -10,6 +10,7 @@
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [with-controlled-popup select]]))
 
+; TODO el limit distinto no funca bien cuando se reemplaza el filter
 (defn- init-splitted-dim [dim {:keys [cube-view]}]
   (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
     (cond-> (assoc dim
