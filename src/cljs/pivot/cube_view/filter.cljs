@@ -6,22 +6,33 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
             [pivot.lib.react :refer [rmap]]
-            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query]]
+            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
-            [pivot.components :refer [with-controlled-popup]]))
+            [pivot.components :refer [with-controlled-popup select checkbox]]))
+
+(defn- fetch-dimension-values [{:keys [cube-view] :as db} {:keys [name] :as dim}]
+  (send-query db {:cube (:cube cube-view)
+                  :filter [(first (:filter cube-view))]
+                  :split [(assoc dim :limit 10)]
+                  :measures [{:type "count" :name "rowCount"}]}
+              [:results :filter name]))
 
 (defevh :dimension-added-to-filter [db dim]
-  (-> (update-in db [:cube-view :filter] add-dimension dim)
-      #_(send-main-query)))
+  (update-in db [:cube-view :filter] add-dimension dim))
 
 (defevh :dimension-removed-from-filter [db dim]
   (-> (update-in db [:cube-view :filter] remove-dimension dim)
       #_(send-main-query)))
 
+; TODO esta se podria meter dentro del :filter-options-changed q es mas generico
 (defevh :time-period-changed [db dim period]
   (-> (update-in db [:cube-view :filter] replace-dimension (assoc dim :selected-period period))
       (send-main-query)
       (send-pinboard-queries)))
+
+(defevh :filter-options-changed [db dim opts]
+  (-> (update-in db [:cube-view :filter] replace-dimension (merge dim opts))
+      (send-main-query)))
 
 (def available-relative-periods
   {:latest-hour "1H" :latest-6hours "6H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D"
@@ -71,14 +82,33 @@
          [relative-period-time-filter dim]
          [specific-period-time-filter dim])])))
 
-(defn- other-filter-popup [dim]
-  [:div (pr-str dim)])
+(defn- dimension-value-item [{:keys [name] :as dim} result]
+  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)} ; TODO duplicado en las measures
+   [checkbox (format-dimension dim result)
+    {:checked false
+     :on-change #(console.log %)}]])
+
+(defn- normal-filter-popup [selected {:keys [name] :as dim}]
+  (let [opts (r/atom (select-keys dim [:include :exclude]))
+        close-popup #(reset! selected false)]
+    (fn []
+      [:div.ui.form.normal-filter
+       [:div.items
+        (rfor [result (cube-view :results :filter name)]
+          [dimension-value-item dim result])]
+       [:button.ui.primary.button
+        {:on-click #(do (close-popup) (dispatch :filter-options-changed dim @opts))}
+        (t :answer/ok)]
+       [:button.ui.button {:on-click close-popup} (t :answer/cancel)]])))
 
 (defn- filter-popup [selected dim]
-  [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
-   (if (time-dimension? dim)
-     [time-filter-popup dim]
-     [other-filter-popup dim])])
+  (when-not (time-dimension? dim) ; FIXME esto no funca bien cuando se agregan varias dims
+    (reset! selected true))
+  (fn []
+    [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
+     (if (time-dimension? dim)
+       [time-filter-popup dim]
+       [normal-filter-popup selected dim])]))
 
 (defn- filter-title [{:keys [title selected-period] :as dim}]
   (if (time-dimension? dim)
