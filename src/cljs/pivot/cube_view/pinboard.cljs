@@ -33,6 +33,7 @@
 (defevh :dimension-unpinned [db dim]
   (update-in db [:cube-view :pinboard :dimensions] remove-dimension dim))
 
+; TODO al cambiar la measure se muestra temporalmente un cero en todas las filas. Ver si se puede evitar.
 (defevh :pinboard-measure-selected [db measure-name]
   (-> (assoc-in db [:cube-view :pinboard :measure]
                 (find-dimension measure-name (current-cube :measures)))
