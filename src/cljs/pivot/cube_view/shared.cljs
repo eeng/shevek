@@ -53,7 +53,7 @@
   (let [value (-> name keyword result)]
     (cond
       (totals-result? result dim) "Total"
-      (nil? value) (t :cubes/null-value)
+      (nil? value) "Ø"
       (dw/time-dimension? dim) (format-time-according-to-period value granularity)
       :else value)))
 
