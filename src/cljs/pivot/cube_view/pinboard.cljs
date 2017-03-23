@@ -1,5 +1,6 @@
 (ns pivot.cube-view.pinboard
-  (:require-macros [reflow.macros :refer [defevh]])
+  (:require-macros [reflow.macros :refer [defevh]]
+                   [pivot.lib.reagent :refer [rfor]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
@@ -44,9 +45,8 @@
     (-> (update-in db [:cube-view :pinboard :dimensions] replace-dimension new-time-dim)
         (send-pinned-dim-query new-time-dim))))
 
-(defn- pinned-dimension-item [dim result]
-  (let [segment-value (format-dimension dim result)
-        measure (cube-view :pinboard :measure)]
+(defn- pinned-dimension-item [dim result measure]
+  (let [segment-value (format-dimension dim result)]
     [:div.item {:title segment-value}
      [:div.segment-value segment-value]
      [:div.measure-value (format-measure measure result)]]))
@@ -62,7 +62,8 @@
     (str "(" (periods granularity) ")")))
 
 (defn- pinned-dimension-panel [{:keys [title name] :as dim}]
-  (let [results (cube-view :results :pinboard name)]
+  (let [results (cube-view :results :pinboard name)
+        measure (cube-view :pinboard :measure)]
     [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
      [panel-header (str title " " (title-according-to-dim-type dim))
       (when (time-dimension? dim)
@@ -71,7 +72,8 @@
          [:i.ellipsis.horizontal.large.link.icon]])
       [:i.close.link.large.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
      [:div.items {:class (when (empty? results) "empty")}
-      (rmap (partial pinned-dimension-item dim) results)]]))
+      (rfor [result results]
+        [pinned-dimension-item dim result measure])]]))
 
 (defn pinboard-panel []
   [:div.pinboard.zone
