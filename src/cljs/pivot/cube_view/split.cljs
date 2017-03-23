@@ -4,7 +4,7 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
-            [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension]]
+            [pivot.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension find-dimension]]
             [pivot.lib.react :refer [rmap without-propagation]]
             [pivot.cube-view.shared :refer [panel-header current-cube cube-view send-main-query]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
@@ -15,8 +15,8 @@
   (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
     (cond-> (assoc dim
                    :limit (if (seq other-dims-in-split) 5 50)
-                   :sort-by (-> cube-view :measures first :name)
-                   :descending (not (time-dimension? dim)))
+                   :sort-by (assoc (-> cube-view :measures first)
+                                   :descending (not (time-dimension? dim))))
             (time-dimension? dim) (assoc :granularity "PT1H"))))
 
 (defevh :dimension-added-to-split [db dim]
@@ -36,28 +36,31 @@
       (send-main-query)))
 
 (defn- split-popup [selected dim]
-  (let [opts (r/atom (select-keys dim [:limit :sort-by :descending]))
+  (let [opts (r/atom (select-keys dim [:limit :sort-by]))
         close-popup #(reset! selected false)
-        measures (current-cube :measures)]
+        posible-sort-bys (conj (current-cube :measures) (select-keys dim [:name :title :type]))]
     (fn []
-      [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
-       [:div.ui.form
-        [:div.field
-         [:label (t :cubes/sort-by)]
-         [:div.flex.field
-          [select (map (juxt :title :name) (conj measures dim))
-           {:class "fluid selection" :selected (:sort-by @opts)
-            :on-change #(swap! opts assoc :sort-by %)}]
-          [:button.ui.basic.icon.button
-           {:on-click #(swap! opts update :descending not)}
-           [:i.long.arrow.icon {:class (if (@opts :descending) "down" "up")}]]]]
-        [:div.field
-         [:label (t :cubes/limit)]
-         [select (map (juxt identity identity) [5 10 25 50 100])
-          {:selected (:limit @opts) :on-change #(swap! opts assoc :limit %)}]]
-        [:button.ui.primary.button {:on-click #(do (close-popup)
-                                                 (dispatch :split-options-changed dim @opts))} (t :answer/ok)]
-        [:button.ui.button {:on-click close-popup} (t :answer/cancel)]]])))
+      (let [desc (get-in @opts [:sort-by :descending])]
+        [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
+         [:div.ui.form
+          [:div.field
+           [:label (t :cubes/sort-by)]
+           [:div.flex.field
+            [select (map (juxt :title :name) posible-sort-bys)
+             {:class "fluid selection" :selected (get-in @opts [:sort-by :name])
+              :on-change #(swap! opts assoc :sort-by (assoc (find-dimension % posible-sort-bys)
+                                                            :descending desc))}]
+            [:button.ui.basic.icon.button
+             {:on-click #(swap! opts update-in [:sort-by :descending] not)}
+             [:i.long.arrow.icon {:class (if desc "down" "up")}]]]]
+          [:div.field
+           [:label (t :cubes/limit)]
+           [select (map (juxt identity identity) [5 10 25 50 100])
+            {:selected (:limit @opts) :on-change #(swap! opts assoc :limit %)}]]
+          [:button.ui.primary.button
+           {:on-click #(do (close-popup) (dispatch :split-options-changed dim @opts))}
+           (t :answer/ok)]
+          [:button.ui.button {:on-click close-popup} (t :answer/cancel)]]]))))
 
 (defn- split-item [selected {:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button

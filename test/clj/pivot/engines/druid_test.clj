@@ -66,7 +66,7 @@
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
                                   :interval ["2015" "2016"]
-                                  :dimension {:name "__time" :granularity "P1D" :descending true}}))))
+                                  :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}}))))
 
   (testing "query with one filter"
     (is (submap? {:filter {:type "selector"
@@ -89,27 +89,27 @@
     (is (submap? {:queryType "topN"
                   :metric {:type "inverted" :metric {:type "numeric" :metric "added"}}}
                  (to-druid-query {:cube "wikiticker"
-                                  :dimension {:name "page" :sort-by "added" :descending false}
+                                  :dimension {:name "page" :sort-by {:name "added" :descending false}}
                                   :measures [{:name "count" :type "longSum"}
                                              {:name "added" :type "longSum"}]}))))
 
   (testing "query with one atemporal dimension sorting by other non selected metric should add it to the aggregations"
-    (is (submap? {:metric {:type "numeric" :metric "added"}
+    (is (submap? {:metric {:type "numeric" :metric "users"}
                   :aggregations [{:name "count" :fieldName "count" :type "longSum"}
-                                 {:name "added" :fieldName "added" :type "doubleSum"}]}
-                 (to-druid-query {:dimension {:name "page" :sort-by "added"}
+                                 {:name "users" :fieldName "users" :type "hyperUnique"}]}
+                 (to-druid-query {:dimension {:name "page" :sort-by {:name "users" :type "hyperUnique"}}
                                   :measures [{:name "count" :type "longSum"}]}))))
 
   (testing "ascending ordered by the same dimension should use lexicographic sorting"
     (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}
                   :aggregations [{:name "count" :fieldName "count" :type "longSum"}]}
-                 (to-druid-query {:dimension {:name "page" :sort-by "page" :descending false}
+                 (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}
                                   :measures [{:name "count" :type "longSum"}]}))))
 
   (testing "descending ordered by the same dimension should use lexicographic sorting"
     (is (submap? {:metric {:type "inverted"
                            :metric {:type "dimension" :ordering "lexicographic"}}}
-                 (to-druid-query {:dimension {:name "page" :sort-by "page" :descending true}})))))
+                 (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending true}}})))))
 
 (deftest from-druid-results-test
   (testing "topN results"

@@ -10,6 +10,7 @@
             [pivot.dw :refer [add-dimension remove-dimension includes-dim?]]
             [pivot.cube-view.shared :refer [current-cube cube-view panel-header send-main-query]]))
 
+; TODO cuando se destilda una measure no hace falta mandar la query
 (defevh :measure-toggled [db dim selected]
   (-> (update-in db [:cube-view :measures] (if selected add-dimension remove-dimension) dim)
       (send-main-query)))

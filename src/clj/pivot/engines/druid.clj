@@ -67,13 +67,13 @@
   (some #(dim=? % dim) coll))
 
 (defn- sort-by-same? [{:keys [name sort-by]}]
-  (= name sort-by))
+  (= name (:name sort-by)))
 
 (defn- add-sort-by-dim-to-aggregations [{:keys [sort-by] :as dim} measures aggregations]
   "If we sort by a not selected metric we should send the field as an aggregation, otherwise Druid complains"
-  (if (or (not sort-by) (sort-by-same? dim) (includes-dim? measures {:name sort-by}))
-    aggregations
-    (conj aggregations (to-druid-agg {:name sort-by}))))
+  (if (and (:name sort-by) (not (sort-by-same? dim)) (not (includes-dim? measures sort-by)))
+    (conj aggregations (to-druid-agg sort-by))
+    aggregations))
 
 (defn- to-druid-filter [[{:keys [name is]} :as filters]]
   (condp = (count filters)
@@ -90,11 +90,11 @@
     "topN"
     "timeseries"))
 
-(defn- generate-metric-field [{:keys [name sort-by descending] :as dim} measures]
-  (let [descending (or (nil? descending) descending)
+(defn- generate-metric-field [{:keys [name sort-by] :as dim} measures]
+  (let [descending (or (nil? (:descending sort-by)) (:descending sort-by))
         field (if (sort-by-same? dim)
                 {:type "dimension" :ordering "lexicographic"}
-                {:type "numeric" :metric (or sort-by (-> measures first :name))})]
+                {:type "numeric" :metric (or (:name sort-by) (-> measures first :name))})]
     (if (or (and (sort-by-same? dim) (not descending))
             (and (not (sort-by-same? dim)) descending))
       field
@@ -115,7 +115,7 @@
            :granularity (if dimension
                           {:type "period" :period (:granularity dimension)}
                           {:type "all"})
-           :descending (get dimension :descending false))))
+           :descending (get-in dimension [:sort-by :descending] false))))
 
 ; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
 (defn to-druid-query [{:keys [cube measures interval dimension filter] :as q}]

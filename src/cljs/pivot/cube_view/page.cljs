@@ -19,7 +19,7 @@
             :time-boundary {:max-time "..."}}}
    :cube-view {:cube "wikitiker"
                :filter [{:name "__time" :selected-period :latest-day}]
-               :split [{:name "region"}]
+               :split [{:name "region" :sort-by {:name "count" :descending true}}]
                :measures [{:name "added"}] ; Selected measures in the left panel
                :pinboard {:measure "channel" ; Selected measure for the pinboard
                           :dimensions [{:name "channel"}]} ; Pinned dimensions
