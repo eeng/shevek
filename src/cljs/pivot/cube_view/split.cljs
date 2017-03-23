@@ -35,10 +35,21 @@
   (-> (update-in db [:cube-view :split] replace-dimension (merge dim opts))
       (send-main-query)))
 
+(defn clean-split [dim]
+  (select-keys dim [:name :title :type]))
+
+(defevh :splits-sorted-by [db sort-bys descending]
+  (-> (update-in db [:cube-view :split]
+                 (fn [splits]
+                   (->> (zipmap splits sort-bys)
+                        (mapv (fn [[split sort-by]]
+                                (assoc split :sort-by (assoc sort-by :descending descending)))))))
+      (send-main-query)))
+
 (defn- split-popup [selected dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by]))
         close-popup #(reset! selected false)
-        posible-sort-bys (conj (current-cube :measures) (select-keys dim [:name :title :type]))]
+        posible-sort-bys (conj (current-cube :measures) (clean-split dim))]
     (fn []
       (let [desc (get-in @opts [:sort-by :descending])]
         [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}

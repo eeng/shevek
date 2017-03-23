@@ -2,12 +2,14 @@
   (:require-macros [pivot.lib.reagent :refer [rfor]])
   (:require [reagent.core :as r]
             [clojure.string :as str]
+            [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
             [pivot.dw :as dw]
             [pivot.lib.react :refer [rmap with-react-keys]]
             [pivot.lib.collections :refer [detect]]
             [pivot.rpc :as rpc]
-            [pivot.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result?]]))
+            [pivot.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result?]]
+            [pivot.cube-view.split :refer [clean-split]]))
 
 (defn- sort-results-according-to-selected-measures [result]
   (map #(assoc % :value (format-measure % result))
@@ -53,17 +55,18 @@
           {}
           (map (comp keyword :name) measures)))
 
-; FIXME creo que seria mas facil de implementar el on-click si el sort-by la propia dim usaria un name "self" o algo asi
-(defn- sortable-th [title icon-when-sorted-by split opts]
-  (let [sort-bys (->> split (map :sort-by) distinct)
-        descendings (->> split (map :descending) distinct)
-        show-icon? (and (= sort-bys icon-when-sorted-by)
+(defn- sortable-th [title on-click-sort-splits-by split opts]
+  (let [on-click-sort-splits-by (map clean-split on-click-sort-splits-by)
+        sort-bys (map (comp :name :sort-by) split)
+        descendings (->> split (map (comp :descending :sort-by)) distinct)
+        show-icon? (and (= sort-bys (map :name on-click-sort-splits-by))
                         (= (count descendings) 1))
-        icon-after? (= (:class opts) "right aligned")]
-    [:th opts
+        icon-after? (= (:class opts) "right aligned")
+        desc (first descendings)]
+    [:th (assoc opts :on-click #(dispatch :splits-sorted-by on-click-sort-splits-by (if show-icon? (not desc) true)))
      (when-not icon-after? [:span title])
      (when show-icon?
-       [:i.icon.caret {:class (if (first descendings) "down" "up")}])
+       [:i.icon.caret {:class (if desc "down" "up")}])
      (when icon-after? [:span title])]))
 
 (defn- pivot-table-visualization []
@@ -74,9 +77,9 @@
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
      [:thead
       [:tr
-       [sortable-th (->> split (map :title) (str/join ", ")) (map :name split) split]
-       (rfor [{:keys [title name]} measures]
-         [sortable-th title [name] split {:class "right aligned"}])]]
+       [sortable-th (->> split (map :title) (str/join ", ")) split split]
+       (rfor [{:keys [title] :as measure} measures]
+         [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]]
      [:tbody
       (with-react-keys (pivot-table-rows results split 0 measures max-values))]]))
 
