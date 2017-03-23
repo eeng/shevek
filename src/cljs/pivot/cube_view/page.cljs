@@ -18,7 +18,8 @@
             :measures [{:name "added"} {:name "deleted"}]
             :time-boundary {:max-time "..."}}}
    :cube-view {:cube "wikitiker"
-               :filter [{:name "__time" :selected-period :latest-day}]
+               :filter [{:name "__time" :selected-period :latest-day}
+                        {:name "countryName" :include ["Italy"]}]
                :split [{:name "region" :sort-by {:name "count" :descending true}}]
                :measures [{:name "added"}] ; Selected measures in the left panel
                :pinboard {:measure "channel" ; Selected measure for the pinboard

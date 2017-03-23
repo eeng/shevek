@@ -75,10 +75,13 @@
     (conj aggregations (to-druid-agg sort-by))
     aggregations))
 
-(defn- to-druid-filter [[{:keys [name is]} :as filters]]
+(defn- to-druid-filter [[{:keys [name is include exclude]} :as filters]]
   (condp = (count filters)
     0 nil
-    1 {:type "selector" :dimension name :value is}
+    1 (cond
+        is {:type "selector" :dimension name :value is}
+        include {:type "in" :dimension name :values include}
+        exclude {:type "not" :field {:type "in" :dimension name :values exclude}})
     {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
 
 ; TODO estas dos estan duplicadas en el client
@@ -224,3 +227,11 @@
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]
             :totals true})
+
+; Filtering
+#_(e/query (DruidEngine. broker)
+           {:cube "wikiticker"
+            :split [{:name "countryName" :limit 5}]
+            :filter [{:name "countryName" :include ["Italy" "France"]}]
+            :measures [{:name "count" :type "longSum"}]
+            :interval ["2015-09-12" "2015-09-13"]})

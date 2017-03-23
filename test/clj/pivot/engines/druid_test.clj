@@ -68,7 +68,7 @@
                                   :interval ["2015" "2016"]
                                   :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}}))))
 
-  (testing "query with one filter"
+  (testing "query with one is filter"
     (is (submap? {:filter {:type "selector"
                            :dimension "isRobot"
                            :value "true"}}
@@ -79,11 +79,23 @@
     (is (submap? {:filter {:type "and"
                            :fields [{:type "selector" :dimension "isRobot" :value "true"}
                                     {:type "selector" :dimension "isNew" :value "false"}]}}
-                 (to-druid-query {:cube "wikiticker"
-                                  :measures [{:name "count" :type "longSum"}]
+                 (to-druid-query {:measures [{:name "count" :type "longSum"}]
                                   :filter [{:name "__time"} ; Este se ignora xq se manda en el interval
                                            {:name "isRobot" :is "true"}
                                            {:name "isNew" :is "false"}]}))))
+
+  (testing "query with :include filter"
+    (is (submap? {:filter {:type "in"
+                           :dimension "countryName"
+                           :values ["Italy" "France"]}}
+                 (to-druid-query {:filter [{:name "countryName" :include ["Italy" "France"]}]}))))
+
+  (testing "query with :exclude filter"
+    (is (submap? {:filter {:type "not"
+                           :field {:type "in"
+                                   :dimension "countryName"
+                                   :values ["Italy" "France"]}}}
+                 (to-druid-query {:filter [{:name "countryName" :exclude ["Italy" "France"]}]}))))
 
   (testing "query with one atemporal dimension sorting by other selected metric in ascending order"
     (is (submap? {:queryType "topN"
