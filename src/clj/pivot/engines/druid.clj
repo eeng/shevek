@@ -55,9 +55,6 @@
   (cond-> map
           (seq val) (assoc key val)))
 
-(defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
-  {:fieldName name :name name :type type})
-
 ; TODO repetida en el client
 (defn dim=? [dim1 dim2]
   (= (:name dim1) (:name dim2)))
@@ -65,6 +62,13 @@
 ; TODO repetida en el client
 (defn includes-dim? [coll dim]
   (some #(dim=? % dim) coll))
+
+; TODO repetida en el client
+(defn time-dimension? [{:keys [name]}]
+  (= name "__time"))
+
+(defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
+  {:fieldName name :name name :type type})
 
 (defn- sort-by-same? [{:keys [name sort-by]}]
   (= name (:name sort-by)))
@@ -84,9 +88,9 @@
         exclude {:type "not" :field {:type "in" :dimension name :values exclude}})
     {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
 
-; TODO estas dos estan duplicadas en el client
-(defn time-dimension? [{:keys [name]}]
-  (= name "__time"))
+(defn- convertible-to-druid-filter? [dim]
+  (and (not (time-dimension? dim))
+       (some #{:is :include :exclude} (keys dim))))
 
 (defn- calculate-query-type [{:keys [dimension]}]
   (if (and dimension (not (time-dimension? dimension)))
@@ -121,14 +125,14 @@
            :descending (get-in dimension [:sort-by :descending] false))))
 
 ; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
-(defn to-druid-query [{:keys [cube measures interval dimension filter] :as q}]
+(defn to-druid-query [{:keys [cube measures interval dimension] :as q}]
   (as-> {:queryType (calculate-query-type q)
          :dataSource {:type "table" :name cube}
          :intervals (str/join "/" interval)
          :aggregations (->> measures (mapv to-druid-agg) (add-sort-by-dim-to-aggregations dimension measures))}
         dq
         (add-query-type-dependant-fields q dq)
-        (assoc-if-seq dq :filter (to-druid-filter (remove time-dimension? filter)))))
+        (assoc-if-seq dq :filter (to-druid-filter (filter convertible-to-druid-filter? (:filter q))))))
 
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]
   (condp = queryType

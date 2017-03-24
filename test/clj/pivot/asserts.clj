@@ -9,3 +9,6 @@
   (and (every? (fn [[sm m]] (submap? sm m))
                (map vector submaps maps))
        (= (count submaps) (count maps))))
+
+(defn without? [k m]
+  (not (contains? m k)))

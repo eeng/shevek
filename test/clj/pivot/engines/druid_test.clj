@@ -1,7 +1,7 @@
 (ns pivot.engines.druid-test
   (:require [clojure.test :refer :all]
             [stub-http.core :refer :all]
-            [pivot.asserts :refer [submaps? submap?]]
+            [pivot.asserts :refer [submaps? submap? without?]]
             [pivot.engines.druid :refer [datasources dimensions metrics to-druid-query from-druid-results]]
             [clojure.java.io :as io]))
 
@@ -68,60 +68,65 @@
                                   :interval ["2015" "2016"]
                                   :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}}))))
 
-  (testing "query with one is filter"
-    (is (submap? {:filter {:type "selector"
-                           :dimension "isRobot"
-                           :value "true"}}
-                 (to-druid-query {:cube "wikiticker"
-                                  :filter [{:name "__time"} {:name "isRobot" :is "true"}]}))))
+  (testing "filter"
+    (testing "query with one :is filter"
+      (is (submap? {:filter {:type "selector"
+                             :dimension "isRobot"
+                             :value "true"}}
+                   (to-druid-query {:cube "wikiticker"
+                                    :filter [{:name "__time"} {:name "isRobot" :is "true"}]}))))
 
-  (testing "query with two filters"
-    (is (submap? {:filter {:type "and"
-                           :fields [{:type "selector" :dimension "isRobot" :value "true"}
-                                    {:type "selector" :dimension "isNew" :value "false"}]}}
-                 (to-druid-query {:measures [{:name "count" :type "longSum"}]
-                                  :filter [{:name "__time"} ; Este se ignora xq se manda en el interval
-                                           {:name "isRobot" :is "true"}
-                                           {:name "isNew" :is "false"}]}))))
+    (testing "query with two filters"
+      (is (submap? {:filter {:type "and"
+                             :fields [{:type "selector" :dimension "isRobot" :value "true"}
+                                      {:type "selector" :dimension "isNew" :value "false"}]}}
+                   (to-druid-query {:measures [{:name "count" :type "longSum"}]
+                                    :filter [{:name "__time"} ; Este se ignora xq se manda en el interval
+                                             {:name "isRobot" :is "true"}
+                                             {:name "isNew" :is "false"}]})))
+      (is (without? :filter
+            (to-druid-query {:filter [{:name "isRobot"}
+                                      {:name "isNew"}]}))))
 
-  (testing "query with :include filter"
-    (is (submap? {:filter {:type "in"
-                           :dimension "countryName"
-                           :values ["Italy" "France"]}}
-                 (to-druid-query {:filter [{:name "countryName" :include ["Italy" "France"]}]}))))
+    (testing "query with :include filter"
+      (is (submap? {:filter {:type "in"
+                             :dimension "countryName"
+                             :values ["Italy" "France"]}}
+                   (to-druid-query {:filter [{:name "countryName" :include ["Italy" "France"]}]}))))
 
-  (testing "query with :exclude filter"
-    (is (submap? {:filter {:type "not"
-                           :field {:type "in"
-                                   :dimension "countryName"
-                                   :values ["Italy" "France"]}}}
-                 (to-druid-query {:filter [{:name "countryName" :exclude ["Italy" "France"]}]}))))
+    (testing "query with :exclude filter"
+      (is (submap? {:filter {:type "not"
+                             :field {:type "in"
+                                     :dimension "countryName"
+                                     :values ["Italy" "France"]}}}
+                   (to-druid-query {:filter [{:name "countryName" :exclude ["Italy" "France"]}]})))))
 
-  (testing "query with one atemporal dimension sorting by other selected metric in ascending order"
-    (is (submap? {:queryType "topN"
-                  :metric {:type "inverted" :metric {:type "numeric" :metric "added"}}}
-                 (to-druid-query {:cube "wikiticker"
-                                  :dimension {:name "page" :sort-by {:name "added" :descending false}}
-                                  :measures [{:name "count" :type "longSum"}
-                                             {:name "added" :type "longSum"}]}))))
+  (testing "sorting"
+    (testing "query with one atemporal dimension sorting by other selected metric in ascending order"
+      (is (submap? {:queryType "topN"
+                    :metric {:type "inverted" :metric {:type "numeric" :metric "added"}}}
+                   (to-druid-query {:cube "wikiticker"
+                                    :dimension {:name "page" :sort-by {:name "added" :descending false}}
+                                    :measures [{:name "count" :type "longSum"}
+                                               {:name "added" :type "longSum"}]}))))
 
-  (testing "query with one atemporal dimension sorting by other non selected metric should add it to the aggregations"
-    (is (submap? {:metric {:type "numeric" :metric "users"}
-                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}
-                                 {:name "users" :fieldName "users" :type "hyperUnique"}]}
-                 (to-druid-query {:dimension {:name "page" :sort-by {:name "users" :type "hyperUnique"}}
-                                  :measures [{:name "count" :type "longSum"}]}))))
+    (testing "query with one atemporal dimension sorting by other non selected metric should add it to the aggregations"
+      (is (submap? {:metric {:type "numeric" :metric "users"}
+                    :aggregations [{:name "count" :fieldName "count" :type "longSum"}
+                                   {:name "users" :fieldName "users" :type "hyperUnique"}]}
+                   (to-druid-query {:dimension {:name "page" :sort-by {:name "users" :type "hyperUnique"}}
+                                    :measures [{:name "count" :type "longSum"}]}))))
 
-  (testing "ascending ordered by the same dimension should use lexicographic sorting"
-    (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}
-                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}]}
-                 (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}
-                                  :measures [{:name "count" :type "longSum"}]}))))
+    (testing "ascending ordered by the same dimension should use lexicographic sorting"
+      (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}
+                    :aggregations [{:name "count" :fieldName "count" :type "longSum"}]}
+                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}
+                                    :measures [{:name "count" :type "longSum"}]}))))
 
-  (testing "descending ordered by the same dimension should use lexicographic sorting"
-    (is (submap? {:metric {:type "inverted"
-                           :metric {:type "dimension" :ordering "lexicographic"}}}
-                 (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending true}}})))))
+    (testing "descending ordered by the same dimension should use lexicographic sorting"
+      (is (submap? {:metric {:type "inverted"
+                             :metric {:type "dimension" :ordering "lexicographic"}}}
+                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending true}}}))))))
 
 (deftest from-druid-results-test
   (testing "topN results"
