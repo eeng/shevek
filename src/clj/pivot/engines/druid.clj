@@ -79,18 +79,19 @@
     (conj aggregations (to-druid-agg sort-by))
     aggregations))
 
-(defn- to-druid-filter [[{:keys [name is include exclude]} :as filters]]
+(defn- to-druid-filter [[{:keys [name operator value]} :as filters]]
   (condp = (count filters)
     0 nil
-    1 (cond
-        is {:type "selector" :dimension name :value is}
-        include {:type "in" :dimension name :values include}
-        exclude {:type "not" :field {:type "in" :dimension name :values exclude}})
+    1 (condp = (keyword operator)
+        :is {:type "selector" :dimension name :value value}
+        :include {:type "in" :dimension name :values value}
+        :exclude {:type "not" :field {:type "in" :dimension name :values value}})
     {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
 
-(defn- convertible-to-druid-filter? [dim]
-  (and (not (time-dimension? dim))
-       (some #{:is :include :exclude} (keys dim))))
+(defn- convertible-to-druid-filter? [{:keys [operator value]}]
+  (and operator (case (keyword operator)
+                  (:include :exclude) (seq value)
+                  value)))
 
 (defn- calculate-query-type [{:keys [dimension]}]
   (if (and dimension (not (time-dimension? dimension)))
@@ -236,6 +237,6 @@
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
             :split [{:name "countryName" :limit 5}]
-            :filter [{:name "countryName" :include ["Italy" "France"]}]
+            :filter [{:name "countryName" :operator "include" :value #{"Italy" "France"}}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})

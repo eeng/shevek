@@ -69,12 +69,12 @@
                                   :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}}))))
 
   (testing "filter"
-    (testing "query with one :is filter"
+    (testing "query with one :is operator"
       (is (submap? {:filter {:type "selector"
                              :dimension "isRobot"
                              :value "true"}}
                    (to-druid-query {:cube "wikiticker"
-                                    :filter [{:name "__time"} {:name "isRobot" :is "true"}]}))))
+                                    :filter [{:name "__time"} {:name "isRobot" :operator "is" :value "true"}]}))))
 
     (testing "query with two filters"
       (is (submap? {:filter {:type "and"
@@ -82,24 +82,23 @@
                                       {:type "selector" :dimension "isNew" :value "false"}]}}
                    (to-druid-query {:measures [{:name "count" :type "longSum"}]
                                     :filter [{:name "__time"} ; Este se ignora xq se manda en el interval
-                                             {:name "isRobot" :is "true"}
-                                             {:name "isNew" :is "false"}]})))
-      (is (without? :filter
-            (to-druid-query {:filter [{:name "isRobot"}
-                                      {:name "isNew"}]}))))
+                                             {:name "isRobot" :operator "is" :value "true"}
+                                             {:name "isNew" :operator "is" :value "false"}]})))
+      (is (without? :filter (to-druid-query {:filter [{:name "isRobot"} {:name "isNew"}]})))
+      (is (without? :filter (to-druid-query {:filter [{:name "isRobot" :operator "include" :value []}]}))))
 
-    (testing "query with :include filter"
+    (testing "query with :include operator"
       (is (submap? {:filter {:type "in"
                              :dimension "countryName"
                              :values ["Italy" "France"]}}
-                   (to-druid-query {:filter [{:name "countryName" :include ["Italy" "France"]}]}))))
+                   (to-druid-query {:filter [{:name "countryName" :operator "include" :value ["Italy" "France"]}]}))))
 
-    (testing "query with :exclude filter"
+    (testing "query with :exclude operator"
       (is (submap? {:filter {:type "not"
                              :field {:type "in"
                                      :dimension "countryName"
                                      :values ["Italy" "France"]}}}
-                   (to-druid-query {:filter [{:name "countryName" :exclude ["Italy" "France"]}]})))))
+                   (to-druid-query {:filter [{:name "countryName" :operator "exclude" :value ["Italy" "France"]}]})))))
 
   (testing "sorting"
     (testing "query with one atemporal dimension sorting by other selected metric in ascending order"

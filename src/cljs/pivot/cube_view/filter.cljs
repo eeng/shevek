@@ -10,12 +10,16 @@
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [controlled-popup select checkbox]]))
 
+(defn init-filtered-dim [dim]
+  (assoc dim :operator "include"))
+
 (defevh :dimension-added-to-filter [db dim]
-  (update-in db [:cube-view :filter] add-dimension dim))
+  (update-in db [:cube-view :filter] add-dimension (init-filtered-dim dim)))
 
 (defevh :dimension-removed-from-filter [db dim]
   (-> (update-in db [:cube-view :filter] remove-dimension dim)
-      #_(send-main-query)))
+      (send-main-query)
+      (send-pinboard-queries)))
 
 (defevh :filter-options-changed [db dim opts]
   (-> (update-in db [:cube-view :filter] replace-dimension (merge dim opts))
@@ -77,20 +81,22 @@
          [relative-period-time-filter dim]
          [specific-period-time-filter dim])])))
 
-(defn- dimension-value-item [{:keys [name] :as dim} result]
-  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)} ; TODO duplicado en las measures
-   [checkbox (format-dimension dim result)
-    {:checked false
-     :on-change #(console.log %)}]])
+; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
+(defn- dimension-value-item [{:keys [name] :as dim} result filter-opts]
+  (let [value (-> name keyword result)]
+    [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)} ; TODO duplicado en las measures
+     [checkbox (format-dimension dim result)
+      {:checked (some #(= value %) (@filter-opts :value))
+       :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)}]]))
 
 (defn- normal-filter-popup [close-popup {:keys [name] :as dim}]
-  (let [opts (r/atom (select-keys dim [:include :exclude]))]
+  (let [opts (r/atom (select-keys dim [:operator :value]))]
     (fn []
       [:div.ui.form.normal-filter
        [:div.items-container
          [:div.items
           (rfor [result (cube-view :results :filter name)]
-            [dimension-value-item dim result])]]
+            [dimension-value-item dim result opts])]]
        [:div
         [:button.ui.primary.compact.button
          {:on-click #(do (close-popup) (dispatch :filter-options-changed dim @opts))}
