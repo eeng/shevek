@@ -17,15 +17,10 @@
   (-> (update-in db [:cube-view :filter] remove-dimension dim)
       #_(send-main-query)))
 
-; TODO esta se podria meter dentro del :filter-options-changed q es mas generico
-(defevh :time-period-changed [db dim period]
-  (-> (update-in db [:cube-view :filter] replace-dimension (assoc dim :selected-period period))
-      (send-main-query)
-      (send-pinboard-queries)))
-
 (defevh :filter-options-changed [db dim opts]
   (-> (update-in db [:cube-view :filter] replace-dimension (merge dim opts))
-      (send-main-query)))
+      (send-main-query)
+      (send-pinboard-queries)))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim}]
   (send-query db {:cube (cube-view :cube)
@@ -46,7 +41,7 @@
      (rfor [period periods]
        [:button.ui.button {:class (when (= period selected-period) "active")
                            :on-click #(when-not (= period selected-period)
-                                        (dispatch :time-period-changed dim period))
+                                        (dispatch :filter-options-changed dim {:selected-period period}))
                            :on-mouse-over #(reset! showed-period period)
                            :on-mouse-out #(reset! showed-period selected-period)}
         (available-relative-periods period)])]])
