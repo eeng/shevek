@@ -151,7 +151,7 @@
 
 (defn- add-filter-for-dim [filter {:keys [name]} result]
   (let [dim-value (result (keyword name))]
-    (conj filter {:name name :is dim-value})))
+    (conj filter {:name name :operator "is" :value dim-value})))
 
 ; TODO no me convencen los nombres de algunas de estas funciones
 (defn- send-queries-for-split [host {:keys [split filter] :as q}]

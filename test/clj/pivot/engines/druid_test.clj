@@ -97,8 +97,8 @@
       (is (submap? {:filter {:type "not"
                              :field {:type "in"
                                      :dimension "countryName"
-                                     :values ["Italy" "France"]}}}
-                   (to-druid-query {:filter [{:name "countryName" :operator "exclude" :value ["Italy" "France"]}]})))))
+                                     :values [nil "France"]}}}
+                   (to-druid-query {:filter [{:name "countryName" :operator "exclude" :value [nil "France"]}]})))))
 
   (testing "sorting"
     (testing "query with one atemporal dimension sorting by other selected metric in ascending order"

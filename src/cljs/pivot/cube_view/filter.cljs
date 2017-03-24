@@ -118,7 +118,7 @@
   [:button.ui.green.compact.button.item
    {:class (when-not (time-dimension? dim) "right labeled icon") :on-click toggle}
    (when-not (time-dimension? dim)
-     [:i.close.icon {:on-click #(dispatch :dimension-removed-from-filter dim)}])
+     [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
    (filter-title dim)])
 
 (defn filter-panel []
