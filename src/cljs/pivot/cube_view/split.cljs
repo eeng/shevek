@@ -67,10 +67,10 @@
            [:label (t :cubes/limit)]
            [select (map (juxt identity identity) [5 10 25 50 100])
             {:selected (:limit @opts) :on-change #(swap! opts assoc :limit %)}]]
-          [:button.ui.primary.button
+          [:button.ui.primary.compact.button
            {:on-click #(do (close) (dispatch :split-options-changed dim @opts))}
            (t :answer/ok)]
-          [:button.ui.button {:on-click close} (t :answer/cancel)]]]))))
+          [:button.ui.compact.button {:on-click close} (t :answer/cancel)]]]))))
 
 (defn- split-item [{:keys [toggle]} {:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button {:on-click toggle}

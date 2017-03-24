@@ -25,7 +25,7 @@
 (defevh :filter-values-requested [db {:keys [name] :as dim}]
   (send-query db {:cube (cube-view :cube)
                   :filter [(first (cube-view :filter))]
-                  :split [(assoc dim :limit 10)]
+                  :split [(assoc dim :limit 50)]
                   :measures [{:type "count" :name "rowCount"}]}
               [:results :filter name]))
 
@@ -87,13 +87,15 @@
   (let [opts (r/atom (select-keys dim [:include :exclude]))]
     (fn []
       [:div.ui.form.normal-filter
-       [:div.items
-        (rfor [result (cube-view :results :filter name)]
-          [dimension-value-item dim result])]
-       [:button.ui.primary.button
-        {:on-click #(do (close-popup) (dispatch :filter-options-changed dim @opts))}
-        (t :answer/ok)]
-       [:button.ui.button {:on-click (without-propagation close-popup)} (t :answer/cancel)]])))
+       [:div.items-container
+         [:div.items
+          (rfor [result (cube-view :results :filter name)]
+            [dimension-value-item dim result])]]
+       [:div
+        [:button.ui.primary.compact.button
+         {:on-click #(do (close-popup) (dispatch :filter-options-changed dim @opts))}
+         (t :answer/ok)]
+        [:button.ui.compact.button {:on-click (without-propagation close-popup)} (t :answer/cancel)]]])))
 
 (defn- filter-popup [{:keys [close opened?]} dim]
   [:div.ui.special.popup {:style {:display (if opened? "block" "none")}}

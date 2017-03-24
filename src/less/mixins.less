@@ -39,5 +39,18 @@
 	color: #949494;
 }
 .more.dimmed {
-	color: #ccc;
+  color: #ccc;
+}
+
+.overflow-shadow {
+	&:not(.loading)::after {
+	  position: absolute;
+	  top: 0;
+	  bottom: 0;
+	  left: 0;
+	  right: 0;
+	  content: '';
+	  pointer-events: none;
+	  .box-shadow(inset 0 -20px 10px -10px #fff);
+  }
 }
