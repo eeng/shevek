@@ -8,7 +8,7 @@
             [pivot.lib.react :refer [rmap without-propagation]]
             [pivot.cube-view.shared :refer [panel-header current-cube cube-view send-main-query]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
-            [pivot.components :refer [with-controlled-popup select]]))
+            [pivot.components :refer [controlled-popup select]]))
 
 ; TODO el limit distinto no funca bien cuando se reemplaza el filter
 (defn- init-splitted-dim [dim {:keys [cube-view]}]
@@ -46,13 +46,12 @@
                                 (assoc split :sort-by (assoc sort-by :descending descending)))))))
       (send-main-query)))
 
-(defn- split-popup [selected dim]
+(defn- split-popup [_ dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by]))
-        close-popup #(reset! selected false)
         posible-sort-bys (conj (current-cube :measures) (clean-split dim))]
-    (fn []
+    (fn [{:keys [close opened?]} dim]
       (let [desc (get-in @opts [:sort-by :descending])]
-        [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
+        [:div.ui.special.popup {:style {:display (if opened? "block" "none")}}
          [:div.ui.form
           [:div.field
            [:label (t :cubes/sort-by)]
@@ -69,18 +68,17 @@
            [select (map (juxt identity identity) [5 10 25 50 100])
             {:selected (:limit @opts) :on-change #(swap! opts assoc :limit %)}]]
           [:button.ui.primary.button
-           {:on-click #(do (close-popup) (dispatch :split-options-changed dim @opts))}
+           {:on-click #(do (close) (dispatch :split-options-changed dim @opts))}
            (t :answer/ok)]
-          [:button.ui.button {:on-click close-popup} (t :answer/cancel)]]]))))
+          [:button.ui.button {:on-click close} (t :answer/cancel)]]]))))
 
-(defn- split-item [selected {:keys [title] :as dim}]
-  [:button.ui.orange.compact.right.labeled.icon.button
-   {:on-click #(swap! selected not)}
+(defn- split-item [{:keys [toggle]} {:keys [title] :as dim}]
+  [:button.ui.orange.compact.right.labeled.icon.button {:on-click toggle}
    [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-split dim)}]
    title])
 
 (defn split-panel []
   [:div.split.panel
    [panel-header (t :cubes/split)]
-   (rmap (with-controlled-popup split-item split-popup {:position "bottom center"})
+   (rmap (controlled-popup split-item split-popup {:position "bottom center"})
          (cube-view :split))])

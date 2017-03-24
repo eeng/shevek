@@ -5,10 +5,10 @@
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
-            [pivot.lib.react :refer [rmap]]
+            [pivot.lib.react :refer [rmap without-propagation]]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
-            [pivot.components :refer [with-controlled-popup select checkbox]]))
+            [pivot.components :refer [controlled-popup select checkbox]]))
 
 (defn- fetch-dimension-values [{:keys [cube-view] :as db} {:keys [name] :as dim}]
   (send-query db {:cube (:cube cube-view)
@@ -88,9 +88,8 @@
     {:checked false
      :on-change #(console.log %)}]])
 
-(defn- normal-filter-popup [selected {:keys [name] :as dim}]
-  (let [opts (r/atom (select-keys dim [:include :exclude]))
-        close-popup #(reset! selected false)]
+(defn- normal-filter-popup [close-popup {:keys [name] :as dim}]
+  (let [opts (r/atom (select-keys dim [:include :exclude]))]
     (fn []
       [:div.ui.form.normal-filter
        [:div.items
@@ -99,26 +98,22 @@
        [:button.ui.primary.button
         {:on-click #(do (close-popup) (dispatch :filter-options-changed dim @opts))}
         (t :answer/ok)]
-       [:button.ui.button {:on-click close-popup} (t :answer/cancel)]])))
+       [:button.ui.button {:on-click (without-propagation close-popup)} (t :answer/cancel)]])))
 
-(defn- filter-popup [selected dim]
-  (when-not (time-dimension? dim) ; FIXME esto no funca bien cuando se agregan varias dims
-    (reset! selected true))
-  (fn []
-    [:div.ui.special.popup {:style {:display (if @selected "block" "none")}}
-     (if (time-dimension? dim)
-       [time-filter-popup dim]
-       [normal-filter-popup selected dim])]))
+(defn- filter-popup [{:keys [close opened?]} dim]
+  [:div.ui.special.popup {:style {:display (if opened? "block" "none")}}
+   (if (time-dimension? dim)
+     [time-filter-popup dim]
+     [normal-filter-popup close dim])])
 
 (defn- filter-title [{:keys [title selected-period] :as dim}]
   (if (time-dimension? dim)
     (->> (name selected-period) (str "cubes.period/") keyword t)
     title))
 
-(defn- filter-item [selected dim]
+(defn- filter-item [{:keys [toggle]} dim]
   [:button.ui.green.compact.button.item
-   {:class (when-not (time-dimension? dim) "right labeled icon")
-    :on-click #(swap! selected not)}
+   {:class (when-not (time-dimension? dim) "right labeled icon") :on-click toggle}
    (when-not (time-dimension? dim)
      [:i.close.icon {:on-click #(dispatch :dimension-removed-from-filter dim)}])
    (filter-title dim)])
@@ -126,5 +121,5 @@
 (defn filter-panel []
   [:div.filter.panel
    [panel-header (t :cubes/filter)]
-   (rmap (with-controlled-popup filter-item filter-popup {:position "bottom center"})
+   (rmap (controlled-popup filter-item filter-popup {:position "bottom center"})
          (cube-view :filter))])

@@ -57,18 +57,24 @@
      :component-did-update #(-> % dom-node js/$
                                 (.popup "reposition"))}))
 
-(defn with-controlled-popup [activator popup-content popup-opts]
+(defn controlled-popup [activator popup-content popup-opts]
   (fn [& _]
-    (let [selected (r/atom false)
+    (let [opened (r/atom false)
+          toggle #(swap! opened not)
+          close #(reset! opened false)
           handle-click-outside (fn [c e]
-                                 (when (and @selected (not (.contains (r/dom-node c) (.-target e))))
-                                   (reset! selected false)))
+                                 (when (and @opened (not (.contains (r/dom-node c) (.-target e))))
+                                   (close)))
           node-listener (atom nil)]
-      (r/create-class {:reagent-render (fn [& args]
-                                         [:div
-                                          (into [(make-popup activator (assoc popup-opts :on "manual")) selected] args)
-                                          (into [popup-content selected] args)])
-                       :component-did-mount #(do
-                                               (reset! node-listener (partial handle-click-outside %))
-                                               (.addEventListener js/document "click" @node-listener true))
-                       :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)}))))
+      (r/create-class {:reagent-render
+                       (fn [& args]
+                         (let [popup-object {:opened? @opened :toggle toggle :close close}]
+                           [:div
+                            (into [(make-popup activator (assoc popup-opts :on "manual")) popup-object] args)
+                            (into [popup-content popup-object] args)]))
+                       :component-did-mount
+                       #(do
+                          (reset! node-listener (partial handle-click-outside %))
+                          (.addEventListener js/document "click" @node-listener true))
+                       :component-will-unmount
+                       #(.removeEventListener js/document "click" @node-listener true)}))))
