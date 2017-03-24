@@ -57,10 +57,15 @@
      :component-did-update #(-> % dom-node js/$
                                 (.popup "reposition"))}))
 
-(defn controlled-popup [activator popup-content popup-opts]
+; TODO quizas se podria dejar de usar el on manual si en el open lo abrimos con js y cerramos con js. Asi se evitaria todo el manejo del click-outside y de paso habria lindas transiciones
+(defn controlled-popup [activator popup-content {:keys [on-open] :or {on-open identity} :as opts}]
   (fn [& _]
-    (let [opened (r/atom false)
-          toggle #(swap! opened not)
+    (let [popup-opts (select-keys opts [:position])
+          opened (r/atom false)
+          negate-and-notify #(let [open (not %)]
+                               (when open (on-open))
+                               open)
+          toggle #(swap! opened negate-and-notify)
           close #(reset! opened false)
           handle-click-outside (fn [c e]
                                  (when (and @opened (not (.contains (r/dom-node c) (.-target e))))

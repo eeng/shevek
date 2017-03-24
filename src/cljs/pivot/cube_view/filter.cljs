@@ -10,13 +10,6 @@
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [controlled-popup select checkbox]]))
 
-(defn- fetch-dimension-values [{:keys [cube-view] :as db} {:keys [name] :as dim}]
-  (send-query db {:cube (:cube cube-view)
-                  :filter [(first (:filter cube-view))]
-                  :split [(assoc dim :limit 10)]
-                  :measures [{:type "count" :name "rowCount"}]}
-              [:results :filter name]))
-
 (defevh :dimension-added-to-filter [db dim]
   (update-in db [:cube-view :filter] add-dimension dim))
 
@@ -33,6 +26,13 @@
 (defevh :filter-options-changed [db dim opts]
   (-> (update-in db [:cube-view :filter] replace-dimension (merge dim opts))
       (send-main-query)))
+
+(defevh :filter-values-requested [db {:keys [name] :as dim}]
+  (send-query db {:cube (cube-view :cube)
+                  :filter [(first (cube-view :filter))]
+                  :split [(assoc dim :limit 10)]
+                  :measures [{:type "count" :name "rowCount"}]}
+              [:results :filter name]))
 
 (def available-relative-periods
   {:latest-hour "1H" :latest-6hours "6H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D"
@@ -121,5 +121,8 @@
 (defn filter-panel []
   [:div.filter.panel
    [panel-header (t :cubes/filter)]
-   (rmap (controlled-popup filter-item filter-popup {:position "bottom center"})
-         (cube-view :filter))])
+   (rfor [dim (cube-view :filter)]
+     [(controlled-popup filter-item filter-popup
+                        {:position "bottom center" :on-open #(when-not (time-dimension? dim)
+                                                               (dispatch :filter-values-requested dim))})
+      dim])])
