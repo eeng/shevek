@@ -6,7 +6,7 @@
             [pivot.rpc :refer [loading?]]
             [pivot.lib.react :refer [rmap]]
             [pivot.rpc :as rpc]
-            [pivot.components :refer [checkbox]]
+            [pivot.components :refer [checkbox toggle-checkbox-inside]]
             [pivot.dw :refer [add-dimension remove-dimension includes-dim?]]
             [pivot.cube-view.shared :refer [current-cube cube-view panel-header send-main-query]]))
 
@@ -15,7 +15,7 @@
           selected (send-main-query)))
 
 (defn- measure-item [{:keys [title description] :as dim}]
-  [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)
+  [:div.item {:on-click toggle-checkbox-inside
               :title description}
    [checkbox title {:checked (includes-dim? (cube-view :measures) dim)
                     :on-change #(dispatch :measure-toggled dim %)}]])

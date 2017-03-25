@@ -48,6 +48,9 @@
             :on-change #(on-change (not checked))}]
    [:label {:for name} label]])
 
+(defn toggle-checkbox-inside [e]
+  (-> e .-target js/$ (.find ".checkbox input") .click))
+
 ; TODO el reposition solo se deberia hacer :on "manual"
 (defn make-popup [activator popup-opts]
   (with-meta activator

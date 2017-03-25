@@ -8,7 +8,7 @@
             [pivot.lib.react :refer [rmap without-propagation]]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
-            [pivot.components :refer [controlled-popup select checkbox dropdown]]))
+            [pivot.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
 (defn init-filtered-dim [dim]
   (assoc dim :operator "include"))
@@ -84,7 +84,7 @@
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts]
   (let [value (-> name keyword result)]
-    [:div.item {:on-click #(-> % .-target js/$ (.find ".checkbox input") .click)} ; TODO duplicado en las measures
+    [:div.item {:on-click toggle-checkbox-inside}
      [checkbox (format-dimension dim result)
       {:checked (some #(= value %) (@filter-opts :value))
        :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)}]]))
