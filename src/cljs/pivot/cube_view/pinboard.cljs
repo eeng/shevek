@@ -4,9 +4,7 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [pivot.i18n :refer [t]]
-            [pivot.rpc :refer [loading?]]
-            [pivot.lib.react :refer [rmap]]
-            [pivot.rpc :as rpc]
+            [pivot.rpc :refer [loading-class]]
             [pivot.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
             [pivot.components :refer [dropdown]]
             [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension]]))
@@ -73,17 +71,18 @@
   (let [search (r/atom nil)]
     (fn []
       (when @searching
-        [:div.ui.icon.small.fluid.input
+        [:div.ui.icon.small.fluid.input.search
          [:input {:type "text" :placeholder (t :input/search)}]
          [:i.search.icon]]))))
 
-(defn- pinned-dimension-panel [{:keys [title name] :as dim}]
+(defn- pinned-dimension-panel* [{:keys [title name] :as dim}]
   (let [searching (r/atom false)]
     (fn []
       (let [results (cube-view :results :pinboard name)
             measure (cube-view :pinboard :measure)
             filtered-results (r/atom results)]
-        [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
+        ; TODO quizas convenga poner el loading en los .items, asi se puede cerrar el panel aun si esta cargando.
+        [:div.dimension.panel.ui.basic.segment (loading-class [:results :pinboard name])
          [panel-header (str title " " (title-according-to-dim-type dim))
           (if (time-dimension? dim)
             [time-granularity-button dim]
@@ -94,14 +93,27 @@
           (rfor [result @filtered-results]
             [pinned-dimension-item dim result measure])]]))))
 
-(defn pinboard-panel []
-  [:div.pinboard.zone
-   [panel-header (t :cubes/pinboard)
-    [dropdown (map (juxt :title :name) (current-cube :measures))
-     {:selected (cube-view :pinboard :measure :name) :class "top right pointing"
-      :on-change #(dispatch :pinboard-measure-selected %)}]]
+(defn- adjust-max-height [rc]
+  (let [panel (-> rc r/dom-node js/$)
+        items (-> panel (.find ".header, .item") .toArray js->clj)
+        height (reduce + (map #(-> % js/$ .outerHeight) items))]
+    (.css panel "max-height", (max (+ height 10) 100))))
+
+(def pinned-dimension-panel
+  (with-meta pinned-dimension-panel*
+    {:component-did-mount adjust-max-height
+     :component-did-update adjust-max-height}))
+
+(defn pinboard-panels []
+  [:div.pinboard
+   [:div.panel
+    [panel-header (t :cubes/pinboard)
+     [dropdown (map (juxt :title :name) (current-cube :measures))
+      {:selected (cube-view :pinboard :measure :name) :class "top right pointing"
+       :on-change #(dispatch :pinboard-measure-selected %)}]]]
    (if (seq (cube-view :pinboard :dimensions))
-     (rmap pinned-dimension-panel (cube-view :pinboard :dimensions))
+     (for [dim (cube-view :pinboard :dimensions)]
+       ^{:key (dim :name)} [pinned-dimension-panel dim])
      [:div.panel.ui.basic.segment.no-pinned
       [:div.icon-hint
        [:i.pin.icon]

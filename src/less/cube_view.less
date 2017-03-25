@@ -1,128 +1,101 @@
 #cube-view {
-  @lateral-col-width: 250px;
-  @panel-separator: 1px solid #f0f0f0;
-  @panel-horizontal-padding: 14px;
-
   position: absolute;
   top: 40px;
   bottom: 0;
   left: 0;
   right: 0;
   overflow: hidden;
+  display: flex;
+
+  @gutter: 10px;
 
   .left-column, .center-column, .right-column {
-    top: 0;
-    bottom: 0;
-    padding: 10px;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    .zone {
-      background-color: white;
-      .border-radius(3px);
-      .box-shadow(0px 0px 15px 0px rgba(0,0,0,0.1));
-      .sub.header {
-        .dimmed;
-        font-weight: normal;
-        padding: 12px @panel-horizontal-padding;
-        margin: 0;
-        position: relative;
-        .actions {
-          position: absolute;
-          top: 12px;
-          right: @panel-horizontal-padding;
-          text-transform: none;
-          font-size: 110%;
-          .icon {
-            margin: 0;
-            margin-left: 5px;
-          }
-          .large.icon {
-            margin-right: -4px;
-            margin-top: -2px;
-            color: #e0e0e0;
-            &:hover { color: #777; }
-          }
-          .ellipsis + .menu { right: -10px; } // Aparecía medio descolgado hacia la izquierda sino
-        }
-      }
-    }
-    .panel {
-      padding: 0;
-      margin: 0;
-      &.loading { color: inherit !important; } // Semantic le pone un color transparent y hace que no se vea el texto que queda debajo del loading
-      .items {
-        overflow-y: auto;
-        padding-bottom: 8px;
-        .item {
-          padding: 5px @panel-horizontal-padding;
-          .icon {
-            color: #ccc;
-            margin-right: 7px;
-          }
-          #cube-view .selectable;
-        }
-        .popup {
-          padding: 0;
-        }
-      }
-    }
+    margin: @gutter;
   }
-  .left-column {
-    width: @lateral-col-width;
-    left: 0;
+  .left-column, .right-column {
+    width: 250px;
   }
   .center-column {
-    left: @lateral-col-width + 2px;
-    right: @lateral-col-width + 2px;
-    padding-left: 0;
-    padding-right: 0;
-  }
-  .right-column {
-    width: @lateral-col-width;
-    right: 0px;
+    flex: 1;
+    margin: @gutter 0;
   }
 
-  .left-column, .right-column {
-    .panel { .overflow-shadow; }
-  }
+  @panel-separator: 1px solid #f0f0f0;
+  @panel-horizontal-padding: 14px;
 
-  .icon-hint {
-    color: #ccc;
-    text-align: center;
-    .icon {
-      line-height: 1;
-      font-size: 3em;
-      margin-bottom: 7px;
-    }
-    .text {
-      font-style: italic;
+  .panel {
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    &:not(:last-child) { border-bottom: @panel-separator; }
+    &:first-child { .border-radiuses(3px, 0, 0, 3px); }
+    &:last-child { .border-radiuses(0, 3px, 3px, 0); }
+    .box-shadow(0px 4px 15px 0px rgba(0,0,0,0.1));
+
+    .sub.header {
+      .dimmed;
       font-weight: normal;
-      font-size: 12pt;
+      padding: 12px @panel-horizontal-padding;
+      margin: 0;
+      position: relative;
+      .actions {
+        position: absolute;
+        top: 12px;
+        right: @panel-horizontal-padding;
+        text-transform: none;
+        font-size: 110%;
+        .icon {
+          margin: 0;
+          margin-left: 5px;
+        }
+        .large.icon {
+          margin-right: -4px;
+          margin-top: -2px;
+          color: #e0e0e0;
+          &:hover { color: #777; }
+        }
+        .ellipsis + .menu { right: -10px; } // Aparecía medio descolgado hacia la izquierda sino
+      }
     }
-  }
 
-  .dimensions-measures {
+    // Necesario para que los items muestren el scroll al overflowear
     display: flex;
     flex-direction: column;
-    height: 100%;
-    .dimensions {
-      flex: 71 1 0%;
-      border-bottom: @panel-separator;
+
+    &.loading { color: inherit !important; } // Semantic le pone un color transparent y hace que no se vea el texto que queda debajo del loading
+    .items {
+      overflow-y: auto;
+      .overflow-shadow;
+      .item {
+        padding: 5px @panel-horizontal-padding;
+        .icon {
+          color: #ccc;
+          margin-right: 7px;
+        }
+        #cube-view .selectable;
+      }
+      .popup {
+        padding: 0;
+      }
     }
-    .measures { flex: 29 1 0%; }
-    .dimensions, .measures {
-      display: flex;
-      flex-direction: column;
+
+    .search.input {
+      margin: 0 (@panel-horizontal-padding - 1px) .7em;
+      flex-shrink: 0;
     }
   }
 
-  .panel.filter, .panel.split {
-    border-bottom: @panel-separator;
-    display: flex;
+  .dimensions { flex: 71 1 0%; }
+  .measures { flex: 29 1 0%; }
+  .dimensions, .measures { padding-bottom: 8px; }
+
+  .filter, .split {
     flex-direction: row;
     align-items: center;
     h2 { width: 67px; }
+
     @content-width: 230px;
 
     .popup .time-filter {
@@ -201,11 +174,12 @@
     }
   }
 
-  .panel.visualization {
-    overflow-y: auto;
+  // TODO faltaria agregarle el overflow-shadow y dejar fijo el header al scrollear
+  .visualization {
     flex: 1;
-    margin-top: 10px;
+    margin-top: @gutter;
     padding: 10px;
+    overflow-y: auto;
     .icon-hint, .statistics { padding: 40px }
     .statistics {
       justify-content: center;
@@ -247,21 +221,16 @@
   }
 
   .pinboard {
+    height: 100%;
     display: flex;
     flex-direction: column;
     .panel {
-      border-top: @panel-separator;
-      display: flex;
-      flex-direction: column;
       &.no-pinned {
         align-items: center;
         justify-content: center;
-        height: @lateral-col-width;
+        height: 250px;
         padding: @panel-horizontal-padding;
         .icon-hint { margin-top: -1em }
-      }
-      .fluid.input {
-        margin: 0 (@panel-horizontal-padding - 1px) 4px (@panel-horizontal-padding - 1px);
       }
       .items.empty { height: 100px; }
       .item {
@@ -275,6 +244,7 @@
           padding-right: 10px;
         }
       }
+      &.dimension { flex: 1; }
     }
   }
 
@@ -289,6 +259,21 @@
     &.active {
       background-color: #dcdcdc;
       .icon { color: black; }
+    }
+  }
+
+  .icon-hint {
+    color: #ccc;
+    text-align: center;
+    .icon {
+      line-height: 1;
+      font-size: 3em;
+      margin-bottom: 7px;
+    }
+    .text {
+      font-style: italic;
+      font-weight: normal;
+      font-size: 12pt;
     }
   }
 }

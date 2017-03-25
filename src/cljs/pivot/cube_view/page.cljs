@@ -10,7 +10,7 @@
             [pivot.cube-view.filter :refer [filter-panel]]
             [pivot.cube-view.split :refer [split-panel]]
             [pivot.cube-view.visualization :refer [visualization-panel]]
-            [pivot.cube-view.pinboard :refer [pinboard-panel]]))
+            [pivot.cube-view.pinboard :refer [pinboard-panels]]))
 
 ;; DB model example
 #_{:cubes {"wikiticker"
@@ -57,13 +57,12 @@
 (defn page []
   [:div#cube-view
    [:div.left-column
-    [:div.dimensions-measures.zone
-     [dimensions-panel]
-     [measures-panel]]]
+    [dimensions-panel]
+    [measures-panel]]
    [:div.center-column
-    [:div.zone
+    [:div
      [filter-panel]
      [split-panel]]
     [visualization-panel]]
    [:div.right-column
-    [pinboard-panel]]])
+    [pinboard-panels]]])
