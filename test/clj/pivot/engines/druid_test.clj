@@ -73,8 +73,11 @@
       (is (submap? {:filter {:type "selector"
                              :dimension "isRobot"
                              :value "true"}}
-                   (to-druid-query {:cube "wikiticker"
-                                    :filter [{:name "__time"} {:name "isRobot" :operator "is" :value "true"}]}))))
+                   (to-druid-query {:filter [{:name "__time"} {:name "isRobot" :operator "is" :value "true"}]})))
+      (is (submap? {:filter {:type "selector"
+                             :dimension "countryName"
+                             :value nil}}
+                   (to-druid-query {:filter [ {:name "countryName" :operator "is" :value nil}]}))))
 
     (testing "query with two filters"
       (is (submap? {:filter {:type "and"

@@ -89,9 +89,7 @@
     {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
 
 (defn- convertible-to-druid-filter? [{:keys [operator value]}]
-  (and operator (case (keyword operator)
-                  (:include :exclude) (seq value)
-                  value)))
+  (and operator (or (= "is" operator) (seq value))))
 
 (defn- calculate-query-type [{:keys [dimension]}]
   (if (and dimension (not (time-dimension? dimension)))
@@ -220,7 +218,7 @@
 ; Two atemporal dimensions
 #_(e/query (DruidEngine. broker)
            {:cube "wikiticker"
-            :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2}]
+            :split [{:name "countryName" :limit 3} {:name "cityName" :limit 2}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]
             :totals true})
