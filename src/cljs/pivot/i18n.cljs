@@ -53,7 +53,8 @@
                    :day "MMM d yyyy"
                    :month "MMM yyyy"}
     :answer {:ok "Accept"
-             :cancel "Cancel"}}
+             :cancel "Cancel"}
+    :input {:search "Search"}}
 
    :es
    {:menu {:logout "Salir"
@@ -102,7 +103,8 @@
                    :day "dd/MM/yyyy"
                    :month "MM/yyyy"}
     :answer {:ok "Aceptar"
-             :cancel "Cancelar"}}
+             :cancel "Cancelar"}
+    :input {:search "Buscar"}}
 
    :tongue/fallback :en})
 

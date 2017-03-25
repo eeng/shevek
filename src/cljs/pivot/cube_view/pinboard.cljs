@@ -61,19 +61,38 @@
   (when (time-dimension? dim)
     (str "(" (periods granularity) ")")))
 
+(defn- time-granularity-button [dim]
+  [dropdown (map (juxt second first) periods)
+   {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
+   [:i.ellipsis.horizontal.link.icon]])
+
+(defn- search-button [searching]
+  [:i.search.link.icon {:on-click #(swap! searching not)}])
+
+(defn- search-input [searching filtered-results]
+  (let [search (r/atom nil)]
+    (fn []
+      (when @searching
+        [:div.ui.icon.small.fluid.input
+         [:input {:type "text" :placeholder (t :input/search)}]
+         [:i.search.icon]]))))
+
 (defn- pinned-dimension-panel [{:keys [title name] :as dim}]
-  (let [results (cube-view :results :pinboard name)
-        measure (cube-view :pinboard :measure)]
-    [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
-     [panel-header (str title " " (title-according-to-dim-type dim))
-      (when (time-dimension? dim)
-        [dropdown (map (juxt second first) periods)
-         {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
-         [:i.ellipsis.horizontal.large.link.icon]])
-      [:i.close.link.large.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
-     [:div.items {:class (when (empty? results) "empty")}
-      (rfor [result results]
-        [pinned-dimension-item dim result measure])]]))
+  (let [searching (r/atom false)]
+    (fn []
+      (let [results (cube-view :results :pinboard name)
+            measure (cube-view :pinboard :measure)
+            filtered-results (r/atom results)]
+        [:div.panel.ui.basic.segment (rpc/loading-class [:results :pinboard name])
+         [panel-header (str title " " (title-according-to-dim-type dim))
+          (if (time-dimension? dim)
+            [time-granularity-button dim]
+            [search-button searching])
+          [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
+         [search-input searching filtered-results]
+         [:div.items {:class (when (empty? results) "empty")}
+          (rfor [result @filtered-results]
+            [pinned-dimension-item dim result measure])]]))))
 
 (defn pinboard-panel []
   [:div.pinboard.zone

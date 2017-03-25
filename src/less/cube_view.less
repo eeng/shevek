@@ -8,6 +8,7 @@
   bottom: 0;
   left: 0;
   right: 0;
+  overflow: hidden;
 
   .left-column, .center-column, .right-column {
     top: 0;
@@ -258,6 +259,9 @@
         height: @lateral-col-width;
         padding: @panel-horizontal-padding;
         .icon-hint { margin-top: -1em }
+      }
+      .fluid.input {
+        margin: 0 (@panel-horizontal-padding - 1px) 4px (@panel-horizontal-padding - 1px);
       }
       .items.empty { height: 100px; }
       .item {
