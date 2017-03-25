@@ -3,6 +3,7 @@
                    [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
+            [cuerdas.core :as str]
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
             [pivot.lib.react :refer [rmap without-propagation]]
@@ -83,11 +84,13 @@
 
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts]
-  (let [value (-> name keyword result)]
+  (let [value (-> name keyword result)
+        label (format-dimension dim result)]
     [:div.item {:on-click toggle-checkbox-inside}
-     [checkbox (format-dimension dim result)
+     [checkbox label
       {:checked (some #(= value %) (@filter-opts :value))
-       :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)}]]))
+       :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)
+       :name (str name "-" (str/slug label))}]]))
 
 (defn- operator-selector [opts]
   [dropdown [[(t :cubes.operator/include) "include"]
