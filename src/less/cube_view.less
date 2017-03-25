@@ -149,6 +149,15 @@
 
     .popup .normal-filter {
       width: @content-width;
+      .top-inputs {
+        display: flex;
+        .ui.input {
+          height: 29px;
+          margin-left: .3em;
+          input { padding-left: .7em }
+        }
+        .icon { line-height: 0.9 }
+      }
       .items-container {
         position: relative;
         margin: .7em -1em 1em -1em;

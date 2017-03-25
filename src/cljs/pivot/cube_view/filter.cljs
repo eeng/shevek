@@ -30,7 +30,7 @@
 (defevh :filter-values-requested [db {:keys [name] :as dim}]
   (send-query db {:cube (cube-view :cube)
                   :filter [(first (cube-view :filter))]
-                  :split [(assoc dim :limit 50)]
+                  :split [(assoc dim :limit 100)]
                   :measures [{:type "count" :name "rowCount"}]}
               [:results :filter name]))
 
@@ -101,11 +101,18 @@
                       "include" "check square"
                       "exclude" "minus square")}]])
 
+(defn- search-input []
+  [:div.ui.icon.input
+   [:input {:type "text" :placeholder "Search"}]
+   [:i.search.icon]])
+
 (defn- normal-filter-popup [close-popup {:keys [name] :as dim}]
   (let [opts (r/atom (select-keys dim [:operator :value]))]
     (fn []
       [:div.ui.form.normal-filter
-       [operator-selector opts]
+       [:div.top-inputs
+        [operator-selector opts]
+        [search-input]]
        [:div.items-container
          [:div.items
           (rfor [result (cube-view :results :filter name)]
@@ -144,6 +151,6 @@
    [panel-header (t :cubes/filter)]
    (rfor [dim (cube-view :filter)]
      [(controlled-popup filter-item filter-popup
-                        {:position "bottom center" :on-open #(when-not (time-dimension? dim)
-                                                               (dispatch :filter-values-requested dim))})
+                        {:position "bottom center"
+                         :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim))})
       dim])])

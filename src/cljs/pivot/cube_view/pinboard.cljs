@@ -14,7 +14,7 @@
 (defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim}]
   (send-query db
               (assoc cube-view
-                     :split [(assoc dim :limit 50)]
+                     :split [(assoc dim :limit 100)]
                      :measures (vector (get-in cube-view [:pinboard :measure])))
               [:results :pinboard name]))
 
