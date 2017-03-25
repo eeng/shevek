@@ -8,7 +8,7 @@
             [pivot.lib.react :refer [rmap without-propagation]]
             [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
-            [pivot.components :refer [controlled-popup select checkbox]]))
+            [pivot.components :refer [controlled-popup select checkbox dropdown]]))
 
 (defn init-filtered-dim [dim]
   (assoc dim :operator "include"))
@@ -89,10 +89,20 @@
       {:checked (some #(= value %) (@filter-opts :value))
        :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)}]]))
 
+(defn- operator-selector [opts]
+  [dropdown [[(t :cubes.operator/include) "include"]
+             [(t :cubes.operator/exclude) "exclude"]]
+   {:class "icon left pointing basic compact button"
+    :on-change #(swap! opts assoc :operator %)}
+   [:i.icon {:class (case (@opts :operator)
+                      "include" "check square"
+                      "exclude" "minus square")}]])
+
 (defn- normal-filter-popup [close-popup {:keys [name] :as dim}]
   (let [opts (r/atom (select-keys dim [:operator :value]))]
     (fn []
       [:div.ui.form.normal-filter
+       [operator-selector opts]
        [:div.items-container
          [:div.items
           (rfor [result (cube-view :results :filter name)]
@@ -109,10 +119,15 @@
      [time-filter-popup dim]
      [normal-filter-popup close dim])])
 
-(defn- filter-title [{:keys [title selected-period] :as dim}]
+(defn- filter-title [{:keys [title selected-period operator value] :as dim}]
   (if (time-dimension? dim)
     (->> (name selected-period) (str "cubes.period/") keyword t)
-    title))
+    [:div title " "
+     (when (seq value)
+       [:span.details {:class (when (= operator "exclude") "striked")}
+        (case operator
+          ("include" "exclude") (str "(" (count value) ")")
+          "")])]))
 
 (defn- filter-item [{:keys [toggle]} dim]
   [:button.ui.green.compact.button.item

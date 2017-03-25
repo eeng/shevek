@@ -42,6 +42,8 @@
                    :previous-month "Previous Month"
                    :previous-quarter "Previous Quarter"
                    :previous-year "Previous Year"}
+    :cubes.operator {:include "Include"
+                     :exclude "Exclude"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -89,6 +91,8 @@
                    :previous-month "Mes Pasado"
                    :previous-quarter "Trimestre Pasado"
                    :previous-year "Año Pasado"}
+    :cubes.operator {:include "Incluir"
+                     :exclude "Excluir"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"

@@ -151,7 +151,7 @@
       width: @content-width;
       .items-container {
         position: relative;
-        margin: 1em -1em 1em -1em;
+        margin: .7em -1em 1em -1em;
         .overflow-shadow;
         padding-bottom: 1px; // Sino se producía es como que quedaba un px de texto a veces x arriba de la sombra
       }
@@ -179,6 +179,14 @@
           margin: 0;
           margin-left: .5em
         }
+      }
+    }
+
+    .button {
+      .details {
+        font-weight: 100;
+        color: rgba(255, 255, 255, 0.8);
+        &.striked { text-decoration: line-through; }
       }
     }
   }
