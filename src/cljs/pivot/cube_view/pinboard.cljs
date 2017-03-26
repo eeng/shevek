@@ -4,6 +4,7 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [clojure.string :as str]
+            [pivot.lib.util :refer [debounce]]
             [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading-class]]
             [pivot.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
@@ -44,6 +45,10 @@
     (-> (update-in db [:cube-view :pinboard :dimensions] replace-dimension new-time-dim)
         (send-pinned-dim-query new-time-dim))))
 
+(defevh :dimension-values-searched [db dim search]
+  (println dim search)
+  db)
+
 (defn- pinned-dimension-item [dim result measure]
   (let [segment-value (format-dimension dim result)]
     [:div.item {:title segment-value}
@@ -75,11 +80,14 @@
             results)
     results))
 
-(defn- search-input* [search searching]
+(def debounce-dispatch (debounce dispatch 500))
+
+(defn- search-input* [search searching dim]
   (let [stop #(reset! searching false)]
     [:div.ui.icon.small.fluid.input.search
      [:input {:type "text" :placeholder (t :input/search) :value @search
-              :on-change #(reset! search (.-target.value %))
+              :on-change #(->> (reset! search (.-target.value %))
+                               (debounce-dispatch :dimension-values-searched dim))
               :on-key-down #(case (.-which %)
                               13 (stop)
                               27 (do (stop) (reset! search ""))
@@ -104,7 +112,7 @@
             [time-granularity-button dim]
             [search-button searching])
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
-         (when @searching [search-input search searching])
+         (when @searching [search-input search searching dim])
          (if results
            [:div.items
             (if (seq filtered-results)
