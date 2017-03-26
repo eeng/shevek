@@ -3,7 +3,6 @@
                    [pivot.lib.reagent :refer [rfor]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
-            [clojure.string :as str]
             [pivot.lib.util :refer [debounce regex-escape]]
             [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading-class]]
@@ -78,26 +77,24 @@
 (defn- search-button [searching]
   [:i.search.link.icon {:on-click #(swap! searching not)}])
 
-(defn- filter-matching [search dim results]
+(defn- filter-matching [search get-value results]
   (if (seq search)
-    (filter #(str/includes? (str/lower-case (str (format-dimension dim %)))
-                            (str/lower-case search))
+    (filter #(re-find (re-pattern (str "(?i)" (regex-escape search)))
+                      (get-value %))
             results)
     results))
 
 (def debounce-dispatch (debounce dispatch 500))
 
-(defn- search-input* [search searching dim]
-  (let [stop #(reset! searching false)
-        on-change #(->> (reset! search %)
-                        (debounce-dispatch :dimension-values-searched dim))
-        clear #(do (when (seq @search) (on-change ""))
-                 (stop))]
+(defn- search-input* [search {:keys [on-change on-stop] :or {on-change identity on-stop identity}}]
+  (let [change #(on-change (reset! search %))
+        clear #(do (when (seq @search) (change ""))
+                 (on-stop))]
     [:div.ui.icon.small.fluid.input.search
      [:input {:type "text" :placeholder (t :input/search) :value @search
-              :on-change #(on-change (.-target.value %))
+              :on-change #(change (.-target.value %))
               :on-key-down #(case (.-which %)
-                              13 (stop)
+                              13 (on-stop)
                               27 (clear)
                               nil)}]
      (if (seq @search)
@@ -113,14 +110,16 @@
     (fn []
       (let [measure (cube-view :pinboard :measure)
             results (cube-view :results :pinboard name)
-            filtered-results (filter-matching @search dim results)]
+            filtered-results (filter-matching @search (partial format-dimension dim) results)]
         [:div.dimension.panel.ui.basic.segment (when-not @searching (loading-class [:results :pinboard name]))
          [panel-header (str title " " (title-according-to-dim-type dim))
           (if (time-dimension? dim)
             [time-granularity-button dim]
             [search-button searching])
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
-         (when @searching [search-input search searching dim])
+         (when @searching
+           [search-input search {:on-change #(debounce-dispatch :dimension-values-searched dim %)
+                                 :on-stop #(reset! searching false)}])
          (if results
            [:div.items
             (if (seq filtered-results)
