@@ -20,6 +20,7 @@
             :no-desc "No description."
             :no-pinned "Drag or click dimensions to pin them"
             :no-measures "Please select at least one measure"
+            :no-results "No results where found"
             :limit "Limit"
             :sort-by "Sort By"}
     :cubes.period {:relative "Relative"
@@ -70,6 +71,7 @@
             :no-desc "Sin descripción."
             :no-pinned "Arrastre o clickee dimensiones para fijarlas aquí"
             :no-measures "Por favor seleccione al menos una métrica"
+            :no-results "No se encontraron resultados"
             :limit "Límite"
             :sort-by "Ordenar Por"}
     :cubes.period {:relative "Relativo"

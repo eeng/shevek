@@ -3,6 +3,7 @@
                    [pivot.lib.reagent :refer [rfor]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
+            [clojure.string :as str]
             [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading-class]]
             [pivot.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
@@ -67,38 +68,49 @@
 (defn- search-button [searching]
   [:i.search.link.icon {:on-click #(swap! searching not)}])
 
-(defn- search-input* []
-  (let [search (r/atom nil)]
-    (fn [filtered-results]
-      [:div.ui.icon.small.fluid.input.search
-       [:input {:type "text" :placeholder (t :input/search)}]
-       [:i.search.icon]])))
+(defn- filter-matching [search dim results]
+  (if (seq search)
+    (filter #(str/includes? (str/lower-case (str (format-dimension dim %)))
+                            (str/lower-case search))
+            results)
+    results))
 
+(defn- search-input* [search]
+  [:div.ui.icon.small.fluid.input.search
+   [:input {:type "text" :placeholder (t :input/search) :on-change #(reset! search (.-target.value %))}]
+   [:i.search.icon]])
+
+; TODO faltaria agregarle soporte para que se oculte en escape
 (def search-input
   (with-meta search-input* {:component-did-mount #(-> % r/dom-node js/$ (.find "input") .focus)}))
 
 ; TODO quizas convenga poner el loading en los .items, asi se puede cerrar el panel aun si esta cargando.
 (defn- pinned-dimension-panel* [{:keys [title name] :as dim}]
-  (let [searching (r/atom false)]
+  (let [searching (r/atom false)
+        search (r/atom "")]
     (fn []
-      (let [results (cube-view :results :pinboard name)
-            measure (cube-view :pinboard :measure)
-            filtered-results (r/atom results)]
+      (let [measure (cube-view :pinboard :measure)
+            results (cube-view :results :pinboard name)
+            filtered-results (filter-matching @search dim results)]
         [:div.dimension.panel.ui.basic.segment (loading-class [:results :pinboard name])
          [panel-header (str title " " (title-according-to-dim-type dim))
           (if (time-dimension? dim)
             [time-granularity-button dim]
             [search-button searching])
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
-         (when @searching [search-input filtered-results])
-         [:div.items {:class (when (empty? results) "empty")}
-          (rfor [result @filtered-results]
-            [pinned-dimension-item dim result measure])]]))))
+         (when @searching [search-input search])
+         (if results
+           [:div.items
+            (if (seq filtered-results)
+              (rfor [result filtered-results]
+                [pinned-dimension-item dim result measure])
+              [:div.item.no-results (t :cubes/no-results)])]
+           [:div.items.empty])]))))
 
 (defn- adjust-max-height [rc]
   (let [panel (-> rc r/dom-node js/$)
-        items (-> panel (.find ".header, .item") .toArray js->clj)
-        height (reduce + (map #(-> % js/$ .outerHeight) items))]
+        items (-> panel (.find ".header, .item, .search.input") .toArray js->clj)
+        height (reduce + (map #(-> % js/$ (.outerHeight true)) items))]
     (.css panel "max-height", (max (+ height 10) 100))))
 
 (def pinned-dimension-panel
