@@ -4,7 +4,7 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [clojure.string :as str]
-            [pivot.lib.util :refer [debounce]]
+            [pivot.lib.util :refer [debounce regex-escape]]
             [pivot.i18n :refer [t]]
             [pivot.rpc :refer [loading-class]]
             [pivot.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
@@ -48,10 +48,16 @@
 (defevh :dimension-values-searched [db dim search]
   (send-pinned-dim-query db (assoc dim :operator "search" :value search)))
 
-(defn- pinned-dimension-item [dim result measure]
+(defn- highlight [value search]
+  (if (seq search)
+    (let [[_ pre bold post] (re-find (re-pattern (str "(?i)(.*?)(" (regex-escape search) ")(.*)")) value)]
+      [:div.segment-value pre [:span.bold bold] post])
+    [:div.segment-value value]))
+
+(defn- pinned-dimension-item [dim result measure search]
   (let [segment-value (format-dimension dim result)]
     [:div.item {:title segment-value}
-     [:div.segment-value segment-value]
+     (highlight segment-value search)
      [:div.measure-value (format-measure measure result)]]))
 
 (def periods {"PT1H" "1H"
@@ -119,7 +125,7 @@
            [:div.items
             (if (seq filtered-results)
               (rfor [result filtered-results]
-                [pinned-dimension-item dim result measure])
+                [pinned-dimension-item dim result measure @search])
               [:div.item.no-results (t :cubes/no-results)])]
            [:div.items.empty])]))))
 
