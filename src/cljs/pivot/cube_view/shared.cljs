@@ -2,9 +2,10 @@
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
-            [reflow.db :as db]
+            [reagent.core :as r]
             [pivot.lib.react :refer [with-react-keys]]
             [pivot.lib.dates :refer [format-time-according-to-period]]
+            [pivot.lib.util :refer [debounce regex-escape]]
             [pivot.i18n :refer [t]]
             [pivot.rpc :as rpc]
             [pivot.dw :as dw]
@@ -60,3 +61,37 @@
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text
    (when (seq actions) [:div.actions (with-react-keys actions)])])
+
+(defn- filter-matching [search get-value results]
+  (if (seq search)
+    (filter #(re-find (re-pattern (str "(?i)" (regex-escape search)))
+                      (get-value %))
+            results)
+    results))
+
+(defn- search-button [searching]
+  [:i.search.link.icon {:on-click #(swap! searching not)}])
+
+(defn- search-input* [search {:keys [on-change on-stop] :or {on-change identity on-stop identity}}]
+  (let [change #(on-change (reset! search %))
+        clear #(do (when (seq @search) (change ""))
+                 (on-stop))]
+    [:div.ui.icon.small.fluid.input.search
+     [:input {:type "text" :placeholder (t :input/search) :value @search
+              :on-change #(change (.-target.value %))
+              :on-key-down #(case (.-which %)
+                              13 (on-stop)
+                              27 (clear)
+                              nil)}]
+     (if (seq @search)
+       [:i.link.remove.circle.icon {:on-click clear}]
+       [:i.search.icon])]))
+
+(def search-input
+  (with-meta search-input* {:component-did-mount #(-> % r/dom-node js/$ (.find "input") .focus)}))
+
+(defn- highlight [value search]
+  (if (seq search)
+    (let [[_ pre bold post] (re-find (re-pattern (str "(?i)(.*?)(" (regex-escape search) ")(.*)")) value)]
+      [:div.segment-value pre [:span.bold bold] post])
+    [:div.segment-value value]))

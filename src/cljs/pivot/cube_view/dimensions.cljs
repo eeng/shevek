@@ -6,7 +6,7 @@
             [pivot.rpc :refer [loading-class]]
             [pivot.lib.react :refer [rmap]]
             [pivot.components :refer [controlled-popup]]
-            [pivot.cube-view.shared :refer [current-cube panel-header send-main-query]]))
+            [pivot.cube-view.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
 
 (defn dimension-popup-button [{:keys [close]} color icon event name]
   [:button.ui.circular.icon.button
@@ -33,13 +33,24 @@
       "LONG" "hashtag"
       "font")))
 
-(defn- dimension-item [popup {:keys [name title type description] :as dimension}]
+(defn- dimension-item [search popup {:keys [name title type description] :as dimension}]
   [:div.item {:class (when (popup :opened?) "active") :on-click (popup :toggle) :title description}
-   [:i.icon {:class (type-icon type name)}] title])
+   [:i.icon {:class (type-icon type name)}]
+   (highlight title search)])
 
 (defn dimensions-panel []
-  [:div.dimensions.panel.ui.basic.segment (loading-class :cube-metadata)
-   [panel-header (t :cubes/dimensions)]
-   [:div.items
-    (rmap (controlled-popup dimension-item dimension-popup {:position "right center" :distanceAway -30})
-          (current-cube :dimensions))]])
+  (let [searching (r/atom false)
+        search (r/atom "")]
+    (fn []
+      (let [filtered-dims (filter-matching @search :title (current-cube :dimensions))
+            search-text @search]
+        [:div.dimensions.panel.ui.basic.segment (loading-class :cube-metadata)
+         [panel-header (t :cubes/dimensions) [search-button searching]]
+         (when @searching
+           [search-input search {:on-stop #(reset! searching false)}])
+         [:div.items
+          (for [dim filtered-dims]
+            ^{:key (:name dim)}
+            [(controlled-popup (partial dimension-item search-text) dimension-popup
+                               {:position "right center" :distanceAway -30})
+             dim])]]))))

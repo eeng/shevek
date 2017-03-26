@@ -8,7 +8,7 @@
             [pivot.rpc :refer [loading-class]]
             [pivot.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
             [pivot.components :refer [dropdown]]
-            [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension]]))
+            [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension filter-matching search-button search-input highlight]]))
 
 (defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name operator] :as dim}]
   (let [q (cond-> (assoc cube-view
@@ -47,12 +47,6 @@
 (defevh :dimension-values-searched [db dim search]
   (send-pinned-dim-query db (assoc dim :operator "search" :value search)))
 
-(defn- highlight [value search]
-  (if (seq search)
-    (let [[_ pre bold post] (re-find (re-pattern (str "(?i)(.*?)(" (regex-escape search) ")(.*)")) value)]
-      [:div.segment-value pre [:span.bold bold] post])
-    [:div.segment-value value]))
-
 (defn- pinned-dimension-item [dim result measure search]
   (let [segment-value (format-dimension dim result)]
     [:div.item {:title segment-value}
@@ -74,35 +68,7 @@
    {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
    [:i.ellipsis.horizontal.link.icon]])
 
-(defn- search-button [searching]
-  [:i.search.link.icon {:on-click #(swap! searching not)}])
-
-(defn- filter-matching [search get-value results]
-  (if (seq search)
-    (filter #(re-find (re-pattern (str "(?i)" (regex-escape search)))
-                      (get-value %))
-            results)
-    results))
-
 (def debounce-dispatch (debounce dispatch 500))
-
-(defn- search-input* [search {:keys [on-change on-stop] :or {on-change identity on-stop identity}}]
-  (let [change #(on-change (reset! search %))
-        clear #(do (when (seq @search) (change ""))
-                 (on-stop))]
-    [:div.ui.icon.small.fluid.input.search
-     [:input {:type "text" :placeholder (t :input/search) :value @search
-              :on-change #(change (.-target.value %))
-              :on-key-down #(case (.-which %)
-                              13 (on-stop)
-                              27 (clear)
-                              nil)}]
-     (if (seq @search)
-       [:i.link.remove.circle.icon {:on-click clear}]
-       [:i.search.icon])]))
-
-(def search-input
-  (with-meta search-input* {:component-did-mount #(-> % r/dom-node js/$ (.find "input") .focus)}))
 
 (defn- pinned-dimension-panel* [{:keys [title name] :as dim}]
   (let [searching (r/atom false)
