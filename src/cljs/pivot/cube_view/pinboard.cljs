@@ -11,12 +11,12 @@
             [pivot.components :refer [dropdown]]
             [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension]]))
 
-(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim}]
-  (send-query db
-              (assoc cube-view
-                     :split [(assoc dim :limit 100)]
-                     :measures (vector (get-in cube-view [:pinboard :measure])))
-              [:results :pinboard name]))
+(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name operator] :as dim}]
+  (let [q (cond-> (assoc cube-view
+                         :split [(assoc dim :limit 100)]
+                         :measures (vector (get-in cube-view [:pinboard :measure])))
+                  operator (update :filter add-dimension dim))]
+    (send-query db q [:results :pinboard name])))
 
 (defn send-pinboard-queries [db]
   (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions)))
@@ -46,8 +46,7 @@
         (send-pinned-dim-query new-time-dim))))
 
 (defevh :dimension-values-searched [db dim search]
-  (println dim search)
-  db)
+  (send-pinned-dim-query db (assoc dim :operator "search" :value search)))
 
 (defn- pinned-dimension-item [dim result measure]
   (let [segment-value (format-dimension dim result)]
@@ -83,22 +82,25 @@
 (def debounce-dispatch (debounce dispatch 500))
 
 (defn- search-input* [search searching dim]
-  (let [stop #(reset! searching false)]
+  (let [stop #(reset! searching false)
+        on-change #(->> (reset! search %)
+                        (debounce-dispatch :dimension-values-searched dim))
+        clear #(do (when (seq @search) (on-change ""))
+                 (stop))]
     [:div.ui.icon.small.fluid.input.search
      [:input {:type "text" :placeholder (t :input/search) :value @search
-              :on-change #(->> (reset! search (.-target.value %))
-                               (debounce-dispatch :dimension-values-searched dim))
+              :on-change #(on-change (.-target.value %))
               :on-key-down #(case (.-which %)
                               13 (stop)
-                              27 (do (stop) (reset! search ""))
+                              27 (clear)
                               nil)}]
-     [:i.search.icon]]))
+     (if (seq @search)
+       [:i.link.remove.circle.icon {:on-click clear}]
+       [:i.search.icon])]))
 
-; TODO faltaria agregarle soporte para que se oculte en escape
 (def search-input
   (with-meta search-input* {:component-did-mount #(-> % r/dom-node js/$ (.find "input") .focus)}))
 
-; TODO quizas convenga poner el loading en los .items, asi se puede cerrar el panel aun si esta cargando.
 (defn- pinned-dimension-panel* [{:keys [title name] :as dim}]
   (let [searching (r/atom false)
         search (r/atom "")]
@@ -106,7 +108,7 @@
       (let [measure (cube-view :pinboard :measure)
             results (cube-view :results :pinboard name)
             filtered-results (filter-matching @search dim results)]
-        [:div.dimension.panel.ui.basic.segment (loading-class [:results :pinboard name])
+        [:div.dimension.panel.ui.basic.segment (when-not @searching (loading-class [:results :pinboard name]))
          [panel-header (str title " " (title-according-to-dim-type dim))
           (if (time-dimension? dim)
             [time-granularity-button dim]

@@ -69,7 +69,7 @@
                                   :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}}))))
 
   (testing "filter"
-    (testing "query with one :is operator"
+    (testing ":is operator"
       (is (submap? {:filter {:type "selector"
                              :dimension "isRobot"
                              :value "true"}}
@@ -79,7 +79,7 @@
                              :value nil}}
                    (to-druid-query {:filter [ {:name "countryName" :operator "is" :value nil}]}))))
 
-    (testing "query with two filters"
+    (testing "two filters should generate an 'and' filter"
       (is (submap? {:filter {:type "and"
                              :fields [{:type "selector" :dimension "isRobot" :value "true"}
                                       {:type "selector" :dimension "isNew" :value "false"}]}}
@@ -90,18 +90,25 @@
       (is (without? :filter (to-druid-query {:filter [{:name "isRobot"} {:name "isNew"}]})))
       (is (without? :filter (to-druid-query {:filter [{:name "isRobot" :operator "include" :value []}]}))))
 
-    (testing "query with :include operator"
+    (testing ":include operator"
       (is (submap? {:filter {:type "in"
                              :dimension "countryName"
                              :values ["Italy" "France"]}}
                    (to-druid-query {:filter [{:name "countryName" :operator "include" :value ["Italy" "France"]}]}))))
 
-    (testing "query with :exclude operator"
+    (testing ":exclude operator"
       (is (submap? {:filter {:type "not"
                              :field {:type "in"
                                      :dimension "countryName"
                                      :values [nil "France"]}}}
-                   (to-druid-query {:filter [{:name "countryName" :operator "exclude" :value [nil "France"]}]})))))
+                   (to-druid-query {:filter [{:name "countryName" :operator "exclude" :value [nil "France"]}]}))))
+
+    (testing ":search operator"
+      (is (submap? {:filter {:type "search"
+                             :dimension "countryName"
+                             :query {:type "insensitive_contains"
+                                     :value "arg"}}}
+                   (to-druid-query {:filter [{:name "countryName" :operator "search" :value "arg"}]})))))
 
   (testing "sorting"
     (testing "query with one atemporal dimension sorting by other selected metric in ascending order"

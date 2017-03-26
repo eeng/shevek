@@ -85,7 +85,8 @@
     1 (condp = (keyword operator)
         :is {:type "selector" :dimension name :value value}
         :include {:type "in" :dimension name :values value}
-        :exclude {:type "not" :field {:type "in" :dimension name :values value}})
+        :exclude {:type "not" :field {:type "in" :dimension name :values value}}
+        :search {:type "search" :dimension name :query {:type "insensitive_contains" :value value}})
     {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
 
 (defn- convertible-to-druid-filter? [{:keys [operator value]}]
@@ -236,5 +237,11 @@
            {:cube "wikiticker"
             :split [{:name "countryName" :limit 5}]
             :filter [{:name "countryName" :operator "include" :value #{"Italy" "France"}}]
+            :measures [{:name "count" :type "longSum"}]
+            :interval ["2015-09-12" "2015-09-13"]})
+#_(e/query (DruidEngine. broker)
+           {:cube "wikiticker"
+            :split [{:name "countryName" :limit 5}]
+            :filter [{:name "countryName" :operator "search" :value "arg"}]
             :measures [{:name "count" :type "longSum"}]
             :interval ["2015-09-12" "2015-09-13"]})
