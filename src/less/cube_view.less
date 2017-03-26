@@ -50,7 +50,7 @@
           margin-left: 7px;
         }
         .icon:not(.dropdown) {
-          margin: 0 -4px 0 8px;
+          margin: 0 -2px 0 8px;
           &:hover { color: #777; }
         }
         .ellipsis + .menu { right: -10px; } // Aparecía medio descolgado hacia la izquierda sino
@@ -127,11 +127,12 @@
       .top-inputs {
         display: flex;
         .ui.input {
-          height: 29px;
-          margin-left: .3em;
-          input { padding-left: .7em }
+          flex: 1;
+          margin: 0;
         }
-        .icon { line-height: 0.9 }
+        .dropdown.icon { 
+          padding: 10px;
+        }
       }
       .items-container {
         position: relative;

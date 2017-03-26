@@ -7,7 +7,7 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
             [pivot.lib.react :refer [rmap without-propagation]]
-            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension]]
+            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
@@ -95,24 +95,20 @@
 (defn- operator-selector [opts]
   [dropdown [[(t :cubes.operator/include) "include"]
              [(t :cubes.operator/exclude) "exclude"]]
-   {:class "icon left pointing basic compact button"
+   {:class "icon top left pointing basic compact button"
     :on-change #(swap! opts assoc :operator %)}
    [:i.icon {:class (case (@opts :operator)
                       "include" "check square"
                       "exclude" "minus square")}]])
 
-(defn- search-input []
-  [:div.ui.icon.input
-   [:input {:type "text" :placeholder "Search"}]
-   [:i.search.icon]])
-
 (defn- normal-filter-popup [close-popup {:keys [name] :as dim}]
-  (let [opts (r/atom (select-keys dim [:operator :value]))]
+  (let [opts (r/atom (select-keys dim [:operator :value]))
+        search (r/atom "")]
     (fn []
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector opts]
-        [search-input]]
+        [search-input search {:on-change #(console.log dim %) :on-stop close-popup}]]
        [:div.items-container
          [:div.items
           (rfor [result (cube-view :results :filter name)]

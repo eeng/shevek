@@ -80,7 +80,7 @@
      [:input {:type "text" :placeholder (t :input/search) :value @search
               :on-change #(change (.-target.value %))
               :on-key-down #(case (.-which %)
-                              13 (on-stop)
+                              13 (on-stop) ; TODO en el enter habria que tildar una opcion
                               27 (clear)
                               nil)}]
      (if (seq @search)
