@@ -86,15 +86,15 @@
         (run :main-namespace "pivot.app")
         (wait)))
 
-(deftask clj-testing
+(deftask clj-test
   "Continuos automatic testing of the backend."
   []
-  (merge-env! :source-paths #{"test/clj"}
-              :resource-paths #{"test/resources"})
-  (comp (dev)
+  (merge-env! :source-paths #{"test/clj"})
+  (set-env! :resource-paths #{"test/resources"})
+  (comp (watch)
         (alt-test)))
 
-(deftask cljs-testing
+(deftask cljs-test
   "Continuos automatic testing of the frontend."
   []
   (merge-env! :source-paths #{"test/cljs"}

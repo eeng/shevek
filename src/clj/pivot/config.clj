@@ -6,3 +6,6 @@
 
 (defn env [& keys]
   (get-in cfg keys))
+
+(defn env-test? []
+  (= (env :env) :test))
