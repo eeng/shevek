@@ -67,28 +67,30 @@
 (defn- search-button [searching]
   [:i.search.link.icon {:on-click #(swap! searching not)}])
 
-(defn- search-input [searching filtered-results]
+(defn- search-input* []
   (let [search (r/atom nil)]
-    (fn []
-      (when @searching
-        [:div.ui.icon.small.fluid.input.search
-         [:input {:type "text" :placeholder (t :input/search)}]
-         [:i.search.icon]]))))
+    (fn [filtered-results]
+      [:div.ui.icon.small.fluid.input.search
+       [:input {:type "text" :placeholder (t :input/search)}]
+       [:i.search.icon]])))
 
+(def search-input
+  (with-meta search-input* {:component-did-mount #(-> % r/dom-node js/$ (.find "input") .focus)}))
+
+; TODO quizas convenga poner el loading en los .items, asi se puede cerrar el panel aun si esta cargando.
 (defn- pinned-dimension-panel* [{:keys [title name] :as dim}]
   (let [searching (r/atom false)]
     (fn []
       (let [results (cube-view :results :pinboard name)
             measure (cube-view :pinboard :measure)
             filtered-results (r/atom results)]
-        ; TODO quizas convenga poner el loading en los .items, asi se puede cerrar el panel aun si esta cargando.
         [:div.dimension.panel.ui.basic.segment (loading-class [:results :pinboard name])
          [panel-header (str title " " (title-according-to-dim-type dim))
           (if (time-dimension? dim)
             [time-granularity-button dim]
             [search-button searching])
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
-         [search-input searching filtered-results]
+         (when @searching [search-input filtered-results])
          [:div.items {:class (when (empty? results) "empty")}
           (rfor [result @filtered-results]
             [pinned-dimension-item dim result measure])]]))))

@@ -46,14 +46,11 @@
         right: @panel-horizontal-padding;
         text-transform: none;
         font-size: 110%;
-        .icon {
-          margin: 0;
-          margin-left: 5px;
+        .icon.dropdown {
+          margin-left: 7px;
         }
-        .large.icon {
-          margin-right: -4px;
-          margin-top: -2px;
-          color: #e0e0e0;
+        .icon:not(.dropdown) {
+          margin: 0 -4px 0 8px;
           &:hover { color: #777; }
         }
         .ellipsis + .menu { right: -10px; } // Aparecía medio descolgado hacia la izquierda sino
