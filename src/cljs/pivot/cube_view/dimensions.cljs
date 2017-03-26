@@ -51,6 +51,6 @@
          [:div.items
           (for [dim filtered-dims]
             ^{:key (:name dim)}
-            [(controlled-popup (partial dimension-item search-text) dimension-popup
-                               {:position "right center" :distanceAway -30})
+            [controlled-popup (partial dimension-item search-text) dimension-popup
+                               {:position "right center" :distanceAway -30}
              dim])]]))))

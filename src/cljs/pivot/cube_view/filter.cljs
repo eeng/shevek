@@ -150,7 +150,7 @@
   [:div.filter.panel
    [panel-header (t :cubes/filter)]
    (rfor [dim (cube-view :filter)]
-     [(controlled-popup filter-item filter-popup
-                        {:position "bottom center"
-                         :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim))})
+     [controlled-popup filter-item filter-popup
+      {:position "bottom center"
+       :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim))}
       dim])])

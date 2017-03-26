@@ -80,5 +80,5 @@
 (defn split-panel []
   [:div.split.panel
    [panel-header (t :cubes/split)]
-   (rmap (controlled-popup split-item split-popup {:position "bottom center"})
-         (cube-view :split))])
+   (rfor [dim (cube-view :split)]
+     [controlled-popup split-item split-popup {:position "bottom center"} dim])])
