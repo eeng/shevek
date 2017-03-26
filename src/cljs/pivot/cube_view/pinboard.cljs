@@ -75,10 +75,16 @@
             results)
     results))
 
-(defn- search-input* [search]
-  [:div.ui.icon.small.fluid.input.search
-   [:input {:type "text" :placeholder (t :input/search) :on-change #(reset! search (.-target.value %))}]
-   [:i.search.icon]])
+(defn- search-input* [search searching]
+  (let [stop #(reset! searching false)]
+    [:div.ui.icon.small.fluid.input.search
+     [:input {:type "text" :placeholder (t :input/search) :value @search
+              :on-change #(reset! search (.-target.value %))
+              :on-key-down #(case (.-which %)
+                              13 (stop)
+                              27 (do (stop) (reset! search ""))
+                              nil)}]
+     [:i.search.icon]]))
 
 ; TODO faltaria agregarle soporte para que se oculte en escape
 (def search-input
@@ -98,7 +104,7 @@
             [time-granularity-button dim]
             [search-button searching])
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
-         (when @searching [search-input search])
+         (when @searching [search-input search searching])
          (if results
            [:div.items
             (if (seq filtered-results)
