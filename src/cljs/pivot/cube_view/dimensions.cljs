@@ -49,8 +49,6 @@
          (when @searching
            [search-input search {:on-stop #(reset! searching false)}])
          [:div.items
-          (for [dim filtered-dims]
-            ^{:key (:name dim)}
-            [controlled-popup (partial dimension-item search-text) dimension-popup
-                               {:position "right center" :distanceAway -30}
-             dim])]]))))
+          (rmap (controlled-popup (partial dimension-item search-text) dimension-popup
+                                  {:position "right center" :distanceAway -30})
+                filtered-dims)]]))))

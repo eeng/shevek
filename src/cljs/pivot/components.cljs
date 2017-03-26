@@ -61,27 +61,28 @@
                                 (.popup "reposition"))}))
 
 ; TODO quizas se podria dejar de usar el on manual si en el open lo abrimos con js y cerramos con js. Asi se evitaria todo el manejo del click-outside y de paso habria lindas transiciones
-(defn controlled-popup [_ _ {:keys [on-open] :or {on-open identity} :as opts} & _]
-  (let [popup-opts (select-keys opts [:position :distanceAway])
-        opened (r/atom false)
-        negate-and-notify #(let [open (not %)]
-                             (when open (on-open))
-                             open)
-        toggle #(swap! opened negate-and-notify)
-        close #(reset! opened false)
-        handle-click-outside (fn [c e]
-                               (when (and @opened (not (.contains (r/dom-node c) (.-target e))))
-                                 (close)))
-        node-listener (atom nil)]
-    (r/create-class {:reagent-render
-                     (fn [activator popup-content _ & args]
-                       (let [popup-object {:opened? @opened :toggle toggle :close close}]
-                         [:div
-                          (into [(make-popup activator (assoc popup-opts :on "manual")) popup-object] args)
-                          (into [popup-content popup-object] args)]))
-                     :component-did-mount
-                     #(do
-                        (reset! node-listener (partial handle-click-outside %))
-                        (.addEventListener js/document "click" @node-listener true))
-                     :component-will-unmount
-                     #(.removeEventListener js/document "click" @node-listener true)})))
+(defn controlled-popup [activator popup-content {:keys [on-open] :or {on-open identity} :as opts}]
+  (fn [& _]
+    (let [popup-opts (select-keys opts [:position :distanceAway])
+          opened (r/atom false)
+          negate-and-notify #(let [open (not %)]
+                               (when open (on-open))
+                               open)
+          toggle #(swap! opened negate-and-notify)
+          close #(reset! opened false)
+          handle-click-outside (fn [c e]
+                                 (when (and @opened (not (.contains (r/dom-node c) (.-target e))))
+                                   (close)))
+          node-listener (atom nil)]
+      (r/create-class {:reagent-render
+                       (fn [& args]
+                         (let [popup-object {:opened? @opened :toggle toggle :close close}]
+                           [:div
+                            (into [(make-popup activator (assoc popup-opts :on "manual")) popup-object] args)
+                            (into [popup-content popup-object] args)]))
+                       :component-did-mount
+                       #(do
+                          (reset! node-listener (partial handle-click-outside %))
+                          (.addEventListener js/document "click" @node-listener true))
+                       :component-will-unmount
+                       #(.removeEventListener js/document "click" @node-listener true)}))))
