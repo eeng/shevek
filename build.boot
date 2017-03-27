@@ -83,7 +83,7 @@
   []
   (comp (dev-config)
         (build)
-        (run :main-namespace "pivot.app")
+        (run :main-namespace "shevek.app")
         (wait)))
 
 (deftask clj-test

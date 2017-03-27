@@ -1,4 +1,4 @@
-{:require  [pivot.app]
- :init-fns [pivot.app/init]
- :boot-reload {:on-jsload pivot.app/init}
+{:require  [shevek.app]
+ :init-fns [shevek.app/init]
+ :boot-reload {:on-jsload shevek.app/init}
  :compiler-options {:asset-path "js/app.out"}}
