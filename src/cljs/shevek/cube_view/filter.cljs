@@ -87,7 +87,7 @@
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
   (let [value (-> name keyword result)
         label (format-dimension dim result)]
-    [:div.item {:on-click toggle-checkbox-inside}
+    [:div.item.has-checkbox {:on-click toggle-checkbox-inside :title label}
      [checkbox (highlight label search)
       {:checked (some #(= value %) (@filter-opts :value))
        :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)

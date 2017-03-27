@@ -72,7 +72,20 @@
           margin-right: 7px;
         }
         &:not(.no-results) { #cube-view .selectable; }
-        label { padding-bottom: 1px } // Necesario para que se vea el borde .bold en los label de checkboxes
+        &.has-checkbox {
+          padding: 6px 1em 5px; // Un pixel menos abajo por el que le agregué en el segment value para el bold
+          .ui.checkbox {
+            display: block;
+          }
+          .segment-value {
+            padding-bottom: 1px; // Necesario para que se vea el borde .bold en los label de checkboxes
+          }
+        }
+        .segment-value {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
         .bold { border-bottom: 1px solid #7bb1e8 }
       }
     }
@@ -148,17 +161,6 @@
       }
       .items {
         height: 300px;
-        .item {
-          padding: 7px 1em;
-          .ui.checkbox {
-            display: block;
-          }
-          label {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-          }
-        }
       }
     }
 
@@ -245,12 +247,7 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        .segment-value {
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-          padding-right: 10px;
-        }
+        .segment-value { padding-right: 10px; }
         &.no-results {
           font-style: italic;
           .dimmed;
