@@ -7,7 +7,7 @@
             [pivot.i18n :refer [t]]
             [pivot.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
             [pivot.lib.react :refer [rmap without-propagation]]
-            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input]]
+            [pivot.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight]]
             [pivot.cube-view.pinboard :refer [send-pinboard-queries]]
             [pivot.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
@@ -27,10 +27,11 @@
       (send-main-query)
       (send-pinboard-queries)))
 
-(defevh :filter-values-requested [db {:keys [name] :as dim}]
+(defevh :filter-values-requested [db {:keys [name] :as dim} search]
   (send-query db {:cube (cube-view :cube)
-                  :filter [(first (cube-view :filter))]
-                  :split [(assoc dim :limit 100)]
+                  :filter (cond-> [(first (cube-view :filter))]
+                                  (seq search) (conj (assoc dim :operator "search" :value search)))
+                  :split [(assoc dim :limit 50)]
                   :measures [{:type "count" :name "rowCount"}]}
               [:results :filter name]))
 
@@ -83,11 +84,11 @@
          [specific-period-time-filter dim])])))
 
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
-(defn- dimension-value-item [{:keys [name] :as dim} result filter-opts]
+(defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
   (let [value (-> name keyword result)
         label (format-dimension dim result)]
     [:div.item {:on-click toggle-checkbox-inside}
-     [checkbox label
+     [checkbox (highlight label search)
       {:checked (some #(= value %) (@filter-opts :value))
        :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)
        :name (str name "-" (str/slug label))}]]))
@@ -108,11 +109,12 @@
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector opts]
-        [search-input search {:on-change #(console.log dim %) :on-stop close}]]
+        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %) :on-stop close}]]
        [:div.items-container
          [:div.items
-          (rfor [result (cube-view :results :filter name)]
-            [dimension-value-item dim result opts])]]
+          (rfor [result (->> (cube-view :results :filter name)
+                             (filter-matching @search (partial format-dimension dim)))]
+            [dimension-value-item dim result opts @search])]]
        [:div
         [:button.ui.primary.compact.button
          {:on-click #(do (close) (dispatch :filter-options-changed dim @opts))}
@@ -147,5 +149,5 @@
    (rfor [dim (cube-view :filter)]
      [(controlled-popup filter-item filter-popup
                         {:position "bottom center"
-                         :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim))})
+                         :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim ""))})
       dim])])

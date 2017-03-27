@@ -87,7 +87,7 @@
        [:i.link.remove.circle.icon {:on-click clear}]
        [:i.search.icon])]))
 
-; El setTimeout es necesario xq sino no funcaba el focus en el search dentro de filter popups. 
+; El setTimeout es necesario xq sino no funcaba el focus en el search dentro de filter popups.
 (def search-input
   (with-meta search-input*
     {:component-did-mount (fn [rc] (js/setTimeout #(-> rc r/dom-node js/$ (.find "input") .focus) 0))}))
@@ -97,3 +97,5 @@
     (let [[_ pre bold post] (re-find (re-pattern (str "(?i)(.*?)(" (regex-escape search) ")(.*)")) value)]
       [:div.segment-value pre [:span.bold bold] post])
     [:div.segment-value value]))
+
+(def debounce-dispatch (debounce dispatch 500))

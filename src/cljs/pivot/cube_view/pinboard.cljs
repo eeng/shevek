@@ -8,7 +8,7 @@
             [pivot.rpc :refer [loading-class]]
             [pivot.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
             [pivot.components :refer [dropdown]]
-            [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension filter-matching search-button search-input highlight]]))
+            [pivot.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch]]))
 
 (defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name operator] :as dim}]
   (let [q (cond-> (assoc cube-view
@@ -67,8 +67,6 @@
   [dropdown (map (juxt second first) periods)
    {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
    [:i.ellipsis.horizontal.link.icon]])
-
-(def debounce-dispatch (debounce dispatch 500))
 
 (defn- pinned-dimension-panel* [{:keys [title name] :as dim}]
   (let [searching (r/atom false)
