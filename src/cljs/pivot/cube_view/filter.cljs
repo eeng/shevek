@@ -101,29 +101,28 @@
                       "include" "check square"
                       "exclude" "minus square")}]])
 
-(defn- normal-filter-popup [close-popup {:keys [name] :as dim}]
+(defn- normal-filter-popup [{:keys [close]} {:keys [name] :as dim}]
   (let [opts (r/atom (select-keys dim [:operator :value]))
         search (r/atom "")]
     (fn []
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector opts]
-        [search-input search {:on-change #(console.log dim %) :on-stop close-popup}]]
+        [search-input search {:on-change #(console.log dim %) :on-stop close}]]
        [:div.items-container
          [:div.items
           (rfor [result (cube-view :results :filter name)]
             [dimension-value-item dim result opts])]]
        [:div
         [:button.ui.primary.compact.button
-         {:on-click #(do (close-popup) (dispatch :filter-options-changed dim @opts))}
+         {:on-click #(do (close) (dispatch :filter-options-changed dim @opts))}
          (t :answer/ok)]
-        [:button.ui.compact.button {:on-click (without-propagation close-popup)} (t :answer/cancel)]]])))
+        [:button.ui.compact.button {:on-click (without-propagation close)} (t :answer/cancel)]]])))
 
-(defn- filter-popup [{:keys [close opened?]} dim]
-  [:div.ui.special.popup {:style {:display (if opened? "block" "none")}}
-   (if (time-dimension? dim)
-     [time-filter-popup dim]
-     [normal-filter-popup close dim])])
+(defn- filter-popup [popup dim]
+  (if (time-dimension? dim)
+    [time-filter-popup dim]
+    [normal-filter-popup popup dim]))
 
 (defn- filter-title [{:keys [title selected-period operator value] :as dim}]
   (if (time-dimension? dim)

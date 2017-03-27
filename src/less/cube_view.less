@@ -74,9 +74,6 @@
         &:not(.no-results) { #cube-view .selectable; }
         .bold { border-bottom: 1px solid #7bb1e8 }
       }
-      .popup {
-        padding: 0;
-      }
     }
 
     .search.input {
@@ -88,6 +85,15 @@
   .dimensions {
     flex: 71 1 0%;
     .segment-value { display: inline }
+    .popup-content {
+      .buttons { white-space: nowrap; }
+      text-align: center;
+      .details {
+        margin-top: .8em;
+        padding-top: .4em;
+        border-top: @panel-separator;
+      }
+    }
   }
   .measures { flex: 29 1 0%; }
   .dimensions, .measures { padding-bottom: 8px; }
@@ -130,15 +136,15 @@
           flex: 1;
           margin: 0;
         }
-        .dropdown.icon { 
+        .dropdown.icon {
           padding: 10px;
         }
       }
       .items-container {
         position: relative;
-        margin: .7em -1em 1em -1em;
+        margin: .7em -1em 0 -1em;
+        padding-bottom: .9em;
         .overflow-shadow;
-        padding-bottom: 1px; // Sino se producía es como que quedaba un px de texto a veces x arriba de la sombra
       }
       .items {
         max-height: 300px;

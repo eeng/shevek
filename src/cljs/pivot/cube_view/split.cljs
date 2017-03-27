@@ -49,9 +49,9 @@
 (defn- split-popup [_ dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by]))
         posible-sort-bys (conj (current-cube :measures) (clean-split dim))]
-    (fn [{:keys [close opened?]} dim]
+    (fn [{:keys [close]} dim]
       (let [desc (get-in @opts [:sort-by :descending])]
-        [:div.ui.special.popup {:style {:display (if opened? "block" "none")}}
+        [:div
          [:div.ui.form
           [:div.field
            [:label (t :cubes/sort-by)]

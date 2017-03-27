@@ -51,16 +51,6 @@
 (defn toggle-checkbox-inside [e]
   (-> e .-target js/$ (.find ".checkbox input") .click))
 
-; TODO el reposition solo se deberia hacer :on "manual"
-(defn make-popup [activator popup-opts]
-  (with-meta activator
-    {:component-did-mount #(-> % dom-node js/$
-                               (.popup (clj->js (assoc popup-opts :inline true)))
-                               (.popup "reposition"))
-     :component-did-update #(-> % dom-node js/$
-                                (.popup "reposition"))}))
-
-; TODO quizas se podria dejar de usar el on manual si en el open lo abrimos con js y cerramos con js. Asi se evitaria todo el manejo del click-outside y de paso habria lindas transiciones
 (defn controlled-popup [activator popup-content {:keys [on-open] :or {on-open identity} :as opts}]
   (fn [& _]
     (let [popup-opts (select-keys opts [:position :distanceAway])
@@ -73,16 +63,19 @@
           handle-click-outside (fn [c e]
                                  (when (and @opened (not (.contains (r/dom-node c) (.-target e))))
                                    (close)))
-          node-listener (atom nil)]
-      (r/create-class {:reagent-render
-                       (fn [& args]
-                         (let [popup-object {:opened? @opened :toggle toggle :close close}]
-                           [:div
-                            (into [(make-popup activator (assoc popup-opts :on "manual")) popup-object] args)
-                            (into [popup-content popup-object] args)]))
-                       :component-did-mount
-                       #(do
-                          (reset! node-listener (partial handle-click-outside %))
-                          (.addEventListener js/document "click" @node-listener true))
-                       :component-will-unmount
-                       #(.removeEventListener js/document "click" @node-listener true)}))))
+          node-listener (atom nil)
+          show-popup #(-> % dom-node js/$ (.find "> *:first")
+                          (.popup (clj->js (assoc popup-opts :inline true :on "manual")))
+                          (.popup "show"))]
+      (r/create-class
+       {:reagent-render
+        (fn [& args]
+          (let [popup-object {:opened? @opened :toggle toggle :close close}]
+            [:div
+             (into [activator popup-object] args)
+             (when @opened [:div.ui.special.popup (into [popup-content popup-object] args)])]))
+        :component-did-mount #(do
+                                 (reset! node-listener (partial handle-click-outside %))
+                                 (.addEventListener js/document "click" @node-listener true))
+        :component-did-update #(when @opened (show-popup %))
+        :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)}))))
