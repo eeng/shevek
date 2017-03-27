@@ -2,7 +2,7 @@
   :source-paths   #{"src/clj" "src/cljc" "src/cljs" "src/less"}
   :resource-paths #{"resources"}
   :dependencies   '[[org.clojure/clojurescript "1.9.494"]
-                    [adzerk/boot-cljs "1.7.228-2" :scope "test"]
+                    [adzerk/boot-cljs "2.0.0" :scope "test"]
                     [adzerk/boot-reload "0.5.1" :scope "test"]
                     [com.cemerick/piggieback "0.2.1" :scope "test"] ; Needed by boot-cljs-repl
                     [weasel "0.7.0" :scope "test"] ; Needed by boot-cljs-repl
