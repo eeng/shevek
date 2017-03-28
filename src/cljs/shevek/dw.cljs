@@ -3,12 +3,13 @@
   (:require [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.rpc :as rpc]
-            [shevek.lib.collections :refer [reverse-merge detect replace-when]]
+            [shevek.lib.collections :refer [reverse-merge detect]]
             [shevek.lib.dates :as d :refer [parse-time to-iso8601]]
             [shevek.lib.collections :refer [detect]]
             [cljs-time.core :as t]
             [cljs-time.format :as f]
-            [reflow.db :as db]))
+            [reflow.db :as db]
+            [com.rpl.specter :refer [setval ALL]]))
 
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
@@ -69,7 +70,7 @@
   (vec (remove #(dim=? dim %) coll)))
 
 (defn replace-dimension [coll dim]
-  (vec (replace-when (partial dim=? dim) (constantly dim) coll)))
+  (setval [ALL (partial dim=? dim)] dim coll))
 
 (defn to-interval [selected-period max-time]
   (let [now (d/now)

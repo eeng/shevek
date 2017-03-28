@@ -31,7 +31,8 @@
                     [secretary "1.2.3"]
                     [funcool/cuerdas "2.0.3"]
                     [com.andrewmcveigh/cljs-time "0.5.0-alpha2"]
-                    [com.taoensso/timbre "4.8.0"]])
+                    [com.taoensso/timbre "4.8.0"]
+                    [com.rpl/specter "1.0.0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

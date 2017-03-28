@@ -64,9 +64,8 @@
 
 (defn- filter-matching [search get-value results]
   (if (seq search)
-    (filter #(re-find (re-pattern (str "(?i)" (regex-escape search)))
-                      (get-value %))
-            results)
+    (let [pattern (re-pattern (str "(?i)" (regex-escape search)))]
+      (filter #(re-find pattern (get-value %)) results))
     results))
 
 (defn- search-button [searching]

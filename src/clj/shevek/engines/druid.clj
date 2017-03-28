@@ -47,7 +47,6 @@
 (defn send-query-with-single-result [& args]
   (-> (apply send-query args) first :result))
 
-; TODO usar specter para transformar las keys de forma general
 (defn time-boundary [host ds]
   (-> (send-query-with-single-result host {:queryType "timeBoundary" :dataSource ds})
       (clojure.set/rename-keys {:minTime :min-time :maxTime :max-time})))
