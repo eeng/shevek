@@ -13,6 +13,7 @@
             [shevek.cube-view.pinboard :refer [pinboard-panels]]))
 
 ;; DB model example
+; TODO Esta resultando molesto acordarse de actualizar esto. Quizas seria mejor usar clojure.spec asi es obligatorio actualizarlo y de paso sirve para prevenir errores, ej se podria especificar que filter y split son vectors, asi nunca pasa que algun update me lo cambia a seq sin querer.
 #_{:cubes {"wikiticker"
            {:dimensions [{:name "page"}]
             :measures [{:name "added"} {:name "deleted"}]
@@ -24,9 +25,9 @@
                :measures [{:name "added"}] ; Selected measures in the left panel
                :pinboard {:measure "channel" ; Selected measure for the pinboard
                           :dimensions [{:name "channel"}]} ; Pinned dimensions
-               :results {:main {...druid response...}
-                         :pinboard {"dim1-name" {...druid response...}
-                                    "dim2-name" {...druid response...}}}}}
+               :results {:main [{:region "North", :added 10} {:region "South", :added 20}]
+                         :pinboard {"dim1-name" [...idem main results...]
+                                    "dim2-name" [...idem main results...]}}}}
 
 (defn- build-time-filter [{:keys [dimensions time-boundary] :as cube}]
   (assoc (dw/time-dimension dimensions)

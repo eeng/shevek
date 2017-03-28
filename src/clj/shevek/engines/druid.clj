@@ -13,6 +13,7 @@
 
 ; TODO en el :context de la q se le puede pasar un timeout
 ; TODO ver como hacer para no loggear en testing
+; TODO separar las funciones low-level como esta de las hig-level que usa el engine
 (defn- send-query [host q]
   (log/debug "Sending query to druid:\n" (pp-str q))
   (:body (http/post (str host "/druid/v2") {:content-type :json :form-params q :as :json})))

@@ -103,6 +103,7 @@
          distinct
          (str/join " - "))))
 
+; TODO esto no se si me convence. Varias veces pasó que no entendia xq no le llegaba algo al server y era por esto. Quizas convenga mejor validar con clojure.spec.
 (defn- only-dw-query-keys [dim]
   (select-keys dim [:name :type :granularity :limit :sort-by :operator :value]))
 
