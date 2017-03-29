@@ -110,7 +110,7 @@
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector opts]
-        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %)}]]
+        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %) :on-stop close}]]
        [:div.items-container
          [:div.items
           (rfor [result (->> (cube-view :results :filter name)

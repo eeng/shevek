@@ -4,10 +4,10 @@
 (def Settings
   {:lang s/Str})
 
-(def Field {:name s/Str :title s/Str})
-
 (def Dimension
-  (assoc Field :type s/Str))
+  {:name s/Str
+   :title s/Str
+   :type s/Str})
 
 (def Measure Dimension)
 
