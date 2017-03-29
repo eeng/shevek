@@ -5,14 +5,14 @@
 
 (defonce app-db (r/atom {}))
 
-(defn- get-in-db [ks]
-  (clojure.core/get-in @app-db ks))
+(defn- get-in-db [ks default]
+  (clojure.core/get-in @app-db ks default))
 
-(defn get-in [ks]
-  @(r/track get-in-db ks))
+(defn get-in [ks & [default]]
+  @(r/track get-in-db ks default))
 
 (defn get [k & [default]]
-  (or (get-in [k]) default))
+  (get-in [k] default))
 
 (defn debug []
   [:pre (with-out-str (pprint @app-db))])

@@ -2,6 +2,7 @@
   (:require [reagent.core :as r]
             [shevek.layout :refer [layout]]
             [shevek.settings :refer [load-settings]]
+            [shevek.db :as db]
             [reflow.core :as reflow]
             [reflow.interceptors :as i]
             [secretary.core :as secretary]
@@ -16,6 +17,6 @@
 
 (defn init []
   (enable-console-print!)
-  (reflow/init (-> (i/router) (i/logger)))
+  (reflow/init (-> (i/router) (i/logger) (db/schema-checker)))
   (load-settings)
   (r/render-component [layout] (.getElementById js/document "app")))

@@ -113,7 +113,7 @@
 (def translate (tongue/build-translate translations))
 
 (defn lang []
-  (keyword (db/get :lang "en")))
+  (keyword (db/get-in [:settings :lang] "en")))
 
 (defn t [& args]
   (apply translate (lang) args))
