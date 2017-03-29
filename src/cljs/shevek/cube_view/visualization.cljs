@@ -69,7 +69,7 @@
      (when icon-after? [:span title])]))
 
 (defn- pivot-table-visualization []
-  (let [split (cube-view :split-arrived)
+  (let [split (cube-view :arrived-split)
         measures (cube-view :measures)
         results (cube-view :results :main)
         max-values (calculate-max-values measures results)]
@@ -89,6 +89,6 @@
        [:div.icon-hint
         [:i.warning.circle.icon]
         [:div.text (t :cubes/no-measures)]]
-       (if (empty? (cube-view :split-arrived))
+       (if (empty? (cube-view :arrived-split))
          [totals-visualization]
          [pivot-table-visualization])))])

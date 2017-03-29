@@ -47,7 +47,7 @@
   {:cube s/Str
    (s/optional-key :filter) [Filter]
    (s/optional-key :split) [Split]
-   (s/optional-key :split-arrived) [Split]
+   (s/optional-key :arrived-split) [Split]
    (s/optional-key :measures) [Measure]
    (s/optional-key :pinboard) {:measure Measure :dimensions [Split]}
    (s/optional-key :results) {(s/enum :main :pinboard :filter) (s/cond-pre [Result] {s/Str [Result]})}

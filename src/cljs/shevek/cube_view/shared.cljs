@@ -22,10 +22,10 @@
       (get (current-cube-name))
       cube-key))
 
-; Copio el split a split-arrived asi sólo se rerenderiza la table cuando llegan los resultados. Sino se re-renderizaría dos veces, primero inmediatamente luego de splitear y despues cuando llegan los resultados, provocando un pantallazo molesto.
+; Copio el split a arrived-split asi sólo se rerenderiza la table cuando llegan los resultados. Sino se re-renderizaría dos veces, primero inmediatamente luego de splitear y despues cuando llegan los resultados, provocando un pantallazo molesto.
 (defevh :query-executed [db results results-keys]
   (-> (assoc-in db (into [:cube-view] results-keys) results)
-      (assoc-in [:cube-view :split-arrived] (-> db :cube-view :split))
+      (assoc-in [:cube-view :arrived-split] (-> db :cube-view :split))
       (rpc/loaded results-keys)))
 
 (defn send-query [db {:keys [measures] :as cube-view} results-keys]
