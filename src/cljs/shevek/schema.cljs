@@ -49,7 +49,6 @@
    (s/optional-key :settings) Settings
    (s/optional-key :cube-view) CubeView})
 
-; TODO Esto solo habria que correrlo solo en dev me parece
 (defn check-schema [db]
   (try
     (s/validate AppDB db)

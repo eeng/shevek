@@ -17,6 +17,6 @@
 
 (defn init []
   (enable-console-print!)
-  (reflow/init (-> (i/router) (i/logger) (schema/checker)))
+  (reflow/init (-> (i/router) (i/dev-only i/logger) (i/dev-only schema/checker)))
   (load-settings)
   (r/render-component [layout] (.getElementById js/document "app")))

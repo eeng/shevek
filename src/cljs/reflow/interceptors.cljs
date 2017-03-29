@@ -3,17 +3,15 @@
             [clojure.data :as data]))
 
 (defn logger [interceptor]
-  (if ^boolean goog.DEBUG
-    (fn [db event]
-      (log "Handling event" event "...")
-      (let [new-db (interceptor db event)
-            [only-before only-after] (data/diff db new-db)
-            db-changed? (or (some? only-before) (some? only-after))]
-        (if db-changed?
-          (log "Finished event with changes: before" only-before "after" only-after)
-          (log "Finished event with no changes."))
-        new-db))
-    interceptor))
+  (fn [db event]
+    (log "Handling event" event "...")
+    (let [new-db (interceptor db event)
+          [only-before only-after] (data/diff db new-db)
+          db-changed? (or (some? only-before) (some? only-after))]
+      (if db-changed?
+        (log "Finished event with changes: before" only-before "after" only-after)
+        (log "Finished event with no changes."))
+      new-db)))
 
 (defn recorder [interceptor]
   (fn [db event]
@@ -30,3 +28,8 @@
     (let [interceptor (@event-handlers eid)]
       (assert interceptor (str "No handler found for event " eid))
       (apply interceptor db ev-data))))
+
+(defn dev-only [next-interceptor interceptor]
+  (if ^boolean goog.DEBUG
+    (interceptor next-interceptor)
+    next-interceptor))
