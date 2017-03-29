@@ -49,7 +49,8 @@
 
 (defn time-boundary [host ds]
   (-> (send-query-with-single-result host {:queryType "timeBoundary" :dataSource ds})
-      (clojure.set/rename-keys {:minTime :min-time :maxTime :max-time})))
+      (clojure.set/rename-keys {:maxTime :max-time})
+      (dissoc :minTime)))
 
 (defn- assoc-if-seq [map key val]
   (cond-> map

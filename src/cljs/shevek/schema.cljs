@@ -11,6 +11,17 @@
 
 (def Measure Dimension)
 
+(def DimensionConfig
+  (assoc Dimension
+         :cardinality (s/maybe s/Int)))
+
+(def Cube
+  {:name s/Str
+   :title s/Str
+   :dimensions [DimensionConfig]
+   :measures [Measure]
+   :time-boundary {:max-time goog.date.DateTime}})
+
 (def Split
   (assoc Dimension
          :limit (s/cond-pre s/Int s/Str)
@@ -45,7 +56,7 @@
 (def AppDB
   {(s/optional-key :page) s/Keyword
    (s/optional-key :loading) {(s/cond-pre s/Keyword [s/Any]) s/Bool}
-   (s/optional-key :cubes) {s/Str {s/Keyword s/Any}} ; TODO falta describir mejor estos cubes
+   (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) Settings
    (s/optional-key :cube-view) CubeView})
 
