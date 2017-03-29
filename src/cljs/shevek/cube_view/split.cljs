@@ -6,11 +6,12 @@
             [shevek.i18n :refer [t]]
             [shevek.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension find-dimension]]
             [shevek.lib.react :refer [rmap without-propagation]]
-            [shevek.cube-view.shared :refer [panel-header current-cube cube-view send-main-query]]
+            [shevek.cube-view.shared :refer [panel-header current-cube cube-view send-main-query clean-dim]]
             [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select]]))
 
 ; TODO el limit distinto no funca bien cuando se reemplaza el filter
+; TODO permitir elegir otras granularidades en el popup
 (defn- init-splitted-dim [dim {:keys [cube-view]}]
   (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
     (cond-> (assoc dim
@@ -35,9 +36,6 @@
   (-> (update-in db [:cube-view :split] replace-dimension (merge dim opts))
       (send-main-query)))
 
-(defn clean-split [dim]
-  (select-keys dim [:name :title :type]))
-
 (defevh :splits-sorted-by [db sort-bys descending]
   (-> (update-in db [:cube-view :split]
                  (fn [splits]
@@ -48,7 +46,7 @@
 
 (defn- split-popup [_ dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by]))
-        posible-sort-bys (conj (current-cube :measures) (clean-split dim))]
+        posible-sort-bys (conj (current-cube :measures) (clean-dim dim))]
     (fn [{:keys [close]} dim]
       (let [desc (get-in @opts [:sort-by :descending])]
         [:div

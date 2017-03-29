@@ -12,7 +12,7 @@
 
 (defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name operator] :as dim}]
   (let [q (cond-> (assoc cube-view
-                         :split [(assoc dim :limit 100)]
+                         :split [dim]
                          :measures (vector (get-in cube-view [:pinboard :measure])))
                   operator (update :filter add-dimension dim))]
     (send-query db q [:results :pinboard name])))
@@ -21,9 +21,8 @@
   (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions)))
 
 (defn init-pinned-dim [dim]
-  (if (time-dimension? dim)
-    (assoc dim :granularity "PT6H" :descending true) ; Default granularity
-    dim))
+  (cond-> (assoc dim :limit 100)
+          (time-dimension? dim) (assoc :granularity "PT6H" :sort-by (assoc dim :descending true))))
 
 (defevh :dimension-pinned [db dim]
   (let [dim (init-pinned-dim dim)]

@@ -6,7 +6,7 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.lib.react :refer [rmap]]
             [shevek.components :refer [controlled-popup]]
-            [shevek.cube-view.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
+            [shevek.cube-view.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight clean-dim]]))
 
 (defn dimension-popup-button [{:keys [close]} color icon event name]
   [:button.ui.circular.icon.button
@@ -16,7 +16,7 @@
 
 ; TODO Pivot hace una query para traer la cardinality exacta dependiente de los filtros. La que tengo aca es para toda la historia y es aproximada.
 (defn- dimension-popup [popup {:keys [cardinality] :as dim}]
-  (let [dim (select-keys dim [:name :title])]
+  (let [dim (clean-dim dim)]
     [:div.popup-content
      [:div.buttons
       [dimension-popup-button popup "green" "filter" :dimension-added-to-filter dim]

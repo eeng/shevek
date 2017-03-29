@@ -7,12 +7,12 @@
             [shevek.i18n :refer [t]]
             [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
             [shevek.lib.react :refer [rmap without-propagation]]
-            [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight]]
+            [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight clean-dim]]
             [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
 (defn init-filtered-dim [dim]
-  (assoc dim :operator "include"))
+  (assoc (clean-dim dim) :operator "include"))
 
 (defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
   (-> (update-in db [:cube-view :filter] add-dimension (init-filtered-dim dim))

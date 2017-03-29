@@ -4,33 +4,16 @@
             [reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
-            [shevek.cube-view.shared :refer [send-main-query]]
+            [shevek.cube-view.shared :refer [send-main-query clean-dim]]
             [shevek.cube-view.dimensions :refer [dimensions-panel]]
             [shevek.cube-view.measures :refer [measures-panel]]
-            [shevek.cube-view.filter :refer [filter-panel]]
+            [shevek.cube-view.filter :refer [filter-panel init-filtered-dim]]
             [shevek.cube-view.split :refer [split-panel]]
             [shevek.cube-view.visualization :refer [visualization-panel]]
             [shevek.cube-view.pinboard :refer [pinboard-panels]]))
 
-;; DB model example
-; TODO Esta resultando molesto acordarse de actualizar esto. Quizas seria mejor usar clojure.spec asi es obligatorio actualizarlo y de paso sirve para prevenir errores, ej se podria especificar que filter y split son vectors, asi nunca pasa que algun update me lo cambia a seq sin querer.
-#_{:cubes {"wikiticker"
-           {:dimensions [{:name "page"}]
-            :measures [{:name "added"} {:name "deleted"}]
-            :time-boundary {:max-time "..."}}}
-   :cube-view {:cube "wikitiker"
-               :filter [{:name "__time" :selected-period :latest-day}
-                        {:name "countryName" :include ["Italy"]}]
-               :split [{:name "region" :sort-by {:name "count" :descending true}}]
-               :measures [{:name "added"}] ; Selected measures in the left panel
-               :pinboard {:measure "channel" ; Selected measure for the pinboard
-                          :dimensions [{:name "channel"}]} ; Pinned dimensions
-               :results {:main [{:region "North", :added 10} {:region "South", :added 20}]
-                         :pinboard {"dim1-name" [...idem main results...]
-                                    "dim2-name" [...idem main results...]}}}}
-
 (defn- build-time-filter [{:keys [dimensions time-boundary] :as cube}]
-  (assoc (dw/time-dimension dimensions)
+  (assoc (clean-dim (dw/time-dimension dimensions))
          :max-time (:max-time time-boundary)
          :selected-period :latest-day))
 
@@ -39,7 +22,7 @@
       (assoc :filter [(build-time-filter cube)]
              :split []
              :measures (->> measures (take 3) vec)
-             :pinboard {:measure (first measures)})
+             :pinboard {:measure (first measures) :dimensions []})
       (->> (assoc db :cube-view))))
 
 (defevh :cube-selected [db cube]

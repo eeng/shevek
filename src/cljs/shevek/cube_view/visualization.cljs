@@ -8,8 +8,7 @@
             [shevek.lib.react :refer [rmap with-react-keys]]
             [shevek.lib.collections :refer [detect]]
             [shevek.rpc :as rpc]
-            [shevek.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result?]]
-            [shevek.cube-view.split :refer [clean-split]]))
+            [shevek.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result? clean-dim]]))
 
 (defn- sort-results-according-to-selected-measures [result]
   (map #(assoc % :value (format-measure % result))
@@ -56,7 +55,7 @@
           (map (comp keyword :name) measures)))
 
 (defn- sortable-th [title on-click-sort-splits-by split opts]
-  (let [on-click-sort-splits-by (map clean-split on-click-sort-splits-by)
+  (let [on-click-sort-splits-by (map clean-dim on-click-sort-splits-by)
         sort-bys (map (comp :name :sort-by) split)
         descendings (->> split (map (comp :descending :sort-by)) distinct)
         show-icon? (and (= sort-bys (map :name on-click-sort-splits-by))

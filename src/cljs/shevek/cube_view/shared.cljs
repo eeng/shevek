@@ -98,3 +98,6 @@
     [:div.segment-value value]))
 
 (def debounce-dispatch (debounce dispatch 500))
+
+(defn clean-dim [dim]
+  (select-keys dim [:name :title :type]))
