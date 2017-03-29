@@ -110,7 +110,7 @@
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector opts]
-        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %) :on-stop close}]]
+        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %)}]]
        [:div.items-container
          [:div.items
           (rfor [result (->> (cube-view :results :filter name)
@@ -118,9 +118,14 @@
             [dimension-value-item dim result opts @search])]]
        [:div
         [:button.ui.primary.compact.button
-         {:on-click #(do (close) (dispatch :filter-options-changed dim @opts))}
+         {:on-click #(if (empty? (@opts :value))
+                       (dispatch :dimension-removed-from-filter dim)
+                       (dispatch :filter-options-changed dim @opts))
+          :class (when (= (seq (@opts :value)) (seq (dim :value))) "disabled")}
          (t :answer/ok)]
-        [:button.ui.compact.button {:on-click (without-propagation close)} (t :answer/cancel)]]])))
+        [:button.ui.compact.button
+         {:on-click (without-propagation close)}
+         (t :answer/cancel)]]])))
 
 (defn- filter-popup [popup dim]
   (if (time-dimension? dim)
@@ -153,6 +158,8 @@
      (rfor [dim (cube-view :filter)]
        [(controlled-popup filter-item filter-popup
                           {:position "bottom center"
-                           :init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 500))
-                           :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim ""))})
+                           :init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 250))
+                           :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim ""))
+                           :on-close #(when (and (not (time-dimension? dim)) (empty? (dim :value)))
+                                        (dispatch :dimension-removed-from-filter dim))})
         dim])]))
