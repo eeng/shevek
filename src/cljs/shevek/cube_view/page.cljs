@@ -12,9 +12,8 @@
             [shevek.cube-view.visualization :refer [visualization-panel]]
             [shevek.cube-view.pinboard :refer [pinboard-panels]]))
 
-(defn- build-time-filter [{:keys [dimensions time-boundary] :as cube}]
+(defn- build-time-filter [{:keys [dimensions] :as cube}]
   (assoc (clean-dim (dw/time-dimension dimensions))
-         :max-time (:max-time time-boundary)
          :selected-period :latest-day))
 
 (defn- init-cube-view [{:keys [cube-view] :as db} {:keys [measures] :as cube}]

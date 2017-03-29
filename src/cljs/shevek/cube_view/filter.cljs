@@ -7,7 +7,7 @@
             [shevek.i18n :refer [t]]
             [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
             [shevek.lib.react :refer [rmap without-propagation]]
-            [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight clean-dim]]
+            [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight clean-dim current-cube]]
             [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
@@ -53,7 +53,7 @@
                            :on-mouse-out #(reset! showed-period selected-period)}
         (available-relative-periods period)])]])
 
-(defn- relative-period-time-filter [{:keys [selected-period max-time] :as dim}]
+(defn- relative-period-time-filter [{:keys [selected-period] :as dim}]
   (let [showed-period (r/atom selected-period)]
     (fn []
       [:div.relative.period-type
@@ -63,7 +63,7 @@
         [:current-day :current-week :current-month :current-quarter :current-year]]
        [period-buttons dim showed-period (t :cubes.period/previous)
         [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]
-       [:div.ui.label (format-period @showed-period max-time)]])))
+       [:div.ui.label (format-period @showed-period (current-cube :time-boundary :max-time))]])))
 
 (defn- specific-period-time-filter []
   [:div.specific.period-type "TODO"])

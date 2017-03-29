@@ -17,10 +17,10 @@
 (defn current-cube-name []
   (cube-view :cube))
 
-(defn current-cube [cube-key]
+(defn current-cube [& keys]
   (-> (db/get :cubes)
       (get (current-cube-name))
-      cube-key))
+      (get-in keys)))
 
 ; Copio el split a arrived-split asi sólo se rerenderiza la table cuando llegan los resultados. Sino se re-renderizaría dos veces, primero inmediatamente luego de splitear y despues cuando llegan los resultados, provocando un pantallazo molesto.
 (defevh :query-executed [db results results-keys]
@@ -32,7 +32,7 @@
   (if (seq measures)
     (do
       (rpc/call "dw/query"
-                :args [(dw/to-dw-query cube-view)]
+                :args [(dw/to-dw-query cube-view (get-in db [:cubes (current-cube-name) :time-boundary :max-time]))]
                 :handler #(dispatch :query-executed % results-keys))
       (rpc/loading db results-keys))
     db))

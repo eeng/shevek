@@ -30,7 +30,6 @@
 
 (def TimeFilter
   (assoc Dimension
-         :max-time s/Any ; TODO no me convence el max-time aquí xq se persistiria con los filtros, usar el del cubo directamente
          :selected-period s/Keyword))
 
 (def NormalFilter
