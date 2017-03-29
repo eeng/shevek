@@ -14,8 +14,9 @@
 (defn init-filtered-dim [dim]
   (assoc dim :operator "include"))
 
-(defevh :dimension-added-to-filter [db dim]
-  (update-in db [:cube-view :filter] add-dimension (init-filtered-dim dim)))
+(defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
+  (-> (update-in db [:cube-view :filter] add-dimension (init-filtered-dim dim))
+      (assoc-in [:cube-view :last-added-filter] [name (js/Date.)])))
 
 (defevh :dimension-removed-from-filter [db dim]
   (-> (update-in db [:cube-view :filter] remove-dimension dim)
@@ -143,11 +144,15 @@
      [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
    (filter-title dim)])
 
+; TODO Lo del init-open? no me parece muy robusto ni prolijo, pero es lo único que se me ocurre por ahora. Revisar.
 (defn filter-panel []
-  [:div.filter.panel
-   [panel-header (t :cubes/filter)]
-   (rfor [dim (cube-view :filter)]
-     [(controlled-popup filter-item filter-popup
-                        {:position "bottom center"
-                         :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim ""))})
-      dim])])
+  (let [[last-added-filter last-added-at] (cube-view :last-added-filter)
+        added-ms-ago (- (js/Date.) last-added-at)]
+    [:div.filter.panel
+     [panel-header (t :cubes/filter)]
+     (rfor [dim (cube-view :filter)]
+       [(controlled-popup filter-item filter-popup
+                          {:position "bottom center"
+                           :init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 500))
+                           :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim ""))})
+        dim])]))
