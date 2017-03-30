@@ -30,7 +30,9 @@
 
 (def TimeFilter
   (assoc Dimension
+         :name (s/eq "__time")
          :selected-period s/Keyword))
+
 
 (def NormalFilter
   (assoc Dimension
@@ -44,7 +46,7 @@
 
 (def CubeView
   {:cube s/Str
-   (s/optional-key :filter) [Filter]
+   (s/optional-key :filter) [(s/one TimeFilter "tf") NormalFilter]
    (s/optional-key :split) [Split]
    (s/optional-key :arrived-split) [Split]
    (s/optional-key :measures) [Measure]
@@ -60,11 +62,9 @@
    (s/optional-key :cube-view) CubeView})
 
 (defn check-schema [db]
-  (try
-    (s/validate AppDB db)
-    (catch js/Error e
-      (console.log e)
-      db)))
+  (if-let [result (s/check AppDB db)]
+    (console.log "[WARN] Invalid Schema:" (pr-str result)))
+  db)
 
 (defn checker [interceptor]
   (fn [db event]
