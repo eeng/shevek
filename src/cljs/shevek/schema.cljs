@@ -33,7 +33,6 @@
          :name (s/eq "__time")
          :selected-period s/Keyword))
 
-
 (def NormalFilter
   (assoc Dimension
          :operator s/Str
@@ -41,6 +40,9 @@
 
 (def Filter
   (s/if :selected-period TimeFilter NormalFilter))
+
+(def Pinboard
+  {:measure Measure :dimensions [Split]})
 
 (def Result {s/Keyword s/Any})
 
@@ -50,7 +52,7 @@
    (s/optional-key :split) [Split]
    (s/optional-key :arrived-split) [Split]
    (s/optional-key :measures) [Measure]
-   (s/optional-key :pinboard) {:measure Measure :dimensions [Split]}
+   (s/optional-key :pinboard) Pinboard
    (s/optional-key :results) {(s/enum :main :pinboard :filter) (s/cond-pre [Result] {s/Str [Result]})}
    (s/optional-key :last-added-filter) s/Any})
 
