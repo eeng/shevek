@@ -101,7 +101,7 @@
   []
   (merge-env! :source-paths #{"test/cljs"}
               :resource-paths #{"test/resources"})
-  (comp (dev)
+  (comp (watch)
         (test-cljs)))
 
 (deftask testing
