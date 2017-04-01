@@ -74,11 +74,10 @@
         results (cube-view :results :main)
         max-values (calculate-max-values measures results)]
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
-     [:thead
-      [:tr
-       [sortable-th (->> split (map :title) (str/join ", ")) split split]
-       (rfor [{:keys [title] :as measure} measures]
-         [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]]
+     [:thead>tr
+      [sortable-th (->> split (map :title) (str/join ", ")) split split]
+      (rfor [{:keys [title] :as measure} measures]
+        [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
      [:tbody
       (with-react-keys (pivot-table-rows results split 0 measures max-values))]]))
 
