@@ -163,16 +163,19 @@
                       (assoc q :split dims
                                :filter (add-filter-for-dim filter dim %)))))))))
 
+(defn- datasources-status [host]
+  (->> (datasources host)
+       (pmap #(merge % (time-boundary host (:name %))))))
+
 ; TODO quizas convenga traer las dimensions y metrics en la misma query para ahorrar un request
 (defrecord DruidEngine [host]
   DwEngine
   (cubes [_]
-         (datasources host))
+         (datasources-status host))
   (cube [_ name]
         (assoc {:name name}
                :dimensions (dimensions host name)
-               :measures (metrics host name)
-               :time-boundary (time-boundary host name)))
+               :measures (metrics host name)))
   (query [_ {:keys [totals] :as q}]
          (concat (if totals (send-query-and-simplify-results host q) [])
                  (send-queries-for-split host q))))
@@ -185,6 +188,7 @@
 #_(dimensions broker "wikiticker")
 #_(metrics broker "vtol_stats")
 #_(time-boundary broker "wikiticker")
+#_(e/cubes (DruidEngine. broker))
 #_(e/cube (DruidEngine. broker) "vtol_stats")
 
 ; Totals query

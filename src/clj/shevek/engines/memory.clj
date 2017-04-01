@@ -11,7 +11,7 @@
                  {:name "__time" :title "Fecha"}]
     :measures [{:name "requests"}
                {:name "duration"}]
-    :time-boundary {:max-time "2015-09-12T23:59:59.200Z"}}
+    :max-time "2015-09-12T23:59:59.200Z"}
    "eventos_pedidos"
    {:name "eventos_pedidos"
     :title "Eventos de Pedidos"
@@ -22,7 +22,7 @@
                  {:name "__time" :title "Fecha"}]
     :measures [{:name "pedidos"}
                {:name "usuarios"}]
-    :time-boundary {:max-time "2016-12-02T10:27:30.563Z"}}
+    :max-time "2016-12-02T10:27:30.563Z"}
    "facturacion"
    {:name "facturacion"
     :dimensions [{:name "__time"}]

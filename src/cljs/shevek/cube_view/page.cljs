@@ -32,7 +32,7 @@
 
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (let [cube (dw/set-cube-defaults cube)]
-    (-> (assoc-in db [:cubes name] cube)
+    (-> (update-in db [:cubes name] merge cube)
         (init-cube-view cube)
         (rpc/loaded :cube-metadata)
         (send-main-query))))

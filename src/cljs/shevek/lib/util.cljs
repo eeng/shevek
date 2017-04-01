@@ -7,6 +7,9 @@
         (when @timeout (js/clearTimeout @timeout))
         (reset! timeout (js/setTimeout later wait))))))
 
+(defn every [secs f]
+  (js/setTimeout #(do (f) (every secs f)) (* 1000 secs)))
+
 (def regex-char-esc-smap
   (let [esc-chars "()&^%$#!?*."]
     (zipmap esc-chars

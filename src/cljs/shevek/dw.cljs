@@ -3,7 +3,7 @@
   (:require [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.rpc :as rpc]
-            [shevek.lib.collections :refer [reverse-merge detect]]
+            [shevek.lib.collections :refer [detect]]
             [shevek.lib.dates :as d :refer [parse-time to-iso8601]]
             [shevek.lib.collections :refer [detect]]
             [cljs-time.core :as t]
@@ -14,12 +14,11 @@
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
 
-(defn set-cube-defaults [{:keys [dimensions measures time-boundary] :as cube}]
-  (-> cube
-      set-default-title
-      (assoc :dimensions (map set-default-title dimensions))
-      (assoc :measures (map set-default-title measures))
-      (assoc-in [:time-boundary :max-time] (parse-time (:max-time time-boundary)))))
+(defn set-cube-defaults [{:keys [dimensions measures max-time] :as cube}]
+  (cond-> (set-default-title cube)
+          dimensions (assoc :dimensions (map set-default-title dimensions))
+          measures (assoc :measures (map set-default-title measures))
+          max-time (assoc :max-time (d/round-to-next-minute (parse-time max-time)))))
 
 (defn- set-defaults [cubes]
   (map set-cube-defaults cubes))
@@ -27,10 +26,8 @@
 (defn- to-map-with-name-as-key [cubes]
   (zipmap (map :name cubes) cubes))
 
-; We need to update instead of assoc because if we reload the cube page the cube metadata could arrive before the cubes list.
-; And it has to be a reverse-merge because the cube metadata contains more information that the cubes list.
 (defevh :cubes-arrived [db cubes]
-  (-> (update db :cubes reverse-merge (to-map-with-name-as-key (set-defaults cubes)))
+  (-> (update db :cubes #(merge-with merge % (to-map-with-name-as-key (set-defaults cubes))))
       (rpc/loaded :cubes)))
 
 (defevh :cubes-requested [db]
@@ -74,7 +71,7 @@
 
 (defn to-interval [selected-period max-time]
   (let [now (d/now)
-        max-time (d/round-to-next-second (or max-time now))
+        max-time (or max-time now)
         day-of-last-week (t/minus (d/beginning-of-week now) (t/days 1))
         day-of-last-month (t/minus (d/beginning-of-month now) (t/days 1))
         day-of-last-quarter (t/minus (d/beginning-of-quarter now) (t/days 1))

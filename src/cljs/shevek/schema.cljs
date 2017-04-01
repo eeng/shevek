@@ -18,9 +18,9 @@
 (def Cube
   {:name s/Str
    :title s/Str
-   :dimensions [DimensionConfig]
-   :measures [Measure]
-   :time-boundary {:max-time goog.date.DateTime}})
+   (s/optional-key :dimensions) [DimensionConfig]
+   (s/optional-key :measures) [Measure]
+   :max-time goog.date.DateTime})
 
 (def Split
   (assoc Dimension

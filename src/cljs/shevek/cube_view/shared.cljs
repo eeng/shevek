@@ -32,7 +32,7 @@
   (if (seq measures)
     (do
       (rpc/call "dw/query"
-                :args [(dw/to-dw-query cube-view (get-in db [:cubes (current-cube-name) :time-boundary :max-time]))]
+                :args [(dw/to-dw-query cube-view (get-in db [:cubes (current-cube-name) :max-time]))]
                 :handler #(dispatch :query-executed % results-keys))
       (rpc/loading db results-keys))
     db))

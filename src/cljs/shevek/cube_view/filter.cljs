@@ -63,7 +63,7 @@
         [:current-day :current-week :current-month :current-quarter :current-year]]
        [period-buttons dim showed-period (t :cubes.period/previous)
         [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]
-       [:div.ui.label (format-period @showed-period (current-cube :time-boundary :max-time))]])))
+       [:div.ui.label (format-period @showed-period (current-cube :max-time))]])))
 
 (defn- specific-period-time-filter []
   [:div.specific.period-type "TODO"])
