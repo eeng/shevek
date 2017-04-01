@@ -70,8 +70,10 @@
    (s/optional-key :cube-view) CubeView})
 
 (defn checker [interceptor]
-  (fn [db event]
-    (->> (interceptor db event)
-         (s/validate AppDB))))
+  (if debug?
+    (fn [db event]
+      (->> (interceptor db event)
+           (s/validate AppDB)))
+    interceptor))
 
 (s/set-fn-validation! debug?)

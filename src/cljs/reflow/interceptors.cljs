@@ -2,16 +2,20 @@
   (:require [reflow.utils :refer [log]]
             [clojure.data :as data]))
 
+(def debug? ^boolean goog.DEBUG)
+
 (defn logger [interceptor]
   (fn [db event]
     (log "Handling event" event "...")
-    (let [new-db (interceptor db event)
-          [only-before only-after] (data/diff db new-db)
-          db-changed? (or (some? only-before) (some? only-after))]
-      (if db-changed?
-        (log "Finished event with changes: before" only-before "after" only-after)
-        (log "Finished event with no changes."))
-      new-db)))
+    (if debug?
+      (let [new-db (interceptor db event)
+            [only-before only-after] (data/diff db new-db)
+            db-changed? (or (some? only-before) (some? only-after))]
+        (if db-changed?
+          (log "Finished event with changes: before" only-before "after" only-after)
+          (log "Finished event with no changes."))
+        new-db)
+      (interceptor db event))))
 
 (defn recorder [interceptor]
   (fn [db event]
