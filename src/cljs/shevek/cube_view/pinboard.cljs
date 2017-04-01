@@ -8,13 +8,14 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
             [shevek.components :refer [dropdown]]
-            [shevek.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch]]))
+            [shevek.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch clean-dim]]))
 
-(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name operator] :as dim}]
-  (let [q (cond-> (assoc cube-view
-                         :split [dim]
-                         :measures (vector (get-in cube-view [:pinboard :measure])))
-                  operator (update :filter add-dimension dim))]
+(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
+  (let [q (cond-> {:cube (:cube cube-view)
+                   :filter (:filter cube-view)
+                   :split [dim]
+                   :measures (vector (get-in cube-view [:pinboard :measure]))}
+                  search-filter (update :filter add-dimension search-filter))]
     (send-query db q [:results :pinboard name])))
 
 (defn send-pinboard-queries [db]
@@ -44,7 +45,7 @@
         (send-pinned-dim-query new-time-dim))))
 
 (defevh :dimension-values-searched [db dim search]
-  (send-pinned-dim-query db (assoc dim :operator "search" :value search)))
+  (send-pinned-dim-query db dim (assoc (clean-dim dim) :operator "search" :value search)))
 
 (defn- pinned-dimension-item [dim result measure search]
   (let [segment-value (format-dimension dim result)]

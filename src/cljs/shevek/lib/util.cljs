@@ -19,3 +19,5 @@
   (->> string
        (replace regex-char-esc-smap)
        (apply str)))
+
+(def debug? ^boolean goog.DEBUG)

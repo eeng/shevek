@@ -9,6 +9,9 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
+            [shevek.schema :refer [Query]]
+            [schema.core :as s]
+            [schema-tools.core :as st]
             [goog.string :as str]))
 
 (defn- cube-view [& keys]
@@ -28,17 +31,18 @@
       (assoc-in [:cube-view :arrived-split] (-> db :cube-view :split))
       (rpc/loaded results-keys)))
 
-(defn send-query [db {:keys [measures] :as cube-view} results-keys]
+(s/defn send-query [db {:keys [measures] :as q} :- Query results-keys]
   (if (seq measures)
     (do
       (rpc/call "dw/query"
-                :args [(dw/to-dw-query cube-view (get-in db [:cubes (current-cube-name) :max-time]))]
+                :args [(dw/add-interval q (get-in db [:cubes (current-cube-name) :max-time]))]
                 :handler #(dispatch :query-executed % results-keys))
       (rpc/loading db results-keys))
     db))
 
 (defn- send-main-query [{:keys [cube-view] :as db}]
-  (send-query db (assoc cube-view :totals true) [:results :main]))
+  (let [q (assoc (st/select-schema cube-view Query) :totals true)]
+    (send-query db q [:results :main])))
 
 (defn format-measure [{:keys [name type]} result]
   (let [value (or (->> name keyword (get result)) 0)]

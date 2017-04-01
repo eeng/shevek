@@ -32,7 +32,7 @@
   (send-query db {:cube (cube-view :cube)
                   :filter (cond-> [(first (cube-view :filter))]
                                   (seq search) (conj (assoc dim :operator "search" :value search)))
-                  :split [(assoc dim :limit 50)]
+                  :split [(assoc (clean-dim dim) :limit 50)]
                   :measures [{:type "count" :name "rowCount"}]}
               [:results :filter name]))
 

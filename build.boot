@@ -33,7 +33,8 @@
                     [com.andrewmcveigh/cljs-time "0.5.0-alpha2"]
                     [com.taoensso/timbre "4.8.0"]
                     [com.rpl/specter "1.0.0"]
-                    [prismatic/schema "1.1.4"]])
+                    [prismatic/schema "1.1.4"]
+                    [metosin/schema-tools "0.9.0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
