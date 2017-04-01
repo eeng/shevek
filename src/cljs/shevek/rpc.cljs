@@ -5,6 +5,7 @@
             [reflow.db :as db]))
 
 (defn call [fid & {:keys [args handler] :or {args []}}]
+  {:pre [(vector? args)]}
   (POST "/rpc" {:params {:fn fid :args args}
                 :handler handler}))
 

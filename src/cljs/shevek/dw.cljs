@@ -14,11 +14,14 @@
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
 
+(defn parse-max-time [max-time]
+  (d/round-to-next-minute (parse-time max-time)))
+
 (defn set-cube-defaults [{:keys [dimensions measures max-time] :as cube}]
   (cond-> (set-default-title cube)
           dimensions (assoc :dimensions (map set-default-title dimensions))
           measures (assoc :measures (map set-default-title measures))
-          max-time (assoc :max-time (d/round-to-next-minute (parse-time max-time)))))
+          max-time (assoc :max-time (parse-max-time max-time))))
 
 (defn- set-defaults [cubes]
   (map set-cube-defaults cubes))

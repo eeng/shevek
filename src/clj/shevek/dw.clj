@@ -16,3 +16,6 @@
 
 (defn query [q]
   (e/query engine q))
+
+(defn max-time [q]
+  (e/max-time engine q))

@@ -4,7 +4,8 @@
             [reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
-            [shevek.cube-view.shared :refer [send-main-query clean-dim]]
+            [shevek.lib.util :refer [every]]
+            [shevek.cube-view.shared :refer [send-main-query clean-dim current-cube-name]]
             [shevek.cube-view.dimensions :refer [dimensions-panel]]
             [shevek.cube-view.measures :refer [measures-panel]]
             [shevek.cube-view.filter :refer [filter-panel init-filtered-dim]]
@@ -36,6 +37,16 @@
         (init-cube-view cube)
         (rpc/loaded :cube-metadata)
         (send-main-query))))
+
+(defevh :max-time-arrived [db cube-name max-time]
+  (update-in db [:cubes cube-name] assoc :max-time (dw/parse-max-time max-time)))
+
+(defn fetch-max-time []
+  (when (= (db/get :page) :cube)
+    (let [name (current-cube-name)]
+      (rpc/call "dw/max-time" :args [name] :handler #(dispatch :max-time-arrived name %)))))
+
+(defonce timeout (every 60 fetch-max-time))
 
 (defn page []
   [:div#cube-view

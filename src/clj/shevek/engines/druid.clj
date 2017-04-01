@@ -171,6 +171,8 @@
   (cube [_ name]
         (merge {:name name :dimensions (dimensions host name) :measures (metrics host name)}
                (time-boundary host name)))
+  (max-time [_ name]
+            (:max-time (time-boundary host name)))
   (query [_ {:keys [totals] :as q}]
          (concat (if totals (send-query-and-simplify-results host q) [])
                  (send-queries-for-split host q))))
