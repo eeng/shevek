@@ -14,14 +14,18 @@
 
 (def register-event-handler i/register-event-handler)
 
+(defn- handle-event [event handler app-db]
+  (try
+    (swap! app-db handler event)
+    (catch js/Error e
+      (console.log e))))
+
 (defn- start-coordinator [app-db handler]
   (go-loop []
     (let [event (<! events)]
       (when (and event (not= event [:shutdown]))
-        (let [new-db (swap! app-db handler event)]
-          (assert (map? new-db)
-                  (str "Handler for event " event " should've returned the new db as a map. Instead returned: " (pr-str new-db)))
-          (recur))))))
+        (handle-event event handler app-db)
+        (recur)))))
 
 (defn stop-coordinator []
   (dispatch :shutdown))

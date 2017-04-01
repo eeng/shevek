@@ -69,14 +69,9 @@
    (s/optional-key :settings) Settings
    (s/optional-key :cube-view) CubeView})
 
-(defn check-schema [db]
-  (if-let [result (s/check AppDB db)]
-    (console.log "[WARN] Invalid Schema:" (pr-str result)))
-  db)
-
 (defn checker [interceptor]
   (fn [db event]
-    (-> (interceptor db event)
-        (check-schema))))
+    (->> (interceptor db event)
+         (s/validate AppDB))))
 
 (s/set-fn-validation! debug?)
