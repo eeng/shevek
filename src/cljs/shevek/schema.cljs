@@ -20,7 +20,7 @@
    :title s/Str
    (s/optional-key :dimensions) [DimensionConfig]
    (s/optional-key :measures) [Measure]
-   :max-time goog.date.DateTime})
+   (s/optional-key :max-time) goog.date.DateTime})
 
 (def Split
   (assoc Dimension

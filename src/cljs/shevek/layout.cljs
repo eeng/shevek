@@ -4,7 +4,6 @@
             [secretary.core :as secretary :refer-macros [defroute]]
             [reflow.core :refer [dispatch]]
             [reflow.db :as db]
-            [shevek.lib.util :refer [every]]
             [shevek.rpc :refer [loading?]]
             [shevek.components :refer [make-dropdown]]
             [shevek.dashboard :as dashboard]
@@ -49,8 +48,6 @@
          [:a.item {:href (str "#/cubes/" name)
                    :class (when (= cube-name name) "active")}
           title])]]]))
-
-(defonce ping-timeout (every 60 dw/fetch-cubes))
 
 (defn layout []
   (dw/fetch-cubes)
