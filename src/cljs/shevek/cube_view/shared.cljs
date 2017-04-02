@@ -4,14 +4,15 @@
             [reflow.db :as db]
             [reagent.core :as r]
             [shevek.lib.react :refer [with-react-keys]]
-            [shevek.lib.dates :refer [format-time-according-to-period]]
+            [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
-            [shevek.schema :refer [Query]]
+            [shevek.schemas.query :refer [Query]]
             [schema.core :as s]
             [schema-tools.core :as st]
+            [com.rpl.specter :refer [setval ALL]]
             [goog.string :as str]))
 
 (defn- cube-view [& keys]
@@ -31,12 +32,18 @@
       (assoc-in [:cube-view :arrived-split] (-> db :cube-view :split))
       (rpc/loaded results-keys)))
 
-(s/defn send-query [db {:keys [measures] :as q} :- Query results-keys]
+; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
+(defn- add-interval [{:keys [filter] :as q} max-time]
+  (let [period (:selected-period (dw/time-dimension filter))]
+    (setval [:filter ALL dw/time-dimension? :interval]
+            (mapv to-iso8601 (dw/to-interval period max-time))
+            q)))
+
+(defn send-query [db {:keys [measures] :as q} results-keys]
   (if (seq measures)
-    (do
-      (rpc/call "dw/query"
-                :args [(dw/add-interval q (get-in db [:cubes (current-cube-name) :max-time]))]
-                :handler #(dispatch :query-executed % results-keys))
+    (let [q (-> (add-interval q (get-in db [:cubes (current-cube-name) :max-time]))
+                (st/select-schema Query))]
+      (rpc/call "dw/query" :args [q] :handler #(dispatch :query-executed % results-keys))
       (rpc/loading db results-keys))
     db))
 

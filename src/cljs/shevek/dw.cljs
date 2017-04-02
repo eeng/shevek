@@ -4,7 +4,7 @@
             [cuerdas.core :as str]
             [shevek.rpc :as rpc]
             [shevek.lib.collections :refer [detect]]
-            [shevek.lib.dates :as d :refer [parse-time to-iso8601]]
+            [shevek.lib.dates :as d :refer [parse-time]]
             [shevek.lib.collections :refer [detect]]
             [cljs-time.core :as t]
             [cljs-time.format :as f]
@@ -103,8 +103,3 @@
          (map #(f/unparse formatter %))
          distinct
          (str/join " - "))))
-
-; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
-(defn add-interval [{:keys [filter] :as q} max-time]
-  (let [period (:selected-period (time-dimension filter))]
-    (assoc q :interval (mapv to-iso8601 (to-interval period max-time)))))

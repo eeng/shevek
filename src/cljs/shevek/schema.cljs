@@ -1,6 +1,5 @@
 (ns shevek.schema
   (:require [schema.core :as s :include-macros true]
-            [schema-tools.core :as st]
             [shevek.lib.util :refer [debug?]]))
 
 (def Settings
@@ -8,7 +7,7 @@
 
 (def Dimension
   {:name s/Str
-   (s/optional-key :title) s/Str ; Opcional por las Query. Ej en la measure del event :filter-values-requested
+   :title s/Str
    :type s/Str})
 
 (def Measure Dimension)
@@ -38,7 +37,7 @@
 (def NormalFilter
   (assoc Dimension
          :operator s/Str
-         (s/optional-key :value) (s/cond-pre s/Str #{(s/maybe s/Str)}))) ; Para el CubeView es siempre un set, pero para la Query que trae los valores que matchean es un str
+         (s/optional-key :value) #{(s/maybe s/Str)}))
 
 (def Filter
   (s/if :selected-period TimeFilter NormalFilter))
@@ -57,10 +56,6 @@
    (s/optional-key :pinboard) Pinboard
    (s/optional-key :results) {(s/enum :main :pinboard :filter) (s/cond-pre [Result] {s/Str [Result]})}
    (s/optional-key :last-added-filter) s/Any})
-
-(def Query
-  (assoc (st/select-keys CubeView [:cube :filter :split :measures])
-         (s/optional-key :totals) s/Bool))
 
 (def AppDB
   {(s/optional-key :page) s/Keyword
