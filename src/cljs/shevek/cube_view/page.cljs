@@ -5,17 +5,13 @@
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
             [shevek.lib.util :refer [every]]
-            [shevek.cube-view.shared :refer [send-main-query clean-dim current-cube-name]]
+            [shevek.cube-view.shared :refer [send-main-query current-cube-name]]
             [shevek.cube-view.dimensions :refer [dimensions-panel]]
             [shevek.cube-view.measures :refer [measures-panel]]
-            [shevek.cube-view.filter :refer [filter-panel init-filtered-dim]]
+            [shevek.cube-view.filter :refer [filter-panel build-time-filter]]
             [shevek.cube-view.split :refer [split-panel]]
             [shevek.cube-view.visualization :refer [visualization-panel]]
             [shevek.cube-view.pinboard :refer [pinboard-panels]]))
-
-(defn- build-time-filter [{:keys [dimensions] :as cube}]
-  (assoc (clean-dim (dw/time-dimension dimensions))
-         :selected-period :latest-day))
 
 (defn- init-cube-view [{:keys [cube-view] :as db} {:keys [measures] :as cube}]
   (-> cube-view

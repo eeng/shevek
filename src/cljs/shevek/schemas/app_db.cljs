@@ -8,25 +8,30 @@
 (def Dimension
   {:name s/Str
    :title s/Str
+   :type s/Str
+   :cardinality (s/maybe s/Int)})
+
+(def Measure
+  {:name s/Str
+   :title s/Str
    :type s/Str})
-
-(def Measure Dimension)
-
-(def DimensionConfig
-  (assoc Dimension
-         :cardinality (s/maybe s/Int)))
 
 (def Cube
   {:name s/Str
    :title s/Str
-   (s/optional-key :dimensions) [DimensionConfig]
+   (s/optional-key :dimensions) [Dimension]
    (s/optional-key :measures) [Measure]
    (s/optional-key :max-time) goog.date.DateTime})
+
+(def SortBy
+  (s/if #(contains? % :cardinality)
+        (assoc Dimension :descending s/Bool)
+        (assoc Measure :descending s/Bool)))
 
 (def Split
   (assoc Dimension
          :limit (s/cond-pre s/Int s/Str)
-         (s/optional-key :sort-by) (assoc Measure :descending s/Bool)
+         (s/optional-key :sort-by) SortBy
          (s/optional-key :granularity) s/Str))
 
 (def TimeFilter

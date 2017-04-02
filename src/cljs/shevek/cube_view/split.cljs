@@ -6,7 +6,7 @@
             [shevek.i18n :refer [t]]
             [shevek.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension find-dimension]]
             [shevek.lib.react :refer [rmap without-propagation]]
-            [shevek.cube-view.shared :refer [panel-header current-cube cube-view send-main-query clean-dim]]
+            [shevek.cube-view.shared :refer [panel-header current-cube cube-view send-main-query]]
             [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select]]))
 
@@ -46,7 +46,7 @@
 
 (defn- split-popup [_ dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by]))
-        posible-sort-bys (conj (current-cube :measures) (clean-dim dim))]
+        posible-sort-bys (conj (current-cube :measures) dim)]
     (fn [{:keys [close]} dim]
       (let [desc (get-in @opts [:sort-by :descending])]
         [:div

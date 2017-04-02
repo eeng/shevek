@@ -5,14 +5,18 @@
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
-            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension? format-period]]
+            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period]]
             [shevek.lib.react :refer [rmap without-propagation]]
-            [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight clean-dim current-cube]]
+            [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube]]
             [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
+(defn build-time-filter [{:keys [dimensions] :as cube}]
+  (assoc (time-dimension dimensions)
+         :selected-period :latest-day))
+
 (defn init-filtered-dim [dim]
-  (assoc (clean-dim dim) :operator "include"))
+  (assoc dim :operator "include"))
 
 (defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
   (-> (update-in db [:cube-view :filter] add-dimension (init-filtered-dim dim))
@@ -32,7 +36,7 @@
   (send-query db {:cube (cube-view :cube)
                   :filter (cond-> [(first (cube-view :filter))]
                                   (seq search) (conj (assoc dim :operator "search" :value search)))
-                  :split [(assoc (clean-dim dim) :limit 50)]
+                  :split [(assoc dim :limit 50)]
                   :measures [{:type "count" :name "rowCount"}]}
               [:results :filter name]))
 
