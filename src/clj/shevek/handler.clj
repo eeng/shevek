@@ -5,7 +5,7 @@
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
             [clojure.string :refer [split]]
-            [shevek.lib.logging :refer [wrap-request-logging]]))
+            [shevek.logging :refer [wrap-request-logging]]))
 
 (defn call-fn
   "Given a map like {:fn 'ns/func' :args [1 2]} calls (shevek.ns/func 1 2)"

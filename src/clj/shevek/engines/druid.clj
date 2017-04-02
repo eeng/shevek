@@ -2,7 +2,7 @@
   (:require [clj-http.client :as http]
             [shevek.engines.engine :as e :refer [DwEngine]]
             [shevek.lib.collections :refer [detect]]
-            [shevek.lib.logging :refer [pp-str]]
+            [shevek.logging :refer [pp-str]]
             [clojure.string :as str]
             [taoensso.timbre :as log]))
 

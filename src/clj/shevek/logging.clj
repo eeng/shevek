@@ -1,10 +1,5 @@
-(ns shevek.lib.logging
-  (:require [taoensso.timbre :as log]
-            [shevek.config :refer [env-test?]]))
-
-; Agrego los milisegundos
-(log/merge-config! (cond-> {:timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS"}}
-                           (env-test?) (assoc :appenders {:println {:enabled? false}})))
+(ns shevek.logging
+  (:require [taoensso.timbre :as log]))
 
 (defn pp-str [& args]
   (with-out-str (apply clojure.pprint/pprint args)))

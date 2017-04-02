@@ -1,11 +1,14 @@
 (ns shevek.config
-  (:require [mount.core :as mount :refer [defstate]]
+  (:require [mount.core :refer [defstate]]
             [cprop.core :refer [load-config]]))
 
 (defstate cfg :start (load-config))
 
-(defn env [& keys]
+(defn config [& keys]
   (get-in cfg keys))
 
-(defn env-test? []
-  (= (env :env) :test))
+(defn env []
+  (config :env))
+
+(defn env? [env-kw]
+  (= (env) env-kw))

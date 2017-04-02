@@ -64,7 +64,8 @@
         (target)))
 
 (deftask dev-config []
-  (merge-env! :source-paths #{"dev/clj"})
+  (merge-env! :source-paths #{"dev/clj"} :resource-paths #{"dev/resources"})
+  (System/setProperty "conf" "dev/resources/config.edn")
   (task-options! cljs {:optimizations :none :source-map true}
                  less {:source-map  true})
   identity)
@@ -92,24 +93,22 @@
 (deftask clj-test
   "Continuos automatic testing of the backend."
   []
-  (merge-env! :source-paths #{"test/clj"})
-  (set-env! :resource-paths #{"test/resources"})
+  (merge-env! :source-paths #{"test/clj"} :resource-paths #{"test/resources"})
+  (System/setProperty "conf" "test/resources/config.edn")
   (comp (watch)
-        (alt-test)))
+        (alt-test :on-start 'shevek.test-helper/init)))
 
 (deftask cljs-test
   "Continuos automatic testing of the frontend."
   []
-  (merge-env! :source-paths #{"test/cljs"}
-              :resource-paths #{"test/resources"})
+  (merge-env! :source-paths #{"test/cljs"} :resource-paths #{"test/resources"})
   (comp (watch)
         (test-cljs)))
 
 (deftask testing
   "Continuos automatic testing."
   []
-  (merge-env! :source-paths #{"test/clj" "test/cljs"}
-              :resource-paths #{"test/resources"})
+  (merge-env! :source-paths #{"test/clj" "test/cljs"} :resource-paths #{"test/resources"})
   (comp (dev)
         (alt-test)
         (test-cljs)))
