@@ -125,7 +125,7 @@
          {:on-click #(if (empty? (@opts :value))
                        (dispatch :dimension-removed-from-filter dim)
                        (dispatch :filter-options-changed dim @opts))
-          :class (when (= (seq (@opts :value)) (seq (dim :value))) "disabled")}
+          :class (when (= @opts (select-keys dim [:operator :value])) "disabled")}
          (t :answer/ok)]
         [:button.ui.compact.button
          {:on-click (without-propagation close)}
