@@ -2,57 +2,57 @@
   (:require [schema.core :as s])
   (:import goog.date.DateTime))
 
-(def Settings
+(s/defschema Settings
   {:lang s/Str})
 
-(def Dimension
+(s/defschema Dimension
   {:name s/Str
    :title s/Str
    :type s/Str
    :cardinality (s/maybe s/Int)})
 
-(def Measure
+(s/defschema Measure
   {:name s/Str
    :title s/Str
    :type s/Str})
 
-(def Cube
+(s/defschema Cube
   {:name s/Str
    :title s/Str
    (s/optional-key :dimensions) [Dimension]
    (s/optional-key :measures) [Measure]
    (s/optional-key :max-time) goog.date.DateTime})
 
-(def SortBy
+(s/defschema SortBy
   (s/if #(contains? % :cardinality)
         (assoc Dimension :descending s/Bool)
         (assoc Measure :descending s/Bool)))
 
-(def Split
+(s/defschema Split
   (assoc Dimension
          :limit (s/cond-pre s/Int s/Str)
          (s/optional-key :sort-by) SortBy
          (s/optional-key :granularity) s/Str))
 
-(def TimeFilter
+(s/defschema TimeFilter
   (assoc Dimension
          :name (s/eq "__time")
          :selected-period s/Keyword))
 
-(def NormalFilter
+(s/defschema NormalFilter
   (assoc Dimension
          :operator s/Str
          (s/optional-key :value) #{(s/maybe s/Str)}))
 
-(def Filter
+(s/defschema Filter
   (s/if :selected-period TimeFilter NormalFilter))
 
-(def Pinboard
+(s/defschema Pinboard
   {:measure Measure :dimensions [Split]})
 
-(def Result {s/Keyword s/Any})
+(s/defschema Result {s/Keyword s/Any})
 
-(def CubeView
+(s/defschema CubeView
   {:cube s/Str
    (s/optional-key :filter) [(s/one TimeFilter "tf") NormalFilter]
    (s/optional-key :split) [Split]
@@ -62,7 +62,7 @@
    (s/optional-key :results) {(s/enum :main :pinboard :filter) (s/cond-pre [Result] {s/Str [Result]})}
    (s/optional-key :last-added-filter) s/Any})
 
-(def AppDB
+(s/defschema AppDB
   {(s/optional-key :page) s/Keyword
    (s/optional-key :loading) {(s/cond-pre s/Keyword [s/Any]) s/Bool}
    (s/optional-key :cubes) {s/Str Cube}

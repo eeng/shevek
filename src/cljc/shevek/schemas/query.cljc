@@ -29,8 +29,8 @@
 (s/defschema Split
   {:name s/Str
    (s/optional-key :limit) (s/cond-pre s/Int s/Str)
-   (s/optional-key :granularity) s/Str
-   (s/optional-key :sort-by) SortBy})
+   (s/optional-key :sort-by) SortBy
+   (s/optional-key :granularity) s/Str})
 
 (s/defschema Query
   {:cube s/Str
