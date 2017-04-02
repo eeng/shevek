@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [shevek.layout :refer [layout]]
             [shevek.settings :refer [load-settings]]
-            [shevek.schema :as schema]
+            [shevek.schemas.interceptor :as schema]
             [reflow.core :as reflow]
             [reflow.interceptors :as i]
             [secretary.core :as secretary]

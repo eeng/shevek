@@ -1,6 +1,6 @@
-(ns shevek.schema
-  (:require [schema.core :as s :include-macros true]
-            [shevek.lib.util :refer [debug?]]))
+(ns shevek.schemas.app-db
+  (:require [schema.core :as s])
+  (:import goog.date.DateTime))
 
 (def Settings
   {:lang s/Str})
@@ -63,12 +63,3 @@
    (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) Settings
    (s/optional-key :cube-view) CubeView})
-
-(defn checker [interceptor]
-  (if debug?
-    (fn [db event]
-      (->> (interceptor db event)
-           (s/validate AppDB)))
-    interceptor))
-
-(s/set-fn-validation! debug?)
