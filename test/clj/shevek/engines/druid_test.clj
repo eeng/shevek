@@ -36,7 +36,7 @@
                   :aggregations [{:name "count" :fieldName "count" :type "longSum"}]}
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
-                                  :interval ["2015" "2016"]}))))
+                                  :filter [{:interval ["2015" "2016"]}]}))))
 
   (testing "measure type should be doubleSum when empty"
     (is (= "doubleSum"
@@ -65,7 +65,7 @@
                   :descending true}
                  (to-druid-query {:cube "wikiticker"
                                   :measures [{:name "count" :type "longSum"}]
-                                  :interval ["2015" "2016"]
+                                  :filter [{:interval ["2015" "2016"]}]
                                   :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}}))))
 
   (testing "filter"
@@ -73,11 +73,11 @@
       (is (submap? {:filter {:type "selector"
                              :dimension "isRobot"
                              :value "true"}}
-                   (to-druid-query {:filter [{:name "__time"} {:name "isRobot" :operator "is" :value "true"}]})))
+                   (to-druid-query {:filter [{:name "isRobot" :operator "is" :value "true"}]})))
       (is (submap? {:filter {:type "selector"
                              :dimension "countryName"
                              :value nil}}
-                   (to-druid-query {:filter [ {:name "countryName" :operator "is" :value nil}]}))))
+                   (to-druid-query {:filter [{:name "countryName" :operator "is" :value nil}]}))))
 
     (testing "two filters should generate an 'and' filter"
       (is (submap? {:filter {:type "and"

@@ -79,7 +79,7 @@
         day-of-last-month (t/minus (d/beginning-of-month now) (t/days 1))
         day-of-last-quarter (t/minus (d/beginning-of-quarter now) (t/days 1))
         day-of-last-year (t/minus (d/beginning-of-year now) (t/days 1))]
-    (condp = selected-period
+    (case selected-period
       :latest-hour [(t/minus max-time (t/hours 1)) max-time]
       :latest-6hours [(t/minus max-time (t/hours 6)) max-time]
       :latest-day [(t/minus max-time (t/days 1)) max-time]

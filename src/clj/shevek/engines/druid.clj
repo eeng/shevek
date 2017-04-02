@@ -14,6 +14,7 @@
 ; TODO en el :context de la q se le puede pasar un timeout
 ; TODO ver como hacer para no loggear en testing
 ; TODO separar las funciones low-level como esta de las hig-level que usa el engine
+; TODO quizas convendria validar esta druid query tb con schema
 (defn- send-query [host q]
   (log/debug "Sending query to druid:\n" (pp-str q))
   (:body (http/post (str host "/druid/v2") {:content-type :json :form-params q :as :json})))
@@ -65,8 +66,8 @@
   (some #(dim=? % dim) coll))
 
 ; TODO repetida en el client
-(defn time-dimension? [{:keys [name]}]
-  (= name "__time"))
+(defn time-dimension? [{:keys [name interval]}]
+  (or (= name "__time") interval))
 
 (defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
   {:fieldName name :name name :type type})
@@ -89,9 +90,6 @@
         :exclude {:type "not" :field {:type "in" :dimension name :values value}}
         :search {:type "search" :dimension name :query {:type "insensitive_contains" :value value}})
     {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
-
-(defn- convertible-to-druid-filter? [{:keys [operator value]}]
-  (and operator (or (= "is" operator) (seq value))))
 
 (defn- calculate-query-type [{:keys [dimension]}]
   (if (and dimension (not (time-dimension? dimension)))
@@ -125,15 +123,18 @@
                           {:type "all"})
            :descending (get-in dimension [:sort-by :descending] false))))
 
-; TODO creo que convendria validar esta q con clojure spec xq sino si falta el period por ej explota en druid, o sino validar la que se envia a druid directamente que ya tenemos los valores obligatorios en la doc
-(defn to-druid-query [{:keys [cube measures interval dimension] :as q}]
-  (as-> {:queryType (calculate-query-type q)
-         :dataSource {:type "table" :name cube}
-         :intervals (str/join "/" interval)
-         :aggregations (->> measures (mapv to-druid-agg) (add-sort-by-dim-to-aggregations dimension measures))}
-        dq
-        (add-query-type-dependant-fields q dq)
-        (assoc-if-seq dq :filter (to-druid-filter (filter convertible-to-druid-filter? (:filter q))))))
+(defn- with-value? [{:keys [operator value]}]
+  (or (= "is" operator) (seq value)))
+
+(defn to-druid-query [{:keys [cube measures dimension] :as q}]
+  (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? (:filter q))]
+    (as-> {:queryType (calculate-query-type q)
+           :dataSource {:type "table" :name cube}
+           :intervals (str/join "/" (-> time-filters first :interval))
+           :aggregations (->> measures (mapv to-druid-agg) (add-sort-by-dim-to-aggregations dimension measures))}
+          dq
+          (add-query-type-dependant-fields q dq)
+          (assoc-if-seq dq :filter (->> normal-filters (filter with-value?) to-druid-filter)))))
 
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]
   (condp = queryType
@@ -178,72 +179,9 @@
                  (send-queries-for-split host q))))
 
 ;;;; Manual testing
-(def broker "http://kafka:8082")
-
+#_(def broker "http://kafka:8082")
 #_(datasources broker)
 #_(dimensions broker "vtol_stats")
 #_(dimensions broker "wikiticker")
 #_(metrics broker "vtol_stats")
 #_(time-boundary broker "wikiticker")
-#_(e/cubes (DruidEngine. broker))
-#_(e/cube (DruidEngine. broker) "vtol_stats")
-
-; Totals query
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :measures [{:name "count" :type "longSum"}
-                       {:name "added" :type "doubleSum"}]
-            :interval ["2015-09-12" "2015-09-13"]
-            :totals true})
-
-; One atemporal dimension and one measure
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :split [{:name "page" :limit 5}]
-            :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]})
-
-; One time dimension and one measure
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :split [{:name "__time" :granularity "PT6H"}]
-            :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]})
-
-; One atemporal dimension with totals
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :split [{:name "page" :limit 5}]
-            :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]
-            :totals true})
-
-; Two atemporal dimensions
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :split [{:name "countryName" :limit 3} {:name "cityName" :limit 2}]
-            :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]
-            :totals true})
-
-; Three atemporal dimensions
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2} {:name "isNew" :limit 2}]
-            :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]
-            :totals true})
-
-; Filtering
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :split [{:name "countryName" :limit 5}]
-            :filter [{:name "countryName" :operator "include" :value #{"Italy" "France"}}]
-            :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]})
-#_(e/query (DruidEngine. broker)
-           {:cube "wikiticker"
-            :split [{:name "countryName" :limit 5}]
-            :filter [{:name "countryName" :operator "search" :value "arg"}]
-            :measures [{:name "count" :type "longSum"}]
-            :interval ["2015-09-12" "2015-09-13"]})

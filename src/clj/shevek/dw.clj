@@ -1,7 +1,9 @@
 (ns shevek.dw
   (:require [shevek.engines.engine :as e]
             [shevek.engines.memory]
-            [shevek.engines.druid])
+            [shevek.engines.druid]
+            [shevek.schemas.query :refer [Query]]
+            [schema.core :as s])
   (:import [shevek.engines.memory InMemoryEngine]
            [shevek.engines.druid DruidEngine]))
 
@@ -14,8 +16,66 @@
 (defn cube [name]
   (e/cube engine name))
 
-(defn query [q]
+(s/defn query [q :- Query]
   (e/query engine q))
 
 (defn max-time [q]
   (e/max-time engine q))
+
+;; Query Examples
+
+; Metadata
+#_(cubes)
+#_(cube "vtol_stats")
+
+; Totals query
+#_(query {:cube "wikiticker"
+          :measures [{:name "count" :type "longSum"}
+                     {:name "added" :type "doubleSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]
+          :totals true})
+
+; One dimension and one measure
+#_(query {:cube "wikiticker"
+          :split [{:name "page" :limit 5}]
+          :measures [{:name "count" :type "longSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
+
+; One time dimension and one measure
+#_(query {:cube "wikiticker"
+          :split [{:name "__time" :granularity "PT6H"}]
+          :measures [{:name "count" :type "longSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
+
+; One dimension with totals
+#_(query {:cube "wikiticker"
+          :split [{:name "page" :limit 5}]
+          :measures [{:name "count" :type "longSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]
+          :totals true})
+
+; Two dimensions
+#_(query {:cube "wikiticker"
+          :split [{:name "countryName" :limit 3} {:name "cityName" :limit 2}]
+          :measures [{:name "count" :type "longSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]
+          :totals true})
+
+; Three atemporal dimensions
+#_(query {:cube "wikiticker"
+          :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2} {:name "isNew" :limit 2}]
+          :measures [{:name "count" :type "longSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]
+          :totals true})
+
+; Filtering
+#_(query {:cube "wikiticker"
+          :split [{:name "countryName" :limit 5}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}
+                   {:name "countryName" :operator "include" :value #{"Italy" "France"}}]
+          :measures [{:name "count" :type "longSum"}]})
+#_(query {:cube "wikiticker"
+          :split [{:name "countryName" :limit 5}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}
+                   {:name "countryName" :operator "search" :value "arg"}]
+          :measures [{:name "count" :type "longSum"}]})
