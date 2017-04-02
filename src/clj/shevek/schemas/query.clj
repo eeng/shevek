@@ -1,6 +1,5 @@
 (ns shevek.schemas.query
-  (:require [schema.core :as s]
-            [schema-tools.core :as st]))
+  (:require [schema.core :as s]))
 
 (s/defschema SpecificTimeFilter
   {(s/optional-key :name) s/Str

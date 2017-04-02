@@ -15,17 +15,13 @@
   :start (start-nrepl (config :nrepl-port))
   :stop (stop-server nrepl))
 
-; Agrego los milisegundos y en test no quiero loggear nada
-(defn- config-logger []
-  (log/merge-config!
-   (cond-> {:timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS"}}
-           (env? :test) (assoc :appenders {:println {:enabled? false}})))
-  (log/info "Starting app in" (env) "environment"))
-
 (defstate initializer :start
   (do
-    (config-logger)
-    (s/set-fn-validation! (not (env? :production)))))
+    (log/merge-config!
+     (cond-> {:timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS"}} ; Por defecto no pone los msegs
+             (env? :test) (assoc :appenders {:println {:enabled? false}})))
+    (s/set-fn-validation! (not (env? :production)))
+    (log/info "Starting app in" (env) "environment")))
 
 (defn -main [& args]
   (mount/start))
