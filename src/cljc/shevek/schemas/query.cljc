@@ -15,16 +15,22 @@
 (s/defschema NormalFilter
   {:name s/Str
    :operator (s/enum "include" "exclude" "search" "is")
-   (s/optional-key :value) (s/cond-pre s/Str #{(s/maybe s/Str)})})
-
-(s/defschema Split
-  {:name s/Str
-   (s/optional-key :limit) s/Int
-   (s/optional-key :granularity) s/Str})
+   :value (s/cond-pre s/Str #{(s/maybe s/Str)})})
 
 (s/defschema Measure
   {:name s/Str
    :type (s/enum "count" "longSum" "doubleSum" "hyperUnique")})
+
+(s/defschema SortBy
+  {:name s/Str
+   :type s/Str
+   :descending s/Bool})
+
+(s/defschema Split
+  {:name s/Str
+   (s/optional-key :limit) (s/cond-pre s/Int s/Str)
+   (s/optional-key :granularity) s/Str
+   (s/optional-key :sort-by) SortBy})
 
 (s/defschema Query
   {:cube s/Str

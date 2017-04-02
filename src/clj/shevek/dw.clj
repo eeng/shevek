@@ -61,7 +61,7 @@
           :filter [{:interval ["2015-09-12" "2015-09-13"]}]
           :totals true})
 
-; Three atemporal dimensions
+; Three dimensions
 #_(query {:cube "wikiticker"
           :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2} {:name "isNew" :limit 2}]
           :measures [{:name "count" :type "longSum"}]
@@ -79,3 +79,13 @@
           :filter [{:interval ["2015-09-12" "2015-09-13"]}
                    {:name "countryName" :operator "search" :value "arg"}]
           :measures [{:name "count" :type "longSum"}]})
+
+; Sorting
+#_(query {:cube "wikiticker"
+          :split [{:name "page" :limit 5 :sort-by {:name "added" :type "longSum" :descending false}}]
+          :measures [{:name "count" :type "longSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
+#_(query {:cube "wikiticker"
+          :split [{:name "page" :limit 5 :sort-by {:name "page" :type "STRING" :descending false}}]
+          :measures [{:name "count" :type "longSum"}]
+          :filter [{:interval ["2015-09-12" "2015-09-13"]}]})

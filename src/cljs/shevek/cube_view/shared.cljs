@@ -39,16 +39,15 @@
             (mapv to-iso8601 (dw/to-interval period max-time))
             q)))
 
-(defn send-query [db {:keys [measures] :as q} results-keys]
-  (if (seq measures)
-    (let [q (-> (add-interval q (get-in db [:cubes (current-cube-name) :max-time]))
-                (st/select-schema Query))]
-      (rpc/call "dw/query" :args [q] :handler #(dispatch :query-executed % results-keys))
-      (rpc/loading db results-keys))
-    db))
+(defn send-query [db q results-keys]
+  (console.log "Sending query" q) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
+  (let [q (-> (add-interval q (get-in db [:cubes (current-cube-name) :max-time]))
+              (st/select-schema Query))]
+    (rpc/call "dw/query" :args [q] :handler #(dispatch :query-executed % results-keys))
+    (rpc/loading db results-keys)))
 
 (defn- send-main-query [{:keys [cube-view] :as db}]
-  (let [q (assoc (st/select-schema cube-view Query) :totals true)]
+  (let [q (assoc cube-view :totals true)]
     (send-query db q [:results :main])))
 
 (defn format-measure [{:keys [name type]} result]
