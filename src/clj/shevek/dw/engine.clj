@@ -26,8 +26,10 @@
          {:name (name column)}))
 
 (defn dimensions-and-measures [dw cube]
-  (let [{:keys [columns aggregators]} (first (segment-metadata-query dw cube))]
-    ((juxt remove filter) #(measure-column? % aggregators) (map with-name-inside columns))))
+  (let [{:keys [columns aggregators]} (first (segment-metadata-query dw cube))
+        dimensions (remove #(measure-column? % aggregators) (map with-name-inside columns))
+        measures (map with-name-inside aggregators)]
+    [dimensions measures]))
 
 (defn query [dw q]
   ,,,)
@@ -36,3 +38,4 @@
 
 #_(cubes dw)
 #_(dimensions-and-measures dw "wikiticker")
+#_(segment-metadata-query dw "wikiticker")
