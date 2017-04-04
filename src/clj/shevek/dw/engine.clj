@@ -14,7 +14,7 @@
    {:queryType "segmentMetadata"
     :dataSource {:type "table" :name cube}
     :merge true
-    :analysisTypes ["cardinality" "aggregators"]
+    :analysisTypes ["aggregators"]
     :intervals ["2000/2100"]
     :lenientAggregatorMerge true}))
 
@@ -22,7 +22,7 @@
   (some #{(keyword column)} (keys aggregators)))
 
 (defn- with-name-inside [[column fields]]
-  (merge (select-keys fields [:type :cardinality])
+  (merge (select-keys fields [:type])
          {:name (name column)}))
 
 (defn dimensions-and-measures [dw cube]

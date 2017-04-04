@@ -4,6 +4,7 @@
             [shevek.dw.engine :as e]
             [clj-fakes.core :as f]))
 
+; TODO quizas con un with-redefs no hace falta este protocol ni la lib clj-fakes, ver el schema_test. Quizas no se pueda hacer el arg matcher que hago con la lib pero es lo de menos
 (deftest engine-test
   (testing "cubes should return a vector of datasources"
     (let [fake-dw (reify DruidDriver
