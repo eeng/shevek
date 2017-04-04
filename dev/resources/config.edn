@@ -1,1 +1,2 @@
-{:env :development}
+{:env :development
+ :druid-uri "http://kafka:8082"}

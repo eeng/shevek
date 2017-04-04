@@ -1,4 +1,5 @@
 {:port 3100
  :nrepl-port 3101
  :env :production
- :mongodb-uri "mongodb://localhost/shevek"}
+ :mongodb-uri "mongodb://localhost/shevek"
+ :druid-uri "http://localhost:8082"}
