@@ -1,16 +1,9 @@
 (ns shevek.schemas.query
   (:require [schema.core :as s]))
 
-(s/defschema SpecificTimeFilter
+(s/defschema TimeFilter
   {(s/optional-key :name) s/Str
    :interval [(s/one s/Str "from") (s/one s/Str "to")]})
-
-(s/defschema RelativeTimeFilter
-  {(s/optional-key :name) s/Str
-   :selected-period s/Keyword})
-
-(s/defschema TimeFilter
-  (s/if :interval SpecificTimeFilter RelativeTimeFilter))
 
 (s/defschema NormalFilter
   {:name s/Str
