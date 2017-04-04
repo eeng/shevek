@@ -16,18 +16,16 @@
   (assoc NTD :type (s/enum "count" "longSum" "doubleSum" "hyperUnique")))
 
 (s/defschema Cube
-  (assoc NTD
-         :dimensions [Dimension]
-         :measures [Measure]))
+  (assoc NTD :dimensions [Dimension] :measures [Measure]))
 
 (s/defn save-cube [db cube :- Cube]
   (mc/insert-and-return db "cubes" (assoc cube :_id (ObjectId.))))
 
 (defn discover! [dw db]
   (doall
-    (for [cube-name (cubes dw)
-          :let [[dimensions measures] (dimensions-and-measures dw cube-name)]]
-      (let [cube {:name cube-name
+    (for [cube-name (cubes dw)]
+      (let [[dimensions measures] (dimensions-and-measures dw cube-name)
+            cube {:name cube-name
                   :dimensions dimensions
                   :measures measures}]
         (save-cube db cube)))))

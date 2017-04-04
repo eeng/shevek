@@ -3,7 +3,6 @@
             [taoensso.timbre :as log]
             [shevek.logging :refer [pp-str]]))
 
-; So we can stub this functions when testing
 (defprotocol DruidDriver
   (datasources [this])
   (send-query [this q]))
