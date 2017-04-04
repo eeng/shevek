@@ -1,1 +1,2 @@
-{:env :test}
+{:env :test
+ :mongodb-uri "mongodb://localhost/shevek-test"}

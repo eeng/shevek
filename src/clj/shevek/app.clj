@@ -3,6 +3,7 @@
             [mount.core :as mount :refer [defstate]]
             [shevek.config :refer [config env? env]]
             [shevek.server]
+            [shevek.db]
             [taoensso.timbre :as log]
             [schema.core :as s])
   (:gen-class))

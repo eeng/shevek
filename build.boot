@@ -34,7 +34,8 @@
                     [com.taoensso/timbre "4.8.0"]
                     [com.rpl/specter "1.0.0"]
                     [prismatic/schema "1.1.4"]
-                    [metosin/schema-tools "0.9.0"]])
+                    [metosin/schema-tools "0.9.0"]
+                    [com.novemberain/monger "3.1.0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
