@@ -13,5 +13,5 @@
   (let [slug (symbol (str/slug description))]
     `(deftest ~slug
        (testing ~description
-         (drop-db (db))
+         (drop-db db)
          ~@body))))

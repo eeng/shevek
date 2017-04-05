@@ -7,5 +7,4 @@
   :start (mg/connect-via-uri (config :mongodb-uri))
   :stop (mg/disconnect (mongo :conn)))
 
-(defn db []
-  (mongo :db))
+(defstate db :start (mongo :db))

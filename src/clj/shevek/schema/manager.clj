@@ -14,15 +14,15 @@
 (defn- corresponding [field coll]
   (detect #(same-name? field %) coll))
 
-(defn- merge-fields [old-coll new-coll]
+(defn- merge-dimensions [old-coll new-coll]
   (let [old-updated-fields (map #(merge % (corresponding % new-coll)) old-coll)
         new-fields (remove #(corresponding % old-coll) new-coll)]
     (concat old-updated-fields new-fields)))
 
 (defn- update-cube [old new]
   (-> (merge old (dissoc new :dimensions :measures))
-      (assoc :dimensions (merge-fields (:dimensions old) (:dimensions new)))
-      (assoc :measures (merge-fields (:measures old) (:measures new)))))
+      (assoc :dimensions (merge-dimensions (:dimensions old) (:dimensions new)))
+      (assoc :measures (merge-dimensions (:measures old) (:measures new)))))
 
 (defn discover! [dw db]
   (let [existing-cubes (find-cubes db)
@@ -31,4 +31,4 @@
       (for [dc discovered-cubes]
         (save-cube db (update-cube (corresponding dc existing-cubes) dc))))))
 
-#_(discover! shevek.dw2/dw (shevek.db/db))
+#_(discover! shevek.dw2/dw shevek.db/db)
