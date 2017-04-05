@@ -43,7 +43,7 @@
   (console.log "Sending query" q) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
   (let [q (-> (add-interval q (get-in db [:cubes (current-cube-name) :max-time]))
               (st/select-schema Query))]
-    (rpc/call "dw/query" :args [q] :handler #(dispatch :query-executed % results-keys))
+    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
 
 (defn- send-main-query [{:keys [cube-view] :as db}]
