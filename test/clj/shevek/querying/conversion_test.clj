@@ -1,31 +1,7 @@
-(ns shevek.engines.druid-test
+(ns shevek.querying.conversion-test
   (:require [clojure.test :refer :all]
-            [stub-http.core :refer :all]
-            [shevek.asserts :refer [submaps? submap? without?]]
-            [shevek.engines.druid :refer [datasources dimensions metrics to-druid-query from-druid-results]]
-            [clojure.java.io :as io]))
-
-(defn druid-res [name]
-  {:status 200
-   :content-type "application/json"
-   :body (-> (str "druid_responses/" name ".json") io/resource slurp)})
-
-(deftest datasources-test
-  (with-routes!
-    {{:method :get :path "/druid/v2/datasources"} (druid-res "datasources")}
-    (is (= [{:name "ds1"} {:name "ds2"}] (datasources uri)))))
-
-(deftest dimensions-test
-  (with-routes!
-    {{:method :post :path "/druid/v2"} (druid-res "segment_metadata")}
-    (is (submaps? [{:name "__time"} {:name "cityName"} {:name "countryName"}]
-                  (dimensions uri "wikiticker")))))
-
-(deftest metrics-test
-  (with-routes!
-    {{:method :post :path "/druid/v2"} (druid-res "segment_metadata")}
-    (is (submaps? [{:name "added"} {:name "count"}]
-                  (metrics uri "wikiticker")))))
+            [shevek.asserts :refer [submap? without? submaps?]]
+            [shevek.querying.conversion :refer [to-druid-query from-druid-results]]))
 
 (deftest to-druid-query-test
   (testing "totals query"

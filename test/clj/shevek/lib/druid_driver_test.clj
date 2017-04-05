@@ -1,8 +1,8 @@
-(ns shevek.dw.druid-driver-test
+(ns shevek.lib.druid-driver-test
   (:require [clojure.test :refer :all]
             [stub-http.core :refer :all]
             [shevek.asserts :refer [submaps?]]
-            [shevek.dw.druid-driver :as druid]
+            [shevek.lib.druid-driver :as druid]
             [clojure.java.io :as io]
             [cheshire.core :refer [generate-string]]))
 
@@ -25,5 +25,5 @@
             (= (:content-type headers) "application/json")))
      (druid-res "time-boundary")}
     (is (= [{:timestamp "T1"
-             :result {:maxTime "T2"}}] 
+             :result {:maxTime "T2"}}]
            (druid/send-query (druid/connect uri) {:queryType "timeBoundary"})))))

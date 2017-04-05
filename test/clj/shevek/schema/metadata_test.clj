@@ -1,7 +1,7 @@
-(ns shevek.dw.engine-test
+(ns shevek.schema.metadata-test
   (:require [clojure.test :refer :all]
-            [shevek.dw.druid-driver :refer [datasources send-query]]
-            [shevek.dw.engine :as e]))
+            [shevek.lib.druid-driver :refer [datasources send-query]]
+            [shevek.schema.metadata :as m]))
 
 (deftest engine-test
   (testing "cubes should return a vector of datasources"
@@ -9,7 +9,7 @@
       (with-redefs [datasources (fn [dw]
                                   (is (= dw fake-dw))
                                   ["wikiticker" "another"])]
-        (is (= ["wikiticker" "another"] (e/cubes fake-dw))))))
+        (is (= ["wikiticker" "another"] (m/cubes fake-dw))))))
 
   (testing "dimensions-and-measures should return a pair of vectors, first the dimensions and second the measures"
     (with-redefs [send-query
@@ -22,4 +22,4 @@
                       :aggregators {:added {:type "longSum"}}}])]
       (is (= [[{:name "region" :type "STRING"} {:name "city" :type "STRING"}]
               [{:name "added" :type "longSum"}]]
-             (e/dimensions-and-measures nil "wikiticker"))))))
+             (m/dimensions-and-measures nil "wikiticker"))))))

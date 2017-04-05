@@ -1,9 +1,7 @@
-(ns shevek.dw.engine
+(ns shevek.schema.metadata
   (:require [shevek.config :refer [config]]
-            [shevek.dw.druid-driver :as druid]
-            [mount.core :refer [defstate]]))
-
-(defstate dw :start (druid/connect (config :druid-uri)))
+            [shevek.lib.druid-driver :as druid]
+            [clojure.set :refer [rename-keys]]))
 
 (defn cubes [dw]
   (druid/datasources dw))
@@ -31,11 +29,15 @@
         measures (map with-name-inside aggregators)]
     [dimensions measures]))
 
-(defn query [dw q]
-  ,,,)
+(defn time-boundary [dw cube]
+  (-> (druid/send-query dw {:queryType "timeBoundary" :dataSource cube})
+      first :result
+      (rename-keys {:maxTime :max-time :minTime :min-time})))
 
 ;; Examples
 
+(require '[shevek.dw2 :refer [dw]])
 #_(cubes dw)
 #_(dimensions-and-measures dw "wikiticker")
 #_(segment-metadata-query dw "wikiticker")
+#_(time-boundary dw "wikiticker")

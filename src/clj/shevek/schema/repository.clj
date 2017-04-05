@@ -1,6 +1,5 @@
-(ns shevek.dw.schema
+(ns shevek.schema.repository
   (:require [schema.core :as s]
-            [shevek.dw.engine :refer [cubes dimensions-and-measures]]
             [monger.collection :as mc])
   (:import [org.bson.types ObjectId]))
 
@@ -20,14 +19,3 @@
 
 (s/defn save-cube [db cube :- Cube]
   (mc/insert-and-return db "cubes" (assoc cube :_id (ObjectId.))))
-
-(defn discover! [dw db]
-  (doall
-    (for [cube-name (cubes dw)]
-      (let [[dimensions measures] (dimensions-and-measures dw cube-name)
-            cube {:name cube-name
-                  :dimensions dimensions
-                  :measures measures}]
-        (save-cube db cube)))))
-
-#_(discover! shevek.dw.engine/dw (shevek.db/db))

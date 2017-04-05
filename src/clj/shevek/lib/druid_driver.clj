@@ -1,4 +1,4 @@
-(ns shevek.dw.druid-driver
+(ns shevek.lib.druid-driver
   (:require [clj-http.client :as http]
             [taoensso.timbre :as log]
             [shevek.logging :refer [pp-str]]))

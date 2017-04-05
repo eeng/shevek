@@ -5,3 +5,7 @@
 
 (defn detect [pred coll]
   (first (filter pred coll)))
+
+(defn assoc-if-seq [map key val]
+  (cond-> map
+          (seq val) (assoc key val)))

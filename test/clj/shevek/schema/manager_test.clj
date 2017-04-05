@@ -1,9 +1,9 @@
-(ns shevek.dw.schema-test
+(ns shevek.schema.manager-test
   (:require [clojure.test :refer :all]
             [shevek.test-helper :refer [with-clean-db]]
             [shevek.asserts :refer [submaps?]]
-            [shevek.dw.schema :refer [discover!]]
-            [shevek.dw.engine :refer [cubes dimensions-and-measures]]
+            [shevek.schema.manager :refer [discover!]]
+            [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
             [shevek.db :refer [db]]))
 
 (deftest discover!-test
