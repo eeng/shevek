@@ -25,3 +25,6 @@
 
 (defn find-cubes [db]
   (mc/find-maps db "cubes"))
+
+(defn find-cube [db name]
+  (mc/find-one-as-map db "cubes" {:name name}))

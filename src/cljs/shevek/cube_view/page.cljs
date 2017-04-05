@@ -22,7 +22,7 @@
       (->> (assoc db :cube-view))))
 
 (defevh :cube-selected [db cube]
-  (rpc/call "dw/cube" :args [cube] :handler #(dispatch :cube-arrived %))
+  (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
   (dispatch :navigate :cube)
   (-> (assoc db :cube-view {:cube cube})
       (rpc/loading :cube-metadata)))
@@ -40,7 +40,7 @@
 (defn fetch-max-time []
   (when (= (db/get :page) :cube)
     (let [name (current-cube-name)]
-      (rpc/call "dw/max-time" :args [name] :handler #(dispatch :max-time-arrived name %)))))
+      (rpc/call "schema.api/max-time" :args [name] :handler #(dispatch :max-time-arrived name %)))))
 
 (defonce timeout (every 60 fetch-max-time))
 

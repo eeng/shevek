@@ -5,7 +5,8 @@
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
             [clojure.string :refer [split]]
-            [shevek.logging :refer [wrap-request-logging]]))
+            [shevek.logging :refer [wrap-request-logging]]
+            [shevek.lib.transit-handlers :as th]))
 
 (defn call-fn
   "Given a map like {:fn 'ns/func' :args [1 2]} calls (shevek.ns/func 1 2)"
@@ -26,5 +27,5 @@
 ; TODO Para habilitar el anti-forgery habría que setearlo en una var en el index con (anti-forgery-field) y luego en los POST de cljs-ajax agregarlo al header X-CSRF-Token
 (def app (-> app-routes
              (wrap-request-logging)
-             (wrap-restful-format)
+             (wrap-restful-format :response-options {:transit-json {:handlers {org.bson.types.ObjectId th/object-id-writer}}})
              (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))

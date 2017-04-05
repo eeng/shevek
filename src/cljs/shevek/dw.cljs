@@ -34,7 +34,7 @@
       (rpc/loaded :cubes)))
 
 (defevh :cubes-requested [db]
-  (rpc/call "dw/cubes" :handler #(dispatch :cubes-arrived %))
+  (rpc/call "schema.api/cubes" :handler #(dispatch :cubes-arrived %))
   (rpc/loading db :cubes))
 
 (defn fetch-cubes []

@@ -8,8 +8,7 @@
 (s/defschema Dimension
   {:name s/Str
    :title s/Str
-   :type s/Str
-   :cardinality (s/maybe s/Int)})
+   :type s/Str})
 
 (s/defschema Measure
   {:name s/Str
@@ -17,16 +16,15 @@
    :type s/Str})
 
 (s/defschema Cube
-  {:name s/Str
+  {(s/optional-key :_id) s/Any
+   :name s/Str
    :title s/Str
    (s/optional-key :dimensions) [Dimension]
    (s/optional-key :measures) [Measure]
    (s/optional-key :max-time) goog.date.DateTime})
 
 (s/defschema SortBy
-  (s/if #(contains? % :cardinality)
-        (assoc Dimension :descending s/Bool)
-        (assoc Measure :descending s/Bool)))
+  (assoc Dimension :descending s/Bool))
 
 (s/defschema Split
   (assoc Dimension
