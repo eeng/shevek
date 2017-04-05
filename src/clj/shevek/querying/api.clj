@@ -1,5 +1,5 @@
 (ns shevek.querying.api
-  (:require [shevek.dw2 :refer [dw]]
+  (:require [shevek.dw :refer [dw]]
             [shevek.querying.manager :as m]))
 
 (defn query [q]

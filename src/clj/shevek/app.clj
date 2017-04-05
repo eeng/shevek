@@ -4,7 +4,7 @@
             [shevek.config :refer [config env? env]]
             [shevek.server]
             [shevek.db]
-            [shevek.dw2]
+            [shevek.dw]
             [taoensso.timbre :as log]
             [schema.core :as s])
   (:gen-class))

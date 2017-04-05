@@ -2,7 +2,7 @@
   (:require [shevek.schema.repository :as r]
             [shevek.schema.metadata :as m]
             [shevek.db :refer [db]]
-            [shevek.dw2 :refer [dw]]))
+            [shevek.dw :refer [dw]]))
 
 (defn cubes []
   (r/find-cubes db))

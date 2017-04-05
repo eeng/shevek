@@ -31,4 +31,4 @@
       (for [dc discovered-cubes]
         (save-cube db (update-cube (corresponding dc existing-cubes) dc))))))
 
-#_(discover! shevek.dw2/dw shevek.db/db)
+#_(discover! shevek.dw/dw shevek.db/db)
