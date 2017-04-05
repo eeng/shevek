@@ -2,11 +2,16 @@
   (:require [mount.core :as mount]
             [monger.db :refer [drop-db]]
             [shevek.app]
-            [shevek.db :refer [db]]))
+            [shevek.db :refer [db]]
+            [clojure.test :refer [deftest testing]]
+            [cuerdas.core :as str]))
 
 (defn init []
   (mount/start-without #'shevek.app/nrepl #'shevek.server/web-server))
 
-(defn with-clean-db [f]
-  (drop-db (db))
-  (f))
+(defmacro spec [description & body]
+  (let [slug (symbol (str/slug description))]
+    `(deftest ~slug
+       (testing ~description
+         (drop-db (db))
+         ~@body))))
