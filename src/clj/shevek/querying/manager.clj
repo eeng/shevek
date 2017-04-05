@@ -19,7 +19,8 @@
            (pmap #(assoc-if-seq % :_results
                     (send-queries-for-split dw
                       (assoc q :split dims
-                               :filter (add-filter-for-dim filter dim %)))))))))
+                               :filter (add-filter-for-dim filter dim %)))))
+           doall))))
 
 ; FIXME s/defn Query
 (defn query [dw {:keys [totals] :as q}]
