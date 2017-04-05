@@ -23,7 +23,7 @@
       (is (submaps? [{:name "added" :type "longSum"}] (-> cubes first :measures)))
       (is (= 2 (->> cubes (map :_id) (filter identity) count))))))
 
-(spec "subsequent discovery found one new cube"
+(spec "discovery of a new cube"
   (let [c1 (save-cube (db) {:name "c1"
                             :dimensions [{:name "d1" :type "STRING"}]
                             :measures [{:name "m1" :type "count"}]})]
@@ -36,5 +36,22 @@
       (discover! nil (db))
       (let [cubes (find-cubes (db))]
         (is (= ["c1" "c2"] (map :name cubes)))
+        (is (= (:_id c1) (:_id (first cubes))))
         (is (= ["d1" "d2"] (select [ALL :dimensions ALL :name] cubes)))
         (is (= ["m1" "m2"] (select [ALL :measures ALL :name] cubes)))))))
+
+(spec "existing cube with a new dimension (d2), a deleted one (d1) and a changed measure type"
+  (let [c1 (save-cube (db) {:name "c1" :title "C1"
+                            :dimensions [{:name "d1" :type "STRING" :title "D1"}]
+                            :measures [{:name "m1" :type "count" :title "M1"}]})]
+    (with-redefs
+      [cubes (constantly ["c1"])
+       dimensions-and-measures (fn [_ cube]
+                                 "c1" [[{:name "d2" :type "STRING"}]
+                                       [{:name "m1" :type "longSum"}]])]
+      (discover! nil (db))
+      (let [cubes (find-cubes (db))]
+        (is (= [["c1" "C1"]] (map (juxt :name :title) cubes)))
+        (is (= (:_id c1) (:_id (first cubes))))
+        (is (= [["d1" "D1"] ["d2" nil]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
+        (is (= [["m1" "M1" "longSum"]] (map (juxt :name :title :type) (select [ALL :measures ALL] cubes))))))))

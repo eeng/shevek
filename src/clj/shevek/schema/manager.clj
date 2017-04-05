@@ -11,16 +11,24 @@
 (defn- same-name? [{n1 :name} {n2 :name}]
   (= n1 n2))
 
-(defn- update-cube [new old]
-  (or old new))
+(defn- corresponding [field coll]
+  (detect #(same-name? field %) coll))
+
+(defn- merge-fields [old-coll new-coll]
+  (let [old-updated-fields (map #(merge % (corresponding % new-coll)) old-coll)
+        new-fields (remove #(corresponding % old-coll) new-coll)]
+    (concat old-updated-fields new-fields)))
+
+(defn- update-cube [old new]
+  (-> (merge old (dissoc new :dimensions :measures))
+      (assoc :dimensions (merge-fields (:dimensions old) (:dimensions new)))
+      (assoc :measures (merge-fields (:measures old) (:measures new)))))
 
 (defn discover! [dw db]
   (let [existing-cubes (find-cubes db)
         discovered-cubes (discover-cubes dw)]
     (doall
       (for [dc discovered-cubes]
-        (save-cube db (->> existing-cubes
-                           (detect #(same-name? dc %))
-                           (update-cube dc)))))))
+        (save-cube db (update-cube (corresponding dc existing-cubes) dc))))))
 
 #_(discover! shevek.dw2/dw (shevek.db/db))
