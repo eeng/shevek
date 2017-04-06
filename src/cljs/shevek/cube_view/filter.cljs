@@ -126,10 +126,10 @@
                        (dispatch :dimension-removed-from-filter dim)
                        (dispatch :filter-options-changed dim @opts))
           :class (when (= @opts (select-keys dim [:operator :value])) "disabled")}
-         (t :answer/ok)]
+         (t :actions/ok)]
         [:button.ui.compact.button
          {:on-click (without-propagation close)}
-         (t :answer/cancel)]]])))
+         (t :actions/cancel)]]])))
 
 (defn- filter-popup [popup dim]
   (if (time-dimension? dim)

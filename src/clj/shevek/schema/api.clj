@@ -14,6 +14,9 @@
   (assoc (r/find-cube db name)
          :max-time (max-time name)))
 
+(defn save-cube [cube]
+  (r/save-cube db cube))
+
 ;; Examples
 
 #_(cubes)

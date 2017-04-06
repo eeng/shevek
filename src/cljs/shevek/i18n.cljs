@@ -45,6 +45,10 @@
                    :previous-year "Previous Year"}
     :cubes.operator {:include "Include"
                      :exclude "Exclude"}
+    :cubes.schema {:name "Name"
+                   :title "Title"
+                   :description "Description"
+                   :type "Type"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -53,8 +57,10 @@
                    :hour "MMM d yyyy, ha"
                    :day "MMM d yyyy"
                    :month "MMM yyyy"}
-    :answer {:ok "Accept"
-             :cancel "Cancel"}
+    :actions {:ok "Accept"
+              :cancel "Cancel"
+              :edit "Modify"
+              :save "Save"}
     :input {:search "Search"}}
 
    :es
@@ -96,6 +102,10 @@
                    :previous-year "Año Pasado"}
     :cubes.operator {:include "Incluir"
                      :exclude "Excluir"}
+    :cubes.schema {:name "Nombre"
+                   :title "Título"
+                   :description "Descripción"
+                   :type "Tipo"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"
@@ -104,8 +114,10 @@
                    :hour "dd/MM/yyyy H 'hs'"
                    :day "dd/MM/yyyy"
                    :month "MM/yyyy"}
-    :answer {:ok "Aceptar"
-             :cancel "Cancelar"}
+    :actions {:ok "Aceptar"
+              :cancel "Cancelar"
+              :edit "Editar"
+              :save "Guardar"}
     :input {:search "Buscar"}}
 
    :tongue/fallback :en})
