@@ -30,7 +30,7 @@
   (zipmap (map :name cubes) cubes))
 
 (defevh :cubes-arrived [db cubes]
-  (-> (update db :cubes #(merge-with merge % (to-map-with-name-as-key (set-defaults cubes))))
+  (-> (assoc db :cubes (to-map-with-name-as-key (set-defaults cubes)))
       (rpc/loaded :cubes)))
 
 (defevh :cubes-requested [db]

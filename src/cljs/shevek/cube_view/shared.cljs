@@ -19,11 +19,10 @@
   (db/get-in (into [:cube-view] keys)))
 
 (defn current-cube-name []
-  (cube-view :cube))
+  (cube-view :cube :name))
 
 (defn current-cube [& keys]
-  (-> (db/get :cubes)
-      (get (current-cube-name))
+  (-> (cube-view :cube)
       (get-in keys)))
 
 ; Copio el split a arrived-split asi sólo se rerenderiza la table cuando llegan los resultados. Sino se re-renderizaría dos veces, primero inmediatamente luego de splitear y despues cuando llegan los resultados, provocando un pantallazo molesto.
@@ -40,9 +39,11 @@
             q)))
 
 (defn send-query [db q results-keys]
-  (console.log "Sending query" q) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
-  (let [q (-> (add-interval q (get-in db [:cubes (current-cube-name) :max-time]))
+  (let [cube (get-in db [:cube-view :cube])
+        q (-> (add-interval q (cube :max-time))
+              (assoc :cube (cube :name))
               (st/select-schema Query))]
+    (console.log "Sending query" q) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
 

@@ -21,18 +21,18 @@
              :pinboard {:measure (first measures) :dimensions []})
       (->> (assoc db :cube-view))))
 
-(defevh :cube-selected [db cube]
-  (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (dispatch :navigate :cube)
-  (-> (assoc db :cube-view {:cube cube})
-      (rpc/loading :cube-metadata)))
-
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (let [cube (dw/set-cube-defaults cube)]
-    (-> (update-in db [:cubes name] merge cube)
+    (-> (assoc-in db [:cube-view :cube] cube)
         (init-cube-view cube)
         (rpc/loaded :cube-metadata)
         (send-main-query))))
+
+(defevh :cube-selected [db cube]
+  (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
+  (dispatch :navigate :cube)
+  (-> (assoc db :cube-view {:cube {:name cube}})
+      (rpc/loading :cube-metadata)))
 
 (defevh :max-time-arrived [db cube-name max-time]
   (update-in db [:cubes cube-name] assoc :max-time (dw/parse-max-time max-time)))

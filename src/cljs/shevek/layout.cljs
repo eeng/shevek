@@ -9,7 +9,7 @@
             [shevek.dashboard :as dashboard]
             [shevek.settings :as settings]
             [shevek.cube-view.page :as cube]
-            [shevek.cube-view.shared :refer [current-cube-name current-cube]]
+            [shevek.cube-view.shared :refer [current-cube-name]]
             [shevek.dw :as dw]))
 
 (def pages
@@ -38,18 +38,20 @@
   (dw/fetch-cubes)
   (fn []
     (let [cube-name (current-cube-name)
-          cube-title (current-cube :title)]
-      [make-dropdown {}
-       [:div.ui.dropdown.item
-        [:i.cubes.icon]
-        [:div.text (if (active? :cube) cube-title (t :cubes/menu))]
-        [:i.dropdown.icon]
-        [:div.menu
-         (for [{:keys [name title]} (dw/cubes-list)]
-           ^{:key name}
-           [:a.item {:href (str "#/cubes/" name)
-                     :class (when (= cube-name name) "active")}
-            title])]]])))
+          cube-title (db/get-in [:cubes cube-name :title])
+          cubes (dw/cubes-list)]
+      (when (seq cubes)
+        [make-dropdown {}
+         [:div.ui.dropdown.item
+          [:i.cubes.icon]
+          [:div.text (if (active? :cube) cube-title (t :cubes/menu))]
+          [:i.dropdown.icon]
+          [:div.menu
+           (for [{:keys [name title]} cubes]
+             ^{:key name}
+             [:a.item {:href (str "#/cubes/" name)
+                       :class (when (= cube-name name) "active")}
+              title])]]]))))
 
 (defn layout []
   [:div

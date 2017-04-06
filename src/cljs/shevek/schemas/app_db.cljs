@@ -18,7 +18,7 @@
 (s/defschema Cube
   {(s/optional-key :_id) s/Any
    :name s/Str
-   :title s/Str
+   (s/optional-key :title) s/Str
    (s/optional-key :description) s/Str
    (s/optional-key :dimensions) [Dimension]
    (s/optional-key :measures) [Measure]
@@ -52,7 +52,7 @@
 (s/defschema Result {s/Keyword s/Any})
 
 (s/defschema CubeView
-  {:cube s/Str
+  {:cube Cube
    (s/optional-key :filter) [(s/one TimeFilter "tf") NormalFilter]
    (s/optional-key :split) [Split]
    (s/optional-key :arrived-split) [Split]
