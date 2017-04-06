@@ -35,32 +35,32 @@
   (when (= (db/get :page) page) "active"))
 
 (defn cubes-menu []
-  (let [cube-name (current-cube-name)
-        cube-title (current-cube :title)]
-    [make-dropdown {}
-     [:div.ui.dropdown.item
-      [:i.cubes.icon]
-      [:div.text (if (active? :cube) cube-title (t :cubes/menu))]
-      [:i.dropdown.icon]
-      [:div.menu
-       (for [{:keys [name title]} (dw/cubes-list)]
-         ^{:key name}
-         [:a.item {:href (str "#/cubes/" name)
-                   :class (when (= cube-name name) "active")}
-          title])]]]))
-
-(defn layout []
   (dw/fetch-cubes)
   (fn []
-    [:div
-     [:div.ui.fixed.inverted.menu
-      [:a.item {:href "#/" :class (active? :dashboard)}
-       [:i.block.layout.icon] (t :dashboard/title)]
-      [cubes-menu]
-      [:div.right.menu
-       (when (loading?) [:div.item [:i.repeat.loading.icon]])
-       [:a.item {:href "#/settings" :class (active? :settings)}
-        [:i.settings.icon] (t :settings/title)]
-       [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]
-     [:div.page
-      [(get pages (db/get :page) :div)]]]))
+    (let [cube-name (current-cube-name)
+          cube-title (current-cube :title)]
+      [make-dropdown {}
+       [:div.ui.dropdown.item
+        [:i.cubes.icon]
+        [:div.text (if (active? :cube) cube-title (t :cubes/menu))]
+        [:i.dropdown.icon]
+        [:div.menu
+         (for [{:keys [name title]} (dw/cubes-list)]
+           ^{:key name}
+           [:a.item {:href (str "#/cubes/" name)
+                     :class (when (= cube-name name) "active")}
+            title])]]])))
+
+(defn layout []
+  [:div
+   [:div.ui.fixed.inverted.menu
+    [:a.item {:href "#/" :class (active? :dashboard)}
+     [:i.block.layout.icon] (t :dashboard/title)]
+    [cubes-menu]
+    [:div.right.menu
+     (when (loading?) [:div.item [:i.repeat.loading.icon]])
+     [:a.item {:href "#/settings" :class (active? :settings)}
+      [:i.settings.icon] (t :settings/title)]
+     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]
+   [:div.page
+    [(get pages (db/get :page) :div)]]])

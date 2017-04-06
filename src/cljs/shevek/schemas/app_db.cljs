@@ -19,6 +19,7 @@
   {(s/optional-key :_id) s/Any
    :name s/Str
    :title s/Str
+   (s/optional-key :description) s/Str
    (s/optional-key :dimensions) [Dimension]
    (s/optional-key :measures) [Measure]
    (s/optional-key :max-time) goog.date.DateTime})

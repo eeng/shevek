@@ -17,15 +17,15 @@
 
 (defn- cubes-cards []
   (let [cubes (dw/cubes-list)]
-    (if (rpc/loading? :cubes)
-      [:div.ui.active.inline.loader]
-      [:div.ui.cards
-       (if (seq cubes)
-         (doall (map-indexed cube-card cubes))
-         [:div.ui.basic.segment (t :cubes/missing)])])))
+    [:div.ui.cards
+     (if (seq cubes)
+       (doall (map-indexed cube-card cubes))
+       [:div.ui.basic.segment (t :cubes/missing)])]))
 
 (defn page []
-  [:div.ui.container
-   [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]
-   [:h2.ui.dividing.header (t :cubes/title)]
-   [cubes-cards]])
+  (dw/fetch-cubes)
+  (fn []
+    [:div.ui.container
+     [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]
+     [:h2.ui.dividing.header (t :cubes/title)]
+     [cubes-cards]]))
