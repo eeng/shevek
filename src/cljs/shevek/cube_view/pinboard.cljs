@@ -1,6 +1,5 @@
 (ns shevek.cube-view.pinboard
-  (:require-macros [reflow.macros :refer [defevh]]
-                   [shevek.lib.reagent :refer [rfor]])
+  (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [debounce regex-escape]]
@@ -85,11 +84,9 @@
            [search-input search {:on-change #(debounce-dispatch :dimension-values-searched dim %)
                                  :on-stop #(reset! searching false)}])
          (if results
-           [:div.items
-            (if (seq filtered-results)
-              (rfor [result filtered-results]
-                [pinned-dimension-item dim result measure @search])
-              [:div.item.no-results (t :cubes/no-results)])]
+           (if (seq filtered-results)
+             (into [:div.items] (map #(pinned-dimension-item dim % measure @search) filtered-results))
+             [:div.items [:div.item.no-results (t :cubes/no-results)]])
            [:div.items.empty])]))))
 
 (defn- adjust-max-height [rc]

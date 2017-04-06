@@ -3,7 +3,6 @@
   (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [reagent.core :as r]
-            [shevek.lib.react :refer [with-react-keys]]
             [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
@@ -71,7 +70,7 @@
 
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text
-   (when (seq actions) [:div.actions (with-react-keys actions)])])
+   (when (seq actions) (into [:div.actions] actions))])
 
 (defn- filter-matching [search get-value results]
   (if (seq search)

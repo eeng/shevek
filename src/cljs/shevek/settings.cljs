@@ -3,6 +3,7 @@
   (:require [shevek.i18n :refer [t]]
             [shevek.components :refer [page-title select]]
             [shevek.lib.local-storage :as local-storage]
+            [shevek.lib.react :refer [rmap]]
             [shevek.dw :as dw]
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
@@ -58,7 +59,7 @@
   (fn []
     [:section
      [:h2.ui.dividing.header (t :cubes/menu)]
-     (map cube-details (dw/cubes-list))]))
+     (rmap cube-details (dw/cubes-list) :name)]))
 
 (defn page []
  [:div#settings.ui.container

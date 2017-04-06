@@ -1,12 +1,11 @@
 (ns shevek.cube-view.filter
-  (:require-macros [shevek.lib.reagent :refer [rfor]]
-                   [reflow.macros :refer [defevh]])
+  (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
             [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period]]
-            [shevek.lib.react :refer [rmap without-propagation]]
+            [shevek.lib.react :refer [without-propagation]]
             [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube]]
             [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
@@ -49,8 +48,9 @@
   [:div.periods
    [:h2.ui.sub.header header]
    [:div.ui.five.small.basic.buttons
-     (rfor [period periods]
-       [:button.ui.button {:class (when (= period selected-period) "active")
+     (for [period periods]
+       [:button.ui.button {:key period
+                           :class (when (= period selected-period) "active")
                            :on-click #(when-not (= period selected-period)
                                         (dispatch :filter-options-changed dim {:selected-period period}))
                            :on-mouse-over #(reset! showed-period period)
@@ -116,10 +116,10 @@
         [operator-selector opts]
         [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %) :on-stop close}]]
        [:div.items-container
-         [:div.items
-          (rfor [result (->> (cube-view :results :filter name)
-                             (filter-matching @search (partial format-dimension dim)))]
-            [dimension-value-item dim result opts @search])]]
+        (into [:div.items]
+          (map #(dimension-value-item dim % opts @search)
+               (->> (cube-view :results :filter name)
+                    (filter-matching @search (partial format-dimension dim)))))]
        [:div
         [:button.ui.primary.compact.button
          {:on-click #(if (empty? (@opts :value))
@@ -159,7 +159,8 @@
         added-ms-ago (- (js/Date.) last-added-at)]
     [:div.filter.panel
      [panel-header (t :cubes/filter)]
-     (rfor [dim (cube-view :filter)]
+     (for [dim (cube-view :filter)]
+       ^{:key (:name dim)}
        [(controlled-popup filter-item filter-popup
                           {:position "bottom center"
                            :init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 250))

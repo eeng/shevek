@@ -1,6 +1,5 @@
 (ns shevek.cube-view.split
-  (:require-macros [shevek.lib.reagent :refer [rfor]]
-                   [reflow.macros :refer [defevh]])
+  (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
@@ -79,4 +78,5 @@
   [:div.split.panel
    [panel-header (t :cubes/split)]
    (rmap (controlled-popup split-item split-popup {:position "bottom center"})
-         (cube-view :split))])
+         (cube-view :split)
+         :name)])

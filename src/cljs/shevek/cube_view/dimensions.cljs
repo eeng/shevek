@@ -4,8 +4,8 @@
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.lib.react :refer [rmap]]
             [shevek.components :refer [controlled-popup]]
+            [shevek.lib.react :refer [rmap]]
             [shevek.cube-view.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
 
 (defn dimension-popup-button [{:keys [close]} color icon event name]
@@ -50,4 +50,5 @@
          [:div.items
           (rmap (controlled-popup (partial dimension-item search-text) dimension-popup
                                   {:position "right center" :distanceAway -30})
-                filtered-dims)]]))))
+                filtered-dims
+                :name)]]))))

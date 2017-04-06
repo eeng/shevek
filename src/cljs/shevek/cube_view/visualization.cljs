@@ -1,11 +1,9 @@
 (ns shevek.cube-view.visualization
-  (:require-macros [shevek.lib.reagent :refer [rfor]])
   (:require [reagent.core :as r]
             [clojure.string :as str]
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
             [shevek.dw :as dw]
-            [shevek.lib.react :refer [rmap with-react-keys]]
             [shevek.lib.collections :refer [detect]]
             [shevek.rpc :as rpc]
             [shevek.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result? clean-dim]]))
@@ -34,9 +32,10 @@
     [:td
      [:div {:class (str "depth-" depth)}
       (format-dimension dim result)]]
-    (rfor [measure measures
+    (for [measure measures
            :let [measure-name (-> measure :name keyword)
                  measure-value (measure-name result)]]
+      ^{:key measure-name}
       [:td.right.aligned
        [:div.bg (when-not (totals-result? result dim)
                   {:style {:width (calculate-rate measure-value (max-values measure-name))}})]
@@ -76,10 +75,9 @@
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
      [:thead>tr
       [sortable-th (->> split (map :title) (str/join ", ")) split split]
-      (rfor [{:keys [title] :as measure} measures]
-        [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
-     [:tbody
-      (with-react-keys (pivot-table-rows results split 0 measures max-values))]]))
+      (for [{:keys [name title] :as measure} measures]
+        ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
+     (into [:tbody] (pivot-table-rows results split 0 measures max-values))]))
 
 (defn visualization-panel []
   [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
