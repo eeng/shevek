@@ -16,8 +16,8 @@
 
 (s/defschema Cube
   (assoc NTD
-         :dimensions [Dimension]
-         :measures [Measure]
+         (s/optional-key :dimensions) [Dimension]
+         (s/optional-key :measures) [Measure]
          (s/optional-key :_id) ObjectId))
 
 (s/defn save-cube [db cube :- Cube]
