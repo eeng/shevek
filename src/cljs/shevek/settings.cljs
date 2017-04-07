@@ -30,10 +30,32 @@
     {:selected (db/get-in [:settings :lang] "en")
      :on-change #(dispatch :settings-saved {:lang %})}]])
 
+(defevh :users-arrived [db users]
+  (-> (assoc db :users users)
+      (rpc/loaded :users)))
+
+(defevh :users-requested [db]
+  (rpc/call "users.api/find-all" :handler #(dispatch :users-arrived %))
+  (rpc/loading db :users))
+
+(defn- user-row [{:keys [username fullname email]}]
+  [:tr
+   [:td username]
+   [:td fullname]
+   [:td email]])
+
 (defn- users-section []
-  [:section
-   [:h2.ui.app.header (t :settings/users)]
-   [:div "TODO Tabla de users"]])
+  (dispatch :users-requested)
+  (fn []
+    [:section
+     [:h2.ui.app.header (t :settings/users)]
+     [:table.ui.basic.table
+      [:thead>tr
+       [:th (t :users/username)]
+       [:th (t :users/fullname)]
+       [:th (t :users/email)]]
+      [:tbody
+       (rmap user-row (db/get :users) :username)]]]))
 
 (defn- dimension-row [{:keys [name title type]} edited-cube coll-key i]
   [:tr {:key name}

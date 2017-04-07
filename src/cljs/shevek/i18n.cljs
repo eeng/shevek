@@ -53,6 +53,9 @@
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
                :users "Users"}
+    :users {:username "User Name"
+            :fullname "Full Name"
+            :email "Email"}
     :date-formats {:minute "MMM d, h:mma"
                    :hour "MMM d yyyy, ha"
                    :day "MMM d yyyy"
@@ -110,6 +113,9 @@
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"
                :users "Usuarios"}
+    :users {:username "Usuario"
+            :fullname "Nombre"
+            :email "Email"}
     :date-formats {:minute "dd/MM HH:mm"
                    :hour "dd/MM/yyyy H 'hs'"
                    :day "dd/MM/yyyy"
