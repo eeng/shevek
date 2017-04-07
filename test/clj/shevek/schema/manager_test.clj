@@ -1,10 +1,11 @@
 (ns shevek.schema.manager-test
   (:require [clojure.test :refer [is]]
-            [shevek.test-helper :refer [spec make]]
+            [shevek.test-helper :refer [spec]]
+            [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
             [shevek.schema.manager :refer [discover!]]
             [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
-            [shevek.schema.repository :refer [save-cube find-cubes Cube]]
+            [shevek.schema.repository :refer [find-cubes Cube]]
             [shevek.db :refer [db]]
             [com.rpl.specter :refer [select ALL]]))
 
@@ -24,9 +25,9 @@
       (is (= 2 (->> cubes (map :_id) (filter identity) count))))))
 
 (spec "discovery of a new cube"
-  (let [c1 (save-cube db (make Cube {:name "c1"
-                                     :dimensions [{:name "d1" :type "STRING"}]
-                                     :measures [{:name "m1" :type "count"}]}))]
+  (let [c1 (make! Cube {:name "c1"
+                        :dimensions [{:name "d1" :type "STRING"}]
+                        :measures [{:name "m1" :type "count"}]})]
     (with-redefs
       [cubes (constantly ["c1" "c2"])
        dimensions-and-measures (fn [_ cube]
@@ -41,9 +42,9 @@
         (is (= ["m1" "m2"] (select [ALL :measures ALL :name] cubes)))))))
 
 (spec "existing cube with a new dimension (d2), a deleted one (d1) and a changed measure type"
-  (let [c1 (save-cube db (make Cube {:name "c1" :title "C1"
-                                     :dimensions [{:name "d1" :type "STRING" :title "D1"}]
-                                     :measures [{:name "m1" :type "count" :title "M1"}]}))]
+  (let [c1 (make! Cube {:name "c1" :title "C1"
+                        :dimensions [{:name "d1" :type "STRING" :title "D1"}]
+                        :measures [{:name "m1" :type "count" :title "M1"}]})]
     (with-redefs
       [cubes (constantly ["c1"])
        dimensions-and-measures (fn [_ cube]
