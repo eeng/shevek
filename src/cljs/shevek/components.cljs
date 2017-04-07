@@ -11,11 +11,13 @@
    [:div.content title
     [:div.sub.header subtitle]]])
 
-(defn input-text [atom field]
-  (let [path (-> field vector flatten)]
-    [:input {:type "text"
-             :value (get-in @atom path)
-             :on-change #(swap! atom assoc-in path (.-target.value %))}]))
+(defn input-text [atom field & [{:as opts}]]
+  (let [path (-> field vector flatten)
+        opts (merge {:type "text"
+                     :value (get-in @atom path)
+                     :on-change #(swap! atom assoc-in path (.-target.value %))}
+                    opts)]
+    [:input opts]))
 
 (defn- dropdown* [coll {:keys [placeholder selected class]} & content]
   [:div.ui.dropdown {:class class}

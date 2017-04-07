@@ -55,7 +55,9 @@
                :users "Users"}
     :users {:username "User Name"
             :fullname "Full Name"
-            :email "Email"}
+            :email "Email"
+            :password "Password"
+            :password-confirmation "Password Confirmation"}
     :date-formats {:minute "MMM d, h:mma"
                    :hour "MMM d yyyy, ha"
                    :day "MMM d yyyy"
@@ -63,7 +65,8 @@
     :actions {:ok "Accept"
               :cancel "Cancel"
               :edit "Modify"
-              :save "Save"}
+              :save "Save"
+              :new "New"}
     :input {:search "Search"}}
 
    :es
@@ -115,7 +118,8 @@
                :users "Usuarios"}
     :users {:username "Usuario"
             :fullname "Nombre"
-            :email "Email"}
+            :email "Email"
+            :password-confirmation "Confirmación de Password"}
     :date-formats {:minute "dd/MM HH:mm"
                    :hour "dd/MM/yyyy H 'hs'"
                    :day "dd/MM/yyyy"
@@ -123,7 +127,8 @@
     :actions {:ok "Aceptar"
               :cancel "Cancelar"
               :edit "Editar"
-              :save "Guardar"}
+              :save "Guardar"
+              :new "Nuevo"}
     :input {:search "Buscar"}}
 
    :tongue/fallback :en})
