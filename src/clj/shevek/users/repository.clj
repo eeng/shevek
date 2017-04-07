@@ -1,6 +1,7 @@
 (ns shevek.users.repository
   (:require [schema.core :as s]
-            [monger.collection :as mc]))
+            [monger.collection :as mc]
+            [monger.query :as mq]))
 
 (s/defschema User
   {:username s/Str
@@ -13,7 +14,8 @@
   (mc/save-and-return db "users" user))
 
 (defn find-all [db]
-  (mc/find-maps db "users"))
+  (mq/with-collection db "users"
+    (mq/sort {:username 1})))
 
 #_(save-user shevek.db/db {:username "ddchp" :fullname "Daniel Chavarini" :password "prueba" :email "auditor@vitolen.com"})
 #_(save-user shevek.db/db {:username "dev" :fullname "Desarrollo" :password "prueba"})

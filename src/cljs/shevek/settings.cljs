@@ -48,30 +48,27 @@
   (rpc/loading db :saving-user))
 
 (defn- user-form [edited-user]
-  (if @edited-user
-    [:div.ui.grid
-     [:div.five.wide.column
-      [:div.ui.segment.form-container
-       [:div.ui.form
-        [:div.field.required
-         [:label (t :users/username)]
-         [input-text edited-user :username]]
-        [:div.field.required
-         [:label (t :users/fullname)]
-         [input-text edited-user :fullname]]
-        [:div.field.required
-         [:label (t :users/password)]
-         [input-text edited-user :password {:type "password"}]]
-        [:div.field.required
-         [:label (t :users/password-confirmation)]
-         [input-text edited-user :password-confirmation {:type "password"}]]
-        [:div.field
-         [:label (t :users/email)]
-         [input-text edited-user :email]]
-        [:button.ui.primary.button {:on-click #(dispatch :user-changed edited-user)} (t :actions/save)]
-        [:button.ui.button {:on-click #(reset! edited-user nil)} (t :actions/cancel)]]]]]
-    [:div.actions
-     [:button.ui.button {:on-click #(reset! edited-user {})} (t :actions/new)]]))
+  [:div.ui.grid
+   [:div.five.wide.column
+    [:div.ui.segment.form-container (rpc/loading-class :saving-user)
+     [:div.ui.form
+      [:div.field.required
+       [:label (t :users/username)]
+       [input-text edited-user :username]]
+      [:div.field.required
+       [:label (t :users/fullname)]
+       [input-text edited-user :fullname]]
+      [:div.field.required
+       [:label (t :users/password)]
+       [input-text edited-user :password {:type "password"}]]
+      [:div.field.required
+       [:label (t :users/password-confirmation)]
+       [input-text edited-user :password-confirmation {:type "password"}]]
+      [:div.field
+       [:label (t :users/email)]
+       [input-text edited-user :email]]
+      [:button.ui.primary.button {:on-click #(dispatch :user-changed edited-user)} (t :actions/save)]
+      [:button.ui.button {:on-click #(reset! edited-user nil)} (t :actions/cancel)]]]]])
 
 (defn- user-row [{:keys [username fullname email] :as original-user} edited-user]
   [:tr
@@ -89,7 +86,8 @@
     [:th (t :users/username)]
     [:th (t :users/fullname)]
     [:th (t :users/email)]
-    [:th]]
+    [:th.center.aligned
+     [:button.ui.button {:on-click #(reset! edited-user {})} (t :actions/new)]]]
    [:tbody
     (for [user (db/get :users)]
       ^{:key (:username user)} [user-row user edited-user])]])
@@ -100,7 +98,7 @@
     (fn []
       [:section
        [:h2.ui.app.header (t :settings/users)]
-       [user-form edited-user]
+       (when @edited-user [user-form edited-user])
        [users-table edited-user]])))
 
 (defn- dimension-row [{:keys [name title type]} edited-cube coll-key i]
