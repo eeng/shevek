@@ -70,7 +70,8 @@
     [:div.actions
      [:button.ui.primary.button
       {:on-click #(dispatch :cube-changed edited-cube)
-       :class (when (= @edited-cube original-cube) "disabled")}
+       :class (or (when (= @edited-cube original-cube) "disabled")
+                  (when (rpc/loading? :saving-cube) "loading"))}
       (t :actions/save)]
      [:button.ui.button {:on-click #(reset! edited-cube nil)} (t :actions/cancel)]]
     [:div.actions
