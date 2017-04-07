@@ -38,6 +38,15 @@
   (rpc/call "users.api/find-all" :handler #(dispatch :users-arrived %))
   (rpc/loading db :users))
 
+(defevh :user-saved [db user]
+  (dispatch :users-requested)
+  (rpc/loaded db :saving-user))
+
+(defevh :user-changed [db edited-user]
+  (rpc/call "users.api/save" :args [@edited-user]
+            :handler #(do (dispatch :user-saved %) (reset! edited-user nil)))
+  (rpc/loading db :saving-user))
+
 (defn- user-form [edited-user]
   (if @edited-user
     [:div.ui.grid
@@ -59,7 +68,7 @@
         [:div.field
          [:label (t :users/email)]
          [input-text edited-user :email]]
-        [:button.ui.primary.button (t :actions/save)]
+        [:button.ui.primary.button {:on-click #(dispatch :user-changed edited-user)} (t :actions/save)]
         [:button.ui.button {:on-click #(reset! edited-user nil)} (t :actions/cancel)]]]]]
     [:div.actions
      [:button.ui.button {:on-click #(reset! edited-user {})} (t :actions/new)]]))

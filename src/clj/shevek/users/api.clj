@@ -4,3 +4,6 @@
 
 (defn find-all []
   (r/find-all db))
+
+(defn save [user]
+  (r/save-user db user))

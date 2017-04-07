@@ -6,7 +6,8 @@
   {:username s/Str
    :fullname s/Str
    :password s/Str
-   (s/optional-key :email) s/Str})
+   (s/optional-key :email) s/Str
+   (s/optional-key :_id) s/Any})
 
 (s/defn save-user [db user :- User]
   (mc/save-and-return db "users" user))
