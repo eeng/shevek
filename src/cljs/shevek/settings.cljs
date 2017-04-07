@@ -1,7 +1,7 @@
 (ns shevek.settings
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title select]]
+            [shevek.components :refer [page-title select input-text]]
             [shevek.lib.local-storage :as local-storage]
             [shevek.lib.react :refer [rmap]]
             [shevek.dw :as dw]
@@ -39,15 +39,13 @@
   [:tr {:key name}
    [:td
     (if @edited-cube
-      [:div.ui.fluid.input
-        [:input {:type "text" :value (get-in @edited-cube [coll-key i :title])
-                 :on-change #(swap! edited-cube assoc-in [coll-key i :title] (.-target.value %))}]]
+      [:div.ui.fluid.input [input-text edited-cube [coll-key i :title]]]
       title)]
    [:td name]
    [:td type]])
 
 (defn- dimensions-table [original-cube edited-cube header coll-key]
-  [:div.margin-bottom
+  [:div.dimensions
    [:h4.ui.header header]
    [:table.ui.three.column.basic.table
     [:thead>tr
@@ -85,12 +83,10 @@
        [:div.fields
         [:div.six.wide.field
          [:label (t :cubes.schema/title)]
-         [:input {:type "text" :value (@edited-cube :title)
-                  :on-change #(swap! edited-cube assoc :title (.-target.value %))}]]
+         [input-text edited-cube :title]]
         [:div.ten.wide.field
          [:label (t :cubes.schema/description)]
-         [:input {:type "text" :value (@edited-cube :description)
-                  :on-change #(swap! edited-cube assoc :description (.-target.value %))}]]]]
+         [input-text edited-cube :description]]]]
       [:h3.ui.header
        [:i.cube.icon]
        [:div.content title [:div.sub.header description]]])])
