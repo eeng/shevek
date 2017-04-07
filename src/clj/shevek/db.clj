@@ -10,6 +10,7 @@
 
 (defn init-db [db]
   (mc/ensure-index db "cubes" (array-map :name 1) {:unique true})
+  (mc/ensure-index db "users" (array-map :username 1) {:unique true})
   db)
 
 (defstate db :start (init-db (mongo :db)))
