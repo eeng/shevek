@@ -19,8 +19,8 @@
 
 (defn set-cube-defaults [{:keys [dimensions measures max-time] :as cube}]
   (cond-> (set-default-title cube)
-          dimensions (assoc :dimensions (map set-default-title dimensions))
-          measures (assoc :measures (map set-default-title measures))
+          dimensions (assoc :dimensions (mapv set-default-title dimensions))
+          measures (assoc :measures (mapv set-default-title measures))
           max-time (assoc :max-time (parse-max-time max-time))))
 
 (defn- set-defaults [cubes]

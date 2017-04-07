@@ -35,20 +35,28 @@
    [:h2.ui.dividing.header (t :settings/users)]
    [:div "TODO Tabla de users"]])
 
-(defn- dimension-row [{:keys [name title type]}]
+(defn- dimension-row [{:keys [name title type]} edited-cube coll-key i]
   [:tr {:key name}
-   [:td name] [:td title] [:td type]])
+   [:td
+    (if @edited-cube
+      [:div.ui.fluid.input
+        [:input {:type "text" :value (get-in @edited-cube [coll-key i :title])
+                 :on-change #(swap! edited-cube assoc-in [coll-key i :title] (.-target.value %))}]]
+      title)]
+   [:td name]
+   [:td type]])
 
-(defn- dimensions-table [header dimensions]
+(defn- dimensions-table [original-cube edited-cube header coll-key]
   [:div.margin-bottom
    [:h4.ui.header header]
-   [:table.ui.three.column.celled.compact.table
+   [:table.ui.three.column.basic.table
     [:thead>tr
-     [:th (t :cubes.schema/name)]
      [:th (t :cubes.schema/title)]
+     [:th (t :cubes.schema/name)]
      [:th (t :cubes.schema/type)]]
     [:tbody
-     (map dimension-row dimensions)]]])
+     (for [[i {:keys [name] :as dim}] (map-indexed vector (original-cube coll-key))]
+       ^{:key name} [dimension-row dim edited-cube coll-key i])]]])
 
 (defevh :cube-saved [db {:keys [name] :as cube}]
   (-> (assoc-in db [:cubes name] cube)
@@ -89,12 +97,12 @@
 
 (defn- cube-details []
   (let [edited-cube (r/atom nil)]
-    (fn [{:keys [dimensions measures] :as original-cube}]
+    (fn [original-cube]
       [:div.cube-details
        [cube-actions original-cube edited-cube]
        [cube-fields original-cube edited-cube]
-       [dimensions-table (t :cubes/dimensions) dimensions]
-       [dimensions-table (t :cubes/measures) measures]])))
+       [dimensions-table original-cube edited-cube (t :cubes/dimensions) :dimensions]
+       [dimensions-table original-cube edited-cube (t :cubes/measures) :measures]])))
 
 (defn- schema-section []
   (dw/fetch-cubes)
