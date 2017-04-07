@@ -75,7 +75,7 @@
    [:td username]
    [:td fullname]
    [:td email]
-   [:td.collapsing
+   [:td.collapsing.center.aligned
     [:button.ui.compact.basic.button
      {:on-click #(reset! edited-user original-user)}
      (t :actions/edit)]]])
