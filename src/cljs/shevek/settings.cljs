@@ -25,14 +25,14 @@
 
 (defn- user-settings-section []
   [:section
-   [:h2.ui.dividing.header (t :settings/language)]
+   [:h2.ui.app.header (t :settings/language)]
    [select [["English" "en"] ["Español" "es"]]
     {:selected (db/get-in [:settings :lang] "en")
      :on-change #(dispatch :settings-saved {:lang %})}]])
 
 (defn- users-section []
   [:section
-   [:h2.ui.dividing.header (t :settings/users)]
+   [:h2.ui.app.header (t :settings/users)]
    [:div "TODO Tabla de users"]])
 
 (defn- dimension-row [{:keys [name title type]} edited-cube coll-key i]
@@ -104,7 +104,7 @@
   (dw/fetch-cubes)
   (fn []
     [:section
-     [:h2.ui.dividing.header (t :cubes/menu)]
+     [:h2.ui.app.header (t :cubes/menu)]
      (rmap cube-details (dw/cubes-list) :name)]))
 
 (defn page []

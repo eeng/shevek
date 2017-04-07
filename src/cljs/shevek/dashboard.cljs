@@ -11,7 +11,7 @@
   [:a.card {:href (str "#/cubes/" name)}
    [:div.content
     [:div.ui.header
-     [:i.cube.blue.icon]
+     [:i.cube.icon]
      [:div.content title]]
     [:div.description description]]])
 
@@ -27,5 +27,5 @@
   (fn []
     [:div.ui.container
      [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]
-     [:h2.ui.dividing.header (t :cubes/title)]
+     [:h2.ui.app.header (t :cubes/title)]
      [cubes-cards]]))
