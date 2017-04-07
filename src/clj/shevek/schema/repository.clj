@@ -1,11 +1,10 @@
 (ns shevek.schema.repository
   (:require [schema.core :as s]
-            [monger.collection :as mc])
-  (:import [org.bson.types ObjectId]))
+            [monger.collection :as mc]))
 
 (s/defschema NTD
   {:name s/Str
-   (s/optional-key :title) s/Str
+   :title s/Str
    (s/optional-key :description) (s/maybe s/Str)})
 
 (s/defschema Dimension
@@ -16,9 +15,9 @@
 
 (s/defschema Cube
   (assoc NTD
-         (s/optional-key :dimensions) [Dimension]
-         (s/optional-key :measures) [Measure]
-         (s/optional-key :_id) ObjectId))
+         :dimensions [Dimension]
+         :measures [Measure]
+         (s/optional-key :_id) s/Any))
 
 (s/defn save-cube [db cube :- Cube]
   (mc/save-and-return db "cubes" cube))

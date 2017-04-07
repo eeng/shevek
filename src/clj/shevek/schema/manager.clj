@@ -1,7 +1,8 @@
 (ns shevek.schema.manager
   (:require [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
-            [shevek.lib.collections :refer [detect]]))
+            [shevek.lib.collections :refer [detect]]
+            [cuerdas.core :as str]))
 
 (defn- discover-cubes [dw]
   (for [cube-name (cubes dw)]
@@ -19,10 +20,19 @@
         new-fields (remove #(corresponding % old-coll) new-coll)]
     (concat old-updated-fields new-fields)))
 
+(defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
+  (assoc record :title title))
+
+(defn set-default-titles [{:keys [dimensions measures] :as cube}]
+  (-> (set-default-title cube)
+      (assoc :dimensions (mapv set-default-title dimensions))
+      (assoc :measures (mapv set-default-title measures))))
+
 (defn- update-cube [old new]
   (-> (merge old (dissoc new :dimensions :measures))
       (assoc :dimensions (merge-dimensions (:dimensions old) (:dimensions new)))
-      (assoc :measures (merge-dimensions (:measures old) (:measures new)))))
+      (assoc :measures (merge-dimensions (:measures old) (:measures new)))
+      set-default-titles))
 
 (defn discover! [dw db]
   (let [existing-cubes (find-cubes db)

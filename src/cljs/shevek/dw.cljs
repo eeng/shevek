@@ -11,19 +11,11 @@
             [reflow.db :as db]
             [com.rpl.specter :refer [setval ALL]]))
 
-(defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
-  (assoc record :title title))
-
-(defn- normalize-coll [coll]
-  (mapv set-default-title coll))
-
 (defn parse-max-time [max-time]
   (d/round-to-next-minute (parse-time max-time)))
 
 (defn set-cube-defaults [{:keys [dimensions measures max-time] :as cube}]
-  (cond-> (set-default-title cube)
-          dimensions (assoc :dimensions (normalize-coll dimensions))
-          measures (assoc :measures (normalize-coll measures))
+  (cond-> cube
           max-time (assoc :max-time (parse-max-time max-time))))
 
 (defn- set-defaults [cubes]

@@ -1,10 +1,10 @@
 (ns shevek.schema.manager-test
   (:require [clojure.test :refer [is]]
-            [shevek.test-helper :refer [spec]]
+            [shevek.test-helper :refer [spec make]]
             [shevek.asserts :refer [submaps?]]
             [shevek.schema.manager :refer [discover!]]
             [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
-            [shevek.schema.repository :refer [save-cube find-cubes]]
+            [shevek.schema.repository :refer [save-cube find-cubes Cube]]
             [shevek.db :refer [db]]
             [com.rpl.specter :refer [select ALL]]))
 
@@ -24,9 +24,9 @@
       (is (= 2 (->> cubes (map :_id) (filter identity) count))))))
 
 (spec "discovery of a new cube"
-  (let [c1 (save-cube db {:name "c1"
-                            :dimensions [{:name "d1" :type "STRING"}]
-                            :measures [{:name "m1" :type "count"}]})]
+  (let [c1 (save-cube db (make Cube {:name "c1"
+                                     :dimensions [{:name "d1" :type "STRING"}]
+                                     :measures [{:name "m1" :type "count"}]}))]
     (with-redefs
       [cubes (constantly ["c1" "c2"])
        dimensions-and-measures (fn [_ cube]
@@ -41,9 +41,9 @@
         (is (= ["m1" "m2"] (select [ALL :measures ALL :name] cubes)))))))
 
 (spec "existing cube with a new dimension (d2), a deleted one (d1) and a changed measure type"
-  (let [c1 (save-cube db {:name "c1" :title "C1"
-                            :dimensions [{:name "d1" :type "STRING" :title "D1"}]
-                            :measures [{:name "m1" :type "count" :title "M1"}]})]
+  (let [c1 (save-cube db (make Cube {:name "c1" :title "C1"
+                                     :dimensions [{:name "d1" :type "STRING" :title "D1"}]
+                                     :measures [{:name "m1" :type "count" :title "M1"}]}))]
     (with-redefs
       [cubes (constantly ["c1"])
        dimensions-and-measures (fn [_ cube]
@@ -53,5 +53,5 @@
       (let [cubes (find-cubes db)]
         (is (= [["c1" "C1"]] (map (juxt :name :title) cubes)))
         (is (= (:_id c1) (:_id (first cubes))))
-        (is (= [["d1" "D1"] ["d2" nil]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
+        (is (= [["d1" "D1"] ["d2" "D2"]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
         (is (= [["m1" "M1" "longSum"]] (map (juxt :name :title :type) (select [ALL :measures ALL] cubes))))))))

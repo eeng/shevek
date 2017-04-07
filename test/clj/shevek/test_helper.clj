@@ -4,7 +4,8 @@
             [shevek.app]
             [shevek.db :refer [db init-db]]
             [clojure.test :refer [deftest testing]]
-            [cuerdas.core :as str]))
+            [cuerdas.core :as str]
+            [schema-generators.complete :as c]))
 
 (defn init []
   (mount/start-without #'shevek.app/nrepl #'shevek.server/web-server))
@@ -16,3 +17,6 @@
          (drop-db db)
          (init-db db)
          ~@body))))
+
+(defn make [schema args]
+  (c/complete args schema))
