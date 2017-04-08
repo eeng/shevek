@@ -1,7 +1,7 @@
 (ns shevek.app
   (:require [reagent.core :as r]
             [shevek.layout :refer [layout]]
-            [shevek.settings :refer [load-settings]]
+            [shevek.settings.regional :refer [load-settings]]
             [shevek.schemas.interceptor :as schema]
             [reflow.core :as reflow]
             [reflow.interceptors :as i]

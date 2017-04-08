@@ -3,7 +3,7 @@
             [shevek.db :refer [db]]))
 
 (defn find-all []
-  (r/find-all db))
+  (r/find-users db))
 
 (defn save [user]
   (r/save-user db user))

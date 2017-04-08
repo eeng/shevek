@@ -17,7 +17,7 @@
   (mc/remove-by-id db "users" _id)
   true)
 
-(defn find-all [db]
+(defn find-users [db]
   (mq/with-collection db "users"
     (mq/sort {:username 1})))
 

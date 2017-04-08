@@ -7,7 +7,7 @@
             [shevek.rpc :refer [loading?]]
             [shevek.components :refer [make-dropdown]]
             [shevek.dashboard :as dashboard]
-            [shevek.settings :as settings]
+            [shevek.settings.page :as settings]
             [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.dw :as dw]))
