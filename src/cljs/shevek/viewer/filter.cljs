@@ -1,4 +1,4 @@
-(ns shevek.cube-view.filter
+(ns shevek.viewer.filter
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
@@ -6,8 +6,8 @@
             [shevek.i18n :refer [t]]
             [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.cube-view.shared :refer [panel-header cube-view send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube]]
-            [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube]]
+            [shevek.viewer.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
 (defn build-time-filter [{:keys [dimensions] :as cube}]
@@ -18,22 +18,22 @@
   (assoc dim :operator "include"))
 
 (defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
-  (-> (update-in db [:cube-view :filter] add-dimension (init-filtered-dim dim))
-      (assoc-in [:cube-view :last-added-filter] [name (js/Date.)])))
+  (-> (update-in db [:viewer :filter] add-dimension (init-filtered-dim dim))
+      (assoc-in [:viewer :last-added-filter] [name (js/Date.)])))
 
 (defevh :dimension-removed-from-filter [db dim]
-  (-> (update-in db [:cube-view :filter] remove-dimension dim)
+  (-> (update-in db [:viewer :filter] remove-dimension dim)
       (send-main-query)
       (send-pinboard-queries)))
 
 (defevh :filter-options-changed [db dim opts]
-  (-> (update-in db [:cube-view :filter] replace-dimension (merge dim opts))
+  (-> (update-in db [:viewer :filter] replace-dimension (merge dim opts))
       (send-main-query)
       (send-pinboard-queries)))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim} search]
-  (send-query db {:cube (cube-view :cube)
-                  :filter (cond-> [(first (cube-view :filter))]
+  (send-query db {:cube (viewer :cube)
+                  :filter (cond-> [(first (viewer :filter))]
                                   (seq search) (conj (assoc dim :operator "search" :value search)))
                   :split [(assoc dim :limit 50)]
                   :measures [{:type "count" :name "rowCount"}]}
@@ -118,7 +118,7 @@
        [:div.items-container
         (into [:div.items]
           (map #(dimension-value-item dim % opts @search)
-               (->> (cube-view :results :filter name)
+               (->> (viewer :results :filter name)
                     (filter-matching @search (partial format-dimension dim)))))]
        [:div
         [:button.ui.primary.compact.button
@@ -155,11 +155,11 @@
 
 ; TODO Lo del init-open? no me parece muy robusto ni prolijo, pero es lo único que se me ocurre por ahora. Revisar.
 (defn filter-panel []
-  (let [[last-added-filter last-added-at] (cube-view :last-added-filter)
+  (let [[last-added-filter last-added-at] (viewer :last-added-filter)
         added-ms-ago (- (js/Date.) last-added-at)]
     [:div.filter.panel
      [panel-header (t :cubes/filter)]
-     (for [dim (cube-view :filter)]
+     (for [dim (viewer :filter)]
        ^{:key (:name dim)}
        [(controlled-popup filter-item filter-popup
                           {:position "bottom center"

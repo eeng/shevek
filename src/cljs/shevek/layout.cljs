@@ -8,8 +8,8 @@
             [shevek.components :refer [make-dropdown]]
             [shevek.dashboard :as dashboard]
             [shevek.settings :as settings]
-            [shevek.cube-view.page :as cube]
-            [shevek.cube-view.shared :refer [current-cube-name]]
+            [shevek.viewer.page :as cube]
+            [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.dw :as dw]))
 
 (def pages

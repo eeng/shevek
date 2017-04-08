@@ -1,4 +1,4 @@
-(ns shevek.cube-view.visualization
+(ns shevek.viewer.visualization
   (:require [reagent.core :as r]
             [clojure.string :as str]
             [reflow.core :refer [dispatch]]
@@ -6,14 +6,14 @@
             [shevek.dw :as dw]
             [shevek.lib.collections :refer [detect]]
             [shevek.rpc :as rpc]
-            [shevek.cube-view.shared :refer [panel-header cube-view format-measure format-dimension totals-result? clean-dim]]))
+            [shevek.viewer.shared :refer [panel-header viewer format-measure format-dimension totals-result? clean-dim]]))
 
 (defn- sort-results-according-to-selected-measures [result]
   (map #(assoc % :value (format-measure % result))
-       (cube-view :measures)))
+       (viewer :measures)))
 
 (defn- totals-visualization []
-  (let [result (sort-results-according-to-selected-measures (first (cube-view :results :main)))]
+  (let [result (sort-results-according-to-selected-measures (first (viewer :results :main)))]
     [:div.ui.statistics
      (for [{:keys [name title value]} result]
        ^{:key name}
@@ -68,9 +68,9 @@
      (when icon-after? [:span title])]))
 
 (defn- pivot-table-visualization []
-  (let [split (cube-view :arrived-split)
-        measures (cube-view :measures)
-        results (cube-view :results :main)
+  (let [split (viewer :arrived-split)
+        measures (viewer :measures)
+        results (viewer :results :main)
         max-values (calculate-max-values measures results)]
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
      [:thead>tr
@@ -81,11 +81,11 @@
 
 (defn visualization-panel []
   [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
-   (when (cube-view :results :main)
-     (if (empty? (cube-view :measures))
+   (when (viewer :results :main)
+     (if (empty? (viewer :measures))
        [:div.icon-hint
         [:i.warning.circle.icon]
         [:div.text (t :cubes/no-measures)]]
-       (if (empty? (cube-view :arrived-split))
+       (if (empty? (viewer :arrived-split))
          [totals-visualization]
          [pivot-table-visualization])))])

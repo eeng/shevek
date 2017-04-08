@@ -1,4 +1,4 @@
-(ns shevek.cube-view.pinboard
+(ns shevek.viewer.pinboard
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
@@ -7,18 +7,18 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
             [shevek.components :refer [dropdown]]
-            [shevek.cube-view.shared :refer [current-cube panel-header cube-view send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch]]))
+            [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch]]))
 
-(defn- send-pinned-dim-query [{:keys [cube-view] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
-  (let [q (cond-> {:cube (:cube cube-view)
-                   :filter (:filter cube-view)
+(defn- send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
+  (let [q (cond-> {:cube (:cube viewer)
+                   :filter (:filter viewer)
                    :split [dim]
-                   :measures (vector (get-in cube-view [:pinboard :measure]))}
+                   :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filter add-dimension search-filter))]
     (send-query db q [:results :pinboard name])))
 
 (defn send-pinboard-queries [db]
-  (reduce #(send-pinned-dim-query %1 %2) db (cube-view :pinboard :dimensions)))
+  (reduce #(send-pinned-dim-query %1 %2) db (viewer :pinboard :dimensions)))
 
 (defn init-pinned-dim [dim]
   (cond-> (assoc dim :limit 100)
@@ -26,21 +26,21 @@
 
 (defevh :dimension-pinned [db dim]
   (let [dim (init-pinned-dim dim)]
-    (-> (update-in db [:cube-view :pinboard :dimensions] add-dimension dim)
+    (-> (update-in db [:viewer :pinboard :dimensions] add-dimension dim)
         (send-pinned-dim-query dim))))
 
 (defevh :dimension-unpinned [db dim]
-  (update-in db [:cube-view :pinboard :dimensions] remove-dimension dim))
+  (update-in db [:viewer :pinboard :dimensions] remove-dimension dim))
 
 ; TODO al cambiar la measure se muestra temporalmente un cero en todas las filas. Ver si se puede evitar.
 (defevh :pinboard-measure-selected [db measure-name]
-  (-> (assoc-in db [:cube-view :pinboard :measure]
+  (-> (assoc-in db [:viewer :pinboard :measure]
                 (find-dimension measure-name (current-cube :measures)))
       (send-pinboard-queries)))
 
 (defevh :pinned-time-granularity-changed [db dim granularity]
   (let [new-time-dim (assoc dim :granularity granularity)]
-    (-> (update-in db [:cube-view :pinboard :dimensions] replace-dimension new-time-dim)
+    (-> (update-in db [:viewer :pinboard :dimensions] replace-dimension new-time-dim)
         (send-pinned-dim-query new-time-dim))))
 
 (defevh :dimension-values-searched [db dim search]
@@ -71,8 +71,8 @@
   (let [searching (r/atom false)
         search (r/atom "")]
     (fn []
-      (let [measure (cube-view :pinboard :measure)
-            results (cube-view :results :pinboard name)
+      (let [measure (viewer :pinboard :measure)
+            results (viewer :results :pinboard name)
             filtered-results (filter-matching @search (partial format-dimension dim) results)]
         [:div.dimension.panel.ui.basic.segment (when-not @searching (loading-class [:results :pinboard name]))
          [panel-header (str title " " (title-according-to-dim-type dim))
@@ -105,10 +105,10 @@
    [:div.panel
     [panel-header (t :cubes/pinboard)
      [dropdown (map (juxt :title :name) (current-cube :measures))
-      {:selected (cube-view :pinboard :measure :name) :class "top right pointing"
+      {:selected (viewer :pinboard :measure :name) :class "top right pointing"
        :on-change #(dispatch :pinboard-measure-selected %)}]]]
-   (if (seq (cube-view :pinboard :dimensions))
-     (for [dim (cube-view :pinboard :dimensions)]
+   (if (seq (viewer :pinboard :dimensions))
+     (for [dim (viewer :pinboard :dimensions)]
        ^{:key (dim :name)} [pinned-dimension-panel dim])
      [:div.panel.ui.basic.segment.no-pinned
       [:div.icon-hint

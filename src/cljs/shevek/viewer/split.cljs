@@ -1,42 +1,42 @@
-(ns shevek.cube-view.split
+(ns shevek.viewer.split
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
             [shevek.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension find-dimension]]
             [shevek.lib.react :refer [rmap without-propagation]]
-            [shevek.cube-view.shared :refer [panel-header current-cube cube-view send-main-query]]
-            [shevek.cube-view.pinboard :refer [send-pinboard-queries]]
+            [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
+            [shevek.viewer.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select]]))
 
 ; TODO el limit distinto no funca bien cuando se reemplaza el filter
 ; TODO permitir elegir otras granularidades en el popup
-(defn- init-splitted-dim [dim {:keys [cube-view]}]
-  (let [other-dims-in-split (remove #(dim=? % dim) (:split cube-view))]
+(defn- init-splitted-dim [dim {:keys [viewer]}]
+  (let [other-dims-in-split (remove #(dim=? % dim) (:split viewer))]
     (cond-> (assoc dim
                    :limit (if (seq other-dims-in-split) 5 50)
-                   :sort-by (assoc (-> cube-view :measures first)
+                   :sort-by (assoc (-> viewer :measures first)
                                    :descending (not (time-dimension? dim))))
             (time-dimension? dim) (assoc :granularity "PT1H"))))
 
 (defevh :dimension-added-to-split [db dim]
-  (-> (update-in db [:cube-view :split] add-dimension (init-splitted-dim dim db))
+  (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim dim db))
       (send-main-query)))
 
 (defevh :dimension-replaced-split [db dim]
-  (-> (assoc-in db [:cube-view :split] [(init-splitted-dim dim db)])
+  (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
       (send-main-query)))
 
 (defevh :dimension-removed-from-split [db dim]
-  (-> (update-in db [:cube-view :split] remove-dimension dim)
+  (-> (update-in db [:viewer :split] remove-dimension dim)
       (send-main-query)))
 
 (defevh :split-options-changed [db dim opts]
-  (-> (update-in db [:cube-view :split] replace-dimension (merge dim opts))
+  (-> (update-in db [:viewer :split] replace-dimension (merge dim opts))
       (send-main-query)))
 
 (defevh :splits-sorted-by [db sort-bys descending]
-  (-> (update-in db [:cube-view :split]
+  (-> (update-in db [:viewer :split]
                  (fn [splits]
                    (->> (zipmap splits sort-bys)
                         (mapv (fn [[split sort-by]]
@@ -78,5 +78,5 @@
   [:div.split.panel
    [panel-header (t :cubes/split)]
    (rmap (controlled-popup split-item split-popup {:position "bottom center"})
-         (cube-view :split)
+         (viewer :split)
          :name)])

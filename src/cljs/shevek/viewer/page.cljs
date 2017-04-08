@@ -1,37 +1,37 @@
-(ns shevek.cube-view.page
+(ns shevek.viewer.page
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
             [shevek.lib.util :refer [every]]
-            [shevek.cube-view.shared :refer [send-main-query current-cube-name]]
-            [shevek.cube-view.dimensions :refer [dimensions-panel]]
-            [shevek.cube-view.measures :refer [measures-panel]]
-            [shevek.cube-view.filter :refer [filter-panel build-time-filter]]
-            [shevek.cube-view.split :refer [split-panel]]
-            [shevek.cube-view.visualization :refer [visualization-panel]]
-            [shevek.cube-view.pinboard :refer [pinboard-panels]]))
+            [shevek.viewer.shared :refer [send-main-query current-cube-name]]
+            [shevek.viewer.dimensions :refer [dimensions-panel]]
+            [shevek.viewer.measures :refer [measures-panel]]
+            [shevek.viewer.filter :refer [filter-panel build-time-filter]]
+            [shevek.viewer.split :refer [split-panel]]
+            [shevek.viewer.visualization :refer [visualization-panel]]
+            [shevek.viewer.pinboard :refer [pinboard-panels]]))
 
-(defn- init-cube-view [{:keys [cube-view] :as db} {:keys [measures] :as cube}]
-  (-> cube-view
+(defn- init-viewer [{:keys [viewer] :as db} {:keys [measures] :as cube}]
+  (-> viewer
       (assoc :filter [(build-time-filter cube)]
              :split []
              :measures (->> measures (take 3) vec)
              :pinboard {:measure (first measures) :dimensions []})
-      (->> (assoc db :cube-view))))
+      (->> (assoc db :viewer))))
 
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (let [cube (dw/set-cube-defaults cube)]
-    (-> (assoc-in db [:cube-view :cube] cube)
-        (init-cube-view cube)
+    (-> (assoc-in db [:viewer :cube] cube)
+        (init-viewer cube)
         (rpc/loaded :cube-metadata)
         (send-main-query))))
 
 (defevh :cube-selected [db cube]
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
   (dispatch :navigate :cube)
-  (-> (assoc db :cube-view {:cube {:name cube}})
+  (-> (assoc db :viewer {:cube {:name cube}})
       (rpc/loading :cube-metadata)))
 
 (defevh :max-time-arrived [db cube-name max-time]
@@ -45,7 +45,7 @@
 (defonce timeout (every 60 fetch-max-time))
 
 (defn page []
-  [:div#cube-view
+  [:div#viewer
    [:div.left-column
     [dimensions-panel]
     [measures-panel]]

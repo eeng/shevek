@@ -1,4 +1,4 @@
-(ns shevek.cube-view.shared
+(ns shevek.viewer.shared
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
@@ -14,20 +14,20 @@
             [com.rpl.specter :refer [setval ALL]]
             [goog.string :as str]))
 
-(defn- cube-view [& keys]
-  (db/get-in (into [:cube-view] keys)))
+(defn- viewer [& keys]
+  (db/get-in (into [:viewer] keys)))
 
 (defn current-cube-name []
-  (cube-view :cube :name))
+  (viewer :cube :name))
 
 (defn current-cube [& keys]
-  (-> (cube-view :cube)
+  (-> (viewer :cube)
       (get-in keys)))
 
 ; Copio el split a arrived-split asi sólo se rerenderiza la table cuando llegan los resultados. Sino se re-renderizaría dos veces, primero inmediatamente luego de splitear y despues cuando llegan los resultados, provocando un pantallazo molesto.
 (defevh :query-executed [db results results-keys]
-  (-> (assoc-in db (into [:cube-view] results-keys) results)
-      (assoc-in [:cube-view :arrived-split] (-> db :cube-view :split))
+  (-> (assoc-in db (into [:viewer] results-keys) results)
+      (assoc-in [:viewer :arrived-split] (-> db :viewer :split))
       (rpc/loaded results-keys)))
 
 ; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
@@ -38,7 +38,7 @@
             q)))
 
 (defn send-query [db q results-keys]
-  (let [cube (get-in db [:cube-view :cube])
+  (let [cube (get-in db [:viewer :cube])
         q (-> (add-interval q (cube :max-time))
               (assoc :cube (cube :name))
               (st/select-schema Query))]
@@ -46,8 +46,8 @@
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
 
-(defn- send-main-query [{:keys [cube-view] :as db}]
-  (let [q (assoc cube-view :totals true)]
+(defn- send-main-query [{:keys [viewer] :as db}]
+  (let [q (assoc viewer :totals true)]
     (send-query db q [:results :main])))
 
 (defn format-measure [{:keys [name type]} result]

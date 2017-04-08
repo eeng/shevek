@@ -1,4 +1,4 @@
-(ns shevek.cube-view.dimensions
+(ns shevek.viewer.dimensions
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
@@ -6,7 +6,7 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.components :refer [controlled-popup]]
             [shevek.lib.react :refer [rmap]]
-            [shevek.cube-view.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
+            [shevek.viewer.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
 
 (defn dimension-popup-button [{:keys [close]} color icon event name]
   [:button.ui.circular.icon.button

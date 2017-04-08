@@ -66,5 +66,5 @@
    (s/optional-key :loading) {(s/cond-pre s/Keyword [s/Any]) s/Bool}
    (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) Settings
-   (s/optional-key :cube-view) CubeView
+   (s/optional-key :viewer) CubeView
    (s/optional-key :users) s/Any}) ; TODO
