@@ -1,7 +1,7 @@
 (ns shevek.settings.schema
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title select input-text input-field]]
+            [shevek.components :refer [page-title select input-text input-field keyboard-shortcuts]]
             [shevek.lib.react :refer [rmap]]
             [shevek.dw :as dw]
             [shevek.rpc :as rpc]
@@ -39,15 +39,15 @@
             :handler #(do (dispatch :cube-saved %) (reset! edited-cube nil)))
   (rpc/loading db :saving-cube))
 
-(defn- cube-actions [original-cube edited-cube]
+(defn- cube-actions [original-cube edited-cube save cancel]
   (if @edited-cube
     [:div.actions
      [:button.ui.primary.button
-      {:on-click #(dispatch :cube-changed edited-cube)
+      {:on-click save
        :class (or (when (= @edited-cube original-cube) "disabled")
                   (when (rpc/loading? :saving-cube) "loading"))}
       (t :actions/save)]
-     [:button.ui.button {:on-click #(reset! edited-cube nil)} (t :actions/cancel)]]
+     [:button.ui.button {:on-click cancel} (t :actions/cancel)]]
     [:div.actions
      [:button.ui.button {:on-click #(reset! edited-cube original-cube)} (t :actions/edit)]]))
 
@@ -63,13 +63,16 @@
        [:div.content title [:div.sub.header description]]])])
 
 (defn- cube-details []
-  (let [edited-cube (r/atom nil)]
+  (let [edited-cube (r/atom nil)
+        save #(dispatch :cube-changed edited-cube)
+        cancel #(reset! edited-cube nil)]
     (fn [original-cube]
-      [:div.cube-details
-       [cube-actions original-cube edited-cube]
-       [cube-fields original-cube edited-cube]
-       [dimensions-table original-cube edited-cube (t :cubes/dimensions) :dimensions]
-       [dimensions-table original-cube edited-cube (t :cubes/measures) :measures]])))
+      [keyboard-shortcuts {:enter save :escape cancel}
+       [:div.cube-details
+        [cube-actions original-cube edited-cube save cancel]
+        [cube-fields original-cube edited-cube]
+        [dimensions-table original-cube edited-cube (t :cubes/dimensions) :dimensions]
+        [dimensions-table original-cube edited-cube (t :cubes/measures) :measures]]])))
 
 (defn schema-section []
   (dw/fetch-cubes)

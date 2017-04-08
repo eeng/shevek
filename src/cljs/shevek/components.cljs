@@ -96,3 +96,15 @@
                                 (.addEventListener js/document "click" @node-listener true))
         :component-did-update #(when @opened (show-popup %))
         :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)}))))
+
+(def Keys {13 :enter 27 :escape})
+
+(defn- handle-keypressed [shortcuts e]
+  (let [key (-> e .-which Keys)
+        assigned-fn (shortcuts key)]
+    (when assigned-fn (assigned-fn))))
+
+(defn keyboard-shortcuts [shortcuts body]
+  (r/create-class
+   {:reagent-render body
+    :component-did-mount #(-> % r/dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts)))}))
