@@ -5,15 +5,17 @@
 (s/defschema Settings
   {:lang s/Str})
 
-(s/defschema Dimension
+; TODO duplicado en el server
+(s/defschema NTD
   {:name s/Str
    :title s/Str
-   :type s/Str})
+   (s/optional-key :description) (s/maybe s/Str)})
+
+(s/defschema Dimension
+  (assoc NTD :type s/Str))
 
 (s/defschema Measure
-  {:name s/Str
-   :title s/Str
-   :type s/Str})
+  (assoc NTD :type s/Str))
 
 (s/defschema Cube
   {(s/optional-key :_id) s/Any
@@ -51,7 +53,7 @@
 
 (s/defschema Result {s/Keyword s/Any})
 
-(s/defschema CubeView
+(s/defschema Viewer
   {:cube Cube
    (s/optional-key :filter) [(s/one TimeFilter "tf") NormalFilter]
    (s/optional-key :split) [Split]
@@ -66,5 +68,5 @@
    (s/optional-key :loading) {(s/cond-pre s/Keyword [s/Any]) s/Bool}
    (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) Settings
-   (s/optional-key :viewer) CubeView
+   (s/optional-key :viewer) Viewer
    (s/optional-key :users) [s/Any]}) ; TODO

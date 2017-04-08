@@ -118,3 +118,7 @@
                                                (.find "input") (.addBack "input")
                                                .focus .select)
                                           0))}))
+
+(defn mail-to [address]
+  (when (seq address)
+    [:a {:href (str "mailto:" address)} address]))

@@ -9,23 +9,28 @@
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
 
-(defn- dimension-row [{:keys [name title type]} edited-cube coll-key i]
+(defn- dimension-row [{:keys [name title type description]} edited-cube coll-key i]
   [:tr {:key name}
    [:td
     (if @edited-cube
       [:div.ui.fluid.input [input-text edited-cube [coll-key i :title]]]
       title)]
+   [:td
+    (if @edited-cube
+      [:div.ui.fluid.input [input-text edited-cube [coll-key i :description]]]
+      description)]
    [:td name]
    [:td type]])
 
 (defn- dimensions-table [original-cube edited-cube header coll-key]
   [:div.dimensions
    [:h4.ui.header header]
-   [:table.ui.three.column.basic.table
+   [:table.ui.basic.table
     [:thead>tr
-     [:th (t :cubes.schema/title)]
-     [:th (t :cubes.schema/name)]
-     [:th (t :cubes.schema/type)]]
+     [:th.three.wide (t :cubes.schema/title)]
+     [:th.eight.wide (t :cubes.schema/description)]
+     [:th.three.wide (t :cubes.schema/name)]
+     [:th.two.wide (t :cubes.schema/type)]]
     [:tbody
      (for [[i {:keys [name] :as dim}] (map-indexed vector (original-cube coll-key))]
        ^{:key name} [dimension-row dim edited-cube coll-key i])]]])

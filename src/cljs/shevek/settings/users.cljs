@@ -1,7 +1,7 @@
 (ns shevek.settings.users
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title input-field keyboard-shortcuts focused]]
+            [shevek.components :refer [page-title input-field keyboard-shortcuts focused mail-to]]
             [shevek.lib.react :refer [rmap]]
             [shevek.rpc :as rpc]
             [reagent.core :as r]
@@ -49,7 +49,7 @@
   [:tr
    [:td username]
    [:td fullname]
-   [:td email]
+   [:td (mail-to email)]
    [:td.collapsing
     [:button.ui.compact.basic.button
      {:on-click #(reset! edited-user original-user)}
@@ -61,8 +61,8 @@
 (defn- users-table [edited-user]
   [:table.ui.basic.table
    [:thead>tr
-    [:th (t :users/username)]
-    [:th (t :users/fullname)]
+    [:th.three.wide (t :users/username)]
+    [:th.five.wide (t :users/fullname)]
     [:th (t :users/email)]
     [:th.right.aligned
      [:button.ui.button {:on-click #(reset! edited-user {})} (t :actions/new)]]]
