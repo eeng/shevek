@@ -7,3 +7,6 @@
 
 (defn save [user]
   (r/save-user db user))
+
+(defn delete [user]
+  (r/delete-user db user))

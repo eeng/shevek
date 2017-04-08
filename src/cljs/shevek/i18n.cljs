@@ -66,7 +66,8 @@
               :cancel "Cancel"
               :edit "Modify"
               :save "Save"
-              :new "New"}
+              :new "New"
+              :delete "Delete"}
     :input {:search "Search"}}
 
    :es
@@ -128,7 +129,8 @@
               :cancel "Cancelar"
               :edit "Editar"
               :save "Guardar"
-              :new "Nuevo"}
+              :new "Nuevo"
+              :delete "Eliminar"}
     :input {:search "Buscar"}}
 
    :tongue/fallback :en})

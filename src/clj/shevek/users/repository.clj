@@ -13,6 +13,10 @@
 (s/defn save-user [db user :- User]
   (mc/save-and-return db "users" user))
 
+(s/defn delete-user [db {:keys [_id]} :- User]
+  (mc/remove-by-id db "users" _id)
+  true)
+
 (defn find-all [db]
   (mq/with-collection db "users"
     (mq/sort {:username 1})))

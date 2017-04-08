@@ -38,13 +38,17 @@
   (rpc/call "users.api/find-all" :handler #(dispatch :users-arrived %))
   (rpc/loading db :users))
 
-(defevh :user-saved [db user]
+(defevh :user-saved [db]
   (dispatch :users-requested)
   (rpc/loaded db :saving-user))
 
 (defevh :user-changed [db edited-user]
   (rpc/call "users.api/save" :args [@edited-user]
-            :handler #(do (dispatch :user-saved %) (reset! edited-user nil)))
+            :handler #(do (dispatch :user-saved) (reset! edited-user nil)))
+  (rpc/loading db :saving-user))
+
+(defevh :user-deleted [db user]
+  (rpc/call "users.api/delete" :args [user] :handler #(dispatch :user-saved %))
   (rpc/loading db :saving-user))
 
 (defn- user-form [edited-user]
@@ -78,7 +82,10 @@
    [:td.collapsing.center.aligned
     [:button.ui.compact.basic.button
      {:on-click #(reset! edited-user original-user)}
-     (t :actions/edit)]]])
+     (t :actions/edit)]
+    [:button.ui.compact.basic.red.button
+     {:on-click #(dispatch :user-deleted original-user)}
+     (t :actions/delete)]]])
 
 (defn- users-table [edited-user]
   [:table.ui.basic.table
