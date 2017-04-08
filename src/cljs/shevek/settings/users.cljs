@@ -1,7 +1,7 @@
 (ns shevek.settings.users
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title input-field keyboard-shortcuts]]
+            [shevek.components :refer [page-title input-field keyboard-shortcuts focused]]
             [shevek.lib.react :refer [rmap]]
             [shevek.rpc :as rpc]
             [reagent.core :as r]
@@ -37,7 +37,7 @@
       [:div.ui.segment.form-container (rpc/loading-class :saving-user)
        [keyboard-shortcuts {:enter save :escape cancel}
         [:div.ui.form
-         [input-field edited-user :username {:label (t :users/username) :class "required focus"}]
+         [focused input-field edited-user :username {:label (t :users/username) :class "required"}]
          [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
          [input-field edited-user :password {:label (t :users/password) :class "required"}]
          [input-field edited-user :password-confirmation {:label (t :users/password-confirmation) :class "required"}]

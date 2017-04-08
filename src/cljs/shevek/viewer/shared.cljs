@@ -9,6 +9,7 @@
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
             [shevek.schemas.query :refer [Query]]
+            [shevek.components :refer [focused]]
             [schema.core :as s]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]
@@ -96,10 +97,8 @@
        [:i.link.remove.circle.icon {:on-click clear}]
        [:i.search.icon])]))
 
-; El setTimeout es necesario xq sino no funcaba el focus en el search dentro de filter popups.
-(def search-input
-  (with-meta search-input*
-    {:component-did-mount (fn [rc] (js/setTimeout #(-> rc r/dom-node js/$ (.find "input") .focus) 0))}))
+(defn search-input [& args]
+  (into [focused search-input*] args))
 
 (defn- highlight [value search]
   (if (seq search)

@@ -1,7 +1,7 @@
 (ns shevek.settings.schema
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title select input-text input-field keyboard-shortcuts]]
+            [shevek.components :refer [page-title select input-text input-field keyboard-shortcuts focused]]
             [shevek.lib.react :refer [rmap]]
             [shevek.dw :as dw]
             [shevek.rpc :as rpc]
@@ -56,7 +56,7 @@
     (if @edited-cube
       [:div.ui.form
        [:div.fields
-        [input-field edited-cube :title {:label (t :cubes.schema/title) :class "six wide"}]
+        [focused input-field edited-cube :title {:label (t :cubes.schema/title) :class "six wide"}]
         [input-field edited-cube :description {:label (t :cubes.schema/description) :class "ten wide"}]]]
       [:h3.ui.header
        [:i.cube.icon]

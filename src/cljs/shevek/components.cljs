@@ -108,3 +108,13 @@
   (r/create-class
    {:reagent-render body
     :component-did-mount #(-> % r/dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts)))}))
+
+; El setTimeout es necesario xq sino no funcaba el focus en el search dentro de filter popups.
+(defn focused [& target]
+  (r/create-class
+   {:reagent-render #(vec target)
+    :component-did-mount (fn [rc]
+                           (js/setTimeout #(-> rc r/dom-node js/$
+                                               (.find "input") (.addBack "input")
+                                               .focus .select)
+                                          0))}))
