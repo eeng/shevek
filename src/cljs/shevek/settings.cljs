@@ -48,8 +48,8 @@
   (rpc/loading db :saving-user))
 
 (defevh :user-deleted [db user]
-  (rpc/call "users.api/delete" :args [user] :handler #(dispatch :user-saved %))
-  (rpc/loading db :saving-user))
+  (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %))
+  db)
 
 (defn- user-form [edited-user]
   [:div.ui.grid
@@ -79,7 +79,7 @@
    [:td username]
    [:td fullname]
    [:td email]
-   [:td.collapsing.center.aligned
+   [:td.collapsing
     [:button.ui.compact.basic.button
      {:on-click #(reset! edited-user original-user)}
      (t :actions/edit)]
@@ -93,7 +93,7 @@
     [:th (t :users/username)]
     [:th (t :users/fullname)]
     [:th (t :users/email)]
-    [:th.center.aligned
+    [:th.right.aligned
      [:button.ui.button {:on-click #(reset! edited-user {})} (t :actions/new)]]]
    [:tbody
     (for [user (db/get :users)]

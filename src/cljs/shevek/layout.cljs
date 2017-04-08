@@ -8,14 +8,14 @@
             [shevek.components :refer [make-dropdown]]
             [shevek.dashboard :as dashboard]
             [shevek.settings :as settings]
-            [shevek.viewer.page :as cube]
+            [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.dw :as dw]))
 
 (def pages
   {:dashboard #'dashboard/page
    :settings #'settings/page
-   :cube #'cube/page})
+   :viewer #'viewer/page})
 
 (defevh :navigate [db page]
   (assoc db :page page))

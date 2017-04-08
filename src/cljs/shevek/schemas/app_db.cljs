@@ -67,4 +67,4 @@
    (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) Settings
    (s/optional-key :viewer) CubeView
-   (s/optional-key :users) s/Any}) ; TODO
+   (s/optional-key :users) [s/Any]}) ; TODO

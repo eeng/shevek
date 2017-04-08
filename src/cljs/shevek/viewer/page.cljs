@@ -30,7 +30,7 @@
 
 (defevh :cube-selected [db cube]
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (dispatch :navigate :cube)
+  (dispatch :navigate :viewer)
   (-> (assoc db :viewer {:cube {:name cube}})
       (rpc/loading :cube-metadata)))
 
