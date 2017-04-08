@@ -19,6 +19,11 @@
                     opts)]
     [:input opts]))
 
+(defn input-field [atom field {:keys [label class]}]
+  [:div.field {:class class}
+   [:label label]
+   [input-text atom field]])
+
 (defn- dropdown* [coll {:keys [placeholder selected class]} & content]
   [:div.ui.dropdown {:class class}
    [:input {:type "hidden" :value (or selected "")}]

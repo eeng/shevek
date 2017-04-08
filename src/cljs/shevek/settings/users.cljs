@@ -1,7 +1,7 @@
 (ns shevek.settings.users
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title input-text]]
+            [shevek.components :refer [page-title input-field]]
             [shevek.lib.react :refer [rmap]]
             [shevek.rpc :as rpc]
             [reagent.core :as r]
@@ -34,21 +34,11 @@
    [:div.five.wide.column
     [:div.ui.segment.form-container (rpc/loading-class :saving-user)
      [:div.ui.form
-      [:div.field.required
-       [:label (t :users/username)]
-       [input-text edited-user :username]]
-      [:div.field.required
-       [:label (t :users/fullname)]
-       [input-text edited-user :fullname]]
-      [:div.field.required
-       [:label (t :users/password)]
-       [input-text edited-user :password {:type "password"}]]
-      [:div.field.required
-       [:label (t :users/password-confirmation)]
-       [input-text edited-user :password-confirmation {:type "password"}]]
-      [:div.field
-       [:label (t :users/email)]
-       [input-text edited-user :email]]
+      [input-field edited-user :username {:label (t :users/username) :class "required"}]
+      [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
+      [input-field edited-user :password {:label (t :users/password) :class "required"}]
+      [input-field edited-user :password-confirmation {:label (t :users/password-confirmation) :class "required"}]
+      [input-field edited-user :email {:label (t :users/email)}]
       [:button.ui.primary.button {:on-click #(dispatch :user-changed edited-user)} (t :actions/save)]
       [:button.ui.button {:on-click #(reset! edited-user nil)} (t :actions/cancel)]]]]])
 
