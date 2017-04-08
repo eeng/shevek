@@ -9,7 +9,7 @@
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
             [shevek.schemas.query :refer [Query]]
-            [shevek.components :refer [focused]]
+            [shevek.components :refer [focused keyboard-shortcuts]]
             [schema.core :as s]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]
@@ -86,16 +86,13 @@
   (let [change #(on-change (reset! search %))
         clear #(do (when (seq @search) (change ""))
                  (on-stop))]
-    [:div.ui.icon.small.fluid.input.search
-     [:input {:type "text" :placeholder (t :input/search) :value @search
-              :on-change #(change (.-target.value %))
-              :on-key-down #(case (.-which %)
-                              13 (on-stop) ; TODO en el enter habria que tildar una opcion
-                              27 (clear)
-                              nil)}]
-     (if (seq @search)
-       [:i.link.remove.circle.icon {:on-click clear}]
-       [:i.search.icon])]))
+    [keyboard-shortcuts {:enter on-stop :escape clear}
+     [:div.ui.icon.small.fluid.input.search
+      [:input {:type "text" :placeholder (t :input/search) :value @search
+               :on-change #(change (.-target.value %))}]
+      (if (seq @search)
+        [:i.link.remove.circle.icon {:on-click clear}]
+        [:i.search.icon])]]))
 
 (defn search-input [& args]
   (into [focused search-input*] args))
