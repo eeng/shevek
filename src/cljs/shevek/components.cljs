@@ -123,7 +123,7 @@
   (when (seq address)
     [:a {:href (str "mailto:" address)} address]))
 
-(def modal-data (r/atom {}))
+(defonce modal-data (r/atom {}))
 
 (defn show-modal [md]
   (reset! modal-data (assoc md :opened? true)))

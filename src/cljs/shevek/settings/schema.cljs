@@ -70,9 +70,10 @@
 (defn- cube-details []
   (let [edited-cube (r/atom nil)
         save #(dispatch :cube-changed edited-cube)
-        cancel #(reset! edited-cube nil)]
+        cancel #(reset! edited-cube nil)
+        shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn [original-cube]
-      [:div.cube-details {:ref (kb-shortcuts :enter save :escape cancel)}
+      [:div.cube-details {:ref shortcuts}
        [cube-actions original-cube edited-cube save cancel]
        [cube-fields original-cube edited-cube]
        [dimensions-table original-cube edited-cube (t :cubes/dimensions) :dimensions]
