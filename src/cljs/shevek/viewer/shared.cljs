@@ -9,7 +9,7 @@
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
             [shevek.schemas.query :refer [Query]]
-            [shevek.components :refer [focused keyboard-shortcuts]]
+            [shevek.components :refer [focused kb-shortcuts]]
             [schema.core :as s]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]
@@ -86,13 +86,12 @@
   (let [change #(on-change (reset! search %))
         clear #(do (when (seq @search) (change ""))
                  (on-stop))]
-    [keyboard-shortcuts {:enter on-stop :escape clear}
-     [:div.ui.icon.small.fluid.input.search
+     [:div.ui.icon.small.fluid.input.search {:ref (kb-shortcuts :enter on-stop :escape clear)}
       [:input {:type "text" :placeholder (t :input/search) :value @search
                :on-change #(change (.-target.value %))}]
       (if (seq @search)
         [:i.link.remove.circle.icon {:on-click clear}]
-        [:i.search.icon])]]))
+        [:i.search.icon])]))
 
 (defn search-input [& args]
   (into [focused search-input*] args))

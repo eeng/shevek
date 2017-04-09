@@ -104,10 +104,10 @@
         assigned-fn (shortcuts key)]
     (when assigned-fn (assigned-fn))))
 
-(defn keyboard-shortcuts [shortcuts body]
-  (r/create-class
-   {:reagent-render body
-    :component-did-mount #(-> % r/dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts)))}))
+(defn kb-shortcuts [& {:as shortcuts}]
+  (fn [dom-node]
+    (when dom-node
+      (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
 
 ; El setTimeout es necesario xq sino no funcaba el focus en el search dentro de filter popups.
 (defn focused [& target]

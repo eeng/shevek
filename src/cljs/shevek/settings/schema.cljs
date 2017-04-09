@@ -1,7 +1,7 @@
 (ns shevek.settings.schema
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title select input-text input-field keyboard-shortcuts focused]]
+            [shevek.components :refer [page-title select input-text input-field kb-shortcuts focused]]
             [shevek.lib.react :refer [rmap]]
             [shevek.dw :as dw]
             [shevek.rpc :as rpc]
@@ -72,12 +72,11 @@
         save #(dispatch :cube-changed edited-cube)
         cancel #(reset! edited-cube nil)]
     (fn [original-cube]
-      [keyboard-shortcuts {:enter save :escape cancel}
-       [:div.cube-details
-        [cube-actions original-cube edited-cube save cancel]
-        [cube-fields original-cube edited-cube]
-        [dimensions-table original-cube edited-cube (t :cubes/dimensions) :dimensions]
-        [dimensions-table original-cube edited-cube (t :cubes/measures) :measures]]])))
+      [:div.cube-details {:ref (kb-shortcuts :enter save :escape cancel)}
+       [cube-actions original-cube edited-cube save cancel]
+       [cube-fields original-cube edited-cube]
+       [dimensions-table original-cube edited-cube (t :cubes/dimensions) :dimensions]
+       [dimensions-table original-cube edited-cube (t :cubes/measures) :measures]])))
 
 (defn schema-section []
   (dw/fetch-cubes)
