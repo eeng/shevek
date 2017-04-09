@@ -15,6 +15,7 @@
                     [binaryage/devtools "0.9.2" :scope "test"]
                     [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
                     [doo "0.1.7" :scope "test"] ; Needed by boot-cljs-test
+                    [pjstadig/humane-test-output "0.8.1" :scope "test"]
                     [proto-repl "0.3.1"]
                     [reagent "0.6.0"]
                     [clj-http "2.3.0"]

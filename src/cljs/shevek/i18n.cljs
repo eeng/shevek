@@ -69,7 +69,8 @@
               :new "New"
               :delete "Delete"
               :close "Close"}
-    :input {:search "Search"}}
+    :input {:search "Search"}
+    :validation {:required "this field is mandatory"}}
 
    :es
    {:menu {:logout "Salir"
@@ -133,7 +134,8 @@
               :new "Nuevo"
               :delete "Eliminar"
               :close "Cerrar"}
-    :input {:search "Buscar"}}
+    :input {:search "Buscar"}
+    :validation {:required "este campo es obligatorio"}}
 
    :tongue/fallback :en})
 

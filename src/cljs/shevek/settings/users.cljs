@@ -3,6 +3,7 @@
   (:require [shevek.i18n :refer [t]]
             [shevek.components :refer [page-title input-field kb-shortcuts focused mail-to]]
             [shevek.lib.react :refer [rmap]]
+            [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
             [reagent.core :as r]
             [reflow.db :as db]
@@ -20,10 +21,17 @@
   (dispatch :users-requested)
   (rpc/loaded db :saving-user))
 
+(defn validate-user! [user]
+  (v/validate! user [(v/required :username)
+                     (v/required :fullname)]))
+
 (defevh :user-changed [db edited-user cancel]
-  (rpc/call "users.api/save" :args [@edited-user]
-            :handler #(do (dispatch :user-saved) (cancel)))
-  (rpc/loading db :saving-user))
+  (if (validate-user! edited-user)
+    (do ; TODO estas dos lineas call y loading se repiten mucho me parece y hacen q se necesite el do, ver si no las podemos combinar en una nueva fn
+      (rpc/call "users.api/save" :args [@edited-user]
+                :handler #(do (dispatch :user-saved) (cancel)))
+      (rpc/loading db :saving-user))
+    db))
 
 (defevh :user-deleted [db user]
   (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %))

@@ -19,10 +19,16 @@
                     opts)]
     [:input opts]))
 
+(defn- classes [& css-classes]
+  (->> css-classes (filter identity) (str/join " ")))
+
 (defn input-field [atom field {:keys [label class]}]
-  [:div.field {:class class}
-   [:label label]
-   [input-text atom field]])
+  (let [path (-> field vector flatten)
+        errors (get-in @atom (into [:errors] path))]
+    [:div.field {:class (classes class (when errors "error"))}
+     [:label label]
+     [input-text atom field]
+     (when errors [:div.ui.pointing.red.basic.label (str/join ", " errors)])]))
 
 (defn- dropdown* [coll {:keys [placeholder selected class]} & content]
   [:div.ui.dropdown {:class class}
