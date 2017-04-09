@@ -70,7 +70,10 @@
               :delete "Delete"
               :close "Close"}
     :input {:search "Search"}
-    :validation {:required "this field is mandatory"}}
+    :validation {:required "can't be blank"
+                 :regex "doesn't match pattern"
+                 :email "is not a valid email address"
+                 :password "must have a combination of at least 7 letters and numbers (or symbols)"}}
 
    :es
    {:menu {:logout "Salir"
@@ -135,7 +138,9 @@
               :delete "Eliminar"
               :close "Cerrar"}
     :input {:search "Buscar"}
-    :validation {:required "este campo es obligatorio"}}
+    :validation {:required "este campo es obligatorio"
+                 :email "no es una dirección válida"
+                 :password "debería tener al menos 7 letras y números (o símbolos)"}}
 
    :tongue/fallback :en})
 

@@ -105,6 +105,7 @@
   "Continuos automatic testing of the frontend."
   []
   (merge-env! :source-paths #{"test/cljs"} :resource-paths #{"test/resources"})
+  (System/setProperty "conf" "test/resources/config.edn")
   (comp (watch)
         (test-cljs)))
 

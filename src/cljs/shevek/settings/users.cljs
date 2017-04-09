@@ -22,8 +22,11 @@
   (rpc/loaded db :saving-user))
 
 (defn validate-user! [user]
-  (v/validate! user [(v/required :username)
-                     (v/required :fullname)]))
+  (v/validate! user {:username v/required
+                     :fullname v/required
+                     :password [v/required (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
+                                                    {:msg :validation/password})]
+                     :email v/email}))
 
 (defevh :user-changed [db edited-user cancel]
   (if (validate-user! edited-user)
@@ -48,7 +51,8 @@
          [:div.ui.form {:ref shortcuts}
           [focused input-field edited-user :username {:label (t :users/username) :class "required"}]
           [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
-          [input-field edited-user :password {:label (t :users/password) :class "required"}]
+          [input-field edited-user :password {:label (t :users/password) :class "required"
+                                              :placeholder "For example: pass123"}]
           [input-field edited-user :password-confirmation {:label (t :users/password-confirmation) :class "required"}]
           [input-field edited-user :email {:label (t :users/email)}]
           [:button.ui.primary.button {:on-click save} (t :actions/save)]
