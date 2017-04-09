@@ -38,11 +38,11 @@
   (update-in db [:cubes cube-name] assoc :max-time (dw/parse-max-time max-time)))
 
 (defn fetch-max-time []
-  (when (= (db/get :page) :cube)
+  (when (= (db/get :page) :viewer)
     (let [name (current-cube-name)]
       (rpc/call "schema.api/max-time" :args [name] :handler #(dispatch :max-time-arrived name %)))))
 
-(defonce timeout (every 60 fetch-max-time))
+(defonce _interval (every 60 fetch-max-time))
 
 (defn page []
   [:div#viewer
