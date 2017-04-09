@@ -67,7 +67,8 @@
               :edit "Modify"
               :save "Save"
               :new "New"
-              :delete "Delete"}
+              :delete "Delete"
+              :close "Close"}
     :input {:search "Search"}}
 
    :es
@@ -130,7 +131,8 @@
               :edit "Editar"
               :save "Guardar"
               :new "Nuevo"
-              :delete "Eliminar"}
+              :delete "Eliminar"
+              :close "Cerrar"}
     :input {:search "Buscar"}}
 
    :tongue/fallback :en})

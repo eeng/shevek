@@ -147,4 +147,4 @@
          [:div.header header])
        [:div.content content]
        (when actions
-         [:div.actions actions])])))
+         (into [:div.actions] actions))])))

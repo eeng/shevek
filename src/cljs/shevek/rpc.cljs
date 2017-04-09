@@ -3,6 +3,7 @@
   (:require [ajax.core :refer [POST]]
             [reflow.core :refer [dispatch]]
             [reflow.db :as db]
+            [shevek.i18n :refer [t]]
             [shevek.components :refer [show-modal]]))
 
 (defn loading?
@@ -21,7 +22,8 @@
                :header [:div.ui.icon.red.header
                         [:i.warning.circle.icon]
                         (str "Error " status ": " status-text)]
-               :content response})
+               :content response
+               :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]})
   (loaded db))
 
 (defn call [fid & {:keys [args handler] :or {args []}}]
