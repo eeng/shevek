@@ -2,12 +2,8 @@
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [ajax.core :refer [POST]]
             [reflow.core :refer [dispatch]]
-            [reflow.db :as db]))
-
-(defn call [fid & {:keys [args handler] :or {args []}}]
-  {:pre [(vector? args)]}
-  (POST "/rpc" {:params {:fn fid :args args}
-                :handler handler}))
+            [reflow.db :as db]
+            [shevek.components :refer [show-modal]]))
 
 (defn loading?
   ([] (seq (db/get :loading)))
@@ -16,8 +12,23 @@
 (defn loading [db key]
   (assoc-in db [:loading key] true))
 
-(defn loaded [db key]
-  (update db :loading dissoc key))
+(defn loaded
+  ([db] (assoc db :loading {}))
+  ([db key] (update db :loading dissoc key)))
+
+(defevh :server-error [db {:keys [status status-text response] :as error}]
+  (show-modal {:class "small basic"
+               :header [:div.ui.icon.red.header
+                        [:i.warning.circle.icon]
+                        (str "Error " status ": " status-text)]
+               :content response})
+  (loaded db))
+
+(defn call [fid & {:keys [args handler] :or {args []}}]
+  {:pre [(vector? args)]}
+  (POST "/rpc" {:params {:fn fid :args args}
+                :handler handler
+                :error-handler #(dispatch :server-error %)}))
 
 ;; Generic events to make remote queries (doesn't allow to process them before storing in the db)
 

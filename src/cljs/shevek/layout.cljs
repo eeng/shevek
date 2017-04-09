@@ -5,7 +5,7 @@
             [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [shevek.rpc :refer [loading?]]
-            [shevek.components :refer [make-dropdown]]
+            [shevek.components :refer [make-dropdown modal]]
             [shevek.dashboard :as dashboard]
             [shevek.settings.page :as settings]
             [shevek.viewer.page :as viewer]
@@ -53,16 +53,20 @@
                        :class (when (= cube-name name) "active")}
               title])]]]))))
 
+(defn- menu []
+  [:div.ui.fixed.inverted.menu
+   [:a.item {:href "#/" :class (active? :dashboard)}
+    [:i.block.layout.icon] (t :dashboard/title)]
+   [cubes-menu]
+   [:div.right.menu
+    (when (loading?) [:div.item [:i.repeat.loading.icon]])
+    [:a.item {:href "#/settings" :class (active? :settings)}
+     [:i.settings.icon] (t :settings/title)]
+    [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]])
+
 (defn layout []
   [:div
-   [:div.ui.fixed.inverted.menu
-    [:a.item {:href "#/" :class (active? :dashboard)}
-     [:i.block.layout.icon] (t :dashboard/title)]
-    [cubes-menu]
-    [:div.right.menu
-     (when (loading?) [:div.item [:i.repeat.loading.icon]])
-     [:a.item {:href "#/settings" :class (active? :settings)}
-      [:i.settings.icon] (t :settings/title)]
-     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]]
+   [menu]
    [:div.page
-    [(get pages (db/get :page) :div)]]])
+    [(get pages (db/get :page) :div)]]
+   [modal]])
