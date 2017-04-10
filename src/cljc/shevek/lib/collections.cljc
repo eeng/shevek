@@ -9,3 +9,11 @@
 (defn assoc-if-seq [map key val]
   (cond-> map
           (seq val) (assoc key val)))
+
+(defn sequential-or-set? [x]
+  (or (sequential? x) (set? x)))
+
+(defn wrap-coll [x]
+  (if (sequential-or-set? x)
+    x
+    (remove nil? [x])))

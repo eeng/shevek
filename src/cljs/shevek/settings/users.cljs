@@ -21,17 +21,18 @@
   (dispatch :users-requested)
   (rpc/loaded db :saving-user))
 
-(defn validate-user! [user]
-  (v/validate! user {:username (v/required)
-                     :fullname (v/required)
-                     :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
-                                        {:when #(or (nil? (:_id %)) (seq (:password %)))
-                                         :msg :validation/password})
-                     :password-confirmation (v/confirmation :password {:when (comp seq :password)})
-                     :email (v/email {:optional? true})}))
+(defn validate-user [user]
+  (v/validate user
+              {:username (v/required)
+               :fullname (v/required)
+               :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
+                                  {:when #(or (nil? (:_id %)) (seq (:password %)))
+                                   :msg :validation/password})
+               :password-confirmation (v/confirmation :password {:when (comp seq :password)})
+               :email (v/email {:optional? true})}))
 
 (defevh :user-changed [db edited-user cancel]
-  (if (validate-user! edited-user)
+  (if (v/valid?! edited-user validate-user)
     (do ; TODO estas dos lineas call y loading se repiten mucho me parece y hacen q se necesite el do, ver si no las podemos combinar en una nueva fn
       (rpc/call "users.api/save" :args [(dissoc @edited-user :password-confirmation)]
                 :handler #(do (dispatch :user-saved) (cancel)))
@@ -53,10 +54,9 @@
          [:div.ui.form {:ref shortcuts}
           [focused input-field edited-user :username {:label (t :users/username) :class "required"}]
           [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
-          [input-field edited-user :password {:label (t :users/password) :class "required"
-                                              :placeholder "For example: pass123" :type "password"}]
+          [input-field edited-user :password {:label (t :users/password) :class "required" :type "password"}]
           [input-field edited-user :password-confirmation {:label (t :users/password-confirmation)
-                                                           :class "required"  :type "password"}]
+                                                           :class "required" :type "password"}]
           [input-field edited-user :email {:label (t :users/email)}]
           [:button.ui.primary.button {:on-click save} (t :actions/save)]
           [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]])))

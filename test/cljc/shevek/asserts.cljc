@@ -1,4 +1,5 @@
-(ns shevek.asserts)
+(ns shevek.asserts
+  (:require [shevek.lib.collections :refer [wrap-coll]]))
 
 (defn submap? [sm m]
   {:pre [(map? sm)]}
@@ -12,3 +13,11 @@
 
 (defn without? [k m]
   (not (contains? m k)))
+
+(defn error-on?
+  ([field record]
+   (seq (get-in (:errors record) (wrap-coll field))))
+  ([field msg record]
+   (some #(.contains % msg) (get-in (:errors record) (wrap-coll field)))))
+
+(def no-error-on? (complement error-on?))
