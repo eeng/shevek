@@ -25,13 +25,17 @@
     (s/validate User merged)
     (mc/save-and-return db "users" merged)))
 
-(s/defn delete-user [db {:keys [_id]} :- User]
+(defn delete-user [db {:keys [_id]}]
   (mc/remove-by-id db "users" _id)
   true)
 
 (defn find-users [db]
   (mq/with-collection db "users"
+    (mq/fields [:username :fullname :email])
     (mq/sort {:username 1})))
+
+;; Examples
 
 #_(save-user shevek.db/db {:username "ddchp" :fullname "Daniel Chavarini" :password "prueba" :email "auditor@vitolen.com"})
 #_(save-user shevek.db/db {:username "dev" :fullname "Desarrollo" :password "prueba"})
+#_(find-users shevek.db/db)
