@@ -1,30 +1,6 @@
-(ns shevek.schemas.app-db
-  (:require [schema.core :as s])
-  (:import goog.date.DateTime))
-
-(s/defschema Settings
-  {:lang s/Str})
-
-; TODO desde aca hasta el viewer esta duplicado en el server
-(s/defschema NTD
-  {:name s/Str
-   :title s/Str
-   (s/optional-key :description) (s/maybe s/Str)})
-
-(s/defschema Dimension
-  (assoc NTD :type s/Str))
-
-(s/defschema Measure
-  (assoc NTD :type s/Str))
-
-(s/defschema Cube
-  {(s/optional-key :_id) s/Any
-   :name s/Str
-   (s/optional-key :title) s/Str
-   (s/optional-key :description) s/Str
-   (s/optional-key :dimensions) [Dimension]
-   (s/optional-key :measures) [Measure]
-   (s/optional-key :max-time) goog.date.DateTime})
+(ns shevek.querying.schemas
+  (:require [schema.core :as s]
+            [shevek.schema.schemas :refer [Cube Dimension Measure]]))
 
 (s/defschema SortBy
   (assoc Dimension :descending s/Bool))
@@ -62,11 +38,3 @@
    (s/optional-key :pinboard) Pinboard
    (s/optional-key :results) {(s/enum :main :pinboard :filter) (s/cond-pre [Result] {s/Str [Result]})}
    (s/optional-key :last-added-filter) s/Any})
-
-(s/defschema AppDB
-  {(s/optional-key :page) s/Keyword
-   (s/optional-key :loading) {(s/cond-pre s/Keyword [s/Any]) s/Bool}
-   (s/optional-key :cubes) {s/Str Cube}
-   (s/optional-key :settings) (s/maybe Settings)
-   (s/optional-key :viewer) Viewer
-   (s/optional-key :users) [s/Any]}) ; TODO

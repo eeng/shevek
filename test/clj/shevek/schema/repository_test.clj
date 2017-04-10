@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [is]]
             [shevek.test-helper :refer [spec]]
             [shevek.makers :refer [make!]]
-            [shevek.schema.repository :refer [Cube]]
+            [shevek.schema.schemas :refer [Cube]]
             [shevek.db :refer [db]]))
 
 (spec "the cube name should be unique"

@@ -5,7 +5,8 @@
             [shevek.asserts :refer [submaps?]]
             [shevek.schema.manager :refer [discover!]]
             [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
-            [shevek.schema.repository :refer [find-cubes Cube]]
+            [shevek.schema.repository :refer [find-cubes]]
+            [shevek.schema.schemas :refer [Cube]]
             [shevek.db :refer [db]]
             [com.rpl.specter :refer [select ALL]]))
 
