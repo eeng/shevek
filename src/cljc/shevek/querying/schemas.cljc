@@ -3,23 +3,24 @@
             [shevek.schema.schemas :refer [Cube Dimension Measure]]))
 
 (s/defschema SortBy
-  (assoc Dimension :descending s/Bool))
+  {(s/optional-key :dimension) Dimension
+   (s/optional-key :measure) Measure
+   :descending s/Bool})
 
 (s/defschema Split
-  (assoc Dimension
-         :limit (s/cond-pre s/Int s/Str)
-         (s/optional-key :sort-by) SortBy
-         (s/optional-key :granularity) s/Str))
+  {:dimension Dimension
+   :limit (s/cond-pre s/Int s/Str)
+   (s/optional-key :sort-by) SortBy
+   (s/optional-key :granularity) s/Str})
 
 (s/defschema TimeFilter
-  (assoc Dimension
-         :name (s/eq "__time")
-         :selected-period s/Keyword))
+  {:dimension Dimension
+   :selected-period s/Keyword})
 
 (s/defschema NormalFilter
-  (assoc Dimension
-         :operator s/Str
-         (s/optional-key :value) #{(s/maybe s/Str)}))
+  {:dimension Dimension
+   :operator s/Str
+   (s/optional-key :value) #{(s/maybe s/Str)}})
 
 (s/defschema Filter
   (s/if :selected-period TimeFilter NormalFilter))
