@@ -31,8 +31,11 @@
 
 ; TODO faltan las rutas para errores
 
-(defn active? [page]
-  (when (= (db/get :page) page) "active"))
+(defn current-page? [page]
+  (= (db/get :page) page))
+
+(defn current-page-class [page]
+  (when (current-page? page) "active"))
 
 (defn cubes-menu []
   (dw/fetch-cubes)
@@ -44,7 +47,7 @@
         [make-dropdown {}
          [:div.ui.dropdown.item
           [:i.cubes.icon]
-          [:div.text (if (active? :cube) cube-title (t :cubes/menu))]
+          [:div.text (if (current-page? :viewer) cube-title (t :cubes/menu))]
           [:i.dropdown.icon]
           [:div.menu
            (for [{:keys [name title]} cubes]
@@ -55,12 +58,12 @@
 
 (defn- menu []
   [:div.ui.fixed.inverted.menu
-   [:a.item {:href "#/" :class (active? :dashboard)}
+   [:a.item {:href "#/" :class (current-page-class :dashboard)}
     [:i.block.layout.icon] (t :dashboard/title)]
    [cubes-menu]
    [:div.right.menu
     (when (loading?) [:div.item [:i.repeat.loading.icon]])
-    [:a.item {:href "#/settings" :class (active? :settings)}
+    [:a.item {:href "#/settings" :class (current-page-class :settings)}
      [:i.settings.icon] (t :settings/title)]
     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]])
 
