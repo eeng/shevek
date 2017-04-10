@@ -73,7 +73,8 @@
     :validation {:required "can't be blank"
                  :regex "doesn't match pattern"
                  :email "is not a valid email address"
-                 :password "must have a combination of at least 7 letters and numbers (or symbols)"}}
+                 :password "must have a combination of at least 7 letters and numbers (or symbols)"
+                 :confirmation "doesn't match the previous value"}}
 
    :es
    {:menu {:logout "Salir"
@@ -140,7 +141,8 @@
     :input {:search "Buscar"}
     :validation {:required "este campo es obligatorio"
                  :email "no es una dirección válida"
-                 :password "debería tener al menos 7 letras y números (o símbolos)"}}
+                 :password "debería tener al menos 7 letras y números (o símbolos)"
+                 :confirmation "no coincide con el valor anterior"}}
 
    :tongue/fallback :en})
 

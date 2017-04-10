@@ -1,7 +1,7 @@
 (ns shevek.lib.validation-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [pjstadig.humane-test-output]
-            [shevek.lib.validation :refer [validate pred required regex email]]))
+            [shevek.lib.validation :refer [validate pred required regex email confirmation]]))
 
 (deftest validation-tests
   (testing "general rules"
@@ -48,4 +48,11 @@
     (testing "email validator"
       (are [ee vr] (= ee (:errors vr))
         {:x ["is not a valid email address"]} (validate {:x "foo"} {:x email})
-        nil (validate {:x "foo@bar.com"} {:x email})))))
+        nil (validate {:x "foo@bar.com"} {:x email})))
+
+    (testing "confirmation validator"
+      (are [ee vr] (= ee (:errors vr))
+        {:y ["doesn't match the previous value"]} (validate {:x "foo" :y "foO"} {:y (confirmation :x)})
+        nil (validate {:x "foo" :y "foo"} {:y (confirmation :x)})
+        {:y ["not optional by default"]} (validate {:x "foo" :y nil}
+                                                   {:y (confirmation :x {:msg "not optional by default"})})))))
