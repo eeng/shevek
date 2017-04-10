@@ -4,6 +4,7 @@
             [reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
+            [shevek.navegation :refer [current-page?]]
             [shevek.lib.util :refer [every]]
             [shevek.viewer.shared :refer [send-main-query current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
@@ -38,7 +39,7 @@
   (update-in db [:cubes cube-name] assoc :max-time (dw/parse-max-time max-time)))
 
 (defn fetch-max-time []
-  (when (= (db/get :page) :viewer)
+  (when (current-page? :viewer)
     (let [name (current-cube-name)]
       (rpc/call "schema.api/max-time" :args [name] :handler #(dispatch :max-time-arrived name %)))))
 

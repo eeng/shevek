@@ -1,9 +1,7 @@
 (ns shevek.layout
-  (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [secretary.core :as secretary :refer-macros [defroute]]
-            [reflow.core :refer [dispatch]]
             [reflow.db :as db]
+            [shevek.navegation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
             [shevek.components :refer [make-dropdown modal]]
             [shevek.dashboard :as dashboard]
@@ -16,23 +14,6 @@
   {:dashboard #'dashboard/page
    :settings #'settings/page
    :viewer #'viewer/page})
-
-(defevh :navigate [db page]
-  (assoc db :page page))
-
-(defroute "/" []
-  (dispatch :navigate :dashboard))
-
-(defroute "/settings" []
-  (dispatch :navigate :settings))
-
-(defroute "/cubes/:cube" [cube]
-  (dispatch :cube-selected cube))
-
-; TODO faltan las rutas para errores
-
-(defn current-page? [page]
-  (= (db/get :page) page))
 
 (defn current-page-class [page]
   (when (current-page? page) "active"))
@@ -71,5 +52,5 @@
   [:div
    [menu]
    [:div.page
-    [(get pages (db/get :page) :div)]]
+    [(get pages (current-page) :div)]]
    [modal]])
