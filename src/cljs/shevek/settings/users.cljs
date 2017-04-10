@@ -25,8 +25,9 @@
   (v/validate! user {:username (v/required)
                      :fullname (v/required)
                      :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
-                                        {:msg :validation/password})
-                     :password-confirmation (v/confirmation :password)
+                                        {:when #(or (nil? (:_id %)) (seq (:password %)))
+                                         :msg :validation/password})
+                     :password-confirmation (v/confirmation :password {:when (comp seq :password)})
                      :email (v/email {:optional? true})}))
 
 (defevh :user-changed [db edited-user cancel]

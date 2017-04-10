@@ -30,10 +30,11 @@
 
 (defn state-pred
   "Use this validator if you need to access de field value and the state in the predicate"
-  [predicate {:keys [msg optional?] :or {optional? false}}]
+  [predicate {:keys [msg optional?] when-fn :when :or {optional? false when-fn identity}}]
   (fn [state field]
     (let [value (get state field)
-          valid? (or (and optional? (blank? value))
+          valid? (or (not (when-fn state))
+                     (and optional? (blank? value))
                      (predicate value state))]
       (when-not valid?
         (str/format (translate msg) value)))))

@@ -20,6 +20,11 @@
         {:x ["pos"]} (validate {:x nil} {:x (pred pos? {:msg "pos"})})
         nil (validate {:x nil} {:x (pred pos? {:msg "pos" :optional? true})})))
 
+    (testing "option :when (fn of state) can be used to validate only on some cases"
+      (are [ee vr] (= ee (:errors vr))
+        {:x ["oops"]} (validate {:x nil :id 1} {:x (required {:when :id :msg "oops"})})
+        nil (validate {:x nil :id nil} {:x (required {:when :id})})))
+
     (testing "value interpolation in the message"
       (are [ee vr] (= ee (:errors vr))
         {:x ["val 'foo' is invalid"]}
