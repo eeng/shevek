@@ -1,6 +1,7 @@
 (ns shevek.lib.validation
   (:require [shevek.i18n :refer [t]]
-            [cuerdas.core :as str]))
+            [cuerdas.core :as str]
+            [clojure.string :refer [blank?]]))
 
 (defn- translate [msg]
   (if (string? msg) msg (t msg)))
@@ -29,10 +30,10 @@
 
 (defn state-pred
   "Use this validator if you need to access de field value and the state in the predicate"
-  [predicate {:keys [msg optional?] :or {optional? true}}]
+  [predicate {:keys [msg optional?] :or {optional? false}}]
   (fn [state field]
     (let [value (get state field)
-          valid? (or (and optional? (nil? value))
+          valid? (or (and optional? (blank? value))
                      (predicate value state))]
       (when-not valid?
         (str/format (translate msg) value)))))
@@ -42,13 +43,18 @@
   [predicate opts]
   (state-pred #(predicate %1) opts))
 
-(def required (pred (comp seq str/trim str) {:msg :validation/required :optional? false}))
+(defn required [& [opts]]
+  (pred (comp seq str/trim str)
+        (merge {:msg :validation/required} opts)))
 
 (defn regex [pattern & [opts]]
-  (pred (partial re-find pattern) (merge {:msg :validation/regex} opts)))
+  (pred (comp (partial re-find pattern) str)
+        (merge {:msg :validation/regex} opts)))
 
-(def email (regex #"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$" {:msg :validation/email}))
+(defn email [& [opts]]
+  (regex #"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$"
+         (merge {:msg :validation/email} opts)))
 
 (defn confirmation [other-field & [opts]]
   (state-pred (fn [value state] (= value (get state other-field)))
-              (merge {:msg :validation/confirmation :optional? false} opts)))
+              (merge {:msg :validation/confirmation} opts)))

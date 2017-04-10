@@ -15,10 +15,10 @@
         {:x ["> 0" "> 1"]} (validate {:x 0} {:x [(pred #(> % 0) {:msg "> 0"})
                                                  (pred #(> % 1) {:msg "> 1"})]})))
 
-    (testing "validators are optional by default"
+    (testing "validators are not optional by default"
       (are [ee vr] (= ee (:errors vr))
-        nil (validate {:x nil} {:x (pred pos? {:msg "pos"})})
-        {:x ["pos"]} (validate {:x nil} {:x (pred pos? {:msg "pos" :optional? false})})))
+        {:x ["pos"]} (validate {:x nil} {:x (pred pos? {:msg "pos"})})
+        nil (validate {:x nil} {:x (pred pos? {:msg "pos" :optional? true})})))
 
     (testing "value interpolation in the message"
       (are [ee vr] (= ee (:errors vr))
@@ -28,27 +28,25 @@
   (testing "validators"
     (testing "required validator"
       (are [ee vr] (= ee (:errors vr))
-        {:x ["can't be blank"]} (validate {} {:x required})
-        {:x ["can't be blank"]} (validate {:x " "} {:x required})
-        nil (validate {:x "..."} {:x required})))
+        {:x ["can't be blank"]} (validate {} {:x (required)})
+        {:x ["can't be blank"]} (validate {:x " "} {:x (required)})
+        nil (validate {:x "..."} {:x (required)})))
 
     (testing "regex validator"
       (are [ee vr] (= ee (:errors vr))
         nil (validate {:x "foo"} {:x (regex #"foo")})
         {:x ["doesn't match pattern"]} (validate {:x "bar"} {:x (regex #"foo")})
         {:x ["oops"]} (validate {:x "bar"} {:x (regex #"foo" {:msg "oops"})})
-        nil (validate {:x nil} {:x (regex #"foo")})
-        {:x ["doesn't match pattern"]} (validate {:x ""} {:x (regex #"foo")})))
+        {:x ["doesn't match pattern"]} (validate {:x nil} {:x (regex #"foo")})
+        {:x ["doesn't match pattern"]} (validate {:x ""} {:x (regex #"foo")})
+        nil (validate {} {:x (regex #"foo" {:optional? true})})))
 
     (testing "email validator"
       (are [ee vr] (= ee (:errors vr))
-        {:x ["is not a valid email address"]} (validate {:x "foo"} {:x email})
-        nil (validate {:x "foo@bar.com"} {:x email})))
-
-    (testing "email validator"
-      (are [ee vr] (= ee (:errors vr))
-        {:x ["is not a valid email address"]} (validate {:x "foo"} {:x email})
-        nil (validate {:x "foo@bar.com"} {:x email})))
+        {:x ["is not a valid email address"]} (validate {:x "foo"} {:x (email)})
+        nil (validate {:x "foo@bar.com"} {:x (email)})
+        nil (validate {:x nil} {:x (email {:optional? true})})
+        nil (validate {:x ""} {:x (email {:optional? true})})))
 
     (testing "confirmation validator"
       (are [ee vr] (= ee (:errors vr))
