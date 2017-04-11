@@ -14,13 +14,12 @@
             [shevek.viewer.visualization :refer [visualization-panel]]
             [shevek.viewer.pinboard :refer [pinboard-panels]]))
 
-(defn- init-viewer [{:keys [viewer] :as db} {:keys [measures] :as cube}]
-  (-> viewer
-      (assoc :filter [(build-time-filter cube)]
-             :split []
-             :measures (->> measures (take 3) vec)
-             :pinboard {:measure (first measures) :dimensions []})
-      (->> (assoc db :viewer))))
+(defn- init-viewer [db {:keys [measures] :as cube}]
+  (update db :viewer assoc
+          :filter [(build-time-filter cube)]
+          :split []
+          :measures (->> measures (take 3) vec)
+          :pinboard {:measure (first measures) :dimensions []}))
 
 (defevh :cube-arrived [db {:keys [name] :as cube}]
   (let [cube (dw/set-cube-defaults cube)]
@@ -33,6 +32,7 @@
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
   (dispatch :navigate :viewer)
   (-> (assoc db :viewer {:cube {:name cube}})
+      (dissoc :viewer-report)
       (rpc/loading :cube-metadata)))
 
 (defevh :max-time-arrived [db cube-name max-time]

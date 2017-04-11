@@ -1,7 +1,5 @@
 (ns shevek.schemas.report
-  (:require [schema.core :as s]
-            [schema-tools.core :as st])
-  (:import [org.bson.types ObjectId]))
+  (:require [schema.core :as s]))
 
 (s/defschema SortBy
   {:name s/Str
@@ -19,12 +17,13 @@
    (s/optional-key :operator) s/Str
    (s/optional-key :value) #{(s/maybe s/Str)}})
 
-; TODO falta el pinboard
+; TODO falta el pinboard y el user
 (s/defschema Report
-  {(s/optional-key :_id) ObjectId
+  {(s/optional-key :_id) s/Any
    :name s/Str
    (s/optional-key :description) s/Str
-   :cube ObjectId
+   :dashboard s/Bool
+   :cube s/Any
    :measures [s/Str]
    :filter [Filter]
    :split [Split]})

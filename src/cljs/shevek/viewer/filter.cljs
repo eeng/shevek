@@ -96,7 +96,7 @@
      [checkbox (highlight label search)
       {:checked (some #(= value %) (@filter-opts :value))
        :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)
-       :name (str name "-" (str/slug label))}]]))
+       :id (str "checkbox-" name "-" (str/slug label))}]]))
 
 (defn- operator-selector [opts]
   [dropdown [[(t :cubes.operator/include) "include"]

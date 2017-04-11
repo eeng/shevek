@@ -10,7 +10,7 @@
   (let [viewer (make Viewer {:cube (make! Cube)
                              :split [{:name "page" :type "STRING" :title "Page" :limit 10
                                       :sort-by {:name "page" :type "STRING" :title "Page" :descending true}}]})
-        r (save-report {:name "Sales per Brand"} viewer)]
+        r (save-report {:name "Sales per Brand" :dashboard false} viewer)]
     (is (= "Sales per Brand" (:name r)))
     (is (= (-> viewer :cube :name)) (:cube r))
     (is (= [{:name "page" :sort-by {:name "page" :descending true}}]) (:split r))))

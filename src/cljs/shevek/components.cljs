@@ -1,7 +1,7 @@
 (ns shevek.components
   (:require [reagent.core :as r :refer [dom-node create-class]]
             [shevek.i18n :refer [t]]
-            [shevek.lib.collections :refer [detect]]
+            [shevek.lib.collections :refer [detect wrap-coll]]
             [shevek.lib.react :refer [with-react-keys]]
             [cuerdas.core :as str]))
 
@@ -11,24 +11,49 @@
    [:div.content title
     [:div.sub.header subtitle]]])
 
-(defn input-text [atom field & [{:as opts}]]
-  (let [path (-> field vector flatten)
+(defn- classes [& css-classes]
+  (->> css-classes (filter identity) (str/join " ")))
+
+(defn text-input [atom field & [{:as opts}]]
+  (let [path (wrap-coll field)
         opts (merge {:type "text"
                      :value (get-in @atom path)
                      :on-change #(swap! atom assoc-in path (.-target.value %))}
                     opts)]
     [:input opts]))
 
-(defn- classes [& css-classes]
-  (->> css-classes (filter identity) (str/join " ")))
+(defn textarea [atom field & [{:as opts}]]
+  (let [path (wrap-coll field)
+        opts (merge {:value (get-in @atom path)
+                     :on-change #(swap! atom assoc-in path (.-target.value %))}
+                    opts)]
+    [:textarea opts]))
 
-(defn input-field [atom field {:keys [label class] :as opts}]
-  (let [path (-> field vector flatten)
+(defn- checkbox-input [atom field & [{:keys [label class] :as opts}]]
+  (let [path (wrap-coll field)
+        id (str "cb-" (str/join "-" (map str path)))
+        opts (merge {:type "checkbox"
+                     :checked (get-in @atom path)
+                     :on-change #(swap! atom update-in path not)
+                     :id id}
+                    opts)]
+    [:div.ui.checkbox {:class class}
+     [:input opts]
+     [:label {:for id} label]]))
+
+(def input-types {:text text-input :textarea textarea :checkbox checkbox-input})
+
+(defn input-field [atom field {:keys [label class input-class as] :or {as :text} :as opts}]
+  (let [path (wrap-coll field)
         errors (get-in @atom (into [:errors] path))
-        input-text-opts (dissoc opts :label :class)]
+        input-opts (cond-> (assoc opts :class input-class)
+                           true (dissoc :input-class :as)
+                           (not= as :checkbox) (dissoc :label))
+        input (input-types as)]
+    (assert input (str "Input type '" as "' not supported"))
     [:div.field {:class (classes class (when errors "error"))}
-     [:label label]
-     [input-text atom field input-text-opts]
+     (when (not= as :checkbox) [:label label])
+     [input atom field input-opts]
      (when errors [:div.ui.pointing.red.basic.label (str/join ", " errors)])]))
 
 (defn- dropdown* [coll {:keys [placeholder selected class]} & content]
@@ -61,12 +86,12 @@
                          [:i.dropdown.icon]
                          [:div.default.text placeholder]])))
 
-(defn- checkbox [label & [{:keys [checked on-change name]
-                           :or {on-change identity name (str/slug label)}}]]
+(defn- checkbox [label & [{:keys [checked on-change id]
+                           :or {on-change identity id (str "checkbox-" (str/slug label))}}]]
   [:div.ui.checkbox
-   [:input {:type "checkbox" :id name :checked (or checked false)
+   [:input {:type "checkbox" :id id :checked (or checked false)
             :on-change #(on-change (not checked))}]
-   [:label {:for name} label]])
+   [:label {:for id} label]])
 
 (defn toggle-checkbox-inside [e]
   (-> e .-target js/$ (.find ".checkbox input") .click))

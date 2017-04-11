@@ -49,6 +49,10 @@
                    :title "Title"
                    :description "Description"
                    :type "Type"}
+    :reports {:menu "Save Report"
+              :name "Name"
+              :description "Description"
+              :dashboard "Show in dashboard"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -79,8 +83,7 @@
    :es
    {:menu {:logout "Salir"
            :settings "Configuración"}
-    :dashboard {:title "Centro de Control"
-                :subtitle "Muestra las fuentes de datos disponibles y sus reportes favoritos"}
+    :dashboard {:subtitle "Muestra las fuentes de datos disponibles y sus reportes favoritos"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
             :missing "No hay cubos definidos."
@@ -119,6 +122,10 @@
                    :title "Título"
                    :description "Descripción"
                    :type "Tipo"}
+    :reports {:menu "Guardar Reporte"
+              :name "Nombre"
+              :description "Descripción"
+              :dashboard "Mostrar en dashboard"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"

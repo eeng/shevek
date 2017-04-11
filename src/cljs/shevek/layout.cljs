@@ -7,6 +7,7 @@
             [shevek.dashboard :as dashboard]
             [shevek.settings.page :as settings]
             [shevek.viewer.page :as viewer]
+            [shevek.viewer.report :refer [save-report-menu]]
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.dw :as dw]))
 
@@ -44,6 +45,7 @@
    [cubes-menu]
    [:div.right.menu
     (when (loading?) [:div.item [:i.repeat.loading.icon]])
+    (when (current-page? :viewer) [save-report-menu])
     [:a.item {:href "#/settings" :class (current-page-class :settings)}
      [:i.settings.icon] (t :settings/title)]
     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]])

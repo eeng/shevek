@@ -1,7 +1,8 @@
 (ns shevek.schemas.app-db
   (:require [schema.core :as s]
             [shevek.schemas.cube :refer [Dimension Measure]]
-            [shevek.schemas.viewer :refer [Viewer Cube]]))
+            [shevek.schemas.viewer :refer [Viewer Cube]]
+            [shevek.schemas.report :refer [Report]]))
 
 (s/defschema Settings
   {:lang s/Str})
@@ -12,4 +13,5 @@
    (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) (s/maybe Settings)
    (s/optional-key :viewer) Viewer
+   (s/optional-key :viewer-report) Report
    (s/optional-key :users) [s/Any]}) ; TODO

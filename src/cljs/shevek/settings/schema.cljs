@@ -1,7 +1,7 @@
 (ns shevek.settings.schema
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title select input-text input-field kb-shortcuts focused]]
+            [shevek.components :refer [page-title select text-input input-field kb-shortcuts focused]]
             [shevek.lib.react :refer [rmap]]
             [shevek.dw :as dw]
             [shevek.rpc :as rpc]
@@ -13,11 +13,11 @@
   [:tr {:key name}
    [:td
     (if @edited-cube
-      [:div.ui.fluid.input [input-text edited-cube [coll-key i :title]]]
+      [:div.ui.fluid.input [text-input edited-cube [coll-key i :title]]]
       title)]
    [:td
     (if @edited-cube
-      [:div.ui.fluid.input [input-text edited-cube [coll-key i :description]]]
+      [:div.ui.fluid.input [text-input edited-cube [coll-key i :description]]]
       description)]
    [:td name]
    [:td type]])
