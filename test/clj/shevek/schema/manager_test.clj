@@ -6,7 +6,7 @@
             [shevek.schema.manager :refer [discover!]]
             [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
             [shevek.schema.repository :refer [find-cubes]]
-            [shevek.schema.schemas :refer [Cube]]
+            [shevek.schemas.cube :refer [Cube]]
             [shevek.db :refer [db]]
             [com.rpl.specter :refer [select ALL]]))
 

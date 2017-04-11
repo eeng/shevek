@@ -1,7 +1,7 @@
 (ns shevek.schema.repository
   (:require [schema.core :as s]
             [monger.collection :as mc]
-            [shevek.schema.schemas :refer [Cube]]))
+            [shevek.schemas.cube :refer [Cube]]))
 
 (s/defn save-cube [db cube :- Cube]
   (mc/save-and-return db "cubes" cube))

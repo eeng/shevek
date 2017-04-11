@@ -1,4 +1,4 @@
-(ns shevek.schema.schemas
+(ns shevek.schemas.cube
   (:require [schema.core :as s]))
 
 (s/defschema NTD

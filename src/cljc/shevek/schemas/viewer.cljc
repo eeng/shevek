@@ -1,6 +1,6 @@
-(ns shevek.querying.schemas
+(ns shevek.schemas.viewer
   (:require [schema.core :as s]
-            [shevek.schema.schemas :refer [Cube Dimension Measure]]))
+            [shevek.schemas.cube :refer [Cube Dimension Measure]]))
 
 (s/defschema SortBy
   {(s/optional-key :dimension) Dimension

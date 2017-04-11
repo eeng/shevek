@@ -2,8 +2,8 @@
   (:require [clojure.test :refer [is]]
             [shevek.test-helper :refer [spec]]
             [shevek.makers :refer [make make!]]
-            [shevek.querying.schemas :refer [Viewer]]
-            [shevek.schema.schemas :refer [Cube]]
+            [shevek.schemas.viewer :refer [Viewer]]
+            [shevek.schemas.cube :refer [Cube]]
             [shevek.reports.api :refer [save-report]]))
 
 (spec "save-report should convert the viewer, persist it and return the report"
