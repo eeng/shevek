@@ -1,16 +1,23 @@
 (ns shevek.schemas.report
   (:require [schema.core :as s]
-            [shevek.schemas.viewer :as vs]
-            [shevek.schemas.cube :as cs])
+            [schema-tools.core :as st])
   (:import [org.bson.types ObjectId]))
 
-(def keys-to-remove-from-viewer [:type :title :description])
-
-(s/defschema Filter
-  (apply dissoc vs/Filter keys-to-remove-from-viewer))
+(s/defschema SortBy
+  {:name s/Str
+   :descending s/Bool})
 
 (s/defschema Split
-  (apply dissoc vs/Split keys-to-remove-from-viewer))
+  {:name s/Str
+   :limit (s/cond-pre s/Int s/Str)
+   (s/optional-key :sort-by) SortBy
+   (s/optional-key :granularity) s/Str})
+
+(s/defschema Filter
+  {:name s/Str
+   (s/optional-key :selected-period) s/Keyword
+   (s/optional-key :operator) s/Str
+   (s/optional-key :value) #{(s/maybe s/Str)}})
 
 ; TODO falta el pinboard
 (s/defschema Report

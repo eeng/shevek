@@ -1,8 +1,7 @@
-(ns shevek.reports.conversion
-  (:require [shevek.schemas.report :refer [keys-to-remove-from-viewer]]))
+(ns shevek.reports.conversion)
 
 (defn- simplify-dimension [dim]
-  (apply dissoc dim keys-to-remove-from-viewer))
+  (dissoc dim :type :title :description))
 
 (defn viewer->report [{:keys [cube measures filter split]}]
   {:cube (:_id cube)
