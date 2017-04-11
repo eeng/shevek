@@ -10,4 +10,4 @@
   (let [viewer (make Viewer {:cube (make! Cube)})
         r (save-report {:name "Sales per Brand"} viewer)]
     (is (= "Sales per Brand" (:name r)))
-    (is (= (-> viewer :cube :_id)) (:cube r))))
+    (is (= (-> viewer :cube :name)) (:cube r))))

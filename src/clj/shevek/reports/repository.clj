@@ -1,14 +1,15 @@
 (ns shevek.reports.repository
   (:require [schema.core :as s]
             [shevek.schemas.viewer :as vs]
+            [shevek.schemas.cube :as cs]
             [monger.collection :as mc])
   (:import [org.bson.types ObjectId]))
 
 (s/defschema Filter
-  (assoc vs/Filter :dimension s/Str))
+  (dissoc vs/Filter :type :title :description))
 
 (s/defschema Split
-  (assoc vs/Split :dimension s/Str))
+  (dissoc vs/Split :type :title :description))
 
 ; TODO falta el pinboard
 (s/defschema Report
