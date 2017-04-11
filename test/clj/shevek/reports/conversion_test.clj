@@ -1,15 +1,12 @@
-(ns shevek.reports.repository-test
+(ns shevek.reports.conversion-test
   (:require [clojure.test :refer :all]
             [shevek.makers :refer [make]]
             [shevek.asserts :refer [submap? submaps?]]
-            [shevek.reports.repository :refer [viewer->report]])
-  (:import [org.bson.types ObjectId]))
+            [shevek.reports.conversion :refer [viewer->report]]))
 
 (deftest viewer->report-tests
   (testing "should store only the cube id"
-    (let [cube-id (ObjectId.)]
-      (is (= cube-id
-             (-> {:cube {:_id cube-id}} viewer->report :cube)))))
+    (is (= 123 (-> {:cube {:_id 123}} viewer->report :cube))))
 
   (testing "should store only the selected measures names"
     (is (= ["added" "deleted"]

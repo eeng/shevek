@@ -11,8 +11,9 @@
 (defn make [schema args]
   (c/complete args schema))
 
-(defn make! [schema args]
-  (let [saver (makers schema)]
-    (assert saver (str "Maker not defined " (meta schema)))
-    (->> (c/complete args schema)
-         (saver db))))
+(defn make!
+  ([schema] (make! schema {}))
+  ([schema args]
+   (let [saver (makers schema)]
+     (assert saver (str "You need to define a save function (in makers) for the schema: " (meta schema)))
+     (->> (make schema args) (saver db)))))
