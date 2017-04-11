@@ -1,23 +1,10 @@
 (ns shevek.schemas.app-db
   (:require [schema.core :as s]
             [shevek.schemas.cube :refer [Dimension Measure]]
-            [shevek.schemas.viewer :as vs])
-  (:import goog.date.DateTime))
+            [shevek.schemas.viewer :refer [Viewer Cube]]))
 
 (s/defschema Settings
   {:lang s/Str})
-
-(s/defschema Cube
-  {(s/optional-key :_id) s/Any
-   :name s/Str
-   (s/optional-key :title) s/Str
-   (s/optional-key :description) s/Str
-   (s/optional-key :dimensions) [Dimension]
-   (s/optional-key :measures) [Measure]
-   (s/optional-key :max-time) goog.date.DateTime})
-
-(s/defschema Viewer
-  (assoc vs/Viewer :cube Cube))
 
 (s/defschema AppDB
   {(s/optional-key :page) s/Keyword

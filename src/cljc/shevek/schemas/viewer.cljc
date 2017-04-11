@@ -1,6 +1,6 @@
 (ns shevek.schemas.viewer
   (:require [schema.core :as s]
-            [shevek.schemas.cube :refer [Cube Dimension Measure]]))
+            [shevek.schemas.cube :refer [Dimension Measure]]))
 
 (s/defschema SortBy
   (assoc Dimension :descending s/Bool))
@@ -28,6 +28,16 @@
   {:measure Measure :dimensions [Split]})
 
 (s/defschema Result {s/Keyword s/Any})
+
+; In the Viewer the Cube is slightly different from the schemas.cube.Cube: it starts only with the name and later receives a max-time
+(s/defschema Cube
+  {(s/optional-key :_id) s/Any
+   :name s/Str
+   (s/optional-key :title) s/Str
+   (s/optional-key :description) s/Str
+   (s/optional-key :dimensions) [Dimension]
+   (s/optional-key :measures) [Measure]
+   (s/optional-key :max-time) s/Any})
 
 (s/defschema Viewer
   {:cube Cube
