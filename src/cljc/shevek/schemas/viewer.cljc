@@ -19,7 +19,7 @@
 (s/defschema NormalFilter
   (assoc Dimension
          :operator s/Str
-         (s/optional-key :value) #{(s/maybe s/Str)}))
+         (s/optional-key :value) [(s/maybe s/Str)]))
 
 (s/defschema Filter
   (s/if :selected-period TimeFilter NormalFilter))

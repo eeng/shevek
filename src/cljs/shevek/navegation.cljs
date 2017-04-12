@@ -16,6 +16,9 @@
 (defroute "/cubes/:cube" [cube]
   (dispatch :cube-selected cube))
 
+(defroute "/viewer" []
+  (dispatch :navigate :viewer))
+
 ; TODO faltan las rutas para errores
 
 (defn current-page []
@@ -23,3 +26,6 @@
 
 (defn current-page? [page]
   (= (current-page) page))
+
+(defn navigate [& args]
+  (aset js/window "location" (apply str "/#" args)))

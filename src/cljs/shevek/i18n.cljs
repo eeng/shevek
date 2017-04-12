@@ -125,7 +125,7 @@
                    :description "Descripción"
                    :type "Tipo"}
     :reports {:menu "Reportes"
-              :title "Reportes Guardados"
+              :title "Reportes"
               :name "Nombre"
               :description "Descripción"
               :dashboard "Mostrar en dashboard"}

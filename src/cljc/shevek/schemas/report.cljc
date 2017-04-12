@@ -15,7 +15,7 @@
   {:name s/Str
    (s/optional-key :selected-period) s/Str
    (s/optional-key :operator) s/Str
-   (s/optional-key :value) #{(s/maybe s/Str)}})
+   (s/optional-key :value) [(s/maybe s/Str)]})
 
 ; TODO falta el pinboard y el user
 (s/defschema Report

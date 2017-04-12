@@ -6,7 +6,7 @@
 
 (deftest viewer->report-tests
   (testing "should store only the cube id"
-    (is (= 123 (-> {:cube {:_id 123}} viewer->report :cube))))
+    (is (= "wikiticker" (-> {:cube {:name "wikiticker"}} viewer->report :cube))))
 
   (testing "should store only the selected measures names"
     (is (= ["added" "deleted"]
@@ -14,7 +14,7 @@
                viewer->report :measures))))
 
   (testing "in each filter should store only the dimension name besides its own fields"
-    (is (= [{:name "time" :selected-period :current-day}
+    (is (= [{:name "time" :selected-period "current-day"}
             {:name "page" :operator "exclude" :value #{nil}}]
            (-> {:filter [{:name "time" :type "..." :selected-period :current-day}
                          {:name "page" :type "..." :operator "exclude" :value #{nil}}]}

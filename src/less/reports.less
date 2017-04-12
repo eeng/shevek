@@ -1,8 +1,20 @@
 #reports-popup {
   width: 300px;
   .actions {
-    text-align: right;
-    margin-bottom: -4em;
+    float: right;
     .button:last-child { margin-right: 0 }
+  }
+  .ui.header {
+    margin-top: 0;
+    margin-bottom: .8em;
+    &.has-actions { margin-bottom: 1.8em }
+  }
+  .ui.list {
+    .item {
+      margin: 0 -.5em;
+      padding: .5em;
+      .border-radius(.5em) !important;
+      &:last-child { margin-bottom: -.3em }
+    }
   }
 }
