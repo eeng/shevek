@@ -32,7 +32,7 @@
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
   (dispatch :navigate :viewer)
   (-> (assoc db :viewer {:cube {:name cube}})
-      (dissoc :viewer-report)
+      (dissoc :current-report)
       (rpc/loading :cube-metadata)))
 
 (defevh :max-time-arrived [db cube-name max-time]

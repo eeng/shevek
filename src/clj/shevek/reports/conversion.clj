@@ -1,7 +1,8 @@
 (ns shevek.reports.conversion)
 
-(defn- simplify-dimension [dim]
-  (dissoc dim :type :title :description))
+(defn- simplify-dimension [{:keys [selected-period] :as dim}]
+  (cond-> (dissoc dim :type :title :description)
+          selected-period (assoc :selected-period (name selected-period))))
 
 (defn viewer->report [{:keys [cube measures filter split]}]
   {:cube (:_id cube)

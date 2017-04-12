@@ -13,5 +13,6 @@
    (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) (s/maybe Settings)
    (s/optional-key :viewer) Viewer
-   (s/optional-key :viewer-report) Report
+   (s/optional-key :current-report) Report
+   (s/optional-key :reports) [Report]
    (s/optional-key :users) [s/Any]}) ; TODO

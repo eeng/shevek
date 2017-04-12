@@ -49,7 +49,8 @@
                    :title "Title"
                    :description "Description"
                    :type "Type"}
-    :reports {:menu "Save Report"
+    :reports {:menu "Reports"
+              :title "Saved Reports"
               :name "Name"
               :description "Description"
               :dashboard "Show in dashboard"}
@@ -70,6 +71,7 @@
               :cancel "Cancel"
               :edit "Modify"
               :save "Save"
+              :save-as "Save As"
               :new "New"
               :delete "Delete"
               :close "Close"}
@@ -122,7 +124,8 @@
                    :title "Título"
                    :description "Descripción"
                    :type "Tipo"}
-    :reports {:menu "Guardar Reporte"
+    :reports {:menu "Reportes"
+              :title "Reportes Guardados"
               :name "Nombre"
               :description "Descripción"
               :dashboard "Mostrar en dashboard"}
@@ -142,6 +145,7 @@
               :cancel "Cancelar"
               :edit "Editar"
               :save "Guardar"
+              :save-as "Guardar Como"
               :new "Nuevo"
               :delete "Eliminar"
               :close "Cerrar"}

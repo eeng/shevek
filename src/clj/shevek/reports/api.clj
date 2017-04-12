@@ -7,3 +7,6 @@
 
 (s/defn save-report [report viewer :- Viewer]
   (r/save-report db (merge report (viewer->report viewer))))
+
+(defn find-all []
+  (r/find-reports db))
