@@ -27,14 +27,19 @@
   (-> (assoc db :viewer {:cube {:name cube}} :current-report report)
       (rpc/loading :cube-metadata)))
 
-(defevh :report-saved [db report]
-  (-> (assoc db :current-report report)
-      (rpc/loaded :save-report)))
+(defevh :report-saved [db report editing-current?]
+  (cond-> (rpc/loaded db :save-report)
+          editing-current? (assoc :current-report report)))
 
 (defevh :save-report [db report]
-  (rpc/call "reports.api/save-report" :args [(merge report (viewer->report (db :viewer)))]
-                                      :handler #(dispatch :report-saved %))
-  (rpc/loading db :save-report))
+  (let [current-report-id (get-in db [:current-report :_id])
+        editing-current? (or (nil? current-report-id)
+                             (= (:_id report) current-report-id))
+        report (if editing-current?
+                 (merge report (viewer->report (db :viewer)))
+                 report)]
+    (rpc/call "reports.api/save-report" :args [report] :handler #(dispatch :report-saved % editing-current?))
+    (rpc/loading db :save-report)))
 
 (defevh :delete-report [db report]
   ; TODO unificar estas dos lineas ya que siempre que hay un call debe haber un loading
@@ -70,8 +75,8 @@
      [:h3.ui.sub.header {:class (when show-actions? "has-actions")} (t :reports/title)]
      (if (seq reports)
        [:div.ui.relaxed.middle.aligned.selection.list
-        (for [{:keys [name description cube] :as report} reports]
-          [:div.item {:key name :on-click #(select-report report)}
+        (for [{:keys [_id name description cube] :as report} reports]
+          [:div.item {:key _id :on-click #(select-report report)}
            [:div.right.floated.content
             [:div.cube (:title (cubes cube))]
             [:div.item-actions
