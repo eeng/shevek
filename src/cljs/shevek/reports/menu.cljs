@@ -1,4 +1,4 @@
-(ns shevek.reports
+(ns shevek.reports.menu
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [reflow.db :as db]
@@ -8,11 +8,8 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.components :refer [controlled-popup kb-shortcuts focused input-field]]
             [shevek.navegation :refer [current-page? navigate]]
+            [shevek.reports.conversion :refer [viewer->report]]
             [cuerdas.core :as str]))
-
-; TODO hacer un goog date writer asi no hay que andar haciendo esto
-(defn- clean-viewer [viewer]
-  (update viewer :cube dissoc :max-time))
 
 ; TODO Muy parecido a lo de users, de nuevo el patron de call, loading y loaded
 (defevh :reports-arrived [db reports]
@@ -35,8 +32,7 @@
       (rpc/loaded :save-report)))
 
 (defevh :save-report [db report]
-  ; TODO unificar estas dos lineas ya que siempre que hay un call debe haber un loading
-  (rpc/call "reports.api/save-report" :args [report (clean-viewer (db :viewer))]
+  (rpc/call "reports.api/save-report" :args [(merge report (viewer->report (db :viewer)))]
                                       :handler #(dispatch :report-saved %))
   (rpc/loading db :save-report))
 
@@ -79,7 +75,7 @@
            [:div.right.floated.content
             [:div.cube (:title (cubes cube))]
             [:div.item-actions
-             [:i.write.icon]
+             [:i.write.icon {:on-click (without-propagation reset! editing-report report)}]
              [:i.trash.icon {:on-click (without-propagation dispatch :delete-report report)}]]]
            [:div.header name]
            [:div.description description]])]

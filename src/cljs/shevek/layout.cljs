@@ -8,7 +8,7 @@
             [shevek.settings.page :as settings]
             [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]
-            [shevek.reports :refer [reports-menu]]
+            [shevek.reports.menu :refer [reports-menu]]
             [shevek.dw :as dw]))
 
 (def pages
@@ -19,6 +19,7 @@
 (defn current-page-class [page]
   (when (current-page? page) "active"))
 
+; TODO esto estaria muy lindo que sea popup como el de Reports
 (defn cubes-menu []
   (dw/fetch-cubes)
   (fn []

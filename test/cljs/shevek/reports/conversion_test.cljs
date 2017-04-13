@@ -1,6 +1,6 @@
 (ns shevek.reports.conversion-test
-  (:require [clojure.test :refer :all]
-            [shevek.makers :refer [make]]
+  (:require-macros [cljs.test :refer [deftest testing is are]])
+  (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [submap? submaps?]]
             [shevek.reports.conversion :refer [viewer->report]]))
 

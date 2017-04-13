@@ -12,7 +12,8 @@
             [shevek.viewer.filter :refer [filter-panel build-time-filter]]
             [shevek.viewer.split :refer [split-panel]]
             [shevek.viewer.visualization :refer [visualization-panel]]
-            [shevek.viewer.pinboard :refer [pinboard-panels]]))
+            [shevek.viewer.pinboard :refer [pinboard-panels]]
+            [shevek.reports.conversion :refer [report->viewer]]))
 
 (defn- build-new-viewer [{:keys [cube] :as viewer}]
   (let [measures (cube :measures)]
@@ -21,18 +22,6 @@
            :split []
            :measures (->> measures (take 3) vec)
            :pinboard {:measure (first measures) :dimensions []})))
-
-; TODO refactorizar esto a un conversion y unificar con el del server, quizas convenga guardar las measures como maps tb asi usamos esta misma fn y x las dudas si en otro momento agregamos mas cosas adentro
-(defn- report-dim->viewer [{:keys [name selected-period sort-by] :as dim} {:keys [dimensions measures]}]
-  (cond-> (merge dim (dw/find-dimension name dimensions))
-          selected-period (update :selected-period keyword)
-          sort-by (update :sort-by merge (dw/find-dimension (:name sort-by) (concat dimensions measures)))))
-
-(defn- report->viewer [report cube]
-  {:cube cube
-   :filter (mapv #(report-dim->viewer % cube) (report :filter))
-   :split (mapv #(report-dim->viewer % cube) (report :split))
-   :measures (mapv #(dw/find-dimension % (cube :measures)) (report :measures))})
 
 (defn- init-viewer [{:keys [current-report viewer] :as db}]
   (assoc db :viewer
