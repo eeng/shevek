@@ -57,7 +57,9 @@
         save #(if (:_id current-report)
                 (do (dispatch :save-report current-report) (close))
                 (reset! editing-report current-report))
-        save-as #(reset! editing-report (dissoc current-report :_id :name))]
+        save-as #(reset! editing-report (dissoc current-report :_id :name))
+        select-report #(do (dispatch :report-selected %) (close))
+        cubes (db/get :cubes)]
     [:div
      (when show-actions?
        [:div.actions
@@ -66,8 +68,14 @@
      [:h3.ui.sub.header {:class (when show-actions? "has-actions")} (t :reports/title)]
      (if (seq reports)
        [:div.ui.relaxed.middle.aligned.selection.list
-        (for [{:keys [name description] :as report} reports]
-          [:div.item {:key name :on-click #(do (dispatch :report-selected report) (close))}
+        (for [{:keys [name description cube] :as report} reports]
+          [:div.item {:key name :on-click #(select-report report)}
+           [:div.right.floated.content
+            [:div.cube (:title (cubes cube))]
+            [:div.item-actions
+             [:i.pin.icon]
+             [:i.edit.icon]
+             [:i.trash.icon]]]
            [:div.header name]
            [:div.description (or description (t :cubes/no-desc))]])]
        [:div (t :cubes/no-results)])]))
