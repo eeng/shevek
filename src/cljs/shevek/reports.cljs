@@ -5,6 +5,7 @@
             [reflow.core :refer [dispatch]]
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
+            [shevek.lib.react :refer [without-propagation]]
             [shevek.components :refer [controlled-popup kb-shortcuts focused input-field]]
             [shevek.navegation :refer [current-page? navigate]]
             [cuerdas.core :as str]))
@@ -18,7 +19,7 @@
   (-> (assoc db :reports reports)
       (rpc/loaded :reports)))
 
-(defevh :reports-requested [db report]
+(defevh :reports-requested [db]
   (rpc/call "reports.api/find-all" :handler #(dispatch :reports-arrived %))
   (rpc/loading db :reports))
 
@@ -37,6 +38,11 @@
   ; TODO unificar estas dos lineas ya que siempre que hay un call debe haber un loading
   (rpc/call "reports.api/save-report" :args [report (clean-viewer (db :viewer))]
                                       :handler #(dispatch :report-saved %))
+  (rpc/loading db :save-report))
+
+(defevh :delete-report [db report]
+  ; TODO unificar estas dos lineas ya que siempre que hay un call debe haber un loading
+  (rpc/call "reports.api/delete-report" :args [report] :handler #(dispatch :reports-requested))
   (rpc/loading db :save-report))
 
 (defn- save-report-form [{:keys [close]} report]
@@ -73,11 +79,10 @@
            [:div.right.floated.content
             [:div.cube (:title (cubes cube))]
             [:div.item-actions
-             [:i.pin.icon]
-             [:i.edit.icon]
-             [:i.trash.icon]]]
+             [:i.write.icon]
+             [:i.trash.icon {:on-click (without-propagation dispatch :delete-report report)}]]]
            [:div.header name]
-           [:div.description (or description (t :cubes/no-desc))]])]
+           [:div.description description]])]
        [:div (t :cubes/no-results)])]))
 
 (defn- popup-content [popup]
