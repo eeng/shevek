@@ -32,9 +32,9 @@
           editing-current? (assoc :current-report report)))
 
 (defevh :save-report [db report]
-  (let [current-report-id (get-in db [:current-report :_id])
-        editing-current? (or (nil? current-report-id)
-                             (= (:_id report) current-report-id))
+  (let [editing-current? (or (nil? (:_id report))
+                             (and (= (:_id report) (get-in db [:current-report :_id]))
+                                  (current-page? :viewer)))
         report (if editing-current?
                  (merge report (viewer->report (db :viewer)))
                  report)]
