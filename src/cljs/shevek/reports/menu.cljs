@@ -41,14 +41,23 @@
     (rpc/call "reports.api/save-report" :args [report] :handler #(dispatch :report-saved % editing-current?))
     (rpc/loading db :save-report)))
 
+(defn fetch-reports []
+  (dispatch :reports-requested))
+
 (defevh :delete-report [db report]
   ; TODO unificar estas dos lineas ya que siempre que hay un call debe haber un loading
-  (rpc/call "reports.api/delete-report" :args [report] :handler #(dispatch :reports-requested))
+  (rpc/call "reports.api/delete-report" :args [report] :handler fetch-reports)
   (rpc/loading db :save-report))
 
-(defn- save-report-form [{:keys [close]} report]
-  (let [valid? #(seq (:name @report))
-        save #(when (valid?) (dispatch :save-report @report) (close))
+(defn- save-report-form [{:keys [close]} form-data]
+  (let [report (r/cursor form-data [:report])
+        valid? #(seq (:name @report))
+        cancel #(reset! form-data nil)
+        save #(when (valid?)
+                (dispatch :save-report @report)
+                (if (:editing? @form-data)
+                  (do (fetch-reports) (cancel))
+                  (close)))
         shortcuts (kb-shortcuts :enter save :escape close)]
     (fn []
       [:div.ui.form {:ref shortcuts}
@@ -56,15 +65,16 @@
        [input-field report :description {:label (t :reports/description) :as :textarea :rows 2}]
        [input-field report :dashboard {:label (t :reports/dashboard) :as :checkbox :input-class "toggle"}]
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
-       [:button.ui.button {:on-click close} (t :actions/cancel)]])))
+       [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
-(defn- reports-list [{:keys [close]} editing-report current-report]
+(defn- reports-list [{:keys [close]} form-data current-report]
   (let [reports (db/get :reports)
         show-actions? (current-page? :viewer)
         save #(if (:_id current-report)
                 (do (dispatch :save-report current-report) (close))
-                (reset! editing-report current-report))
-        save-as #(reset! editing-report (dissoc current-report :_id :name))
+                (reset! form-data {:report current-report :editing? false}))
+        save-as #(reset! form-data {:report (dissoc current-report :_id :name) :editing? false})
+        edit #(reset! form-data {:report % :editing? true})
         select-report #(do (dispatch :report-selected %) (close))
         cubes (db/get :cubes)]
     [:div
@@ -80,21 +90,21 @@
            [:div.right.floated.content
             [:div.cube (:title (cubes cube))]
             [:div.item-actions
-             [:i.write.icon {:on-click (without-propagation reset! editing-report report)}]
+             [:i.write.icon {:on-click (without-propagation edit report)}]
              [:i.trash.icon {:on-click (without-propagation dispatch :delete-report report)}]]]
            [:div.header name]
            [:div.description description]])]
        [:div (t :cubes/no-results)])]))
 
 (defn- popup-content [popup]
-  (dispatch :reports-requested)
-  (let [editing-report (r/atom nil)
+  (fetch-reports)
+  (let [form-data (r/atom nil)
         current-report (or (db/get :current-report) {:dashboard false})]
     (fn []
       [:div#reports-popup
-       (if @editing-report
-         [save-report-form popup editing-report]
-         [reports-list popup editing-report current-report])])))
+       (if @form-data
+         [save-report-form popup form-data]
+         [reports-list popup form-data current-report])])))
 
 (defn- popup-activator [popup]
   (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
