@@ -20,4 +20,5 @@
   {:cube cube
    :filter (mapv #(report-dim->viewer % cube) (report :filter))
    :split (mapv #(report-dim->viewer % cube) (report :split))
-   :measures (mapv #(dw/find-dimension % (cube :measures)) (report :measures))})
+   :measures (mapv #(dw/find-dimension % (cube :measures)) (report :measures))
+   :pinboard {:measure (first (cube :measures)) :dimensions []}}) ; TODO

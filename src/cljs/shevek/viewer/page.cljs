@@ -15,6 +15,7 @@
             [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.reports.conversion :refer [report->viewer]]))
 
+; TODO esto quedaria mejor junto al report->viewer
 (defn- build-new-viewer [{:keys [cube] :as viewer}]
   (let [measures (cube :measures)]
     (assoc viewer
