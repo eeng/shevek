@@ -1,8 +1,8 @@
-(ns shevek.reports.conversion-test
+(ns shevek.schemas.conversion-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [submap? submaps?]]
-            [shevek.reports.conversion :refer [viewer->report]]))
+            [shevek.schemas.conversion :refer [viewer->report]]))
 
 (deftest viewer->report-tests
   (testing "should store only the cube id"

@@ -9,20 +9,11 @@
             [shevek.viewer.shared :refer [send-main-query current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
-            [shevek.viewer.filter :refer [filter-panel build-time-filter]]
+            [shevek.viewer.filter :refer [filter-panel]]
             [shevek.viewer.split :refer [split-panel]]
             [shevek.viewer.visualization :refer [visualization-panel]]
             [shevek.viewer.pinboard :refer [pinboard-panels]]
-            [shevek.reports.conversion :refer [report->viewer]]))
-
-; TODO esto quedaria mejor junto al report->viewer
-(defn- build-new-viewer [{:keys [cube] :as viewer}]
-  (let [measures (cube :measures)]
-    (assoc viewer
-           :filter [(build-time-filter cube)]
-           :split []
-           :measures (->> measures (take 3) vec)
-           :pinboard {:measure (first measures) :dimensions []})))
+            [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]))
 
 (defn- init-viewer [{:keys [current-report viewer] :as db}]
   (assoc db :viewer

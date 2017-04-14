@@ -10,10 +10,6 @@
             [shevek.viewer.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
 
-(defn build-time-filter [{:keys [dimensions] :as cube}]
-  (assoc (time-dimension dimensions)
-         :selected-period :latest-day))
-
 (defn init-filtered-dim [dim]
   (assoc dim :operator "include"))
 

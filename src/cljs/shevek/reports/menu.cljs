@@ -8,7 +8,7 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.components :refer [controlled-popup kb-shortcuts focused input-field]]
             [shevek.navegation :refer [current-page? navigate]]
-            [shevek.reports.conversion :refer [viewer->report]]
+            [shevek.schemas.conversion :refer [viewer->report]]
             [cuerdas.core :as str]))
 
 ; TODO Muy parecido a lo de users, de nuevo el patron de call, loading y loaded
