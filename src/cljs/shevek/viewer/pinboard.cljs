@@ -18,7 +18,7 @@
     (send-query db q [:results :pinboard name])))
 
 (defn send-pinboard-queries [db]
-  (reduce #(send-pinned-dim-query %1 %2) db (viewer :pinboard :dimensions)))
+  (reduce #(send-pinned-dim-query %1 %2) db (get-in db [:viewer :pinboard :dimensions])))
 
 (defn init-pinned-dim [dim]
   (cond-> (assoc dim :limit 100)

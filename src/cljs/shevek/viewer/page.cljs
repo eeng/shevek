@@ -12,26 +12,26 @@
             [shevek.viewer.filter :refer [filter-panel]]
             [shevek.viewer.split :refer [split-panel]]
             [shevek.viewer.visualization :refer [visualization-panel]]
-            [shevek.viewer.pinboard :refer [pinboard-panels]]
+            [shevek.viewer.pinboard :refer [pinboard-panels send-pinboard-queries]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]))
 
-(defn- init-viewer [{:keys [current-report viewer] :as db}]
-  (assoc db :viewer
-         (if current-report
-           (report->viewer current-report (viewer :cube))
-           (build-new-viewer viewer))))
+(defn- init-viewer [cube current-report]
+  (if current-report
+    (report->viewer current-report cube)
+    (build-new-viewer cube)))
 
-(defevh :cube-arrived [db {:keys [name] :as cube}]
-  (let [cube (dw/set-cube-defaults cube)]
-    (-> (assoc-in db [:viewer :cube] cube)
-        (init-viewer)
+(defevh :cube-arrived [{:keys [current-report] :as db} {:keys [name] :as cube}]
+  (let [cube (dw/set-cube-defaults cube)
+        {:keys [pinboard] :as viewer} (init-viewer cube current-report)]
+    (-> (assoc db :viewer viewer)
         (rpc/loaded :cube-metadata)
-        (send-main-query))))
+        (send-main-query)
+        (send-pinboard-queries))))
 
 (defevh :cube-selected [db cube]
   (navigate "/viewer")
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (-> (assoc db :viewer {:cube {:name cube}})
+  (-> (assoc db :viewer {:cube {:name cube}}) ; So we can display immediately the cube in the menu
       (dissoc :current-report)
       (rpc/loading :cube-metadata)))
 
