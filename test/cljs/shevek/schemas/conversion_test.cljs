@@ -2,7 +2,7 @@
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [submap? submaps?]]
-            [shevek.schemas.conversion :refer [viewer->report]]))
+            [shevek.schemas.conversion :refer [viewer->report report->viewer]]))
 
 (deftest viewer->report-tests
   (testing "should store only the cube id"
@@ -13,9 +13,9 @@
            (-> {:measures [{:name "added"} {:name "deleted"}]}
                viewer->report :measures))))
 
-  (testing "in each filter should store only the dimension name besides its own fields"
+  (testing "in each filter should store only the dimension name besides its own fields and converted keywords and sets"
     (is (= [{:name "time" :selected-period "current-day"}
-            {:name "page" :operator "exclude" :value #{nil}}]
+            {:name "page" :operator "exclude" :value [nil]}]
            (-> {:filter [{:name "time" :type "..." :selected-period :current-day}
                          {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
                viewer->report :filter))))
@@ -28,3 +28,13 @@
                                {:name "time" :type "..." :granularity "P1D"
                                 :sort-by {:name "count" :type "..." :descending false}}]}
                       viewer->report :split)))))
+
+(deftest report->viewer-tests
+  (testing "should convert back to keywords and sets and add title and other fields"
+    (is (= [{:name "time" :title "Fecha" :selected-period :current-day}
+            {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
+           (-> {:filter [{:name "time" :selected-period "current-day"}
+                         {:name "page" :operator "exclude" :value [nil]}]}
+               (report->viewer {:dimensions [{:name "time" :title "Fecha"}
+                                             {:name "page" :title "Pag"}]})
+               :filter)))))

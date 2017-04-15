@@ -13,9 +13,11 @@
            :measures (->> measures (take 3) vec)
            :pinboard {:measure (first measures) :dimensions []})))
 
-(defn- report-dim->viewer [{:keys [name selected-period sort-by] :as dim} {:keys [dimensions measures]}]
+(defn- report-dim->viewer [{:keys [name selected-period sort-by value] :as dim}
+                           {:keys [dimensions measures]}]
   (cond-> (merge dim (dw/find-dimension name dimensions))
           selected-period (update :selected-period keyword)
+          value (update :value set)
           sort-by (update :sort-by merge (dw/find-dimension (:name sort-by) (concat dimensions measures)))))
 
 (defn report->viewer [report cube]
@@ -25,9 +27,10 @@
    :measures (mapv #(dw/find-dimension % (cube :measures)) (report :measures))
    :pinboard {:measure (first (cube :measures)) :dimensions []}}) ; TODO
 
-(defn- viewer-dim->report [{:keys [selected-period] :as dim}]
+(defn- viewer-dim->report [{:keys [selected-period value] :as dim}]
   (cond-> (dissoc dim :type :title :description)
-          selected-period (assoc :selected-period (name selected-period))))
+          selected-period (update :selected-period name)
+          value (update :value vec)))
 
 (defn viewer->report [{:keys [cube measures filter split]}]
   {:cube (:name cube)

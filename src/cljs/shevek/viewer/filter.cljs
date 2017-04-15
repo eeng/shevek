@@ -91,7 +91,7 @@
     [:div.item.has-checkbox {:on-click toggle-checkbox-inside :title label}
      [checkbox (highlight label search)
       {:checked (some #(= value %) (@filter-opts :value))
-       :on-change #(swap! filter-opts update :value (fnil (if % conj disj) []) value)
+       :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)
        :id (str "checkbox-" name "-" (str/slug label))}]]))
 
 (defn- operator-selector [opts]
