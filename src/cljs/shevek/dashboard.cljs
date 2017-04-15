@@ -8,7 +8,7 @@
 
 (defn- cube-card [i {:keys [name title description] :or {description (t :cubes/no-desc)}}]
   ^{:key i}
-  [:a.card {:href (str "#/cubes/" name)}
+  [:a.card {:on-click #(dispatch :cube-selected name)}
    [:div.content
     [:div.ui.header
      [:i.cube.icon]
