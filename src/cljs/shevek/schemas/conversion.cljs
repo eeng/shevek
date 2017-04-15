@@ -20,20 +20,27 @@
           value (update :value set)
           sort-by (update :sort-by merge (dw/find-dimension (:name sort-by) (concat dimensions measures)))))
 
-(defn report->viewer [report cube]
-  {:cube cube
-   :filter (mapv #(report-dim->viewer % cube) (report :filter))
-   :split (mapv #(report-dim->viewer % cube) (report :split))
-   :measures (mapv #(dw/find-dimension % (cube :measures)) (report :measures))
-   :pinboard {:measure (first (cube :measures)) :dimensions []}}) ; TODO
+(defn- report-dims->viewer [coll cube]
+  (mapv #(report-dim->viewer % cube) coll))
 
-(defn- viewer-dim->report [{:keys [selected-period value] :as dim}]
+(defn report->viewer [{:keys [pinboard] :as report} cube]
+  {:cube cube
+   :filter (report-dims->viewer (report :filter) cube)
+   :split (report-dims->viewer (report :split) cube)
+   :measures (mapv #(dw/find-dimension % (cube :measures)) (report :measures))
+   :pinboard {:measure (dw/find-dimension (:measure pinboard) (cube :measures))
+              :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
+
+(defn- viewer-dim->report [{:keys [selected-period value sort-by] :as dim}]
   (cond-> (dissoc dim :type :title :description)
           selected-period (update :selected-period name)
-          value (update :value vec)))
+          value (update :value vec)
+          sort-by (update :sort-by viewer-dim->report)))
 
-(defn viewer->report [{:keys [cube measures filter split]}]
+(defn viewer->report [{:keys [cube measures filter split pinboard]}]
   {:cube (:name cube)
    :measures (map :name measures)
    :filter (map viewer-dim->report filter)
-   :split (map #(-> % viewer-dim->report (assoc :sort-by (viewer-dim->report (:sort-by %)))) split)})
+   :split (map viewer-dim->report split)
+   :pinboard {:measure (-> pinboard :measure :name)
+              :dimensions (map viewer-dim->report (:dimensions pinboard))}})

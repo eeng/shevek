@@ -27,7 +27,15 @@
                                 :sort-by {:name "page" :type "..." :descending true}}
                                {:name "time" :type "..." :granularity "P1D"
                                 :sort-by {:name "count" :type "..." :descending false}}]}
-                      viewer->report :split)))))
+                      viewer->report :split))))
+
+  (testing "should convert the pinboard"
+    (is (= {:measure "count"
+            :dimensions [{:name "time" :granularity "PT1H" :sort-by {:name "time" :descending false}}]}
+           (-> {:pinboard {:measure {:name "count" :type "..."}
+                           :dimensions [{:name "time" :type "..." :granularity "PT1H"
+                                         :sort-by {:name "time" :title "..." :descending false}}]}}
+               viewer->report :pinboard)))))
 
 (deftest report->viewer-tests
   (testing "should convert back to keywords and sets and add title and other fields"
@@ -37,4 +45,13 @@
                          {:name "page" :operator "exclude" :value [nil]}]}
                (report->viewer {:dimensions [{:name "time" :title "Fecha"}
                                              {:name "page" :title "Pag"}]})
-               :filter)))))
+               :filter))))
+
+  (testing "should converted back the pinboard with the info in the cube"
+    (is (= {:measure {:name "count" :type "longSum"}
+            :dimensions [{:name "time" :title "Time"}]}
+           (-> {:pinboard {:measure "count"
+                           :dimensions [{:name "time"}]}}
+               (report->viewer {:dimensions [{:name "otherD" :title "..."} {:name "time" :title "Time"}]
+                                :measures [{:name "otherM" :type "..."} {:name "count" :type "longSum"}]})
+               :pinboard)))))
