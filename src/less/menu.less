@@ -1,4 +1,4 @@
-#reports-popup {
+#reports-popup, #cubes-popup {
   width: 300px;
   .actions {
     float: right;
@@ -6,15 +6,18 @@
   }
   .ui.header {
     margin-top: 0;
-    margin-bottom: .8em;
+    margin-bottom: .8em; // when there are no results
     &.has-actions { margin-bottom: 2em }
   }
   .ui.list {
+    margin-top: .8em;
     .item {
       margin: 0 -.5em;
       padding: .5em;
       .border-radius(.5em) !important;
       &:last-child { margin-bottom: -.3em }
+      .middle.aligned.icon { color: black }
+      .content { padding-left: .3em }
       .right.content {
         .dimmed;
         font-size: .9em;

@@ -10,16 +10,11 @@
 (defroute "/" []
   (dispatch :navigate :dashboard))
 
-(defroute "/settings" []
-  (dispatch :navigate :settings))
-
-(defroute "/cubes/:cube" [cube]
-  (dispatch :cube-selected cube))
-
 (defroute "/viewer" []
   (dispatch :navigate :viewer))
 
-; TODO faltan las rutas para errores
+(defroute "/settings" []
+  (dispatch :navigate :settings))
 
 (defn current-page []
   (db/get :page))

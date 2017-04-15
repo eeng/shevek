@@ -4,7 +4,7 @@
             [reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
-            [shevek.navegation :refer [current-page?]]
+            [shevek.navegation :refer [current-page? navigate]]
             [shevek.lib.util :refer [every]]
             [shevek.viewer.shared :refer [send-main-query current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
@@ -29,8 +29,8 @@
         (send-main-query))))
 
 (defevh :cube-selected [db cube]
+  (navigate "/viewer")
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (dispatch :navigate :viewer)
   (-> (assoc db :viewer {:cube {:name cube}})
       (dissoc :current-report)
       (rpc/loading :cube-metadata)))

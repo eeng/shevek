@@ -20,7 +20,7 @@
   (rpc/call "reports.api/find-all" :handler #(dispatch :reports-arrived %))
   (rpc/loading db :reports))
 
-; FIXME Si se recarga la pagina /viewer no va a funcar. Habria que codificar el state en la URL asi si se recarga vuelve a mostrar lo mismo. Luego de hacer eso se podria quitar la route /cubes.
+; FIXME Si se recarga la pagina /viewer no va a funcar. Habria que codificar el state en la URL asi si se recarga vuelve a mostrar lo mismo.
 (defevh :report-selected [db {:keys [cube] :as report}]
   (navigate "/viewer")
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
@@ -82,7 +82,7 @@
        [:div.actions
         [:button.ui.compact.green.button {:on-click save} (t :actions/save)]
         [:button.ui.basic.compact.button {:on-click save-as} (t :actions/save-as)]])
-     [:h3.ui.sub.header {:class (when show-actions? "has-actions")} (t :reports/title)]
+     [:h3.ui.sub.orange.header {:class (when show-actions? "has-actions")} (t :reports/title)]
      (if (seq reports)
        [:div.ui.relaxed.middle.aligned.selection.list
         (for [{:keys [_id name description cube] :as report} reports]
@@ -112,4 +112,4 @@
      [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/menu))]))
 
 (defn- reports-menu []
-  [(controlled-popup popup-activator popup-content {:position "bottom right"})])
+  [(controlled-popup popup-activator popup-content {:position "bottom left"})])
