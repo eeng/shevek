@@ -7,6 +7,7 @@
             [shevek.components :refer [modal controlled-popup]]
             [shevek.dashboard :as dashboard]
             [shevek.settings.page :as settings]
+            [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.reports.menu :refer [reports-menu]]
@@ -65,4 +66,5 @@
    [menu]
    [:div.page
     [(get pages (current-page) :div)]]
-   [modal]])
+   [modal]
+   [notification]])

@@ -1,3 +1,22 @@
+body {
+  background-color: #F7F7F7;
+}
+
+.page {
+  padding-top: 40px;
+
+  > .ui.container {
+    padding-top: 30px;
+  }
+
+  h2.app.header {
+    color: #307db7;
+    border-bottom: 2px solid rgba(48, 125, 183, 0.18);
+    margin-bottom: .7em;
+    font-size: 1.5rem;
+  }
+}
+
 #reports-popup, #cubes-popup {
   width: 300px;
   .actions {
@@ -36,5 +55,30 @@
       }
       .description { margin-top: .1em }
     }
+  }
+}
+
+#notification {
+  .border-radius;
+  @width: 500px;
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  width: @width;
+  margin-left: -@width / 2;
+  text-align: center;
+  padding: 10px;
+  color: #2c662d;
+  background-color: rgba(193, 226, 176, 0.86);
+  .box-shadow(0 0 0 1px #a3c293 inset, 0px 8px 36px -15px rgba(0, 0, 0, 0.75));
+  &.visible {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 250ms linear;
+  }
+  &.hidden {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 250ms, opacity 250ms linear;
   }
 }

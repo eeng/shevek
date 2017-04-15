@@ -53,7 +53,8 @@
               :title "Saved Reports"
               :name "Name"
               :description "Description"
-              :dashboard "Show in dashboard"}
+              :dashboard "Show in dashboard"
+              :saved "Report '{1}' saved!"}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -128,7 +129,8 @@
               :title "Reportes"
               :name "Nombre"
               :description "Descripción"
-              :dashboard "Mostrar en dashboard"}
+              :dashboard "Mostrar en dashboard"
+              :saved "Reporte '{1}' guardado correctamente"}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"

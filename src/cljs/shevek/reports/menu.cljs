@@ -8,6 +8,7 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.components :refer [controlled-popup kb-shortcuts focused input-field]]
             [shevek.navegation :refer [current-page? navigate]]
+            [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
             [cuerdas.core :as str]))
 
@@ -27,7 +28,8 @@
   (-> (assoc db :viewer {:cube {:name cube}} :current-report report)
       (rpc/loading :cube-metadata)))
 
-(defevh :report-saved [db report editing-current?]
+(defevh :report-saved [db {:keys [name] :as report} editing-current?]
+  (notify (t :reports/saved name))
   (cond-> (rpc/loaded db :save-report)
           editing-current? (assoc :current-report report)))
 
