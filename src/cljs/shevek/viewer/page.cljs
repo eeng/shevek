@@ -36,8 +36,8 @@
       (dissoc :current-report)
       (rpc/loading :cube-metadata)))
 
-(defevh :viewer-restored [db query-params]
-  (if-let [{:keys [cube] :as report} (restore-report-from-url query-params)]
+(defevh :viewer-restored [db encoded-report]
+  (if-let [{:keys [cube] :as report} (restore-report-from-url encoded-report)]
     (do
       (dispatch :navigate :viewer)
       (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
