@@ -22,23 +22,21 @@
   (when (current-page? page) "active"))
 
 (defn- cubes-popup-content [{:keys [close]}]
-  (dw/fetch-cubes)
-  (fn []
-    (let [cubes (dw/cubes-list)
-          select-cube #(do (dispatch :cube-selected %) (close))]
-      [:div#cubes-popup
-       [:h3.ui.sub.orange.header (t :cubes/title)]
-       (if (seq cubes)
-         [:div.ui.relaxed.middle.aligned.selection.list
-          (doall
-            (for [{:keys [name title description] :or {description (t :cubes/no-desc)}} cubes
-                  :let [selected? (and (current-page? :viewer) (= name (current-cube-name)))]]
-              [:div.item {:key name :on-click #(select-cube name)}
-               [:i.large.middle.aligned.cube.icon {:class (when selected? "orange")}]
-               [:div.content
-                [:div.header title]
-                [:div.description description]]]))]
-         [:div (t :cubes/no-results)])])))
+  (let [cubes (dw/cubes-list)
+        select-cube #(do (dispatch :cube-selected %) (close))]
+    [:div#cubes-popup
+     [:h3.ui.sub.orange.header (t :cubes/title)]
+     (if (seq cubes)
+       [:div.ui.relaxed.middle.aligned.selection.list
+        (doall
+          (for [{:keys [name title description] :or {description (t :cubes/no-desc)}} cubes
+                :let [selected? (and (current-page? :viewer) (= name (current-cube-name)))]]
+            [:div.item {:key name :on-click #(select-cube name)}
+             [:i.large.middle.aligned.cube.icon {:class (when selected? "orange")}]
+             [:div.content
+              [:div.header title]
+              [:div.description description]]]))]
+       [:div (t :cubes/no-results)])]))
 
 (defn- cubes-popup-activator [popup]
   [:a.item {:on-click (popup :toggle)}
@@ -48,7 +46,9 @@
      (t :cubes/menu))])
 
 (defn- cubes-menu []
-  [(controlled-popup cubes-popup-activator cubes-popup-content {:position "bottom left"})])
+  (dw/fetch-cubes)
+  (fn []
+    [(controlled-popup cubes-popup-activator cubes-popup-content {:position "bottom left"})]))
 
 (defn- menu []
   [:div.ui.fixed.inverted.menu

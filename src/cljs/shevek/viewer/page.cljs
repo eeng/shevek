@@ -13,7 +13,8 @@
             [shevek.viewer.split :refer [split-panel]]
             [shevek.viewer.visualization :refer [visualization-panel]]
             [shevek.viewer.pinboard :refer [pinboard-panels send-pinboard-queries]]
-            [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]))
+            [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
+            [shevek.reports.url :refer [restore-report-from-url]]))
 
 (defn- init-viewer [cube current-report]
   (if current-report
@@ -34,6 +35,17 @@
   (-> (assoc db :viewer {:cube {:name cube}}) ; So we can display immediately the cube in the menu
       (dissoc :current-report)
       (rpc/loading :cube-metadata)))
+
+(defevh :viewer-restored [db query-params]
+  (if-let [{:keys [cube] :as report} (restore-report-from-url query-params)]
+    (do
+      (dispatch :navigate :viewer)
+      (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
+      (-> (assoc db :viewer {:cube {:name cube}} :current-report report)
+          (rpc/loading :cube-metadata)))
+    (do
+      (navigate "/")
+      db)))
 
 (defevh :max-time-arrived [db cube-name max-time]
   (update-in db [:cubes cube-name] assoc :max-time (dw/parse-max-time max-time)))

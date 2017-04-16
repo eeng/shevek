@@ -23,9 +23,9 @@
 ; TODO falta el user
 (s/defschema Report
   {(s/optional-key :_id) s/Any
-   :name s/Str
+   (s/optional-key :name) s/Str ; Optional when restored from URL
    (s/optional-key :description) s/Str
-   :dashboard s/Bool
+   (s/optional-key :dashboard) s/Bool ; Optional when restored from URL
    :cube s/Any
    :measures [s/Str]
    :filter [Filter]

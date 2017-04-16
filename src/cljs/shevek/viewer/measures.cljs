@@ -7,7 +7,8 @@
             [shevek.rpc :as rpc]
             [shevek.components :refer [checkbox toggle-checkbox-inside]]
             [shevek.dw :refer [add-dimension remove-dimension includes-dim?]]
-            [shevek.viewer.shared :refer [current-cube viewer panel-header send-main-query]]))
+            [shevek.viewer.shared :refer [current-cube viewer panel-header send-main-query]]
+            [shevek.reports.url :refer [store-in-url]]))
 
 (defevh :measure-toggled [db dim selected]
   (cond-> (update-in db [:viewer :measures] (if selected add-dimension remove-dimension) dim)

@@ -10,8 +10,10 @@
 (defroute "/" []
   (dispatch :navigate :dashboard))
 
-(defroute "/viewer" []
-  (dispatch :navigate :viewer))
+(defroute "/viewer" [query-params]
+  (if query-params
+    (dispatch :viewer-restored query-params)
+    (dispatch :navigate :viewer)))
 
 (defroute "/settings" []
   (dispatch :navigate :settings))

@@ -10,6 +10,7 @@
             [shevek.dw :as dw]
             [shevek.schemas.query :refer [Query]]
             [shevek.components :refer [focused kb-shortcuts]]
+            [shevek.reports.url :refer [store-in-url]]
             [schema.core :as s]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]
@@ -39,6 +40,7 @@
             q)))
 
 (defn send-query [db q results-keys]
+  (store-in-url db)
   (let [cube (get-in db [:viewer :cube])
         q (-> (add-interval q (cube :max-time))
               (assoc :cube (cube :name))
