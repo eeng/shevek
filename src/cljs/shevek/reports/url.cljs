@@ -11,7 +11,7 @@
 (defn- store-in-url* [{:keys [viewer]}]
   (-> viewer viewer->report pr-str b64/encodeString store))
 
-(def store-in-url (debounce store-in-url* 500))
+(def store-in-url (debounce store-in-url* 250))
 
 (defn restore-report-from-url [{:keys [r]}]
   (try

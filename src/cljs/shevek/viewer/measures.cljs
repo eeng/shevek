@@ -11,8 +11,8 @@
             [shevek.reports.url :refer [store-in-url]]))
 
 (defevh :measure-toggled [db dim selected]
-  (cond-> (update-in db [:viewer :measures] (if selected add-dimension remove-dimension) dim)
-          selected (send-main-query)))
+  (-> (update-in db [:viewer :measures] (if selected add-dimension remove-dimension) dim)
+      (send-main-query)))
 
 (defn- measure-item [{:keys [title description] :as dim} selected-measures]
   [:div.item {:on-click toggle-checkbox-inside :title description}
