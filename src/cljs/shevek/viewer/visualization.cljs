@@ -2,22 +2,24 @@
   (:require [reagent.core :as r]
             [clojure.string :as str]
             [reflow.core :refer [dispatch]]
+            [reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.dw :as dw]
             [shevek.lib.collections :refer [detect]]
+            [shevek.navegation :refer [current-page?]]
             [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header viewer format-measure format-dimension totals-result? clean-dim]]))
+            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? clean-dim]]))
 
-(defn- sort-results-according-to-selected-measures [result]
-  (map #(assoc % :value (format-measure % result))
-       (viewer :measures)))
+(defn- sort-results-according-to-selected-measures [viewer]
+  (let [result (first (get-in viewer [:results :main]))]
+    (map #(assoc % :value (format-measure % result))
+         (viewer :measures))))
 
-(defn- totals-visualization []
-  (let [result (sort-results-according-to-selected-measures (first (viewer :results :main)))]
+(defn- totals-visualization [viewer]
+  (let [result (sort-results-according-to-selected-measures viewer)]
     [:div.ui.statistics
      (for [{:keys [name title value]} result]
-       ^{:key name}
-       [:div.statistic
+       [:div.statistic {:key name}
         [:div.label title]
         [:div.value value]])]))
 
@@ -35,8 +37,7 @@
     (for [measure measures
            :let [measure-name (-> measure :name keyword)
                  measure-value (measure-name result)]]
-      ^{:key measure-name}
-      [:td.right.aligned
+      [:td.right.aligned {:key measure-name}
        [:div.bg (when-not (totals-result? result dim)
                   {:style {:width (calculate-rate measure-value (max-values measure-name))}})]
        (format-measure measure result)])])
@@ -54,23 +55,25 @@
           (map (comp keyword :name) measures)))
 
 (defn- sortable-th [title on-click-sort-splits-by split opts]
-  (let [on-click-sort-splits-by (map clean-dim on-click-sort-splits-by)
-        sort-bys (map (comp :name :sort-by) split)
-        descendings (->> split (map (comp :descending :sort-by)) distinct)
-        show-icon? (and (= sort-bys (map :name on-click-sort-splits-by))
-                        (= (count descendings) 1))
-        icon-after? (= (:class opts) "right aligned")
-        desc (first descendings)]
-    [:th (assoc opts :on-click #(dispatch :splits-sorted-by on-click-sort-splits-by (if show-icon? (not desc) true)))
-     (when-not icon-after? [:span title])
-     (when show-icon?
-       [:i.icon.caret {:class (if desc "down" "up")}])
-     (when icon-after? [:span title])]))
+  (if (current-page? :viewer)
+    (let [on-click-sort-splits-by (map clean-dim on-click-sort-splits-by)
+          sort-bys (map (comp :name :sort-by) split)
+          descendings (->> split (map (comp :descending :sort-by)) distinct)
+          show-icon? (and (= sort-bys (map :name on-click-sort-splits-by))
+                          (= (count descendings) 1))
+          icon-after? (= (:class opts) "right aligned")
+          desc (first descendings)]
+      [:th (assoc opts :on-click #(dispatch :splits-sorted-by on-click-sort-splits-by (if show-icon? (not desc) true)))
+       (when-not icon-after? [:span title])
+       (when show-icon?
+         [:i.icon.caret {:class (if desc "down" "up")}])
+       (when icon-after? [:span title])])
+    [:th opts title]))
 
-(defn- pivot-table-visualization []
+(defn- pivot-table-visualization [viewer]
   (let [split (viewer :arrived-split)
         measures (viewer :measures)
-        results (viewer :results :main)
+        results (get-in viewer [:results :main])
         max-values (calculate-max-values measures results)]
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
      [:thead>tr
@@ -79,13 +82,16 @@
         ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
      (into [:tbody] (pivot-table-rows results split 0 measures max-values))]))
 
+(defn visualization [viewer]
+  (when (get-in viewer [:results :main])
+    (if (empty? (viewer :measures))
+      [:div.icon-hint
+       [:i.warning.circle.icon]
+       [:div.text (t :cubes/no-measures)]]
+      (if (empty? (viewer :arrived-split))
+        [totals-visualization viewer]
+        [pivot-table-visualization viewer]))))
+
 (defn visualization-panel []
   [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
-   (when (viewer :results :main)
-     (if (empty? (viewer :measures))
-       [:div.icon-hint
-        [:i.warning.circle.icon]
-        [:div.text (t :cubes/no-measures)]]
-       (if (empty? (viewer :arrived-split))
-         [totals-visualization]
-         [pivot-table-visualization])))])
+   [visualization (db/get :viewer)]])

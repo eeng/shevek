@@ -8,7 +8,8 @@
             [shevek.dw :as dw]
             [shevek.reports.menu :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
-            [shevek.lib.react :refer [rmap]]))
+            [shevek.lib.react :refer [rmap]]
+            [shevek.viewer.visualization :refer [visualization]]))
 
 (defn- cube-card [{:keys [name title description] :or {description (t :cubes/no-desc)}}]
   [:a.cube.card {:on-click #(dispatch :cube-selected name)}
@@ -26,6 +27,7 @@
 
 (defevh :dashboard/query-executed [db results name]
   (-> (assoc-in db [:dashboard name :results :main] results)
+      (assoc-in [:dashboard name :arrived-split] (get-in db [:dashboard name :split])) ; TODO mmm no queda muy prolijo esto del arrived-split, lo tengo q hacer aca xq el component visualization lo necesita
       (rpc/loaded [:dashboard name])))
 
 (defevh :dashboard/cube-arrived [db cube {:keys [name] :as report}]
@@ -38,13 +40,16 @@
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :dashboard/cube-arrived % report))
   (rpc/loading db [:dashboard name]))
 
+; TODO agregar el loading
 (defn- report-card [{:keys [name description] :as report}]
-  (dispatch :dashboard/cube-requested report)
+  (dispatch :dashboard/cube-requested report) ; TODO esto no hay q hacerlo aca xq sino al actualizar un reporte y volver al dashboard no se reflejan los cambios si el fetch-reports llega luego de renderizar los reportes como estaban antes. Mejor hacerlo en el fetch-reports o sino al guardar un report inmediatamente pisar el db :reports.
   (fn []
-    [:a.card
+    [:a.report.card
      [:div.content
       [:div.header name]
-      [:div.meta description]]]))
+      [:div.meta description]]
+     [:div.content.visualization
+      [visualization (db/get-in [:dashboard name])]]]))
 
 (defn- reports-cards []
   (fetch-reports)
