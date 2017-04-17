@@ -21,7 +21,6 @@
   (rpc/call "reports.api/find-all" :handler #(dispatch :reports-arrived %))
   (rpc/loading db :reports))
 
-; FIXME Si se recarga la pagina /viewer no va a funcar. Habria que codificar el state en la URL asi si se recarga vuelve a mostrar lo mismo.
 (defevh :report-selected [db {:keys [cube] :as report}]
   (navigate "/viewer")
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
@@ -65,7 +64,7 @@
       [:div.ui.form {:ref shortcuts}
        [focused input-field report :name {:label (t :reports/name) :class "required"}]
        [input-field report :description {:label (t :reports/description) :as :textarea :rows 2}]
-       [input-field report :dashboard {:label (t :reports/dashboard) :as :checkbox :input-class "toggle"}]
+       [input-field report :pin-in-dashboard {:label (t :reports/pin-in-dashboard) :as :checkbox :input-class "toggle"}]
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
@@ -101,7 +100,7 @@
 (defn- popup-content [popup]
   (fetch-reports)
   (let [form-data (r/atom nil)
-        current-report (or (db/get :current-report) {:dashboard false})]
+        current-report (or (db/get :current-report) {:pin-in-dashboard false})]
     (fn []
       [:div#reports-popup
        (if @form-data

@@ -53,8 +53,9 @@
               :title "Saved Reports"
               :name "Name"
               :description "Description"
-              :dashboard "Show in dashboard"
-              :saved "Report '{1}' saved!"}
+              :pin-in-dashboard "Pin in dashboard"
+              :saved "Report '{1}' saved!"
+              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
     :settings {:title "Settings"
                :subtitle "Configure the application language, users and other stuff in this page"
                :language "Language"
@@ -129,8 +130,9 @@
               :title "Reportes"
               :name "Nombre"
               :description "Descripción"
-              :dashboard "Mostrar en dashboard"
-              :saved "Reporte '{1}' guardado correctamente"}
+              :pin-in-dashboard "Mostrar en dashboard"
+              :saved "Reporte '{1}' guardado correctamente"
+              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
     :settings {:title "Configuración"
                :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
                :language "Lenguaje"

@@ -25,7 +25,7 @@
   {(s/optional-key :_id) s/Any
    (s/optional-key :name) s/Str ; Optional when restored from URL
    (s/optional-key :description) s/Str
-   (s/optional-key :dashboard) s/Bool ; Optional when restored from URL
+   (s/optional-key :pin-in-dashboard) s/Bool ; Optional when restored from URL
    :cube s/Any
    :measures [s/Str]
    :filter [Filter]
