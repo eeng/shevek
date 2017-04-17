@@ -1,11 +1,14 @@
 (ns shevek.schemas.app-db
   (:require [schema.core :as s]
             [shevek.schemas.cube :refer [Dimension Measure]]
-            [shevek.schemas.viewer :refer [Viewer Cube]]
+            [shevek.schemas.viewer :refer [Viewer Cube Result]]
             [shevek.schemas.report :refer [Report]]))
 
 (s/defschema Settings
   {:lang s/Str})
+
+(s/defschema Dashboard
+  {:reports {s/Str [Result]}})
 
 (s/defschema AppDB
   {(s/optional-key :page) s/Keyword
@@ -15,4 +18,5 @@
    (s/optional-key :viewer) Viewer
    (s/optional-key :current-report) Report
    (s/optional-key :reports) [Report]
-   (s/optional-key :users) [s/Any]}) ; TODO
+   (s/optional-key :users) [s/Any] ; TODO
+   (s/optional-key :dashboard) Dashboard})

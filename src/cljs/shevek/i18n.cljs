@@ -51,6 +51,7 @@
                    :type "Type"}
     :reports {:menu "Reports"
               :title "Saved Reports"
+              :pinned "Favorite Reports"
               :name "Name"
               :description "Description"
               :pin-in-dashboard "Pin in dashboard"
@@ -128,6 +129,7 @@
                    :type "Tipo"}
     :reports {:menu "Reportes"
               :title "Reportes"
+              :pinned "Reportes Favoritos"
               :name "Nombre"
               :description "Descripción"
               :pin-in-dashboard "Mostrar en dashboard"

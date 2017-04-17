@@ -50,6 +50,7 @@
 (defevh :max-time-arrived [db cube-name max-time]
   (update-in db [:cubes cube-name] assoc :max-time (dw/parse-max-time max-time)))
 
+; FIXME esto habria que hacerlo en todas las pags o por lo menos en el dashboard tb ya que ahi se necesitan los max-time actualizados de varios cubos
 (defn fetch-max-time []
   (when (current-page? :viewer)
     (let [name (current-cube-name)]

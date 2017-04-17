@@ -8,12 +8,10 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.dw :as dw]
-            [shevek.schemas.query :refer [Query]]
+            [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components :refer [focused kb-shortcuts]]
             [shevek.reports.url :refer [store-in-url]]
             [schema.core :as s]
-            [schema-tools.core :as st]
-            [com.rpl.specter :refer [setval ALL]]
             [goog.string :as str]))
 
 (defn- viewer [& keys]
@@ -32,26 +30,16 @@
       (assoc-in [:viewer :arrived-split] (-> db :viewer :split))
       (rpc/loaded results-keys)))
 
-; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
-(defn- add-interval [{:keys [filter] :as q} max-time]
-  (let [period (:selected-period (dw/time-dimension filter))]
-    (setval [:filter ALL dw/time-dimension? :interval]
-            (mapv to-iso8601 (dw/to-interval period max-time))
-            q)))
-
-(defn send-query [db q results-keys]
-  (store-in-url db)
-  (let [cube (get-in db [:viewer :cube])
-        q (-> (add-interval q (cube :max-time))
-              (assoc :cube (cube :name))
-              (st/select-schema Query))]
+; TODO repetida la conversion de viewer a query en schemas.conversion
+(defn send-query [db viewer results-keys]
+  (store-in-url viewer)
+  (let [q (viewer->query viewer)]
     (console.log "Sending query" q) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
 
 (defn- send-main-query [{:keys [viewer] :as db}]
-  (let [q (assoc viewer :totals true)]
-    (send-query db q [:results :main])))
+  (send-query db (assoc viewer :totals true) [:results :main]))
 
 (defn format-measure [{:keys [name type]} result]
   (let [value (or (->> name keyword (get result)) 0)]
