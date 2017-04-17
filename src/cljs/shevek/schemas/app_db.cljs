@@ -8,7 +8,7 @@
   {:lang s/Str})
 
 (s/defschema Dashboard
-  {:reports {s/Str [Result]}})
+  {s/Str Viewer})
 
 (s/defschema AppDB
   {(s/optional-key :page) s/Keyword

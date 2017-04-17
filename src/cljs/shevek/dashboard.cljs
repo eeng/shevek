@@ -7,7 +7,7 @@
             [shevek.components :refer [page-title]]
             [shevek.dw :as dw]
             [shevek.reports.menu :refer [fetch-reports]]
-            [shevek.schemas.conversion :refer [report->query]]
+            [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]))
 
 (defn- cube-card [{:keys [name title description] :or {description (t :cubes/no-desc)}}]
@@ -24,19 +24,19 @@
          [:div.ui.cards (rmap cube-card cubes :name)]
          [:div.tip [:i.info.circle.icon] (t :cubes/missing)]))))
 
-(defevh :dashboard/query-executed [db results results-key]
-  (-> (assoc-in db results-key results)
-      (rpc/loaded results-key)))
+(defevh :dashboard/query-executed [db results name]
+  (-> (assoc-in db [:dashboard name :results :main] results)
+      (rpc/loaded [:dashboard name])))
 
-(defevh :dashboard/cube-arrived [db report cube results-key]
-  (let [q (report->query report (dw/set-cube-defaults cube))]
-    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :dashboard/query-executed % results-key))
-    db))
+(defevh :dashboard/cube-arrived [db cube {:keys [name] :as report}]
+  (let [viewer (report->viewer report (dw/set-cube-defaults cube))
+        q (viewer->query (assoc viewer :totals true))]
+    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :dashboard/query-executed % name))
+    (assoc-in db [:dashboard name] viewer)))
 
 (defevh :dashboard/cube-requested [db {:keys [name cube] :as report}]
-  (let [results-key [:dashboard :reports name]]
-    (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :dashboard/cube-arrived report % results-key))
-    (rpc/loading db results-key)))
+  (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :dashboard/cube-arrived % report))
+  (rpc/loading db [:dashboard name]))
 
 (defn- report-card [{:keys [name description] :as report}]
   (dispatch :dashboard/cube-requested report)
