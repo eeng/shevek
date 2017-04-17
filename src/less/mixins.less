@@ -67,3 +67,15 @@
 	.dimmed;
 	font-style: italic;
 }
+
+.selectable {
+	&:hover {
+		background-color: #f7f7f7;
+		cursor: pointer;
+		.icon { color: black; }
+	}
+	&.active {
+		background-color: #eaeaea;
+		.icon { color: black; }
+	}
+}

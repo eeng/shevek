@@ -1,0 +1,43 @@
+// TODO faltaria agregarle el overflow-shadow en el viewer (creo que no andaba xq debe ir en el container, xq en el dashboard funco en el container. y dejar fijo el header al scrollear
+#viewer, #dashboard {
+  .visualization {
+    .icon-hint, .statistics { padding: 40px }
+    .statistics {
+      justify-content: center;
+      margin: 0;
+    }
+    .pivot-table {
+      th:first-child, td:first-child { padding-left: 0.5em }
+      th:last-child, td:last-child { padding-right: 0.5em }
+      thead {
+        th {
+          cursor: pointer;
+          .icon { margin-right: 0; }
+          span + .icon, .icon + span { margin-left: .25rem; }
+        }
+      }
+      tbody tr {
+        .selectable;
+        opacity: .999;
+        td {
+          position: relative;
+
+          .bg {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(187, 181, 0, 0.12);
+            z-index: -1;
+          }
+
+          .generate-depths(@i) when (@i > 0) {
+            .generate-depths(@i - 1);
+            .depth-@{i} { margin-left: (@i * 1.5em); }
+          }
+          .generate-depths(5);
+        }
+      }
+    }
+  }
+}

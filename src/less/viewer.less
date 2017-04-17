@@ -71,7 +71,7 @@
           color: #ccc;
           margin-right: 7px;
         }
-        &:not(.no-results) { #viewer .selectable; }
+        &:not(.no-results) { .selectable; }
         &.has-checkbox {
           padding: 6px 1em 5px; // Un pixel menos abajo por el que le agregué en el segment value para el bold
           .ui.checkbox {
@@ -184,50 +184,11 @@
     }
   }
 
-  // TODO faltaria agregarle el overflow-shadow y dejar fijo el header al scrollear
-  .visualization {
+  .visualization-container {
     flex: 1;
     margin-top: @gutter;
     padding: 10px;
     overflow-y: auto;
-    .icon-hint, .statistics { padding: 40px }
-    .statistics {
-      justify-content: center;
-      margin: 0;
-    }
-    .pivot-table {
-      th:first-child, td:first-child { padding-left: 0.5em }
-      th:last-child, td:last-child { padding-right: 0.5em }
-      thead {
-        th {
-          cursor: pointer;
-          .icon { margin-right: 0; }
-          span + .icon, .icon + span { margin-left: .25rem; }
-        }
-      }
-      tbody tr {
-        #viewer .selectable;
-        opacity: .999;
-        td {
-          position: relative;
-
-          .bg {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            background-color: rgba(187, 181, 0, 0.12);
-            z-index: -1;
-          }
-
-          .generate-depths(@i) when (@i > 0) {
-            .generate-depths(@i - 1);
-            .depth-@{i} { margin-left: (@i * 1.5em); }
-          }
-          .generate-depths(5);
-        }
-      }
-    }
   }
 
   .pinboard {
@@ -258,18 +219,6 @@
   }
 
   .ui.checkbox label { cursor: pointer; }
-
-  .selectable {
-    &:hover {
-      background-color: #f7f7f7;
-      cursor: pointer;
-      .icon { color: black; }
-    }
-    &.active {
-      background-color: #eaeaea;
-      .icon { color: black; }
-    }
-  }
 
   .icon-hint {
     color: #ccc;

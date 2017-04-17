@@ -34,7 +34,7 @@
   (let [viewer (report->viewer report (dw/set-cube-defaults cube))
         q (viewer->query (assoc viewer :totals true))]
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :dashboard/query-executed % name))
-    (assoc-in db [:dashboard name] viewer)))
+    (update-in db [:dashboard name] merge viewer)))
 
 (defevh :dashboard/cube-requested [db {:keys [name cube] :as report}]
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :dashboard/cube-arrived % report))
@@ -44,11 +44,11 @@
 (defn- report-card [{:keys [name description] :as report}]
   (dispatch :dashboard/cube-requested report) ; TODO esto no hay q hacerlo aca xq sino al actualizar un reporte y volver al dashboard no se reflejan los cambios si el fetch-reports llega luego de renderizar los reportes como estaban antes. Mejor hacerlo en el fetch-reports o sino al guardar un report inmediatamente pisar el db :reports.
   (fn []
-    [:a.report.card
+    [:a.report.card {:on-click #(dispatch :report-selected report)}
      [:div.content
       [:div.header name]
       [:div.meta description]]
-     [:div.content.visualization
+     [:div.content.visualization-container
       [visualization (db/get-in [:dashboard name])]]]))
 
 (defn- reports-cards []

@@ -84,14 +84,15 @@
 
 (defn visualization [viewer]
   (when (get-in viewer [:results :main])
-    (if (empty? (viewer :measures))
-      [:div.icon-hint
-       [:i.warning.circle.icon]
-       [:div.text (t :cubes/no-measures)]]
-      (if (empty? (viewer :arrived-split))
-        [totals-visualization viewer]
-        [pivot-table-visualization viewer]))))
+    [:div.visualization
+     (if (empty? (viewer :measures))
+       [:div.icon-hint
+        [:i.warning.circle.icon]
+        [:div.text (t :cubes/no-measures)]]
+       (if (empty? (viewer :arrived-split))
+         [totals-visualization viewer]
+         [pivot-table-visualization viewer]))]))
 
 (defn visualization-panel []
-  [:div.visualization.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
+  [:div.visualization-container.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
    [visualization (db/get :viewer)]])
