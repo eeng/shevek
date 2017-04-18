@@ -38,7 +38,6 @@
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :dashboard/cube-arrived % report))
   (rpc/loading db [:dashboard name]))
 
-; TODO agregar el loading
 (defn- report-card [{:keys [name description] :as report}]
   (dispatch :dashboard/cube-requested report)
   (fn []

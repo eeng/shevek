@@ -62,15 +62,17 @@
   (when (time-dimension? dim)
     (str "(" (periods granularity) ")")))
 
-(defn- time-granularity-button [dim]
+(defn- time-granularity-button [{:keys [granularity] :as dim}]
   [dropdown (map (juxt second first) periods)
-   {:class "top right pointing" :on-change #(dispatch :pinned-time-granularity-changed dim %)}
+   {:class "top right pointing"
+    :on-change #(dispatch :pinned-time-granularity-changed dim %)
+    :selected granularity}
    [:i.ellipsis.horizontal.link.icon]])
 
-(defn- pinned-dimension-panel* [{:keys [title name] :as dim}]
+(defn- pinned-dimension-panel* [_]
   (let [searching (r/atom false)
         search (r/atom "")]
-    (fn []
+    (fn [{:keys [title name] :as dim}]
       (let [measure (viewer :pinboard :measure)
             results (viewer :results :pinboard name)
             filtered-results (filter-matching @search (partial format-dimension dim) results)]

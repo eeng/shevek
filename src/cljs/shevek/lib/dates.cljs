@@ -71,10 +71,11 @@
 (defn formatter [i18n-key]
   (f/formatter (translation :date-formats i18n-key)))
 
-; TODO agregar formato week
 (defn format-time-according-to-period [time period]
-  (let [formatter (condp #(str/ends-with? %2 %1) period
-                    "H" (formatter :hour)
-                    "D" (formatter :day)
-                    "M" (formatter :month))]
+  (let [formatter (condp re-find period
+                    #"PT(\d+)M" (formatter :minute)
+                    #"PT(\d+)H" (formatter :hour)
+                    #"P(\d+)D" (formatter :day)
+                    #"P(\d+)W" (formatter :day)
+                    #"P(\d+)M" (formatter :month))]
     (f/unparse formatter (parse-time time))))

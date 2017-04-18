@@ -22,7 +22,8 @@
             :no-measures "Please select at least one measure"
             :no-results "No results where found"
             :limit "Limit"
-            :sort-by "Sort By"}
+            :sort-by "Sort By"
+            :granularity "Granularity"}
     :cubes.period {:relative "Relative"
                    :specific "Specific"
                    :latest "Latest"
@@ -100,7 +101,8 @@
             :no-measures "Por favor seleccione al menos una métrica"
             :no-results "No se encontraron resultados"
             :limit "Límite"
-            :sort-by "Ordenar Por"}
+            :sort-by "Ordenar Por"
+            :granularity "Granularidad"}
     :cubes.period {:relative "Relativo"
                    :specific "Específico"
                    :latest "Ultimo"

@@ -4,7 +4,7 @@
             [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [shevek.i18n :refer [t]]
-            [shevek.components :refer [show-modal]]))
+            [shevek.components.modal :refer [show-modal]]))
 
 (defn loading?
   ([] (seq (db/get :loading)))

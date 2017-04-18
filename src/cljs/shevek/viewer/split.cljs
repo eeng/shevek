@@ -10,7 +10,6 @@
             [shevek.components :refer [controlled-popup select]]))
 
 ; TODO el limit distinto no funca bien cuando se reemplaza el filter
-; TODO permitir elegir otras granularidades en el popup
 (defn- init-splitted-dim [dim {:keys [viewer]}]
   (let [other-dims-in-split (remove #(dim=? % dim) (:split viewer))]
     (cond-> (assoc dim
@@ -43,13 +42,25 @@
                                 (assoc split :sort-by (assoc sort-by :descending descending)))))))
       (send-main-query)))
 
+(def granularities {"PT5M" "5m", "PT1H" "1H", "P1D" "1D", "P1W" "1W", "P1M" "1M"})
+
 (defn- split-popup [_ dim]
-  (let [opts (r/atom (select-keys dim [:limit :sort-by]))
+  (let [opts (r/atom (select-keys dim [:limit :sort-by :granularity]))
         posible-sort-bys (conj (current-cube :measures) dim)]
     (fn [{:keys [close]} dim]
-      (let [desc (get-in @opts [:sort-by :descending])]
-        [:div
+      (let [desc (get-in @opts [:sort-by :descending])
+            current-granularity (@opts :granularity)]
+        [:div.split.popup
          [:div.ui.form
+          (when (time-dimension? dim)
+            [:div.field.periods
+             [:label (t :cubes/granularity)]
+             [:div.ui.five.small.basic.buttons
+              (for [[period title] granularities]
+                [:button.ui.button {:key period
+                                    :class (when (= current-granularity period) "active")
+                                    :on-click #(swap! opts assoc :granularity period)}
+                 title])]])
           [:div.field
            [:label (t :cubes/sort-by)]
            [:div.flex.field
