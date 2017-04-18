@@ -8,7 +8,7 @@
             [shevek.components.modal :refer [modal]]
             [shevek.dashboard :as dashboard]
             [shevek.admin.page :as admin]
-            [shevek.settings.menu :refer [settings-menu]]
+            [shevek.settings :refer [settings-menu]]
             [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]

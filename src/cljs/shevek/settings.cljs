@@ -1,4 +1,4 @@
-(ns shevek.settings.menu
+(ns shevek.settings
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
