@@ -68,7 +68,7 @@
    [:h2.ui.app.header (t :reports/pinned)]
    [reports-cards]])
 
-; TODO esto funca y queda simple pero hace demasiados requests al server. Ver de hacer solo las queries de los viewers
+; TODO esto funca y queda simple pero hace demasiados requests al server. Ver de hacer solo las queries de los viewers. Aunque a favor tiene que no hace falta actualizar los max-time periodicamente.
 (defevh :dashboard/refresh [db]
   (doseq [report (dashboard-reports)]
     (dispatch :dashboard/cube-requested report))

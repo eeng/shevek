@@ -47,20 +47,18 @@
       (navigate "/")
       db)))
 
-(defevh :max-time-arrived [db cube-name max-time]
-  (update-in db [:cubes cube-name] assoc :max-time (dw/parse-max-time max-time)))
+(defevh :max-time-arrived [db max-time]
+  (assoc-in db [:viewer :cube :max-time] (dw/parse-max-time max-time)))
 
-; FIXME esto habria que hacerlo en todas las pags o por lo menos en el dashboard tb ya que ahi se necesitan los max-time actualizados de varios cubos
 (defn fetch-max-time []
   (when (current-page? :viewer)
     (let [name (current-cube-name)]
-      (rpc/call "schema.api/max-time" :args [name] :handler #(dispatch :max-time-arrived name %)))))
+      (rpc/call "schema.api/max-time" :args [name] :handler #(dispatch :max-time-arrived %)))))
 
 (defonce _interval (every 60 fetch-max-time))
 
 (defevh :viewer/refresh [db]
-  (-> db
-      (send-main-query)
+  (-> (send-main-query db)
       (send-pinboard-queries)))
 
 (defn page []

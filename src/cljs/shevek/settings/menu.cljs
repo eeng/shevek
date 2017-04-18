@@ -15,17 +15,26 @@
   (local-storage/store! "shevek.settings" (db :settings))
   db)
 
-(defevh :settings-loaded [db]
-  (assoc db :settings (local-storage/retrieve "shevek.settings")))
-
-(defevh :settings-saved [db new-settings]
-  (-> db (update :settings merge new-settings) save-settings!))
-
 (defn refresh-page []
   (let [refresh-events {:dashboard :dashboard/refresh
                         :viewer :viewer/refresh}
         event (refresh-events (current-page))]
     (when event (dispatch event))))
+
+(defonce auto-refresh-interval (atom nil))
+
+(defn set-auto-refresh-interval! [every]
+  (js/clearTimeout @auto-refresh-interval)
+  (when (and every (pos? every))
+    (reset! auto-refresh-interval (js/setInterval refresh-page (* 1000 every)))))
+
+(defevh :settings-loaded [db]
+  (let [{:keys [auto-refresh] :as settings} (local-storage/retrieve "shevek.settings")]
+    (set-auto-refresh-interval! auto-refresh)
+    (assoc db :settings settings)))
+
+(defevh :settings-saved [db new-settings]
+  (-> db (update :settings merge new-settings) save-settings!))
 
 (defn- popup-content [{:keys [close]}]
   [:div#settings-popup.ui.form
@@ -33,8 +42,11 @@
    [:div.field
     [:label (t :settings/auto-refresh)]
     [select (t :settings/auto-refresh-opts)
-      {:selected (db/get-in [:settings :auto-refresh] "en")
-       :on-change #(do (dispatch :settings-saved {:auto-refresh (str/parse-int %)}) (close))}]
+      {:selected (db/get-in [:settings :auto-refresh] 0)
+       :on-change #(let [auto-refresh (str/parse-int %)]
+                     (set-auto-refresh-interval! auto-refresh)
+                     (dispatch :settings-saved {:auto-refresh auto-refresh})
+                     (close))}]
     [:button.ui.fluid.button {:on-click #(do (refresh-page) (close))} "Update Now"]]
    [:div.field
     [:label (t :settings/lang)]
