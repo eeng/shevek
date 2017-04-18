@@ -1,6 +1,6 @@
 (ns shevek.navegation
   (:require-macros [reflow.macros :refer [defevh]])
-  (:require [secretary.core :as secretary :refer-macros [defroute]]
+  (:require [secretary.core :refer-macros [defroute]]
             [reflow.core :refer [dispatch]]
             [reflow.db :as db]))
 

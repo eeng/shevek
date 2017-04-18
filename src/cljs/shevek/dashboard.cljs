@@ -23,6 +23,9 @@
       [:div.ui.cards (rmap cube-card cubes :name)]
       [:div.tip [:i.info.circle.icon] (t :cubes/missing)])))
 
+(defn dashboard-reports []
+  (filter :pin-in-dashboard (db/get :reports)))
+
 (defevh :dashboard/query-executed [db results name]
   (-> (assoc-in db [:dashboard name :results :main] results)
       (assoc-in [:dashboard name :arrived-split] (get-in db [:dashboard name :split])) ; TODO mmm no queda muy prolijo esto del arrived-split, lo tengo q hacer aca xq el component visualization lo necesita
@@ -52,7 +55,7 @@
 (defn- reports-cards []
   (fetch-reports)
   (fn []
-    (let [reports (filter :pin-in-dashboard (db/get :reports))]
+    (let [reports (dashboard-reports)]
       (if (seq reports)
         [:div.ui.two.stackable.cards (rmap report-card reports :name)]
         [:div.tip [:i.info.circle.icon] (t :reports/none)]))))
@@ -64,3 +67,9 @@
    [cubes-cards]
    [:h2.ui.app.header (t :reports/pinned)]
    [reports-cards]])
+
+; TODO esto funca y queda simple pero hace demasiados requests al server. Ver de hacer solo las queries de los viewers
+(defevh :dashboard/refresh [db]
+  (doseq [report (dashboard-reports)]
+    (dispatch :dashboard/cube-requested report))
+  db)

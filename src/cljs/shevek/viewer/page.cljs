@@ -58,6 +58,11 @@
 
 (defonce _interval (every 60 fetch-max-time))
 
+(defevh :viewer/refresh [db]
+  (-> db
+      (send-main-query)
+      (send-pinboard-queries)))
+
 (defn page []
   [:div#viewer
    [:div.left-column

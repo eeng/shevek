@@ -6,7 +6,7 @@
 
 (s/defschema Settings
   {(s/optional-key :lang) s/Str
-   (s/optional-key :auto-update) s/Int})
+   (s/optional-key :auto-refresh) s/Int})
 
 (s/defschema Dashboard
   {s/Str Viewer})
