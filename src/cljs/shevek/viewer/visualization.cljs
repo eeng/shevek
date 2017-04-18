@@ -31,16 +31,15 @@
 
 (defn- pivot-table-row [result dim depth measures max-values]
   [:tr
-    [:td
-     [:div {:class (str "depth-" depth)}
-      (format-dimension dim result)]]
-    (for [measure measures
-           :let [measure-name (-> measure :name keyword)
-                 measure-value (measure-name result)]]
-      [:td.right.aligned {:key measure-name}
-       [:div.bg (when-not (totals-result? result dim)
-                  {:style {:width (calculate-rate measure-value (max-values measure-name))}})]
-       (format-measure measure result)])])
+   [:td
+    [:div {:class (str "depth-" depth)} (format-dimension dim result)]]
+   (for [measure measures
+         :let [measure-name (-> measure :name keyword)
+               measure-value (measure-name result)]]
+     [:td.right.aligned {:key measure-name}
+      [:div.bg (when-not (totals-result? result dim)
+                 {:style {:width (calculate-rate measure-value (max-values measure-name))}})]
+      (format-measure measure result)])])
 
 (defn- pivot-table-rows [results [dim & dims] depth measures max-values]
   (when dim
