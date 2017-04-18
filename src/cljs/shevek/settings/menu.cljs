@@ -54,7 +54,9 @@
                      (set-auto-refresh-interval! auto-refresh)
                      (dispatch :settings-saved {:auto-refresh auto-refresh})
                      (close))}]
-    [:button.ui.fluid.button {:on-click #(do (refresh-page) (close))} "Update Now"]]
+    [:button.ui.fluid.button
+     {:on-click #(do (refresh-page) (close))}
+     (t :settings/update-now)]]
    [:div.field
     [:label (t :settings/lang)]
     [select [["English" "en"] ["Español" "es"]]
