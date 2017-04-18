@@ -16,8 +16,8 @@
 (defroute "/viewer" []
   (dispatch :navigate :viewer))
 
-(defroute "/settings" []
-  (dispatch :navigate :settings))
+(defroute "/admin" []
+  (dispatch :navigate :admin))
 
 (defn current-page []
   (db/get :page))

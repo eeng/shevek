@@ -58,7 +58,9 @@
               :saved "Report '{1}' saved!"
               :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
     :settings {:menu "Settings"
-               :lang "Language"}
+               :lang "Language"
+               :auto-update "Auto Update"
+               :auto-update-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 5 minutes" 300] ["Every 15 minutes" 900] ["Every 30 minutes" 1800]])}
     :admin {:menu "Admin"
             :title "Administration"
             :subtitle "Configure the users, cube descriptions and other stuff in this page"
@@ -138,7 +140,9 @@
               :saved "Reporte '{1}' guardado correctamente"
               :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
     :settings {:menu "Preferencias"
-               :lang "Lenguaje"}
+               :lang "Lenguaje"
+               :auto-update "Refrescar Automáticamente"
+               :auto-update-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada minuto" 60] ["Cada 5 minutos" 300] ["Cada 15 minutos" 900] ["Cada 30 minutos" 1800]])}
     :admin {:title "Administración"
             :subtitle "Configure los usuarios, descripciones de cubos y otras cuestiones aquí"
             :users "Usuarios"}

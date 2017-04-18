@@ -7,7 +7,7 @@
             [shevek.components :refer [controlled-popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.dashboard :as dashboard]
-            [shevek.admin.page :as settings]
+            [shevek.admin.page :as admin]
             [shevek.settings.menu :refer [settings-menu]]
             [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
@@ -17,7 +17,7 @@
 
 (def pages
   {:dashboard #'dashboard/page
-   :settings #'settings/page
+   :admin #'admin/page
    :viewer #'viewer/page})
 
 (defn current-page-class [page]
@@ -60,7 +60,7 @@
    [reports-menu]
    [:div.right.menu
     [settings-menu]
-    [:a.item {:href "#/settings" :class (current-page-class :settings)}
+    [:a.item {:href "#/admin" :class (current-page-class :admin)}
      [:i.users.icon] (t :admin/menu)]
     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]])
 

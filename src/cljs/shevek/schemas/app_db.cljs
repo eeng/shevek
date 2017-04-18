@@ -5,7 +5,8 @@
             [shevek.schemas.report :refer [Report]]))
 
 (s/defschema Settings
-  {:lang s/Str})
+  {(s/optional-key :lang) s/Str
+   (s/optional-key :auto-update) s/Int})
 
 (s/defschema Dashboard
   {s/Str Viewer})
