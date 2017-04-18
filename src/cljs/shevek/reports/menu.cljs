@@ -21,6 +21,9 @@
   (rpc/call "reports.api/find-all" :handler #(dispatch :reports-arrived %))
   (rpc/loading db :reports))
 
+(defn fetch-reports []
+  (dispatch :reports-requested))
+
 (defevh :report-selected [db {:keys [cube] :as report}]
   (navigate "/viewer")
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
@@ -29,6 +32,7 @@
 
 (defevh :report-saved [db {:keys [name] :as report} editing-current?]
   (notify (t :reports/saved name))
+  (fetch-reports)
   (cond-> (rpc/loaded db :save-report)
           editing-current? (assoc :current-report report)))
 
@@ -42,9 +46,6 @@
     (rpc/call "reports.api/save-report" :args [report] :handler #(dispatch :report-saved % editing-current?))
     (rpc/loading db :save-report)))
 
-(defn fetch-reports []
-  (dispatch :reports-requested))
-
 (defevh :delete-report [db report]
   ; TODO unificar estas dos lineas ya que siempre que hay un call debe haber un loading
   (rpc/call "reports.api/delete-report" :args [report] :handler fetch-reports)
@@ -56,9 +57,7 @@
         cancel #(reset! form-data nil)
         save #(when (valid?)
                 (dispatch :save-report @report)
-                (if (:editing? @form-data)
-                  (do (fetch-reports) (cancel))
-                  (close)))
+                (if (:editing? @form-data) (cancel) (close)))
         shortcuts (kb-shortcuts :enter save :escape close)]
     (fn []
       [:div.ui.form {:ref shortcuts}

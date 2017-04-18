@@ -18,12 +18,10 @@
     [:div.meta description]]])
 
 (defn- cubes-cards []
-  (dw/fetch-cubes)
-  (fn []
-    (let [cubes (dw/cubes-list)]
-       (if (seq cubes)
-         [:div.ui.cards (rmap cube-card cubes :name)]
-         [:div.tip [:i.info.circle.icon] (t :cubes/missing)]))))
+  (let [cubes (dw/cubes-list)]
+    (if (seq cubes)
+      [:div.ui.cards (rmap cube-card cubes :name)]
+      [:div.tip [:i.info.circle.icon] (t :cubes/missing)])))
 
 (defevh :dashboard/query-executed [db results name]
   (-> (assoc-in db [:dashboard name :results :main] results)
@@ -42,7 +40,7 @@
 
 ; TODO agregar el loading
 (defn- report-card [{:keys [name description] :as report}]
-  (dispatch :dashboard/cube-requested report) ; TODO esto no hay q hacerlo aca xq sino al actualizar un reporte y volver al dashboard no se reflejan los cambios si el fetch-reports llega luego de renderizar los reportes como estaban antes. Mejor hacerlo en el fetch-reports o sino al guardar un report inmediatamente pisar el db :reports.
+  (dispatch :dashboard/cube-requested report)
   (fn []
     [:a.report.card {:on-click #(dispatch :report-selected report)}
      [:div.content
