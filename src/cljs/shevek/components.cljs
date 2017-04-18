@@ -3,6 +3,7 @@
             [shevek.i18n :refer [t]]
             [shevek.lib.collections :refer [detect wrap-coll]]
             [shevek.lib.react :refer [with-react-keys]]
+            [shevek.rpc :refer [loading?]]
             [cuerdas.core :as str]))
 
 (defn page-title [title subtitle icon-class]
@@ -180,3 +181,7 @@
        [:div.content content]
        (when actions
          (into [:div.actions] actions))])))
+
+(defn loader [loading-key]
+  (when (loading? loading-key)
+    [:div.ui.active.inverted.dimmer [:div.ui.loader]]))

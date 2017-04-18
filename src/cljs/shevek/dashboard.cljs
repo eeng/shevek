@@ -4,7 +4,7 @@
             [reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
-            [shevek.components :refer [page-title]]
+            [shevek.components :refer [page-title loader]]
             [shevek.dw :as dw]
             [shevek.reports.menu :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
@@ -47,6 +47,7 @@
       [:div.header name]
       [:div.meta description]]
      [:div.content.visualization-container
+      [loader [:dashboard name]]
       [visualization (db/get-in [:dashboard name])]]]))
 
 (defn- reports-cards []
