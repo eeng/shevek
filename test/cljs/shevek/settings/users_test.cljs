@@ -1,8 +1,8 @@
-(ns shevek.settings.users-test
+(ns shevek.admin.users-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [error-on? no-error-on?]]
-            [shevek.settings.users :refer [validate-user]]))
+            [shevek.admin.users :refer [validate-user]]))
 
 (deftest validate-user-tests
   (testing "username is required"

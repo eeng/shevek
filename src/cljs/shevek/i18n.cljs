@@ -4,8 +4,7 @@
 
 (def translations
   {:en
-   {:menu {:logout "Logout"
-           :settings "Settings"}
+   {:menu {:logout "Logout"}
     :dashboard {:title "Dashboard"
                 :subtitle "Pin here your favorite reports for easy access"}
     :cubes {:title "Data Cubes"
@@ -58,10 +57,12 @@
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
               :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
-    :settings {:title "Settings"
-               :subtitle "Configure the application language, users and other stuff in this page"
-               :language "Language"
-               :users "Users"}
+    :settings {:menu "Settings"
+               :lang "Language"}
+    :admin {:menu "Admin"
+            :title "Administration"
+            :subtitle "Configure the users, cube descriptions and other stuff in this page"
+            :users "Users"}
     :users {:username "User Name"
             :fullname "Full Name"
             :email "Email"
@@ -87,8 +88,7 @@
                  :confirmation "doesn't match the previous value"}}
 
    :es
-   {:menu {:logout "Salir"
-           :settings "Configuración"}
+   {:menu {:logout "Salir"}
     :dashboard {:subtitle "Muestra las fuentes de datos disponibles y sus reportes favoritos"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
@@ -137,10 +137,11 @@
               :pin-in-dashboard "Mostrar en dashboard"
               :saved "Reporte '{1}' guardado correctamente"
               :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
-    :settings {:title "Configuración"
-               :subtitle "Configure el lenguaje de la aplicación, los usuarios y otras cuestiones aquí"
-               :language "Lenguaje"
-               :users "Usuarios"}
+    :settings {:menu "Preferencias"
+               :lang "Lenguaje"}
+    :admin {:title "Administración"
+            :subtitle "Configure los usuarios, descripciones de cubos y otras cuestiones aquí"
+            :users "Usuarios"}
     :users {:username "Usuario"
             :fullname "Nombre"
             :email "Email"

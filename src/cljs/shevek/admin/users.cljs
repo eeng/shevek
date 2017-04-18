@@ -1,4 +1,4 @@
-(ns shevek.settings.users
+(ns shevek.admin.users
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
             [shevek.components :refer [page-title input-field kb-shortcuts focused mail-to]]
@@ -91,6 +91,6 @@
   (let [edited-user (r/atom nil)]
     (fn []
       [:section
-       [:h2.ui.app.header (t :settings/users)]
+       [:h2.ui.app.header (t :admin/users)]
        (when @edited-user [user-form edited-user])
        [users-table edited-user]])))

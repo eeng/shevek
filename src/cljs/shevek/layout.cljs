@@ -7,7 +7,8 @@
             [shevek.components :refer [controlled-popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.dashboard :as dashboard]
-            [shevek.settings.page :as settings]
+            [shevek.admin.page :as settings]
+            [shevek.settings.menu :refer [settings-menu]]
             [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]
@@ -58,8 +59,9 @@
    [cubes-menu]
    [reports-menu]
    [:div.right.menu
+    [settings-menu]
     [:a.item {:href "#/settings" :class (current-page-class :settings)}
-     [:i.settings.icon] (t :settings/title)]
+     [:i.users.icon] (t :admin/menu)]
     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]])
 
 (defn layout []

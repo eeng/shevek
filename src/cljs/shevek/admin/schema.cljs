@@ -1,4 +1,4 @@
-(ns shevek.settings.schema
+(ns shevek.admin.schema
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
             [shevek.components :refer [page-title select text-input input-field kb-shortcuts focused]]
