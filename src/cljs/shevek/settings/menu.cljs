@@ -6,6 +6,8 @@
             [shevek.lib.local-storage :as local-storage]
             [shevek.components :refer [controlled-popup select]]
             [shevek.navegation :refer [current-page]]
+            [shevek.schemas.app-db :refer [Settings]]
+            [schema-tools.core :as st]
             [cuerdas.core :as str]))
 
 (defn load-settings []
@@ -28,8 +30,13 @@
   (when (and every (pos? every))
     (reset! auto-refresh-interval (js/setInterval refresh-page (* 1000 every)))))
 
+(defn- try-parse [settings]
+  (try
+    (st/select-schema settings Settings)
+    (catch js/Error _ {})))
+
 (defevh :settings-loaded [db]
-  (let [{:keys [auto-refresh] :as settings} (local-storage/retrieve "shevek.settings")]
+  (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "shevek.settings"))]
     (set-auto-refresh-interval! auto-refresh)
     (assoc db :settings settings)))
 
