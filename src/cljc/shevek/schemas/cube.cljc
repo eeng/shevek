@@ -10,7 +10,7 @@
   (assoc NTD :type s/Str))
 
 (s/defschema Measure
-  (assoc NTD :type (s/enum "count" "longSum" "doubleSum" "hyperUnique")))
+  (assoc NTD :type s/Str))
 
 (s/defschema Cube
   (assoc NTD

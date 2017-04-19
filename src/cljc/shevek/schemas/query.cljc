@@ -12,7 +12,7 @@
 
 (s/defschema Measure
   {:name s/Str
-   :type (s/enum "count" "longSum" "doubleSum" "hyperUnique")})
+   :type s/Str})
 
 (s/defschema SortBy
   {:name s/Str
