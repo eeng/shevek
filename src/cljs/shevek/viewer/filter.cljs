@@ -36,7 +36,7 @@
               [:results :filter name]))
 
 (def available-relative-periods
-  {:latest-hour "1H" :latest-6hours "6H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D"
+  {:latest-hour "1H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D" :latest-90days "90D"
    :current-day "D" :current-week "W" :current-month "M" :current-quarter "Q" :current-year "Y"
    :previous-day "D" :previous-week "W" :previous-month "M" :previous-quarter "Q" :previous-year "Y"})
 
@@ -58,7 +58,7 @@
     (fn []
       [:div.relative.period-type
        [period-buttons dim showed-period (t :cubes.period/latest)
-        [:latest-hour :latest-6hours :latest-day :latest-7days :latest-30days]]
+        [:latest-hour :latest-day :latest-7days :latest-30days :latest-90days]]
        [period-buttons dim showed-period (t :cubes.period/current)
         [:current-day :current-week :current-month :current-quarter :current-year]]
        [period-buttons dim showed-period (t :cubes.period/previous)

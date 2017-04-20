@@ -76,10 +76,10 @@
         day-of-last-year (t/minus (d/beginning-of-year now) (t/days 1))]
     (case selected-period
       :latest-hour [(t/minus max-time (t/hours 1)) max-time]
-      :latest-6hours [(t/minus max-time (t/hours 6)) max-time]
       :latest-day [(t/minus max-time (t/days 1)) max-time]
       :latest-7days [(t/minus max-time (t/days 7)) max-time]
       :latest-30days [(t/minus max-time (t/days 30)) max-time]
+      :latest-90days [(t/minus max-time (t/days 90)) max-time]
       :current-day [(d/beginning-of-day now) (d/end-of-day now)]
       :current-week [(d/beginning-of-week now) (d/end-of-week now)]
       :current-month [(d/beginning-of-month now) (d/end-of-month now)]
