@@ -9,8 +9,9 @@
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
 
-(defn- dimension-row [{:keys [name title type description]} edited-cube coll-key i]
+(defn- dimension-row [{:keys [name title type description format]} edited-cube coll-key i]
   [:tr {:key name}
+   [:td name]
    [:td
     (if @edited-cube
       [:div.ui.fluid.input [text-input edited-cube [coll-key i :title]]]
@@ -19,21 +20,39 @@
     (if @edited-cube
       [:div.ui.fluid.input [text-input edited-cube [coll-key i :description]]]
       description)]
-   [:td name]
+   (when (= coll-key :measures)
+     [:td
+      (if @edited-cube
+        [:div.ui.fluid.input [text-input edited-cube [coll-key i :format]]]
+        format)])
    [:td type]])
 
-(defn- dimensions-table [original-cube edited-cube header coll-key]
+(defn- dimensions-table [original-cube edited-cube]
   [:div.dimensions
-   [:h4.ui.header header]
+   [:h4.ui.header (t :cubes/dimensions)]
    [:table.ui.basic.table
     [:thead>tr
+     [:th.three.wide (t :cubes.schema/name)]
      [:th.three.wide (t :cubes.schema/title)]
      [:th.eight.wide (t :cubes.schema/description)]
-     [:th.three.wide (t :cubes.schema/name)]
      [:th.two.wide (t :cubes.schema/type)]]
     [:tbody
-     (for [[i {:keys [name] :as dim}] (map-indexed vector (original-cube coll-key))]
-       ^{:key name} [dimension-row dim edited-cube coll-key i])]]])
+     (for [[i {:keys [name] :as dim}] (map-indexed vector (original-cube :dimensions))]
+       ^{:key name} [dimension-row dim edited-cube :dimensions i])]]])
+
+(defn- measures-table [original-cube edited-cube]
+  [:div.dimensions
+   [:h4.ui.header (t :cubes/measures)]
+   [:table.ui.basic.table
+    [:thead>tr
+     [:th.three.wide (t :cubes.schema/name)]
+     [:th.three.wide (t :cubes.schema/title)]
+     [:th.six.wide (t :cubes.schema/description)]
+     [:th.two.wide (t :cubes.schema/format)]
+     [:th.two.wide (t :cubes.schema/type)]]
+    [:tbody
+     (for [[i {:keys [name] :as dim}] (map-indexed vector (original-cube :measures))]
+       ^{:key name} [dimension-row dim edited-cube :measures i])]]])
 
 (defevh :cube-saved [db {:keys [name] :as cube}]
   (-> (assoc-in db [:cubes name] cube)
@@ -76,8 +95,8 @@
       [:div.cube-details {:ref shortcuts}
        [cube-actions original-cube edited-cube save cancel]
        [cube-fields original-cube edited-cube]
-       [dimensions-table original-cube edited-cube (t :cubes/dimensions) :dimensions]
-       [dimensions-table original-cube edited-cube (t :cubes/measures) :measures]])))
+       [dimensions-table original-cube edited-cube]
+       [measures-table original-cube edited-cube (t :cubes/measures)]])))
 
 (defn schema-section []
   (dw/fetch-cubes)

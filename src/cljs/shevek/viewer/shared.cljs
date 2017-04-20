@@ -4,6 +4,7 @@
             [reflow.db :as db]
             [reagent.core :as r]
             [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
+            [shevek.lib.number :as num]
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
@@ -41,12 +42,14 @@
 (defn- send-main-query [{:keys [viewer] :as db}]
   (send-query db (assoc viewer :totals true) [:results :main]))
 
-(defn format-measure [{:keys [name type]} result]
-  (let [value (or (->> name keyword (get result)) 0)]
-    (condp = type
-      "doubleSum" (str/format "%.2f" value)
-      "hyperUnique" (str/format "%.0f" value)
-      value)))
+(defn format-measure [{:keys [name type format]} result]
+  (let [value (or (->> name keyword (get result)) 0)
+        value (condp = type
+                "doubleSum" (str/format "%.2f" value)
+                "hyperUnique" (str/format "%.0f" value)
+                value)]
+    (cond-> value
+            format (num/format format))))
 
 (defn- totals-result? [result dim]
   (not (contains? result (-> dim :name keyword))))

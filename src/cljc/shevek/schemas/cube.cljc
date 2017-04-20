@@ -10,7 +10,9 @@
   (assoc NTD :type s/Str))
 
 (s/defschema Measure
-  (assoc NTD :type s/Str))
+  (assoc NTD
+         :type s/Str
+         (s/optional-key :format) s/Str))
 
 (s/defschema Cube
   (assoc NTD

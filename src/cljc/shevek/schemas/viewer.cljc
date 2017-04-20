@@ -3,7 +3,7 @@
             [shevek.schemas.cube :refer [Dimension Measure]]))
 
 (s/defschema SortBy
-  (assoc Dimension :descending s/Bool))
+  (assoc Measure :descending s/Bool))
 
 (s/defschema Split
   (assoc Dimension

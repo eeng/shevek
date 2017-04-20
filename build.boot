@@ -38,7 +38,8 @@
                     [metosin/schema-tools "0.9.0"]
                     [prismatic/schema-generators "0.1.0"]
                     [com.novemberain/monger "3.1.0"]
-                    [bcrypt-clj "0.3.3"]])
+                    [bcrypt-clj "0.3.3"]
+                    [cljsjs/numeral "2.0.6-0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

@@ -48,7 +48,8 @@
     :cubes.schema {:name "Name"
                    :title "Title"
                    :description "Description"
-                   :type "Type"}
+                   :type "Type"
+                   :format "Format"}
     :reports {:menu "Reports"
               :title "Saved Reports"
               :pinned "Favorite Reports"
@@ -131,7 +132,8 @@
     :cubes.schema {:name "Nombre"
                    :title "Título"
                    :description "Descripción"
-                   :type "Tipo"}
+                   :type "Tipo"
+                   :format "Formato"}
     :reports {:menu "Reportes"
               :title "Reportes"
               :pinned "Reportes Favoritos"
