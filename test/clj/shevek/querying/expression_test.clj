@@ -1,62 +1,52 @@
 (ns shevek.querying.expression-test
   (:require [clojure.test :refer :all]
-            [shevek.querying.expression :refer [eval-expression measure->druid]]))
+            [shevek.querying.expression :refer [measure->druid]]))
 
-(deftest eval-expression-test
-  (testing "numeric expression should return constant post-aggregator and none aggretators"
-    (is (= [{:type "constant" :value 100} []]
-           (eval-expression "100"))))
+(deftest measure->druid-test
+  (testing "aggregators"
+    (testing "sum aggregator"
+      (is (= [[{:type "doubleSum" :fieldName "amount" :name "amount"}]
+              nil]
+             (measure->druid {:name "amount" :expression "(sum $amount)"})))))
 
-  (testing "aggregation expression should return fieldAccess post-aggregator and one aggregator for the field"
-    (is (= [{:type "fieldAccess" :fieldName "t0!amount"}
-            [{:fieldName "amount" :type "doubleSum" :name "t0!amount"}]]
-           (eval-expression "(sum $amount)"))))
+  (testing "count-distinct aggregator"
+    (is (= [[{:type "hyperUnique" :fieldName "amount" :name "amount"}]
+            nil]
+           (measure->druid {:name "amount" :expression "(count-distinct $amount)"}))))
 
-  (testing "aggregation count-distinct"
-    (is (= [{:type "fieldAccess" :fieldName "t0!users"}
-            [{:fieldName "users" :type "hyperUnique" :name "t0!users"}]]
-           (eval-expression "(count-distinct $users)"))))
+  (testing "filtered aggregator"
+    (is (= [[{:type "filtered"
+              :filter {:type "selector" :dimension "country" :value "ar"}
+              :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+              :name "amount"}]
+            nil]
+           (measure->druid {:name "amount" :expression "(where (= $country \"ar\") (sum $amount))"}))))
 
-  (testing "arithmetic expression between a field and a constant"
-    (is (= [{:type "arithmetic" :fn "/"
-             :fields [{:type "fieldAccess" :fieldName "t0!amount"}
-                      {:type "constant" :value 100}]}
-            [{:fieldName "amount" :type "doubleSum" :name "t0!amount"}]]
-           (eval-expression "(/ (sum $amount) 100)"))))
+  (testing "post-aggregators"
+    (testing "arithmetic operation between same measure and a constant"
+      (is (= [[{:type "doubleSum" :fieldName "amount" :name "_t0"}]
+              {:type "arithmetic" :name "amount" :fn "/"
+               :fields [{:type "fieldAccess" :fieldName "_t0"}
+                        {:type "constant" :value 100}]}]
+             (measure->druid {:name "amount" :expression "(/ (sum $amount) 100)"}))))
 
-  (testing "arithmetic expression between two fields"
-    (is (= [{:type "arithmetic" :fn "*"
-             :fields [{:type "fieldAccess" :fieldName "t0!amount"}
-                      {:type "fieldAccess" :fieldName "t1!quantity"}]}
-            [{:fieldName "amount" :type "doubleSum" :name "t0!amount"}
-             {:fieldName "quantity" :type "doubleSum" :name "t1!quantity"}]]
-           (eval-expression "(* (sum $amount) (sum $quantity))"))))
+    (testing "arithmetic operation between other measures"
+      (is (= [[{:fieldName "unitPrice" :type "doubleSum" :name "_t0"}
+               {:fieldName "quantity" :type "doubleSum" :name "_t1"}]
+              {:type "arithmetic" :name "total" :fn "*"
+               :fields [{:type "fieldAccess" :fieldName "_t0"}
+                        {:type "fieldAccess" :fieldName "_t1"}]}]
+             (measure->druid {:name "total" :expression "(* (sum $unitPrice) (sum $quantity))"}))))
 
-  (testing "nested arithmetic expression"
-    (is (= [{:type "arithmetic" :fn "/"
-             :fields [{:type "arithmetic" :fn "*"
-                       :fields [{:type "fieldAccess" :fieldName "t0!amount"}
-                                {:type "constant" :value 5}]}
-                      {:type "constant" :value 100}]}
-            [{:fieldName "amount" :type "doubleSum" :name "t0!amount"}]]
-           (eval-expression "(/ (* (sum $amount) 5) 100)")))))
-
-#_(deftest to-druid-test
-    (testing "arithmetic post-aggregator of existing field against a constant value"
-      (is (= {:aggregations [{:fieldName "amount" :type "longSum" :name "t1!amount"}]
-              :postAggregations [{:type "arithmetic"
-                                  :name "amount"
-                                  :fn "/"
-                                  :fields [{:type "fieldAccess" :fieldName "o1!amount"}
-                                           {:type "constant" :value 100}]}]}
-            (measure->druid {:name "amount" :type "longSum" :expression "(/ (sum $amount) 100)"}))))
-
-    (testing "arithmetic post-aggregator creating new field refering to other fields"
-      (is (= {:aggregations [{:fieldName "unitPrice" :type "doubleSum" :name "t1!unitPrice"}
-                             {:fieldName "quantity" :type "longSum" :name "t1!quantity"}]
-              :postAggregations [{:type "arithmetic"
-                                  :name "total"
-                                  :fn "*"
-                                  :fields [{:type "fieldAccess" :fieldName "t1!unitPrice"}
-                                           {:type "fieldAccess" :fieldName "t1!quantity"}]}]}
-            (measure->druid {:name "total" :type "longSum" :expression "(* (sum $unitPrice) (sum $quantity))"})))))
+    (testing "complex nested filtered expression"
+      (is (= [[{:type "filtered"
+                :filter {:type "selector" :dimension "country" :value "br"}
+                :aggregator {:type "doubleSum" :fieldName "amount" :name "_t0"}
+                :name "_t0"}
+               {:type "doubleSum" :fieldName "units" :name "_t1"}]
+              {:type "arithmetic" :fn "/" :name "x"
+               :fields [{:type "arithmetic" :fn "*"
+                         :fields [{:type "fieldAccess" :fieldName "_t0"}
+                                  {:type "fieldAccess" :fieldName "_t1"}]}
+                        {:type "constant" :value 100}]}]
+             (measure->druid {:name "x" :expression "(/ (* (where (= $country \"br\") (sum $amount)) (sum $units)) 100)"}))))))
