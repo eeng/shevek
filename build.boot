@@ -39,7 +39,8 @@
                     [prismatic/schema-generators "0.1.0"]
                     [com.novemberain/monger "3.1.0"]
                     [bcrypt-clj "0.3.3"]
-                    [cljsjs/numeral "2.0.6-0"]])
+                    [cljsjs/numeral "2.0.6-0"]
+                    [org.clojure/core.match "0.3.0-alpha4"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

@@ -17,3 +17,6 @@
   (if (sequential-or-set? x)
     x
     (remove nil? [x])))
+
+(defn includes? [coll x]
+  (some #{x} coll))
