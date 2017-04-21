@@ -41,27 +41,27 @@
 (defn- build-constant-postagg [value aggregators-so-far]
   [aggregators-so-far {:type "constant" :value value}])
 
-(defn- build-field-access-postagg [name expression aggregators-so-far]
-  (let [new-aggregator (eval-aggregator name expression)
+(defn- build-field-access-postagg [expression aggregators-so-far]
+  (let [temp-name (str "_t" (count aggregators-so-far))
+        new-aggregator (eval-aggregator temp-name expression)
         aggregators (conj aggregators-so-far new-aggregator)]
-    [aggregators {:type "fieldAccess" :fieldName name}]))
+    [aggregators {:type "fieldAccess" :fieldName temp-name}]))
 
 (declare eval-post-aggregator)
 
 (defn- build-arithmetic-postagg [name operator args aggregators-so-far]
   (let [accumulator (fn [[aggregators fields] arg]
-                      (let [temp-name (str "_t" (count aggregators))
-                            [new-aggregators post-aggregator] (eval-post-aggregator temp-name arg aggregators)]
+                      (let [[new-aggregators post-aggregator] (eval-post-aggregator nil arg aggregators)]
                         [new-aggregators (conj fields post-aggregator)]))
         [aggregators fields] (reduce accumulator [aggregators-so-far []] args)]
     [aggregators (cond-> {:type "arithmetic" :fn (str operator) :fields fields}
-                         (not (starts-with? name "_t")) (assoc :name name))]))
+                         name (assoc :name name))]))
 
 (defn eval-post-aggregator [name expression aggregators-so-far]
   (match expression
     ([(op :guard arithmetic-operator?) & args] :seq) (build-arithmetic-postagg name op args aggregators-so-far)
     (value :guard number?) (build-constant-postagg value aggregators-so-far)
-    ([(_ :guard aggregation?) & _] :seq) (build-field-access-postagg name expression aggregators-so-far)))
+    ([(_ :guard aggregation?) & _] :seq) (build-field-access-postagg expression aggregators-so-far)))
 
 (defn eval-expression
   "First we need to discriminate between and expression that should return only an aggregator and one that should return a post-aggregator besides its generated aggregators"
@@ -71,4 +71,5 @@
     ([(_ :guard arithmetic-operator?) & _] :seq) (eval-post-aggregator name expression [])))
 
 (defn measure->druid [{:keys [name expression]}]
-  (eval-expression name (read-string expression)))
+  (let [[aggregators post-aggregator] (eval-expression name (read-string expression))]
+    {:aggregations aggregators :postAggregations (remove nil? [post-aggregator])}))
