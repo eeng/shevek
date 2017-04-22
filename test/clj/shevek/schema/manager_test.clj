@@ -17,12 +17,16 @@
                   (case cube
                     "wikiticker" [[{:name "region" :type "STRING"}]
                                   [{:name "added" :type "longSum"}]]
-                    "vtol_stats" [[{:name "path" :type "STRING"}]
-                                  [{:name "requests" :type "longSum"}]]))]
+                    "vtol_stats" [[{:name "path" :type "LONG"}]
+                                  [{:name "requests" :type "hyperUnique"}]]))]
     (let [cubes (discover! nil db)]
       (is (submaps? [{:name "wikiticker"} {:name "vtol_stats"}] cubes))
-      (is (submaps? [{:name "region" :type "STRING"}] (-> cubes first :dimensions)))
-      (is (submaps? [{:name "added" :type "longSum"}] (-> cubes first :measures)))
+      (is (submaps? [{:name "region" :type "STRING"}
+                     {:name "path" :type "LONG"}]
+                    (mapcat :dimensions cubes)))
+      (is (submaps? [{:name "added" :expression "(sum $added)"}
+                     {:name "requests" :expression "(count-distinct $requests)"}]
+                    (mapcat :measures cubes)))
       (is (= 2 (->> cubes (map :_id) (filter identity) count))))))
 
 (spec "discovery of a new cube"

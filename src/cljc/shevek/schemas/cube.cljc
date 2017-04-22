@@ -12,6 +12,7 @@
 (s/defschema Measure
   (assoc NTD
          :type s/Str
+         :expression s/Str
          (s/optional-key :format) s/Str))
 
 (s/defschema Cube

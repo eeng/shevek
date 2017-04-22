@@ -23,10 +23,14 @@
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
 
+(defn- set-default-expression [{:keys [type name] :as measure}]
+  (let [type->agg-fn #(if (= % "hyperUnique") "count-distinct" "sum")]
+    (assoc measure :expression (str "(" (type->agg-fn type) " $" name ")"))))
+
 (defn set-default-titles [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
       (assoc :dimensions (mapv set-default-title dimensions))
-      (assoc :measures (mapv set-default-title measures))))
+      (assoc :measures (mapv (comp set-default-expression set-default-title) measures))))
 
 (defn- update-cube [old new]
   (-> (merge old (dissoc new :dimensions :measures))
