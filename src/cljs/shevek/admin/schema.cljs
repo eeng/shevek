@@ -9,32 +9,30 @@
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]))
 
-(defn- dimension-row [{:keys [name title type description format]} edited-cube coll-key i]
+(defn- input-or-text [dim edited-cube coll-key i field]
+  (if @edited-cube
+    [:div.ui.fluid.input [text-input edited-cube [coll-key i field]]]
+    [:div (dim field)]))
+
+(defn- dimension-row [{:keys [name type] :as dim} edited-cube coll-key i]
   [:tr {:key name}
    [:td name]
-   [:td
-    (if @edited-cube
-      [:div.ui.fluid.input [text-input edited-cube [coll-key i :title]]]
-      title)]
-   [:td
-    (if @edited-cube
-      [:div.ui.fluid.input [text-input edited-cube [coll-key i :description]]]
-      description)]
+   [:td [input-or-text dim edited-cube coll-key i :title]]
+   [:td [input-or-text dim edited-cube coll-key i :description]]
+   (if (= coll-key :measures)
+     [:td [input-or-text dim edited-cube coll-key i :expression]]
+     [:td type])
    (when (= coll-key :measures)
-     [:td
-      (if @edited-cube
-        [:div.ui.fluid.input [text-input edited-cube [coll-key i :format]]]
-        format)])
-   [:td type]])
+     [:td [input-or-text dim edited-cube coll-key i :format]])])
 
 (defn- dimensions-table [original-cube edited-cube]
   [:div.dimensions
    [:h4.ui.header (t :cubes/dimensions)]
    [:table.ui.basic.table
     [:thead>tr
-     [:th.three.wide (t :cubes.schema/name)]
+     [:th.two.wide (t :cubes.schema/name)]
      [:th.three.wide (t :cubes.schema/title)]
-     [:th.eight.wide (t :cubes.schema/description)]
+     [:th.nine.wide (t :cubes.schema/description)]
      [:th.two.wide (t :cubes.schema/type)]]
     [:tbody
      (for [[i {:keys [name] :as dim}] (map-indexed vector (original-cube :dimensions))]
@@ -45,11 +43,11 @@
    [:h4.ui.header (t :cubes/measures)]
    [:table.ui.basic.table
     [:thead>tr
-     [:th.three.wide (t :cubes.schema/name)]
+     [:th.two.wide (t :cubes.schema/name)]
      [:th.three.wide (t :cubes.schema/title)]
-     [:th.six.wide (t :cubes.schema/description)]
-     [:th.two.wide (t :cubes.schema/format)]
-     [:th.two.wide (t :cubes.schema/type)]]
+     [:th.five.wide (t :cubes.schema/description)]
+     [:th.four.wide (t :cubes.schema/expression)]
+     [:th.two.wide (t :cubes.schema/format)]]
     [:tbody
      (for [[i {:keys [name] :as dim}] (map-indexed vector (original-cube :measures))]
        ^{:key name} [dimension-row dim edited-cube :measures i])]]])

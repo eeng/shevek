@@ -2,13 +2,16 @@
   (:require [schema.core :as s]
             [shevek.schemas.cube :refer [Dimension Measure]]))
 
-(s/defschema SortBy
+(s/defschema DimensionSortBy
+  (assoc Dimension :descending s/Bool))
+
+(s/defschema MeasureSortBy
   (assoc Measure :descending s/Bool))
 
 (s/defschema Split
   (assoc Dimension
          :limit (s/cond-pre s/Int s/Str)
-         (s/optional-key :sort-by) SortBy
+         (s/optional-key :sort-by) (s/if :expression MeasureSortBy DimensionSortBy)
          (s/optional-key :granularity) s/Str))
 
 (s/defschema TimeFilter

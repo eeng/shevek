@@ -35,7 +35,7 @@
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
 (defn- viewer-dim->report [{:keys [selected-period value sort-by] :as dim}]
-  (cond-> (dissoc dim :type :title :description)
+  (cond-> (dissoc dim :type :title :description :format :expression)
           selected-period (update :selected-period name)
           value (update :value vec)
           sort-by (update :sort-by viewer-dim->report)))

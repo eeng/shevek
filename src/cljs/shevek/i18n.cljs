@@ -49,7 +49,8 @@
                    :title "Title"
                    :description "Description"
                    :type "Type"
-                   :format "Format"}
+                   :format "Format"
+                   :expression "Expression"}
     :reports {:menu "Reports"
               :title "Saved Reports"
               :pinned "Favorite Reports"
@@ -133,7 +134,8 @@
                    :title "Título"
                    :description "Descripción"
                    :type "Tipo"
-                   :format "Formato"}
+                   :format "Formato"
+                   :expression "Expresión"}
     :reports {:menu "Reportes"
               :title "Reportes"
               :pinned "Reportes Favoritos"
