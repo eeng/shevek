@@ -12,7 +12,7 @@
 
 (s/defschema Measure
   {:name s/Str
-   :type s/Str})
+   :expression s/Str})
 
 (s/defschema SortBy
   {:name s/Str

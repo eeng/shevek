@@ -9,15 +9,10 @@
                   :dataSource {:type "table" :name "wikiticker"}
                   :granularity {:type "all"}
                   :intervals "2015/2016"
-                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}]}
+                  :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}]}
                  (to-druid-query {:cube "wikiticker"
-                                  :measures [{:name "count" :type "longSum"}]
+                                  :measures [{:name "count" :expression "(sum $count)"}]
                                   :filter [{:interval ["2015" "2016"]}]}))))
-
-  (testing "measure type should be doubleSum when empty"
-    (is (= "doubleSum"
-           (-> (to-druid-query {:measures [{:name "count"}]})
-               (get-in [:aggregations 0 :type])))))
 
   (testing "query with one atemporal dimension should generate a topN query"
     (is (submap? {:queryType "topN"
@@ -25,22 +20,20 @@
                   :granularity {:type "all"}
                   :dimension "page"
                   :metric {:type "numeric" :metric "count"}
-                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
+                  :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}]
                   :threshold 10}
                  (to-druid-query {:cube "wikiticker"
                                   :dimension {:name "page" :limit 10}
-                                  :measures [{:name "count" :type "longSum"}]}))))
+                                  :measures [{:name "count" :expression "(sum $count)"}]}))))
 
   (testing "query with one time dimension should generate a timeseries query"
     (is (submap? {:queryType "timeseries"
                   :dataSource {:type "table" :name "wikiticker"}
                   :intervals "2015/2016"
-                  :aggregations [{:name "count" :fieldName "count" :type "longSum"}]
                   :granularity {:type "period"
                                 :period "P1D"}
                   :descending true}
                  (to-druid-query {:cube "wikiticker"
-                                  :measures [{:name "count" :type "longSum"}]
                                   :filter [{:interval ["2015" "2016"]}]
                                   :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}}))))
 
@@ -59,8 +52,7 @@
       (is (submap? {:filter {:type "and"
                              :fields [{:type "selector" :dimension "isRobot" :value "true"}
                                       {:type "selector" :dimension "isNew" :value "false"}]}}
-                   (to-druid-query {:measures [{:name "count" :type "longSum"}]
-                                    :filter [{:name "__time"} ; Este se ignora xq se manda en el interval
+                   (to-druid-query {:filter [{:name "__time"} ; Este se ignora xq se manda en el interval
                                              {:name "isRobot" :operator "is" :value "true"}
                                              {:name "isNew" :operator "is" :value "false"}]})))
       (is (without? :filter (to-druid-query {:filter [{:name "isRobot"} {:name "isNew"}]})))
@@ -92,26 +84,48 @@
                     :metric {:type "inverted" :metric {:type "numeric" :metric "added"}}}
                    (to-druid-query {:cube "wikiticker"
                                     :dimension {:name "page" :sort-by {:name "added" :descending false}}
-                                    :measures [{:name "count" :type "longSum"}
-                                               {:name "added" :type "longSum"}]}))))
+                                    :measures [{:name "count" :expression "(sum $count)"}
+                                               {:name "added" :expression "(sum $added)"}]}))))
 
     (testing "query with one atemporal dimension sorting by other non selected metric should add it to the aggregations"
       (is (submap? {:metric {:type "numeric" :metric "users"}
-                    :aggregations [{:name "count" :fieldName "count" :type "longSum"}
+                    :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}
                                    {:name "users" :fieldName "users" :type "hyperUnique"}]}
-                   (to-druid-query {:dimension {:name "page" :sort-by {:name "users" :type "hyperUnique"}}
-                                    :measures [{:name "count" :type "longSum"}]}))))
+                   (to-druid-query {:dimension {:name "page"
+                                                :sort-by {:name "users" :expression "(count-distinct $users)"}}
+                                    :measures [{:name "count" :expression "(sum $count)"}]}))))
 
     (testing "ascending ordered by the same dimension should use lexicographic sorting"
-      (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}
-                    :aggregations [{:name "count" :fieldName "count" :type "longSum"}]}
+      (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}}
                    (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}
-                                    :measures [{:name "count" :type "longSum"}]}))))
+                                    :measures [{:name "count" :expression "(sum $count)"}]}))))
 
     (testing "descending ordered by the same dimension should use lexicographic sorting"
       (is (submap? {:metric {:type "inverted"
                              :metric {:type "dimension" :ordering "lexicographic"}}}
-                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending true}}}))))))
+                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending true}}})))))
+
+  (testing "measures"
+    (testing "arithmetic expression"
+      (is (submap? {:aggregations [{:fieldName "amount" :name "_t0" :type "doubleSum"}]
+                    :postAggregations [{:type "arithmetic"
+                                        :name "amount"
+                                        :fn "/"
+                                        :fields [{:type "fieldAccess" :fieldName "_t0"}
+                                                 {:type "constant" :value 100}]}]}
+                   (to-druid-query {:measures [{:name "amount" :expression "(/ (sum $amount) 100)"}]}))))
+
+    (testing "two expressions referring to the same measure"
+      (is (submap? {:aggregations [{:fieldName "amount" :name "_t0" :type "doubleSum"}
+                                   {:fieldName "amount" :name "_t1" :type "doubleSum"}]
+                    :postAggregations [{:type "arithmetic" :name "a1" :fn "/"
+                                        :fields [{:type "fieldAccess" :fieldName "_t0"}
+                                                 {:type "constant" :value 10}]}
+                                       {:type "arithmetic" :name "a2" :fn "*"
+                                        :fields [{:type "fieldAccess" :fieldName "_t1"}
+                                                 {:type "constant" :value 20}]}]}
+                   (to-druid-query {:measures [{:name "a1" :expression "(/ (sum $amount) 10)"}
+                                               {:name "a2" :expression "(* (sum $amount) 20)"}]}))))))
 
 (deftest from-druid-results-test
   (testing "topN results"

@@ -12,7 +12,7 @@
       (with-redefs [druid/send-query (fn [_ dq] (swap! queries-sent conj dq) [])]
         (query dw {:cube "wikiticker"
                    :split [{:name "page"}]
-                   :measures [{:name "count" :type "longSum"}]
+                   :measures [{:name "count" :expression "(sum $count)"}]
                    :filter [{:interval ["2015-09-12" "2015-09-13"]}]
                    :totals true})
         (is (submaps? [{:queryType "timeseries" :granularity {:type "all"}}
@@ -36,7 +36,7 @@
                        {:country "Brasil" :count 2 :_results [{:city "Rio de Janerio" :count 5}]}]
                       (query dw {:cube "wikiticker"
                                  :split [{:name "country"} {:name "city"}]
-                                 :measures [{:name "count" :type "longSum"}]
+                                 :measures [{:name "count" :expression "(sum $count)"}]
                                  :filter [{:interval ["2015-09-12" "2015-09-13"]}]})))
         (is (submaps? [{:queryType "topN" :dimension "country"}
                        {:queryType "topN" :dimension "city"

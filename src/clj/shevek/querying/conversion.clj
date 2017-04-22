@@ -1,6 +1,7 @@
 (ns shevek.querying.conversion
   (:require [clojure.string :as str]
-            [shevek.lib.collections :refer [assoc-if-seq]]))
+            [shevek.lib.collections :refer [assoc-if-seq]]
+            [shevek.querying.expression :refer [measure->druid]]))
 
 ; TODO repetida en el client
 (defn dim=? [dim1 dim2]
@@ -14,17 +15,18 @@
 (defn time-dimension? [{:keys [name interval]}]
   (or (= name "__time") interval))
 
-(defn- to-druid-agg [{:keys [name type] :or {type "doubleSum"}}]
-  {:fieldName name :name name :type type})
+(defn make-tig
+  "tig = Temporary ID Generator, counter for generating temporary field names used in aggregations that are later refered in post-aggregations"
+  []
+  (let [counter (atom -1)]
+    (fn []
+      (swap! counter inc))))
+
+(defn- to-druid-agg [measure tig]
+  (measure->druid measure tig))
 
 (defn- sort-by-same? [{:keys [name sort-by]}]
   (= name (:name sort-by)))
-
-(defn- add-sort-by-dim-to-aggregations [{:keys [sort-by] :as dim} measures aggregations]
-  "If we sort by a not selected metric we should send the field as an aggregation, otherwise Druid complains"
-  (if (and (:name sort-by) (not (sort-by-same? dim)) (not (includes-dim? measures sort-by)))
-    (conj aggregations (to-druid-agg sort-by))
-    aggregations))
 
 (defn- to-druid-filter [[{:keys [name operator value]} :as filters]]
   (condp = (count filters)
@@ -71,13 +73,26 @@
 (defn- with-value? [{:keys [operator value]}]
   (or (= "is" operator) (seq value)))
 
+(defn sort-by-derived-measures
+  "If we sort by a not selected metric we should send the field as an aggregation, otherwise Druid complains"
+  [{:keys [sort-by] :as dim} measures]
+  (if (and (:name sort-by) (not (sort-by-same? dim)) (not (includes-dim? measures sort-by)))
+    [sort-by]
+    []))
+
+(defn measures->druid [measures]
+  (let [tig (make-tig)]
+    (->> measures
+         (map #(measure->druid % tig))
+         (reduce (partial merge-with concat)))))
+
 (defn to-druid-query [{:keys [cube measures dimension] :as q}]
   (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? (:filter q))]
     (as-> {:queryType (calculate-query-type q)
            :dataSource {:type "table" :name cube}
-           :intervals (str/join "/" (-> time-filters first :interval))
-           :aggregations (->> measures (mapv to-druid-agg) (add-sort-by-dim-to-aggregations dimension measures))}
+           :intervals (str/join "/" (-> time-filters first :interval))}
           dq
+          (merge dq (measures->druid (concat measures (sort-by-derived-measures dimension measures))))
           (add-query-type-dependant-fields q dq)
           (assoc-if-seq dq :filter (->> normal-filters (filter with-value?) to-druid-filter)))))
 
@@ -89,10 +104,3 @@
                           (assoc result :__time timestamp)
                           result))
                       results)))
-
-(defn make-tig
-  "tig = Temporary ID Generator, counter for generating temporary field names used in aggregations that are later refered in post-aggregations"
-  []
-  (let [counter (atom -1)]
-    (fn []
-      (swap! counter inc))))
