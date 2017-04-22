@@ -1,6 +1,10 @@
 (ns shevek.querying.expression-test
   (:require [clojure.test :refer :all]
-            [shevek.querying.expression :refer [measure->druid]]))
+            [shevek.querying.expression :as e]
+            [shevek.querying.conversion :refer [make-tig]]))
+
+(defn measure->druid [m]
+  (e/measure->druid m (make-tig)))
 
 (deftest measure->druid-test
   (testing "aggregators"

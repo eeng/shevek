@@ -89,3 +89,10 @@
                           (assoc result :__time timestamp)
                           result))
                       results)))
+
+(defn make-tig
+  "tig = Temporary ID Generator, counter for generating temporary field names used in aggregations that are later refered in post-aggregations"
+  []
+  (let [counter (atom -1)]
+    (fn []
+      (swap! counter inc))))
