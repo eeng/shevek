@@ -16,8 +16,8 @@
 
 (s/defschema SortBy
   {:name s/Str
-   :type s/Str
-   :descending s/Bool})
+   :descending s/Bool
+   (s/optional-key :expression) s/Str})
 
 (s/defschema Split
   {:name s/Str

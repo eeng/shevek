@@ -71,5 +71,6 @@
     ([(_ :guard arithmetic-operator?) & _] :seq) (eval-post-aggregator name expression tig)))
 
 (defn measure->druid [{:keys [name expression]} tig]
+  {:pre [(string? expression)]}
   (let [[aggregators post-aggregator] (eval-expression name (read-string expression) tig)]
     {:aggregations aggregators :postAggregations (remove nil? [post-aggregator])}))

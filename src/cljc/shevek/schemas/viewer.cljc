@@ -8,10 +8,13 @@
 (s/defschema MeasureSortBy
   (assoc Measure :descending s/Bool))
 
+(s/defschema SortBy
+  (s/if :expression MeasureSortBy DimensionSortBy))
+
 (s/defschema Split
   (assoc Dimension
          :limit (s/cond-pre s/Int s/Str)
-         (s/optional-key :sort-by) (s/if :expression MeasureSortBy DimensionSortBy)
+         (s/optional-key :sort-by) SortBy
          (s/optional-key :granularity) s/Str))
 
 (s/defschema TimeFilter

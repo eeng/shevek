@@ -8,7 +8,7 @@
             [shevek.lib.collections :refer [detect]]
             [shevek.navegation :refer [current-page?]]
             [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? clean-dim]]))
+            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result?]]))
 
 (defn- sort-results-according-to-selected-measures [viewer]
   (let [result (first (get-in viewer [:results :main]))]
@@ -55,7 +55,7 @@
 
 (defn- sortable-th [title on-click-sort-splits-by split opts]
   (if (current-page? :viewer)
-    (let [on-click-sort-splits-by (map clean-dim on-click-sort-splits-by)
+    (let [on-click-sort-splits-by (map #(select-keys % [:name :title :type :expression]) on-click-sort-splits-by)
           sort-bys (map (comp :name :sort-by) split)
           descendings (->> split (map (comp :descending :sort-by)) distinct)
           show-icon? (and (= sort-bys (map :name on-click-sort-splits-by))
