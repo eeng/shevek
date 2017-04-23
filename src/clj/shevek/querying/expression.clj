@@ -3,7 +3,7 @@
             [clojure.string :refer [starts-with?]]
             [shevek.lib.collections :refer [includes?]]))
 
-(def aggregator-types {'sum "doubleSum" 'count-distinct "hyperUnique"})
+(def aggregator-types {'sum "doubleSum" 'count-distinct "hyperUnique" 'max "doubleMax"})
 
 (defn- field-ref->field [field-ref]
   (-> field-ref str (subs 1)))

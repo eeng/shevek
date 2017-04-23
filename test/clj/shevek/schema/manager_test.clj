@@ -1,9 +1,9 @@
 (ns shevek.schema.manager-test
-  (:require [clojure.test :refer [is]]
+  (:require [clojure.test :refer [deftest is are]]
             [shevek.test-helper :refer [spec]]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
-            [shevek.schema.manager :refer [discover! update-cubes]]
+            [shevek.schema.manager :refer [discover! update-cubes calculate-expression]]
             [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
             [shevek.schema.repository :refer [find-cubes]]
             [shevek.schemas.cube :refer [Cube]]
@@ -76,3 +76,10 @@
   (make! Cube {:name "sales" :measures []})
   (update-cubes db [{:name "sales" :measures [{:name "amount" :expression "(/ (sum $amount) 100)"}]}])
   (is (submaps? [{:name "amount" :expression "(/ (sum $amount) 100)"}] (-> (find-cubes db) first :measures))))
+
+(deftest calculate-expression-tests
+  (are [x y] (= x (calculate-expression y))
+    "(sum $amount)" {:name "amount" :type "longSum"}
+    "(sum $amount)" {:name "amount" :type "doubleSum"}
+    "(max $amount)" {:name "amount" :type "longMax"}
+    "(count-distinct $amount)" {:name "amount" :type "hyperUnique"}))

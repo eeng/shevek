@@ -9,14 +9,19 @@
 (deftest measure->druid-test
   (testing "aggregators"
     (testing "sum aggregator"
-      (is (= {:aggregations [{:type "doubleSum" :fieldName "amount" :name "amount"}]
+      (is (= {:aggregations [{:type "doubleSum" :fieldName "x" :name "x"}]
               :postAggregations []}
-             (measure->druid {:name "amount" :expression "(sum $amount)"})))))
+             (measure->druid {:name "x" :expression "(sum $x)"})))))
 
   (testing "count-distinct aggregator"
-    (is (= {:aggregations [{:type "hyperUnique" :fieldName "amount" :name "amount"}]
+    (is (= {:aggregations [{:type "hyperUnique" :fieldName "x" :name "x"}]
             :postAggregations []}
-           (measure->druid {:name "amount" :expression "(count-distinct $amount)"}))))
+           (measure->druid {:name "x" :expression "(count-distinct $x)"}))))
+
+  (testing "max aggregator"
+    (is (= {:aggregations [{:type "doubleMax" :fieldName "x" :name "x"}]
+            :postAggregations []}
+           (measure->druid {:name "x" :expression "(max $x)"}))))
 
   (testing "filtered aggregator"
     (is (= {:aggregations [{:type "filtered"

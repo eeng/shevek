@@ -23,10 +23,15 @@
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
 
-(defn- set-default-expression [{:keys [type name] :as measure}]
-  (let [agg-fn (if (= type "hyperUnique") "count-distinct" "sum")
-        expression (str "(" agg-fn " $" name ")")]
-    (merge {:expression expression} measure)))
+(defn calculate-expression [{:keys [type name] :as measure}]
+  (let [agg-fn (condp re-find (str type)
+                 #"Max" "max"
+                 #"Unique" "count-distinct"
+                 "sum")]
+    (str "(" agg-fn " $" name ")")))
+
+(defn- set-default-expression [measure]
+  (merge {:expression (calculate-expression measure)} measure))
 
 (defn set-default-titles [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
