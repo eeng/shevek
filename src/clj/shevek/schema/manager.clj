@@ -24,8 +24,9 @@
   (assoc record :title title))
 
 (defn- set-default-expression [{:keys [type name] :as measure}]
-  (let [type->agg-fn #(if (= % "hyperUnique") "count-distinct" "sum")]
-    (assoc measure :expression (str "(" (type->agg-fn type) " $" name ")"))))
+  (let [agg-fn (if (= type "hyperUnique") "count-distinct" "sum")
+        expression (str "(" agg-fn " $" name ")")]
+    (merge {:expression expression} measure)))
 
 (defn set-default-titles [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
@@ -38,11 +39,13 @@
       (assoc :measures (merge-dimensions (:measures old) (:measures new)))
       set-default-titles))
 
-(defn discover! [dw db]
-  (let [existing-cubes (find-cubes db)
-        discovered-cubes (discover-cubes dw)]
+(defn update-cubes [db new-cubes]
+  (let [existing-cubes (find-cubes db)]
     (doall
-      (for [dc discovered-cubes]
-        (save-cube db (update-cube (corresponding dc existing-cubes) dc))))))
+      (for [new-cube new-cubes]
+        (save-cube db (update-cube (corresponding new-cube existing-cubes) new-cube))))))
+
+(defn discover! [dw db]
+  (update-cubes db (discover-cubes dw)))
 
 #_(discover! shevek.dw/dw shevek.db/db)

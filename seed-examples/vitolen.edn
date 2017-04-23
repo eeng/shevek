@@ -1,0 +1,19 @@
+{:cubes
+ [{:name "facturacion"
+   :title "Facturación"
+   :measures [{:name "importe"
+               :title "Importe Total"
+               :expression "(/ (sum $importe) 100)"
+               :format "$0.00a"}
+              {:name "importe_productos"
+               :title "Importe Productos"
+               :expression "(/ (where (= $grupo_item \"Productos\") (sum $importe)) 100)"
+               :format "$0.00a"}
+              {:name "importe_impuestos"
+               :title "Importe Impuestos"
+               :expression "(/ (where (= $grupo_item \"Impuestos\") (sum $importe)) 100)"
+               :format "$0.00a"}]}
+  {:name "eventos_pedidos"
+   :title "Eventos de Pedidos"}
+  {:name "vtol_stats"
+   :title "VTOL Stats"}]}

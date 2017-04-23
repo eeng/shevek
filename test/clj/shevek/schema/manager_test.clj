@@ -3,13 +3,14 @@
             [shevek.test-helper :refer [spec]]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
-            [shevek.schema.manager :refer [discover!]]
+            [shevek.schema.manager :refer [discover! update-cubes]]
             [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
             [shevek.schema.repository :refer [find-cubes]]
             [shevek.schemas.cube :refer [Cube]]
             [shevek.db :refer [db]]
             [com.rpl.specter :refer [select ALL]]))
 
+; TODO Todos estos test se podrian simplificar si testeamos directamente el update-cubes. Dejar uno solo que pase x el discover y listo
 (spec "initial descovery should save all cubes with their dimensions and metrics"
   (with-redefs [cubes (constantly ["wikiticker" "vtol_stats"])
                 dimensions-and-measures
@@ -61,3 +62,22 @@
         (is (= (:_id c1) (:_id (first cubes))))
         (is (= [["d1" "D1"] ["d2" "D2"]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
         (is (= [["m1" "M1" "longSum"]] (map (juxt :name :title :type) (select [ALL :measures ALL] cubes))))))))
+
+; Seeds
+
+(spec "updating cube title"
+  (make! Cube {:name "stats"})
+  (update-cubes db [{:name "stats" :title "Statistics"}])
+  (is (= "Statistics" (-> (find-cubes db) first :title)))
+  (update-cubes db [{:name "stats" :title "Statistics 2"}])
+  (is (= "Statistics 2" (-> (find-cubes db) first :title))))
+
+(spec "changing the default measure expression and format"
+  (make! Cube {:name "sales" :measures [{:name "amount" :expression "(sum $amount)"}]})
+  (update-cubes db [{:name "sales" :measures [{:name "amount" :expression "(/ (sum $amount) 100)" :format "$0.00"}]}])
+  (is (submaps? [{:expression "(/ (sum $amount) 100)" :format "$0.00"}] (-> (find-cubes db) first :measures))))
+
+(spec "adding new derived measure"
+  (make! Cube {:name "sales" :measures []})
+  (update-cubes db [{:name "sales" :measures [{:name "amount" :expression "(/ (sum $amount) 100)"}]}])
+  (is (submaps? [{:name "amount" :expression "(/ (sum $amount) 100)"}] (-> (find-cubes db) first :measures))))
