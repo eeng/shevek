@@ -14,18 +14,15 @@
 (defn parse-max-time [max-time]
   (d/round-to-next-minute (parse-time max-time)))
 
-(defn set-cube-defaults [{:keys [dimensions measures max-time] :as cube}]
+(defn set-cube-defaults [{:keys [max-time] :as cube}]
   (cond-> cube
-          max-time (assoc :max-time (parse-max-time max-time))))
-
-(defn- set-defaults [cubes]
-  (map set-cube-defaults cubes))
+          max-time (update :max-time parse-max-time)))
 
 (defn- to-map-with-name-as-key [cubes]
   (zipmap (map :name cubes) cubes))
 
 (defevh :cubes-arrived [db cubes]
-  (-> (assoc db :cubes (to-map-with-name-as-key (set-defaults cubes)))
+  (-> (assoc db :cubes (to-map-with-name-as-key cubes))
       (rpc/loaded :cubes)))
 
 (defevh :cubes-requested [db]
