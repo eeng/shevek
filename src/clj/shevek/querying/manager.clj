@@ -33,41 +33,41 @@
 
 ; Totals query
 #_(query dw {:cube "wikiticker"
-             :measures [{:name "count" :type "longSum"}
-                        {:name "added" :type "doubleSum"}]
+             :measures [{:name "count" :expression "(sum $count)"}
+                        {:name "added" :expression "(sum $added)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]
              :totals true})
 
 ; One dimension and one measure
 #_(query dw {:cube "wikiticker"
              :split [{:name "page" :limit 5}]
-             :measures [{:name "count" :type "longSum"}]
+             :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
 
 ; One time dimension and one measure
 #_(query dw {:cube "wikiticker"
              :split [{:name "__time" :granularity "PT6H"}]
-             :measures [{:name "count" :type "longSum"}]
+             :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
 
 ; One dimension with totals
 #_(query dw {:cube "wikiticker"
              :split [{:name "page" :limit 5}]
-             :measures [{:name "count" :type "longSum"}]
+             :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]
              :totals true})
 
 ; Two dimensions
 #_(query dw {:cube "wikiticker"
              :split [{:name "countryName" :limit 3} {:name "cityName" :limit 2}]
-             :measures [{:name "count" :type "longSum"}]
+             :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]
              :totals true})
 
 ; Three dimensions
 #_(query dw {:cube "wikiticker"
              :split [{:name "isMinor" :limit 3} {:name "isRobot" :limit 2} {:name "isNew" :limit 2}]
-             :measures [{:name "count" :type "longSum"}]
+             :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]
              :totals true})
 
@@ -76,19 +76,19 @@
              :split [{:name "countryName" :limit 5}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}
                       {:name "countryName" :operator "include" :value #{"Italy" "France"}}]
-             :measures [{:name "count" :type "longSum"}]})
+             :measures [{:name "count" :expression "(sum $count)"}]})
 #_(query dw {:cube "wikiticker"
              :split [{:name "countryName" :limit 5}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}
                       {:name "countryName" :operator "search" :value "arg"}]
-             :measures [{:name "count" :type "longSum"}]})
+             :measures [{:name "count" :expression "(sum $count)"}]})
 
 ; Sorting
 #_(query dw {:cube "wikiticker"
-             :split [{:name "page" :limit 5 :sort-by {:name "added" :type "longSum" :descending false}}]
-             :measures [{:name "count" :type "longSum"}]
+             :split [{:name "page" :limit 5 :sort-by {:name "added" :expression "(sum $count)" :descending false}}]
+             :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
 #_(query dw {:cube "wikiticker"
              :split [{:name "page" :limit 5 :sort-by {:name "page" :type "STRING" :descending false}}]
-             :measures [{:name "count" :type "longSum"}]
+             :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
