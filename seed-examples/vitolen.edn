@@ -59,4 +59,16 @@
                :expression "(/ (where {$estado_generado \"Finalizado\" $condicion_ruteo \"En Tiempo\"} (sum $eventos)) (where {$estado_generado \"Finalizado\"} (sum $eventos)))"}]}
   {:name "vtol_stats"
    :title "VTOL Stats"
-   :description "Estadísticas de utilización del sistema VTOL"}]}
+   :description "Estadísticas de utilización del sistema VTOL"
+   :measures [{:name "db_runtime"
+               :title "DB Runtime (ms)"
+               :expression "(/ (sum $db_runtime) (sum $requests))"
+               :format "0"}
+              {:name "view_runtime"
+               :title "View Runtime (ms)"
+               :expression "(/ (sum $view_runtime) (sum $requests))"
+               :format "0"}
+              {:name "duration"
+               :title "Duration (ms)"
+               :expression "(/ (sum $duration) (sum $requests))"
+               :format "0"}]}]}
