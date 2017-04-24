@@ -24,5 +24,5 @@
     [:div.measures.panel.ui.basic.segment (rpc/loading-class :cube-metadata)
      [panel-header (t :cubes/measures)]
      [:div.items
-      (for [m (current-cube :measures)]
+      (for [m (sort-by :title (current-cube :measures))]
         ^{:key (:name m)} [measure-item m selected-measures])]]))

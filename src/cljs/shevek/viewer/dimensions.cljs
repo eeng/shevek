@@ -41,7 +41,9 @@
   (let [searching (r/atom false)
         search (r/atom "")]
     (fn []
-      (let [filtered-dims (filter-matching @search :title (current-cube :dimensions))
+      (let [filtered-dims (->> (current-cube :dimensions)
+                               (filter-matching @search :title)
+                               (sort-by :title))
             search-text @search]
         [:div.dimensions.panel.ui.basic.segment (loading-class :cube-metadata)
          [panel-header (t :cubes/dimensions) [search-button searching]]
