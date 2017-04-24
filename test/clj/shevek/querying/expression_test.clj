@@ -8,52 +8,57 @@
 
 (deftest measure->druid-test
   (testing "aggregators"
+    (testing "count aggregator"
+      (is (= {:aggregations [{:type "count" :name "x"}]
+              :postAggregations []}
+             (measure->druid {:name "x" :expression "(count)"}))))
+
     (testing "sum aggregator"
       (is (= {:aggregations [{:type "doubleSum" :fieldName "x" :name "x"}]
               :postAggregations []}
-             (measure->druid {:name "x" :expression "(sum $x)"})))))
+             (measure->druid {:name "x" :expression "(sum $x)"}))))
 
-  (testing "count-distinct aggregator"
-    (is (= {:aggregations [{:type "hyperUnique" :fieldName "x" :name "x"}]
-            :postAggregations []}
-           (measure->druid {:name "x" :expression "(count-distinct $x)"}))))
+    (testing "count-distinct aggregator"
+      (is (= {:aggregations [{:type "hyperUnique" :fieldName "x" :name "x"}]
+              :postAggregations []}
+             (measure->druid {:name "x" :expression "(count-distinct $x)"}))))
 
-  (testing "max aggregator"
-    (is (= {:aggregations [{:type "doubleMax" :fieldName "x" :name "x"}]
-            :postAggregations []}
-           (measure->druid {:name "x" :expression "(max $x)"}))))
+    (testing "max aggregator"
+      (is (= {:aggregations [{:type "doubleMax" :fieldName "x" :name "x"}]
+              :postAggregations []}
+             (measure->druid {:name "x" :expression "(max $x)"}))))
 
-  (testing "filtered aggregator"
-    (is (= {:aggregations [{:type "filtered"
-                            :filter {:type "selector" :dimension "country" :value "ar"}
-                            :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
-                            :name "amount"}]
-            :postAggregations []}
-           (measure->druid {:name "amount" :expression "(where (= $country \"ar\") (sum $amount))"})))
-    (is (= {:aggregations [{:type "filtered"
-                            :filter {:type "and"
-                                     :fields [{:type "selector" :dimension "country" :value 1}
-                                              {:type "selector" :dimension "city" :value 2}]}
-                            :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
-                            :name "amount"}]
-            :postAggregations []}
-           (measure->druid {:name "amount" :expression "(where (and (= $country 1) (= $city 2)) (sum $amount))"}))))
+    (testing "filtered aggregator"
+      (is (= {:aggregations [{:type "filtered"
+                              :filter {:type "selector" :dimension "country" :value "ar"}
+                              :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                              :name "amount"}]
+              :postAggregations []}
+             (measure->druid {:name "amount" :expression "(where (= $country \"ar\") (sum $amount))"})))
+      (is (= {:aggregations [{:type "filtered"
+                              :filter {:type "and"
+                                       :fields [{:type "selector" :dimension "country" :value 1}
+                                                {:type "selector" :dimension "city" :value 2}]}
+                              :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                              :name "amount"}]
+              :postAggregations []}
+             (measure->druid {:name "amount" :expression "(where (and (= $country 1) (= $city 2)) (sum $amount))"}))))
 
-  (testing "filtered aggregator with sintax sugar"
-    (is (= {:aggregations [{:type "filtered"
-                            :filter {:type "selector" :dimension "x" :value 1}
-                            :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
-                            :name "amount"}]
-            :postAggregations []}
-           (measure->druid {:name "amount" :expression "(where {$x 1} (sum $amount))"})))
-    (is (= {:aggregations [{:type "filtered"
-                            :filter {:type "and"
-                                     :fields [{:type "selector" :dimension "x" :value 1}
-                                              {:type "selector" :dimension "y" :value 2}]}
-                            :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
-                            :name "amount"}]
-            :postAggregations []}
-           (measure->druid {:name "amount" :expression "(where {$x 1 $y 2} (sum $amount))"}))))
+    (testing "filtered aggregator with sintax sugar"
+      (is (= {:aggregations [{:type "filtered"
+                              :filter {:type "selector" :dimension "x" :value 1}
+                              :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                              :name "amount"}]
+              :postAggregations []}
+             (measure->druid {:name "amount" :expression "(where {$x 1} (sum $amount))"})))
+      (is (= {:aggregations [{:type "filtered"
+                              :filter {:type "and"
+                                       :fields [{:type "selector" :dimension "x" :value 1}
+                                                {:type "selector" :dimension "y" :value 2}]}
+                              :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                              :name "amount"}]
+              :postAggregations []}
+             (measure->druid {:name "amount" :expression "(where {$x 1 $y 2} (sum $amount))"})))))
 
   (testing "post-aggregators"
     (testing "arithmetic operation between same measure and a constant"

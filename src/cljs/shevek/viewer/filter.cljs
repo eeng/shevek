@@ -32,7 +32,7 @@
                   :filter (cond-> [(first (viewer :filter))]
                                   (seq search) (conj (assoc dim :operator "search" :value search)))
                   :split [(assoc dim :limit 50)]
-                  :measures [{:type "count" :name "rowCount"}]}
+                  :measures [{:expression "(count)" :name "rowCount"}]}
               [:results :filter name]))
 
 (def available-relative-periods

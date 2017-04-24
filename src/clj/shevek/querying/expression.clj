@@ -3,15 +3,14 @@
             [clojure.string :refer [starts-with?]]
             [shevek.lib.collections :refer [includes?]]))
 
-(def aggregator-types {'sum "doubleSum" 'count-distinct "hyperUnique" 'max "doubleMax"})
+(def aggregator-types {'count "count" 'sum "doubleSum" 'count-distinct "hyperUnique" 'max "doubleMax"})
 
 (defn- field-ref->field [field-ref]
   (-> field-ref str (subs 1)))
 
-(defn- build-aggregator [name agg-fn field-ref]
-  {:type (aggregator-types agg-fn)
-   :fieldName (field-ref->field field-ref)
-   :name name})
+(defn- build-aggregator [name agg-fn & [field-ref]]
+  (cond-> {:type (aggregator-types agg-fn) :name name}
+          field-ref (assoc :fieldName (field-ref->field field-ref))))
 
 (defn- condition->filter [condition]
   (if (map? condition)
@@ -43,7 +42,7 @@
 
 (defn- eval-aggregator [name expression]
   (match expression
-    ([(agg-fn :guard simple-aggregation?) field-ref] :seq) (build-aggregator name agg-fn field-ref)
+    ([(agg-fn :guard simple-aggregation?) & args] :seq) (apply build-aggregator name agg-fn args)
     (['where condition subexp] :seq) (build-filtered-aggregator name condition (eval-aggregator name subexp))))
 
 (declare eval-post-aggregator)
