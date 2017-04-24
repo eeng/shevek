@@ -13,10 +13,13 @@
    :fieldName (field-ref->field field-ref)
    :name name})
 
-(defn- condition->filter [[_ field-ref value]]
-  {:type "selector"
-   :dimension (field-ref->field field-ref)
-   :value value})
+(defn- condition->filter [[op & args]]
+  (if (includes? ['and 'or] op)
+    {:type (str op)
+     :fields (map condition->filter args)}
+    {:type "selector"
+     :dimension (field-ref->field (first args))
+     :value (second args)}))
 
 (defn- build-filtered-aggregator [field condition aggregator]
   {:type "filtered"

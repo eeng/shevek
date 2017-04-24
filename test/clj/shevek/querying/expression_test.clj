@@ -29,7 +29,15 @@
                             :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
                             :name "amount"}]
             :postAggregations []}
-           (measure->druid {:name "amount" :expression "(where (= $country \"ar\") (sum $amount))"}))))
+           (measure->druid {:name "amount" :expression "(where (= $country \"ar\") (sum $amount))"})))
+    (is (= {:aggregations [{:type "filtered"
+                            :filter {:type "and"
+                                     :fields [{:type "selector" :dimension "country" :value "ar"}
+                                              {:type "selector" :dimension "city" :value "Salta"}]}
+                            :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                            :name "amount"}]
+            :postAggregations []}
+           (measure->druid {:name "amount" :expression "(where (and (= $country \"ar\") (= $city \"Salta\")) (sum $amount))"}))))
 
   (testing "post-aggregators"
     (testing "arithmetic operation between same measure and a constant"
