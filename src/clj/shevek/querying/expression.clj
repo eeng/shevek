@@ -13,13 +13,18 @@
    :fieldName (field-ref->field field-ref)
    :name name})
 
-(defn- condition->filter [[op & args]]
-  (if (includes? ['and 'or] op)
-    {:type (str op)
-     :fields (map condition->filter args)}
-    {:type "selector"
-     :dimension (field-ref->field (first args))
-     :value (second args)}))
+(defn- condition->filter [condition]
+  (if (map? condition)
+    (if (> (count condition) 1)
+      {:type "and" :fields (map #(condition->filter (into {} [%])) condition)}
+      (condition->filter (-> condition seq flatten (conj '=))))
+
+    (match condition
+      ([(op :guard #{'and 'or}) & args] :seq)
+      {:type (str op) :fields (map condition->filter args)}
+
+      ([op field-ref val] :seq)
+      {:type "selector" :dimension (field-ref->field field-ref) :value val})))
 
 (defn- build-filtered-aggregator [field condition aggregator]
   {:type "filtered"

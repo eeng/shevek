@@ -32,12 +32,28 @@
            (measure->druid {:name "amount" :expression "(where (= $country \"ar\") (sum $amount))"})))
     (is (= {:aggregations [{:type "filtered"
                             :filter {:type "and"
-                                     :fields [{:type "selector" :dimension "country" :value "ar"}
-                                              {:type "selector" :dimension "city" :value "Salta"}]}
+                                     :fields [{:type "selector" :dimension "country" :value 1}
+                                              {:type "selector" :dimension "city" :value 2}]}
                             :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
                             :name "amount"}]
             :postAggregations []}
-           (measure->druid {:name "amount" :expression "(where (and (= $country \"ar\") (= $city \"Salta\")) (sum $amount))"}))))
+           (measure->druid {:name "amount" :expression "(where (and (= $country 1) (= $city 2)) (sum $amount))"}))))
+
+  (testing "filtered aggregator with sintax sugar"
+    (is (= {:aggregations [{:type "filtered"
+                            :filter {:type "selector" :dimension "x" :value 1}
+                            :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                            :name "amount"}]
+            :postAggregations []}
+           (measure->druid {:name "amount" :expression "(where {$x 1} (sum $amount))"})))
+    (is (= {:aggregations [{:type "filtered"
+                            :filter {:type "and"
+                                     :fields [{:type "selector" :dimension "x" :value 1}
+                                              {:type "selector" :dimension "y" :value 2}]}
+                            :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                            :name "amount"}]
+            :postAggregations []}
+           (measure->druid {:name "amount" :expression "(where {$x 1 $y 2} (sum $amount))"}))))
 
   (testing "post-aggregators"
     (testing "arithmetic operation between same measure and a constant"

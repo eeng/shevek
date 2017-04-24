@@ -28,11 +28,11 @@
                :format "$0.00a"}
               {:name "importe_productos"
                :title "Importe Productos"
-               :expression "(/ (where (= $grupo_item \"Productos\") (sum $importe)) 100)"
+               :expression "(/ (where {$grupo_item \"Productos\"} (sum $importe)) 100)"
                :format "$0.00a"}
               {:name "importe_impuestos"
                :title "Importe Impuestos"
-               :expression "(/ (where (= $grupo_item \"Impuestos\") (sum $importe)) 100)"
+               :expression "(/ (where {$grupo_item \"Impuestos\"} (sum $importe)) 100)"
                :format "$0.00a"}
               {:name "ultimo_nro_cbte"
                :title "Último Cbte"
@@ -47,9 +47,16 @@
                 {:name "condicion_ruteo" :title "Condición de Ruteo"}]
    :measures [{:name "facturado" :format "$0,0.00a" :expression "(/ (sum $facturado) 100)"}
               {:name "pedidos" :title "Pedidos" :description "Cantidad aproximada de pedidos distintos"}
+              {:name "pedidos_finalizados_en_tiempo"
+               :title "Pedidos Finalizados En Tiempo"
+               :expression "(where {$estado_generado \"Finalizado\" $condicion_ruteo \"En Tiempo\"} (sum $eventos))"}
               {:name "pedidos_finalizados"
                :title "Pedidos Finalizados"
-               :expression "(where (= $estado_generado \"Finalizado\") (sum $eventos))"}]}
+               :expression "(where {$estado_generado \"Finalizado\"} (sum $eventos))"}
+              {:name "ins"
+               :title "INS"
+               :format "0%"
+               :expression "(/ (where {$estado_generado \"Finalizado\" $condicion_ruteo \"En Tiempo\"} (sum $eventos)) (where {$estado_generado \"Finalizado\"} (sum $eventos)))"}]}
   {:name "vtol_stats"
    :title "VTOL Stats"
    :description "Estadísticas de utilización del sistema VTOL"}]}
