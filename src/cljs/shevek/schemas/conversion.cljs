@@ -7,7 +7,7 @@
 
 (defn- build-time-filter [{:keys [dimensions] :as cube}]
   (assoc (dw/time-dimension dimensions)
-         :selected-period :latest-day))
+         :period :latest-day))
 
 (defn- build-new-viewer [{:keys [measures] :as cube}]
   {:cube cube
@@ -16,10 +16,10 @@
    :measures (->> measures (take 3) vec)
    :pinboard {:measure (first measures) :dimensions []}})
 
-(defn- report-dim->viewer [{:keys [name selected-period sort-by value] :as dim}
+(defn- report-dim->viewer [{:keys [name period sort-by value] :as dim}
                            {:keys [dimensions measures]}]
   (cond-> (merge dim (dw/find-dimension name dimensions))
-          selected-period (update :selected-period keyword)
+          period (update :period keyword)
           value (update :value set)
           sort-by (update :sort-by merge (dw/find-dimension (:name sort-by) (concat dimensions measures)))))
 
@@ -34,9 +34,9 @@
    :pinboard {:measure (dw/find-dimension (:measure pinboard) (cube :measures))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
-(defn- viewer-dim->report [{:keys [selected-period value sort-by] :as dim}]
+(defn- viewer-dim->report [{:keys [period value sort-by] :as dim}]
   (cond-> (dissoc dim :type :title :description :format :expression)
-          selected-period (update :selected-period name)
+          period (update :period name)
           value (update :value vec)
           sort-by (update :sort-by viewer-dim->report)))
 
@@ -50,7 +50,7 @@
 
 ; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
 (defn- add-interval [{:keys [filter] :as q} max-time]
-  (let [period (:selected-period (dw/time-dimension filter))]
+  (let [period (:period (dw/time-dimension filter))]
     (setval [:filter ALL dw/time-dimension? :interval]
             (mapv to-iso8601 (dw/to-interval period max-time))
             q)))

@@ -14,9 +14,9 @@
                viewer->report :measures))))
 
   (testing "in each filter should store only the dimension name besides its own fields and converted keywords and sets"
-    (is (= [{:name "time" :selected-period "current-day"}
+    (is (= [{:name "time" :period "current-day"}
             {:name "page" :operator "exclude" :value [nil]}]
-           (-> {:filter [{:name "time" :type "..." :selected-period :current-day}
+           (-> {:filter [{:name "time" :type "..." :period :current-day}
                          {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
                viewer->report :filter))))
 
@@ -39,9 +39,9 @@
 
 (deftest report->viewer-tests
   (testing "should convert back to keywords and sets and add title and other fields"
-    (is (= [{:name "time" :title "Fecha" :selected-period :current-day}
+    (is (= [{:name "time" :title "Fecha" :period :current-day}
             {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
-           (-> {:filter [{:name "time" :selected-period "current-day"}
+           (-> {:filter [{:name "time" :period "current-day"}
                          {:name "page" :operator "exclude" :value [nil]}]}
                (report->viewer {:dimensions [{:name "time" :title "Fecha"}
                                              {:name "page" :title "Pag"}]})

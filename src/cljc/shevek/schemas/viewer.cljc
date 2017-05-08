@@ -20,7 +20,7 @@
 (s/defschema TimeFilter
   (assoc Dimension
          :name (s/eq "__time")
-         :selected-period s/Keyword))
+         :period s/Keyword))
 
 (s/defschema NormalFilter
   (assoc Dimension
@@ -28,7 +28,7 @@
          (s/optional-key :value) #{(s/maybe s/Str)}))
 
 (s/defschema Filter
-  (s/if :selected-period TimeFilter NormalFilter))
+  (s/if :period TimeFilter NormalFilter))
 
 (s/defschema Pinboard
   {:measure Measure :dimensions [Split]})

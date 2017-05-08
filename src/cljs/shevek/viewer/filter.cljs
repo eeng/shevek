@@ -40,21 +40,21 @@
    :current-day "D" :current-week "W" :current-month "M" :current-quarter "Q" :current-year "Y"
    :previous-day "D" :previous-week "W" :previous-month "M" :previous-quarter "Q" :previous-year "Y"})
 
-(defn- period-buttons [{:keys [selected-period] :as dim} showed-period header periods]
+(defn- period-buttons [dim showed-period header periods]
   [:div.periods
    [:h2.ui.sub.header header]
    [:div.ui.five.small.basic.buttons
      (for [period periods]
        [:button.ui.button {:key period
-                           :class (when (= period selected-period) "active")
-                           :on-click #(when-not (= period selected-period)
-                                        (dispatch :filter-options-changed dim {:selected-period period}))
+                           :class (when (= period (:period dim)) "active")
+                           :on-click #(when-not (= period (:period dim))
+                                        (dispatch :filter-options-changed dim {:period period}))
                            :on-mouse-over #(reset! showed-period period)
-                           :on-mouse-out #(reset! showed-period selected-period)}
+                           :on-mouse-out #(reset! showed-period period)}
         (available-relative-periods period)])]])
 
-(defn- relative-period-time-filter [{:keys [selected-period] :as dim}]
-  (let [showed-period (r/atom selected-period)]
+(defn- relative-period-time-filter [{:keys [period] :as dim}]
+  (let [showed-period (r/atom period)]
     (fn []
       [:div.relative.period-type
        [period-buttons dim showed-period (t :cubes.period/latest)
@@ -132,9 +132,9 @@
     [time-filter-popup dim]
     [normal-filter-popup popup dim]))
 
-(defn- filter-title [{:keys [title selected-period operator value] :as dim}]
+(defn- filter-title [{:keys [title period operator value] :as dim}]
   (if (time-dimension? dim)
-    (->> (name selected-period) (str "cubes.period/") keyword t)
+    (->> (name period) (str "cubes.period/") keyword t)
     [:div title " "
      (when (seq value)
        [:span.details {:class (when (= operator "exclude") "striked")}

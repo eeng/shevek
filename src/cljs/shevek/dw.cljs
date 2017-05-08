@@ -64,14 +64,14 @@
 (defn replace-dimension [coll dim]
   (setval [ALL (partial dim=? dim)] dim coll))
 
-(defn to-interval [selected-period max-time]
+(defn to-interval [period max-time]
   (let [now (d/now)
         max-time (or max-time now)
         day-of-last-week (t/minus (d/beginning-of-week now) (t/days 1))
         day-of-last-month (t/minus (d/beginning-of-month now) (t/days 1))
         day-of-last-quarter (t/minus (d/beginning-of-quarter now) (t/days 1))
         day-of-last-year (t/minus (d/beginning-of-year now) (t/days 1))]
-    (case selected-period
+    (case period
       :latest-hour [(t/minus max-time (t/hours 1)) max-time]
       :latest-day [(t/minus max-time (t/days 1)) max-time]
       :latest-7days [(t/minus max-time (t/days 7)) max-time]

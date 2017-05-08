@@ -13,7 +13,7 @@
 
 (s/defschema Filter
   {:name s/Str
-   (s/optional-key :selected-period) s/Str
+   (s/optional-key :period) s/Str
    (s/optional-key :operator) s/Str
    (s/optional-key :value) [(s/maybe s/Str)]})
 
