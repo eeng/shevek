@@ -7,7 +7,7 @@
   (try
     (s/validate schema db)
     (catch ExceptionInfo e
-      (console.log :ERROR (.-message e)))))
+      (console.log :ERROR (.-message e) (.-data e)))))
 
 (defn checker [interceptor]
   (if debug?

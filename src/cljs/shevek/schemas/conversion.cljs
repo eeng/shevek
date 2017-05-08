@@ -50,10 +50,11 @@
 
 ; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
 (defn- add-interval [{:keys [filter] :as q} max-time]
-  (let [period (:period (dw/time-dimension filter))]
+  (if-let [period (:period (dw/time-dimension filter))]
     (setval [:filter ALL dw/time-dimension? :interval]
             (mapv to-iso8601 (dw/to-interval period max-time))
-            q)))
+            q)
+    q))
 
 (defn viewer->query [{:keys [cube] :as viewer}]
   (-> (add-interval viewer (cube :max-time))

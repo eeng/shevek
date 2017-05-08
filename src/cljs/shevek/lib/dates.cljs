@@ -59,6 +59,9 @@
 (defn to-iso8601 [time]
   (f/unparse (:date-time f/formatters) time))
 
+(defn format-date [time]
+  (f/unparse (:date f/formatters) time))
+
 ; So the goog.date's are serialized as iso8601 strings with pr-str
 (extend-protocol IPrintWithWriter
   goog.date.UtcDateTime

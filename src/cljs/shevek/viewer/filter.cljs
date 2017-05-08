@@ -4,11 +4,12 @@
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
-            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period]]
+            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period to-interval]]
             [shevek.lib.react :refer [without-propagation]]
+            [shevek.lib.dates :refer [format-date]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube]]
             [shevek.viewer.pinboard :refer [send-pinboard-queries]]
-            [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown]]))
+            [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field focused kb-shortcuts]]))
 
 (defn init-filtered-dim [dim]
   (assoc dim :operator "include"))
@@ -23,7 +24,7 @@
       (send-pinboard-queries)))
 
 (defevh :filter-options-changed [db dim opts]
-  (-> (update-in db [:viewer :filter] replace-dimension (merge dim opts))
+  (-> (update-in db [:viewer :filter] replace-dimension (merge (dissoc dim :period :interval) opts))
       (send-main-query)
       (send-pinboard-queries)))
 
@@ -50,10 +51,14 @@
                            :on-click #(when-not (= period (:period dim))
                                         (dispatch :filter-options-changed dim {:period period}))
                            :on-mouse-over #(reset! showed-period period)
-                           :on-mouse-out #(reset! showed-period period)}
+                           :on-mouse-out #(reset! showed-period (dim :period))}
         (available-relative-periods period)])]])
 
-(defn- relative-period-time-filter [{:keys [period] :as dim}]
+; TODO hacerlo mas lindo
+(defn format-interval [interval]
+  (str/join " - " interval))
+
+(defn- relative-period-time-filter [{:keys [period interval] :as dim}]
   (let [showed-period (r/atom period)]
     (fn []
       [:div.relative.period-type
@@ -63,18 +68,31 @@
         [:current-day :current-week :current-month :current-quarter :current-year]]
        [period-buttons dim showed-period (t :cubes.period/previous)
         [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]
-       [:div.ui.label (format-period @showed-period (current-cube :max-time))]])))
+       [:div.ui.label (if period
+                        (format-period @showed-period (current-cube :max-time))
+                        (format-interval interval))]])))
 
-(defn- specific-period-time-filter []
-  [:div.specific.period-type "TODO"])
+(defn- specific-period-time-filter [{:keys [close]} {:keys [period interval] :as dim}]
+  (let [shown-interval (or interval (mapv format-date (to-interval period (current-cube :max-time))))
+        form-interval (r/atom (zipmap [:from :to] shown-interval))
+        accept #(dispatch :filter-options-changed dim {:interval ((juxt :from :to) @form-interval)})
+        shortcuts (kb-shortcuts :enter accept :escape close)]
+    (fn []
+      [:div.specific.period-type.ui.form {:ref shortcuts}
+       [:div.fields
+        [focused input-field form-interval :from]
+        [input-field form-interval :to]]
+       [:div
+        [:button.ui.primary.compact.button {:on-click accept} (t :actions/ok)]
+        [:button.ui.compact.button {:on-click (without-propagation close)} (t :actions/cancel)]]])))
 
 (defn- menu-item-for-period-type [period-type period-type-value]
   [:a.item {:class (when (= @period-type period-type-value) "active")
             :on-click #(reset! period-type period-type-value)}
    (->> (name period-type-value) (str "cubes.period/") keyword t)])
 
-(defn- time-filter-popup [dim]
-  (let [period-type (r/atom :relative)] ; TODO aca habria que tomar el valor de la dim pero solo al abrirse el popup... mm
+(defn- time-filter-popup [popup {:keys [period] :as dim}]
+  (let [period-type (r/atom (if period :relative :specific))]
     (fn []
       [:div.time-filter
        [:div.ui.secondary.pointing.fluid.two.item.menu
@@ -82,7 +100,7 @@
         [menu-item-for-period-type period-type :specific]]
        (if (= @period-type :relative)
          [relative-period-time-filter dim]
-         [specific-period-time-filter dim])])))
+         [specific-period-time-filter popup dim])])))
 
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
@@ -129,18 +147,19 @@
 
 (defn- filter-popup [popup dim]
   (if (time-dimension? dim)
-    [time-filter-popup dim]
+    [time-filter-popup popup dim]
     [normal-filter-popup popup dim]))
 
-(defn- filter-title [{:keys [title period operator value] :as dim}]
-  (if (time-dimension? dim)
-    (->> (name period) (str "cubes.period/") keyword t)
-    [:div title " "
-     (when (seq value)
-       [:span.details {:class (when (= operator "exclude") "striked")}
-        (case operator
-          ("include" "exclude") (str "(" (count value) ")")
-          "")])]))
+(defn- filter-title [{:keys [title period interval operator value] :as dim}]
+  (cond
+    period (->> (name period) (str "cubes.period/") keyword t)
+    interval (format-interval interval)
+    :else [:div title " "
+           (when (seq value)
+             [:span.details {:class (when (= operator "exclude") "striked")}
+              (case operator
+                ("include" "exclude") (str "(" (count value) ")")
+                "")])]))
 
 (defn- filter-item [{:keys [toggle]} dim]
   [:button.ui.green.compact.button.item

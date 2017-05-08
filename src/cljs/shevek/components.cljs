@@ -54,7 +54,7 @@
         input (input-types as)]
     (assert input (str "Input type '" as "' not supported"))
     [:div.field {:class (classes class (when errors "error"))}
-     (when (not= as :checkbox) [:label label])
+     (when (and label (not= as :checkbox)) [:label label])
      [input atom field input-opts]
      (when errors [:div.ui.pointing.red.basic.label (str/join ", " errors)])]))
 
