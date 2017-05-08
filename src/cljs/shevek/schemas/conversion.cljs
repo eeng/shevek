@@ -1,6 +1,6 @@
 (ns shevek.schemas.conversion
   (:require [shevek.dw :as dw]
-            [shevek.lib.dates :refer [to-iso8601]]
+            [shevek.lib.dates :refer [to-iso8601 end-of-day format-date parse-time]]
             [shevek.schemas.query :refer [Query]]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]))
@@ -16,10 +16,11 @@
    :measures (->> measures (take 3) vec)
    :pinboard {:measure (first measures) :dimensions []}})
 
-(defn- report-dim->viewer [{:keys [name period sort-by value] :as dim}
+(defn- report-dim->viewer [{:keys [name period interval sort-by value] :as dim}
                            {:keys [dimensions measures]}]
   (cond-> (merge dim (dw/find-dimension name dimensions))
           period (update :period keyword)
+          interval (update :interval (partial map parse-time))
           value (update :value set)
           sort-by (update :sort-by merge (dw/find-dimension (:name sort-by) (concat dimensions measures)))))
 
@@ -34,9 +35,10 @@
    :pinboard {:measure (dw/find-dimension (:measure pinboard) (cube :measures))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
-(defn- viewer-dim->report [{:keys [period value sort-by] :as dim}]
+(defn- viewer-dim->report [{:keys [period interval value sort-by] :as dim}]
   (cond-> (dissoc dim :type :title :description :format :expression)
           period (update :period name)
+          interval (update :interval (partial map format-date))
           value (update :value vec)
           sort-by (update :sort-by viewer-dim->report)))
 
@@ -48,13 +50,12 @@
    :pinboard {:measure (-> pinboard :measure :name)
               :dimensions (map viewer-dim->report (:dimensions pinboard))}})
 
-; Convierto manualmente los goog.dates en el intervalo a iso8601 strings porque sino explota transit xq no los reconoce. Alternativamente se podría hacer un handler de transit pero tendría que manejarme con dates en el server y por ahora usa los strings que devuelve Druid nomas.
 (defn- add-interval [{:keys [filter] :as q} max-time]
-  (if-let [period (:period (dw/time-dimension filter))]
+  (let [{:keys [period interval]} (dw/time-dimension filter)
+        interval (when interval [(first interval) (end-of-day (second interval))])]
     (setval [:filter ALL dw/time-dimension? :interval]
-            (mapv to-iso8601 (dw/to-interval period max-time))
-            q)
-    q))
+            (mapv to-iso8601 (if period (dw/to-interval period max-time) interval))
+            q)))
 
 (defn viewer->query [{:keys [cube] :as viewer}]
   (-> (add-interval viewer (cube :max-time))

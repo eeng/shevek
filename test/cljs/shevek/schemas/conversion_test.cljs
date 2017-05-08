@@ -2,7 +2,8 @@
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [submap? submaps?]]
-            [shevek.schemas.conversion :refer [viewer->report report->viewer]]))
+            [shevek.schemas.conversion :refer [viewer->report report->viewer]]
+            [shevek.lib.dates :refer [parse-time]]))
 
 (deftest viewer->report-tests
   (testing "should store only the cube id"
@@ -13,10 +14,12 @@
            (-> {:measures [{:name "added"} {:name "deleted"}]}
                viewer->report :measures))))
 
-  (testing "in each filter should store only the dimension name besides its own fields and converted keywords and sets"
+  (testing "in each filter should store only the dimension name besides its own fields and converted keywords, dates and sets"
     (is (= [{:name "time" :period "current-day"}
+            {:name "time2" :interval ["2018-04-04" "2018-04-05"]}
             {:name "page" :operator "exclude" :value [nil]}]
            (-> {:filter [{:name "time" :type "..." :period :current-day}
+                         {:name "time2" :interval [(parse-time "2018-04-04") (parse-time "2018-04-05")]}
                          {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
                viewer->report :filter))))
 
@@ -38,10 +41,12 @@
                viewer->report :pinboard)))))
 
 (deftest report->viewer-tests
-  (testing "should convert back to keywords and sets and add title and other fields"
+  (testing "should convert back to keywords, dates and sets and add title and other fields"
     (is (= [{:name "time" :title "Fecha" :period :current-day}
+            {:name "time2" :interval [(parse-time "2018-04-04") (parse-time "2018-04-05")]}
             {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
            (-> {:filter [{:name "time" :period "current-day"}
+                         {:name "time2" :interval ["2018-04-04" "2018-04-05"]}
                          {:name "page" :operator "exclude" :value [nil]}]}
                (report->viewer {:dimensions [{:name "time" :title "Fecha"}
                                              {:name "page" :title "Pag"}]})

@@ -21,7 +21,7 @@
   (assoc Dimension
          :name (s/eq "__time")
          (s/optional-key :period) s/Keyword
-         (s/optional-key :interval) [(s/one s/Str "from") (s/one s/Str "to")]))
+         (s/optional-key :interval) [(s/one s/Any "from") (s/one s/Any "to")]))
 
 (s/defschema NormalFilter
   (assoc Dimension

@@ -10,7 +10,9 @@
 
 ; El f/unparse es lentísimo supongo que xq prueba con varios formatos, pero aca por ahora solo parseamos iso8601 asi que con esto basta.
 (defn parse-time [time]
-  (c/from-long (.parse js/Date time)))
+  (let [parsed (.parse js/Date time)]
+    (when-not (js/isNaN parsed)
+      (c/from-long parsed))))
 
 (def now t/now)
 

@@ -4,12 +4,12 @@
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
-            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period to-interval]]
+            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.lib.dates :refer [format-date]]
+            [shevek.lib.dates :refer [format-date parse-time]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube]]
             [shevek.viewer.pinboard :refer [send-pinboard-queries]]
-            [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field focused kb-shortcuts]]))
+            [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]))
 
 (defn init-filtered-dim [dim]
   (assoc dim :operator "include"))
@@ -54,10 +54,6 @@
                            :on-mouse-out #(reset! showed-period (dim :period))}
         (available-relative-periods period)])]])
 
-; TODO hacerlo mas lindo
-(defn format-interval [interval]
-  (str/join " - " interval))
-
 (defn- relative-period-time-filter [{:keys [period interval] :as dim}]
   (let [showed-period (r/atom period)]
     (fn []
@@ -68,23 +64,26 @@
         [:current-day :current-week :current-month :current-quarter :current-year]]
        [period-buttons dim showed-period (t :cubes.period/previous)
         [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]
-       [:div.ui.label (if period
+       [:div.ui.label (if @showed-period
                         (format-period @showed-period (current-cube :max-time))
                         (format-interval interval))]])))
 
 (defn- specific-period-time-filter [{:keys [close]} {:keys [period interval] :as dim}]
-  (let [shown-interval (or interval (mapv format-date (to-interval period (current-cube :max-time))))
-        form-interval (r/atom (zipmap [:from :to] shown-interval))
-        accept #(dispatch :filter-options-changed dim {:interval ((juxt :from :to) @form-interval)})
+  (let [interval (or interval (to-interval period (current-cube :max-time)))
+        form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
+        parse #(map parse-time ((juxt :from :to) %))
+        accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})
         shortcuts (kb-shortcuts :enter accept :escape close)]
     (fn []
-      [:div.specific.period-type.ui.form {:ref shortcuts}
-       [:div.fields
-        [focused input-field form-interval :from]
-        [input-field form-interval :to]]
-       [:div
-        [:button.ui.primary.compact.button {:on-click accept} (t :actions/ok)]
-        [:button.ui.compact.button {:on-click (without-propagation close)} (t :actions/cancel)]]])))
+      (let [[from to] (parse @form-interval)
+            valid? (and from to (<= from to))]
+        [:div.specific.period-type.ui.form {:ref shortcuts}
+         [:div.fields
+          [input-field form-interval :from]
+          [input-field form-interval :to]]
+         [:div
+          [:button.ui.primary.compact.button {:on-click accept :class (when-not valid? "disabled")} (t :actions/ok)]
+          [:button.ui.compact.button {:on-click (without-propagation close)} (t :actions/cancel)]]]))))
 
 (defn- menu-item-for-period-type [period-type period-type-value]
   [:a.item {:class (when (= @period-type period-type-value) "active")

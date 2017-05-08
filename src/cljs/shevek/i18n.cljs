@@ -74,8 +74,8 @@
             :password "Password"
             :password-confirmation "Password Confirmation"}
     :date-formats {:minute "MMM d, h:mma"
-                   :hour "MMM d yyyy, ha"
-                   :day "MMM d yyyy"
+                   :hour "MMM d, yyyy ha"
+                   :day "MMM d, yyyy"
                    :month "MMM yyyy"}
     :actions {:ok "Accept"
               :cancel "Cancel"
@@ -157,9 +157,9 @@
             :email "Email"
             :password-confirmation "Confirmación de Password"}
     :date-formats {:minute "dd/MM HH:mm"
-                   :hour "dd/MM/yyyy H 'hs'"
-                   :day "dd/MM/yyyy"
-                   :month "MM/yyyy"}
+                   :hour "dd/MM/yy H 'hs'"
+                   :day "dd/MM/yy"
+                   :month "MM/yy"}
     :actions {:ok "Aceptar"
               :cancel "Cancelar"
               :edit "Editar"

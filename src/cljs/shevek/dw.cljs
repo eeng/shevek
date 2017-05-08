@@ -88,10 +88,15 @@
       :previous-quarter [(d/beginning-of-quarter day-of-last-quarter) (d/end-of-quarter day-of-last-quarter)]
       :previous-year [(d/beginning-of-year day-of-last-year) (d/end-of-year day-of-last-year)])))
 
+(defn format-interval
+  ([interval] (format-interval interval (d/formatter :day)))
+  ([interval formatter]
+   (->> interval
+        (map #(f/unparse formatter %))
+        distinct
+        (str/join " - "))))
+
 (defn format-period [period max-time]
   (let [formatter (d/formatter
                    (if (str/starts-with? (name period) "latest") :minute :day))]
-    (->> (to-interval period max-time)
-         (map #(f/unparse formatter %))
-         distinct
-         (str/join " - "))))
+    (format-interval (to-interval period max-time) formatter)))
