@@ -4,12 +4,12 @@
             [shevek.querying.expression :refer [measure->druid]]))
 
 ; TODO repetida en el client
-(defn dim=? [dim1 dim2]
+(defn dim= [dim1 dim2]
   (= (:name dim1) (:name dim2)))
 
 ; TODO repetida en el client
 (defn includes-dim? [coll dim]
-  (some #(dim=? % dim) coll))
+  (some #(dim= % dim) coll))
 
 ; TODO repetida en el client
 (defn time-dimension? [{:keys [name interval]}]

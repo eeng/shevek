@@ -3,15 +3,15 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
-            [shevek.dw :refer [add-dimension remove-dimension dim=? time-dimension? replace-dimension find-dimension]]
+            [shevek.dw :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
-            [shevek.viewer.pinboard :refer [send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select]]))
 
 ; TODO el limit distinto no funca bien cuando se reemplaza el filter
+; TODO el PT1H deberia ser solo cuando hay pocos dias en el intervalo actual
 (defn- init-splitted-dim [dim {:keys [viewer]}]
-  (let [other-dims-in-split (remove #(dim=? % dim) (:split viewer))]
+  (let [other-dims-in-split (remove #(dim= % dim) (:split viewer))]
     (cond-> (assoc dim
                    :limit (if (seq other-dims-in-split) 5 50)
                    :sort-by (assoc (-> viewer :measures first)

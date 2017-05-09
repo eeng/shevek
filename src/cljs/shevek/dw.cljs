@@ -42,7 +42,7 @@
 (defn time-dimension [dimensions]
   (some #(when (time-dimension? %) %) dimensions))
 
-(defn dim=? [dim1 dim2]
+(defn dim= [dim1 dim2]
   (= (:name dim1) (:name dim2)))
 
 ; TODO algunos de estos metodos no corresponderian en el shared?
@@ -50,7 +50,7 @@
   (detect #(= (:name %) name) dimensions))
 
 (defn includes-dim? [coll dim]
-  (some #(dim=? % dim) coll))
+  (some #(dim= % dim) coll))
 
 (defn add-dimension [coll dim]
   (let [coll (or coll [])]
@@ -59,10 +59,10 @@
       (conj coll dim))))
 
 (defn remove-dimension [coll dim]
-  (vec (remove #(dim=? dim %) coll)))
+  (vec (remove #(dim= dim %) coll)))
 
 (defn replace-dimension [coll dim]
-  (setval [ALL (partial dim=? dim)] dim coll))
+  (setval [ALL (partial dim= dim)] dim coll))
 
 (defn to-interval [period max-time]
   (let [now (d/now)

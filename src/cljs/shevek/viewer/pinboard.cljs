@@ -5,7 +5,7 @@
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
+            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension dim=]]
             [shevek.components :refer [dropdown]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch]]))
 
