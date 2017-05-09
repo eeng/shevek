@@ -11,14 +11,18 @@
 
 (defn- send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (:cube viewer)
-                   :filter (:filter viewer)
+                   :filter (remove (partial dim= dim) (:filter viewer))
                    :split [dim]
                    :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filter add-dimension search-filter))]
     (send-query db q [:results :pinboard name])))
 
-(defn send-pinboard-queries [db]
-  (reduce #(send-pinned-dim-query %1 %2) db (get-in db [:viewer :pinboard :dimensions])))
+(defn send-pinboard-queries
+  ([db] (send-pinboard-queries db nil))
+  ([db except-dim]
+   (->> (get-in db [:viewer :pinboard :dimensions])
+        (remove (partial dim= except-dim))
+        (reduce #(send-pinned-dim-query %1 %2) db))))
 
 (defn init-pinned-dim [dim]
   (cond-> (assoc dim :limit 100)

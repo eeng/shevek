@@ -26,7 +26,7 @@
 (defevh :filter-options-changed [db dim opts]
   (-> (update-in db [:viewer :filter] replace-dimension (merge (dissoc dim :period :interval) opts))
       (send-main-query)
-      (send-pinboard-queries)))
+      (send-pinboard-queries dim)))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim} search]
   (send-query db {:cube (viewer :cube)
