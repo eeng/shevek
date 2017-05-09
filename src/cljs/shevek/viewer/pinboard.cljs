@@ -3,15 +3,16 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [debounce regex-escape]]
+            [shevek.lib.collections :refer [includes?]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
             [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension dim=]]
-            [shevek.components :refer [dropdown]]
+            [shevek.components :refer [dropdown checkbox]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch]]))
 
 (defn- send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (:cube viewer)
-                   :filter (remove (partial dim= dim) (:filter viewer))
+                   :filter (->> (:filter viewer) (remove (partial dim= dim)) vec)
                    :split [dim]
                    :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filter add-dimension search-filter))]
@@ -50,10 +51,15 @@
 (defevh :dimension-values-searched [db dim search]
   (send-pinned-dim-query db dim (assoc dim :operator "search" :value search)))
 
-(defn- pinned-dimension-item [dim result measure search]
-  (let [segment-value (format-dimension dim result)]
-    [:div.item {:title segment-value}
-     (highlight segment-value search)
+(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search]
+  (let [dim-value (-> name keyword result)
+        formatted-value (-> (format-dimension dim result)
+                            (highlight search))
+        in-filter (find-dimension name (viewer :filter))]
+    [:div.item {:title formatted-value}
+     (if (and in-filter (seq (:value in-filter)))
+      [checkbox formatted-value {:checked (includes? (in-filter :value) dim-value)}]
+      formatted-value)
      [:div.measure-value (format-measure measure result)]]))
 
 (def periods {"PT1H" "1H"

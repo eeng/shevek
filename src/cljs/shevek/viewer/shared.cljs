@@ -34,8 +34,8 @@
 ; TODO repetida la conversion de viewer a query en schemas.conversion
 (defn send-query [db viewer results-keys]
   (store-in-url viewer)
+  (console.log "Sending query from viewer" viewer) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
   (let [q (viewer->query viewer)]
-    (console.log "Sending query" q) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
 
