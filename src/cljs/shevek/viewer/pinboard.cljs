@@ -53,7 +53,10 @@
         filter-values (:value in-filter)
         toggle-item #(dispatch :pinned-dimension-item-toggled dim filter-values value %)
         show-checkbox? (seq filter-values)]
-    [:div.item {:title formatted-value :on-click (if show-checkbox? toggle-checkbox-inside #(toggle-item true))}
+    [:div.item {:title formatted-value :on-click (cond
+                                                   (time-dimension? dim) identity
+                                                   show-checkbox? toggle-checkbox-inside
+                                                   :else #(toggle-item true))}
      (if show-checkbox?
       [checkbox (str "cb-pinboard-item-" name "-" value) highlighted-value
        {:checked (includes? filter-values value) :on-change toggle-item}]

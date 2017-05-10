@@ -43,7 +43,7 @@
 
 (defn send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (:cube viewer)
-                   :filter (->> (:filter viewer) (remove (partial dim= dim)) vec)
+                   :filter (->> (:filter viewer) (remove #(and (dim= dim %) (not (time-dimension? dim)))) vec)
                    :split [dim]
                    :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filter add-dimension search-filter))]
