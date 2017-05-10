@@ -112,9 +112,12 @@
       {:checked (some #(= value %) (@filter-opts :value))
        :on-change #(swap! filter-opts update :value (toggle-filter-value %) value)}]]))
 
+(defn filter-operators []
+  [[(t :cubes.operator/include) "include"]
+   [(t :cubes.operator/exclude) "exclude"]])
+
 (defn- operator-selector [opts]
-  [dropdown [[(t :cubes.operator/include) "include"]
-             [(t :cubes.operator/exclude) "exclude"]]
+  [dropdown (filter-operators)
    {:class "icon top left pointing basic compact button"
     :on-change #(swap! opts assoc :operator %)}
    [:i.icon {:class (case (@opts :operator)

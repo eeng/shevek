@@ -9,7 +9,7 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
             [shevek.components :refer [dropdown checkbox toggle-checkbox-inside]]
-            [shevek.viewer.filter :refer [update-filter-or-remove init-filtered-dim toggle-filter-value]]
+            [shevek.viewer.filter :refer [update-filter-or-remove init-filtered-dim toggle-filter-value filter-operators]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
 
 (defn init-pinned-dim [dim]
@@ -80,6 +80,14 @@
     :selected granularity}
    [:i.ellipsis.horizontal.link.icon]])
 
+(defn- inclusion-exclusion-button [{:keys [operator value] :or {operator "include"} :as filter-dim}]
+  [dropdown (filter-operators)
+   {:class "top right pointing"
+    :on-change #(when value
+                  (dispatch :filter-options-changed (clean-dim filter-dim) {:operator % :value value}))
+    :selected operator}
+   [:i.ellipsis.horizontal.link.icon]])
+
 (defn- pinned-dimension-panel* [_]
   (let [searching (r/atom false)
         search (r/atom "")]
@@ -87,19 +95,19 @@
       (let [measure (viewer :pinboard :measure)
             results (viewer :results :pinboard name)
             filtered-results (filter-matching @search (partial format-dimension dim) results)
-            in-filter (find-dimension name (viewer :filter))]
+            filter-dim (find-dimension name (viewer :filter))]
         [:div.dimension.panel.ui.basic.segment (when-not @searching (loading-class [:results :pinboard name]))
          [panel-header (str title " " (title-according-to-dim-type dim))
-          (if (time-dimension? dim)
-            [time-granularity-button dim]
-            [search-button searching])
+          (when-not (time-dimension? dim) [inclusion-exclusion-button filter-dim])
+          (when-not (time-dimension? dim) [search-button searching])
+          (when (time-dimension? dim) [time-granularity-button dim])
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
          (when @searching
            [search-input search {:on-change #(debounce-dispatch :dimension-values-searched dim %)
                                  :on-stop #(reset! searching false)}])
          (if results
            (if (seq filtered-results)
-             (into [:div.items] (map #(pinned-dimension-item dim % measure @search in-filter) filtered-results))
+             (into [:div.items] (map #(pinned-dimension-item dim % measure @search filter-dim) filtered-results))
              [:div.items [:div.item.no-results (t :cubes/no-results)]])
            [:div.items.empty])]))))
 
