@@ -8,7 +8,7 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension dim=]]
             [shevek.components :refer [dropdown checkbox]]
-            [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch]]))
+            [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value]]))
 
 (defn- send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (:cube viewer)
@@ -52,13 +52,12 @@
   (send-pinned-dim-query db dim (assoc dim :operator "search" :value search)))
 
 (defn- pinned-dimension-item [{:keys [name] :as dim} result measure search]
-  (let [dim-value (-> name keyword result)
-        formatted-value (-> (format-dimension dim result)
+  (let [formatted-value (-> (format-dimension dim result)
                             (highlight search))
         in-filter (find-dimension name (viewer :filter))]
     [:div.item {:title formatted-value}
      (if (and in-filter (seq (:value in-filter)))
-      [checkbox formatted-value {:checked (includes? (in-filter :value) dim-value)}]
+      [checkbox formatted-value {:checked (includes? (in-filter :value) (result-value name result))}]
       formatted-value)
      [:div.measure-value (format-measure measure result)]]))
 

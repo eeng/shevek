@@ -42,8 +42,11 @@
 (defn- send-main-query [{:keys [viewer] :as db}]
   (send-query db (assoc viewer :totals true) [:results :main]))
 
+(defn result-value [name result]
+  (->> name keyword (get result)))
+
 (defn format-measure [{:keys [name type format]} result]
-  (let [value (or (->> name keyword (get result)) 0)
+  (let [value (or (result-value name result) 0)
         value (condp = type
                 "doubleSum" (str/format "%.2f" value)
                 "hyperUnique" (str/format "%.0f" value)
@@ -55,7 +58,7 @@
   (not (contains? result (-> dim :name keyword))))
 
 (defn format-dimension [{:keys [granularity name] :as dim} result]
-  (let [value (-> name keyword result)]
+  (let [value (result-value name result)]
     (cond
       (totals-result? result dim) "Total"
       (nil? value) "Ø"
