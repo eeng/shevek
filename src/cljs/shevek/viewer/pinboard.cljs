@@ -7,7 +7,7 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
+            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
             [shevek.components :refer [dropdown checkbox toggle-checkbox-inside]]
             [shevek.viewer.filter :refer [update-filter-or-remove init-filtered-dim toggle-filter-value filter-operators]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
@@ -38,28 +38,28 @@
 (defevh :dimension-values-searched [db dim search]
   (send-pinned-dim-query db dim (assoc dim :operator "search" :value search)))
 
-; TODO tomar el operador de un combo "..."
+; TODO esto no quedó muy prolijo xq el update-in se ejecuta primero en realidad y el udpate-filter se encola para despues, ver de invertir para que el orden en el codigo sea el mismo q de ejecucion.
 (defevh :pinned-dimension-item-toggled [{:keys [viewer] :as db} {:keys [name] :as dim}
-                                        current-filter-values toggled-value selected?]
-  (let [dim (clean-dim dim)
-        new-values ((toggle-filter-value selected?) current-filter-values toggled-value)]
-    (update-filter-or-remove dim {:operator "include" :value new-values})
-    (update-in db [:viewer :filter] add-dimension (init-filtered-dim dim))))
+                                        filter-dim toggled-value selected?]
+  (let [dim (init-filtered-dim dim)
+        filter-dim (or filter-dim dim)
+        new-values ((toggle-filter-value selected?) (:value filter-dim) toggled-value)]
+    (update-filter-or-remove dim {:operator (:operator filter-dim) :value new-values})
+    (update-in db [:viewer :filter] add-dimension dim)))
 
-(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search in-filter]
+(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search filter-dim]
   (let [formatted-value (format-dimension dim result)
         highlighted-value (highlight formatted-value search)
         value (result-value name result)
-        filter-values (:value in-filter)
-        toggle-item #(dispatch :pinned-dimension-item-toggled dim filter-values value %)
-        show-checkbox? (seq filter-values)]
+        toggle-item #(dispatch :pinned-dimension-item-toggled dim filter-dim value %)
+        show-checkbox? (seq (:value filter-dim))]
     [:div.item {:title formatted-value :on-click (cond
                                                    (time-dimension? dim) identity
                                                    show-checkbox? toggle-checkbox-inside
                                                    :else #(toggle-item true))}
      (if show-checkbox?
       [checkbox (str "cb-pinboard-item-" name "-" value) highlighted-value
-       {:checked (includes? filter-values value) :on-change toggle-item}]
+       {:checked (includes? (:value filter-dim) value) :on-change toggle-item}]
       highlighted-value)
      [:div.measure-value (format-measure measure result)]]))
 
@@ -83,8 +83,7 @@
 (defn- inclusion-exclusion-button [{:keys [operator value] :or {operator "include"} :as filter-dim}]
   [dropdown (filter-operators)
    {:class "top right pointing"
-    :on-change #(when value
-                  (dispatch :filter-options-changed (clean-dim filter-dim) {:operator % :value value}))
+    :on-change #(when value (update-filter-or-remove filter-dim {:operator % :value value}))
     :selected operator}
    [:i.ellipsis.horizontal.link.icon]])
 

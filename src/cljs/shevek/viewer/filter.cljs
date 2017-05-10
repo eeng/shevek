@@ -4,14 +4,14 @@
             [reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
-            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period format-interval to-interval]]
+            [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period format-interval to-interval clean-dim]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-time]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]))
 
 (defn init-filtered-dim [dim]
-  (assoc dim :operator "include"))
+  (-> dim clean-dim (assoc :operator "include")))
 
 (defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
   (-> (update-in db [:viewer :filter] add-dimension (init-filtered-dim dim))
@@ -23,9 +23,14 @@
       (send-pinboard-queries dim)))
 
 (defevh :filter-options-changed [db dim opts]
-  (-> (update-in db [:viewer :filter] replace-dimension (merge (dissoc dim :period :interval) opts))
+  (-> (update-in db [:viewer :filter] replace-dimension (merge (clean-dim dim) opts))
       (send-main-query)
       (send-pinboard-queries dim)))
+
+(defn update-filter-or-remove [dim opts]
+  (if (empty? (opts :value))
+    (dispatch :dimension-removed-from-filter dim)
+    (dispatch :filter-options-changed dim opts)))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim} search]
   (send-query db {:cube (viewer :cube)
@@ -119,15 +124,11 @@
 (defn- operator-selector [opts]
   [dropdown (filter-operators)
    {:class "icon top left pointing basic compact button"
-    :on-change #(swap! opts assoc :operator %)}
+    :on-change #(swap! opts assoc :operator %)
+    :selected (@opts :operator)}
    [:i.icon {:class (case (@opts :operator)
                       "include" "check square"
                       "exclude" "minus square")}]])
-
-(defn update-filter-or-remove [dim opts]
-  (if (empty? (opts :value))
-    (dispatch :dimension-removed-from-filter dim)
-    (dispatch :filter-options-changed dim opts)))
 
 (defn- normal-filter-popup [{:keys [close]} {:keys [name] :as dim}]
   (let [opts (r/atom (select-keys dim [:operator :value]))
