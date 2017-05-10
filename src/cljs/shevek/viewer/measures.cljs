@@ -14,10 +14,10 @@
   (-> (update-in db [:viewer :measures] (if selected add-dimension remove-dimension) dim)
       (send-main-query)))
 
-(defn- measure-item [{:keys [title description] :as dim} selected-measures]
+(defn- measure-item [{:keys [name title description] :as dim} selected-measures]
   [:div.item {:on-click toggle-checkbox-inside :title description}
-   [checkbox title {:checked (includes-dim? selected-measures dim)
-                    :on-change #(dispatch :measure-toggled dim %)}]])
+   [checkbox (str "cb-measure-" name) title 
+    {:checked (includes-dim? selected-measures dim) :on-change #(dispatch :measure-toggled dim %)}]])
 
 (defn- measures-panel []
   (let [selected-measures (viewer :measures)]

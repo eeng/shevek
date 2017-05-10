@@ -19,4 +19,4 @@
     (remove nil? [x])))
 
 (defn includes? [coll x]
-  (some #{x} coll))
+  (some #(= % x) coll))

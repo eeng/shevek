@@ -88,8 +88,7 @@
                          [:i.dropdown.icon]
                          [:div.default.text placeholder]])))
 
-(defn- checkbox [label & [{:keys [checked on-change id]
-                           :or {on-change identity id (str "checkbox-" (str/slug label))}}]]
+(defn- checkbox [id label & [{:keys [checked on-change] :or {on-change identity}}]]
   [:div.ui.checkbox
    [:input {:type "checkbox" :id id :checked (or checked false)
             :on-change #(on-change (not checked))}]

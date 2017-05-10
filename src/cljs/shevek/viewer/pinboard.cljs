@@ -4,26 +4,13 @@
             [reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.lib.collections :refer [includes?]]
+            [shevek.lib.react :refer [without-propagation]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension dim=]]
-            [shevek.components :refer [dropdown checkbox]]
-            [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value]]))
-
-(defn- send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
-  (let [q (cond-> {:cube (:cube viewer)
-                   :filter (->> (:filter viewer) (remove (partial dim= dim)) vec)
-                   :split [dim]
-                   :measures (vector (get-in viewer [:pinboard :measure]))}
-                  search-filter (update :filter add-dimension search-filter))]
-    (send-query db q [:results :pinboard name])))
-
-(defn send-pinboard-queries
-  ([db] (send-pinboard-queries db nil))
-  ([db except-dim]
-   (->> (get-in db [:viewer :pinboard :dimensions])
-        (remove (partial dim= except-dim))
-        (reduce #(send-pinned-dim-query %1 %2) db))))
+            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
+            [shevek.components :refer [dropdown checkbox toggle-checkbox-inside]]
+            [shevek.viewer.filter :refer [update-filter-or-remove init-filtered-dim toggle-filter-value]]
+            [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
 
 (defn init-pinned-dim [dim]
   (cond-> (assoc dim :limit 100)
@@ -51,14 +38,26 @@
 (defevh :dimension-values-searched [db dim search]
   (send-pinned-dim-query db dim (assoc dim :operator "search" :value search)))
 
-(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search]
-  (let [formatted-value (-> (format-dimension dim result)
-                            (highlight search))
-        in-filter (find-dimension name (viewer :filter))]
-    [:div.item {:title formatted-value}
-     (if (and in-filter (seq (:value in-filter)))
-      [checkbox formatted-value {:checked (includes? (in-filter :value) (result-value name result))}]
-      formatted-value)
+; TODO tomar el operador de un combo "..."
+(defevh :pinned-dimension-item-toggled [{:keys [viewer] :as db} {:keys [name] :as dim}
+                                        current-filter-values toggled-value selected?]
+  (let [dim (clean-dim dim)
+        new-values ((toggle-filter-value selected?) current-filter-values toggled-value)]
+    (update-filter-or-remove dim {:operator "include" :value new-values})
+    (update-in db [:viewer :filter] add-dimension (init-filtered-dim dim))))
+
+(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search in-filter]
+  (let [formatted-value (format-dimension dim result)
+        highlighted-value (highlight formatted-value search)
+        value (result-value name result)
+        filter-values (:value in-filter)
+        toggle-item #(dispatch :pinned-dimension-item-toggled dim filter-values value %)
+        show-checkbox? (seq filter-values)]
+    [:div.item {:title formatted-value :on-click (if show-checkbox? toggle-checkbox-inside #(toggle-item true))}
+     (if show-checkbox?
+      [checkbox (str "cb-pinboard-item-" name "-" value) highlighted-value
+       {:checked (includes? filter-values value) :on-change toggle-item}]
+      highlighted-value)
      [:div.measure-value (format-measure measure result)]]))
 
 (def periods {"PT1H" "1H"
@@ -84,7 +83,8 @@
     (fn [{:keys [title name] :as dim}]
       (let [measure (viewer :pinboard :measure)
             results (viewer :results :pinboard name)
-            filtered-results (filter-matching @search (partial format-dimension dim) results)]
+            filtered-results (filter-matching @search (partial format-dimension dim) results)
+            in-filter (find-dimension name (viewer :filter))]
         [:div.dimension.panel.ui.basic.segment (when-not @searching (loading-class [:results :pinboard name]))
          [panel-header (str title " " (title-according-to-dim-type dim))
           (if (time-dimension? dim)
@@ -96,7 +96,7 @@
                                  :on-stop #(reset! searching false)}])
          (if results
            (if (seq filtered-results)
-             (into [:div.items] (map #(pinned-dimension-item dim % measure @search) filtered-results))
+             (into [:div.items] (map #(pinned-dimension-item dim % measure @search in-filter) filtered-results))
              [:div.items [:div.item.no-results (t :cubes/no-results)]])
            [:div.items.empty])]))))
 

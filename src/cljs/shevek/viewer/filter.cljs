@@ -7,8 +7,7 @@
             [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-time]]
-            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube result-value]]
-            [shevek.viewer.pinboard :refer [send-pinboard-queries]]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]))
 
 (defn init-filtered-dim [dim]
@@ -21,7 +20,7 @@
 (defevh :dimension-removed-from-filter [db dim]
   (-> (update-in db [:viewer :filter] remove-dimension dim)
       (send-main-query)
-      (send-pinboard-queries)))
+      (send-pinboard-queries dim)))
 
 (defevh :filter-options-changed [db dim opts]
   (-> (update-in db [:viewer :filter] replace-dimension (merge (dissoc dim :period :interval) opts))
@@ -101,15 +100,17 @@
          [relative-period-time-filter dim]
          [specific-period-time-filter popup dim])])))
 
+(defn toggle-filter-value [selected]
+  (fnil (if selected conj disj) #{}))
+
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
   (let [value (result-value name result)
         label (format-dimension dim result)]
     [:div.item.has-checkbox {:on-click toggle-checkbox-inside :title label}
-     [checkbox (highlight label search)
+     [checkbox (str "cb-filter-" name "-" (str/slug label)) (highlight label search)
       {:checked (some #(= value %) (@filter-opts :value))
-       :on-change #(swap! filter-opts update :value (fnil (if % conj disj) #{}) value)
-       :id (str "checkbox-" name "-" (str/slug label))}]]))
+       :on-change #(swap! filter-opts update :value (toggle-filter-value %) value)}]]))
 
 (defn- operator-selector [opts]
   [dropdown [[(t :cubes.operator/include) "include"]
@@ -119,6 +120,11 @@
    [:i.icon {:class (case (@opts :operator)
                       "include" "check square"
                       "exclude" "minus square")}]])
+
+(defn update-filter-or-remove [dim opts]
+  (if (empty? (opts :value))
+    (dispatch :dimension-removed-from-filter dim)
+    (dispatch :filter-options-changed dim opts)))
 
 (defn- normal-filter-popup [{:keys [close]} {:keys [name] :as dim}]
   (let [opts (r/atom (select-keys dim [:operator :value]))
@@ -135,9 +141,7 @@
                     (filter-matching @search (partial format-dimension dim)))))]
        [:div
         [:button.ui.primary.compact.button
-         {:on-click #(if (empty? (@opts :value))
-                       (dispatch :dimension-removed-from-filter dim)
-                       (dispatch :filter-options-changed dim @opts))
+         {:on-click #(update-filter-or-remove dim @opts)
           :class (when (= @opts (select-keys dim [:operator :value])) "disabled")}
          (t :actions/ok)]
         [:button.ui.compact.button

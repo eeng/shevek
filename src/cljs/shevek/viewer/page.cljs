@@ -6,13 +6,13 @@
             [shevek.dw :as dw]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.lib.util :refer [every]]
-            [shevek.viewer.shared :refer [send-main-query current-cube-name]]
+            [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
             [shevek.viewer.filter :refer [filter-panel]]
             [shevek.viewer.split :refer [split-panel]]
             [shevek.viewer.visualization :refer [visualization-panel]]
-            [shevek.viewer.pinboard :refer [pinboard-panels send-pinboard-queries]]
+            [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
             [shevek.reports.url :refer [restore-report-from-url]]))
 

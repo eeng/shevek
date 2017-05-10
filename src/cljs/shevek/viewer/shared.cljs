@@ -8,7 +8,7 @@
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
-            [shevek.dw :as dw]
+            [shevek.dw :refer [dim= add-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components :refer [focused kb-shortcuts]]
             [shevek.reports.url :refer [store-in-url]]
@@ -31,7 +31,6 @@
       (assoc-in [:viewer :arrived-split] (-> db :viewer :split))
       (rpc/loaded results-keys)))
 
-; TODO repetida la conversion de viewer a query en schemas.conversion
 (defn send-query [db viewer results-keys]
   (store-in-url viewer)
   (console.log "Sending query from viewer" viewer) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
@@ -39,8 +38,23 @@
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
 
-(defn- send-main-query [{:keys [viewer] :as db}]
+(defn send-main-query [{:keys [viewer] :as db}]
   (send-query db (assoc viewer :totals true) [:results :main]))
+
+(defn send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
+  (let [q (cond-> {:cube (:cube viewer)
+                   :filter (->> (:filter viewer) (remove (partial dim= dim)) vec)
+                   :split [dim]
+                   :measures (vector (get-in viewer [:pinboard :measure]))}
+                  search-filter (update :filter add-dimension search-filter))]
+    (send-query db q [:results :pinboard name])))
+
+(defn send-pinboard-queries
+  ([db] (send-pinboard-queries db nil))
+  ([db except-dim]
+   (->> (get-in db [:viewer :pinboard :dimensions])
+        (remove (partial dim= except-dim))
+        (reduce #(send-pinned-dim-query %1 %2) db))))
 
 (defn result-value [name result]
   (->> name keyword (get result)))
@@ -62,7 +76,7 @@
     (cond
       (totals-result? result dim) "Total"
       (nil? value) "Ø"
-      (dw/time-dimension? dim) (format-time-according-to-period value granularity)
+      (time-dimension? dim) (format-time-according-to-period value granularity)
       :else value)))
 
 (defn- panel-header [text & actions]

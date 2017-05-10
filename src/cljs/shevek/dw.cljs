@@ -6,6 +6,8 @@
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.dates :as d :refer [parse-time]]
             [shevek.lib.collections :refer [detect]]
+            [shevek.schemas.cube :refer [Dimension]]
+            [schema-tools.core :as st]
             [cljs-time.core :as t]
             [cljs-time.format :as f]
             [reflow.db :as db]
@@ -63,6 +65,9 @@
 
 (defn replace-dimension [coll dim]
   (setval [ALL (partial dim= dim)] dim coll))
+
+(defn clean-dim [dim]
+  (st/select-schema dim Dimension))
 
 (defn to-interval [period max-time]
   (let [now (d/now)
