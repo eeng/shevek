@@ -76,13 +76,16 @@
 (defn- totals-result? [result dim]
   (not (contains? result (-> dim :name keyword))))
 
-(defn format-dimension [{:keys [granularity name] :as dim} result]
-  (let [value (result-value name result)]
-    (cond
-      (totals-result? result dim) "Total"
-      (nil? value) "Ø"
-      (time-dimension? dim) (format-time-according-to-period value granularity)
-      :else value)))
+(defn format-dim-value [value {:keys [granularity name] :as dim}]
+  (cond
+    (nil? value) "Ø"
+    (time-dimension? dim) (format-time-according-to-period value granularity)
+    :else value))
+
+(defn format-dimension [{:keys [name] :as dim} result]
+  (if (totals-result? result dim)
+    "Total"
+    (format-dim-value (result-value name result) dim)))
 
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text

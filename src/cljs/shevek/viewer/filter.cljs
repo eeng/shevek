@@ -7,7 +7,7 @@
             [shevek.dw :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? format-period format-interval to-interval clean-dim]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-time]]
-            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]))
 
 (defn send-queries [db dim]
@@ -166,8 +166,8 @@
     [normal-filter-popup popup dim]))
 
 (defn- filter-title [{:keys [title period interval operator value] :as dim}]
-  (let [details (if (= 1 (count value))
-                  (str/prune (first value) 15) 
+  (let [details (if (= (count value) 1)
+                  (-> (first value) (format-dim-value dim) (str/prune 15))
                   (count value))]
     (cond
       period (->> (name period) (str "cubes.period/") keyword t)
