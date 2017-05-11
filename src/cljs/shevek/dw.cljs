@@ -6,12 +6,12 @@
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.dates :as d :refer [parse-time]]
             [shevek.lib.collections :refer [detect]]
-            [shevek.schemas.cube :refer [Dimension]]
-            [schema-tools.core :as st]
             [cljs-time.core :as t]
             [cljs-time.format :as f]
             [reflow.db :as db]
-            [com.rpl.specter :refer [setval ALL]]))
+            [com.rpl.specter :refer [setval ALL]]
+            [shevek.schemas.cube :refer [Dimension]]
+            [schema-tools.core :as st]))
 
 (defn parse-max-time [max-time]
   (d/round-to-next-minute (parse-time max-time)))

@@ -10,27 +10,38 @@
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]))
 
-(defn init-filtered-dim [dim]
-  (-> dim clean-dim (assoc :operator "include")))
+(defn send-queries [db dim]
+  (-> (send-main-query db)
+      (send-pinboard-queries dim)))
+
+(defn toggle-filter-value [selected]
+  (fnil (if selected conj disj) #{}))
 
 (defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
-  (-> (update-in db [:viewer :filter] add-dimension (init-filtered-dim dim))
+  (-> (update-in db [:viewer :filter] add-dimension (assoc dim :operator "include"))
       (assoc-in [:viewer :last-added-filter] [name (js/Date.)])))
-
-(defevh :dimension-removed-from-filter [db dim]
-  (-> (update-in db [:viewer :filter] remove-dimension dim)
-      (send-main-query)
-      (send-pinboard-queries dim)))
 
 (defevh :filter-options-changed [db dim opts]
   (-> (update-in db [:viewer :filter] replace-dimension (merge (clean-dim dim) opts))
-      (send-main-query)
-      (send-pinboard-queries dim)))
+      (send-queries dim)))
+
+(defevh :dimension-removed-from-filter [db dim]
+  (-> (update-in db [:viewer :filter] remove-dimension dim)
+      (send-queries dim)))
 
 (defn update-filter-or-remove [dim opts]
   (if (empty? (opts :value))
     (dispatch :dimension-removed-from-filter dim)
     (dispatch :filter-options-changed dim opts)))
+
+(defevh :pinned-dimension-item-toggled [db dim toggled-value selected?]
+  (let [already-in-filter? (:value dim)
+        toggle (toggle-filter-value selected?)]
+    (if already-in-filter?
+      (do (update-filter-or-remove dim {:operator (:operator dim) :value (toggle (:value dim) toggled-value)})
+        db)
+      (-> (update-in db [:viewer :filter] add-dimension (assoc dim :value #{toggled-value}))
+          (send-queries dim)))))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim} search]
   (send-query db {:cube (viewer :cube)
@@ -104,9 +115,6 @@
        (if (= @period-type :relative)
          [relative-period-time-filter dim]
          [specific-period-time-filter popup dim])])))
-
-(defn toggle-filter-value [selected]
-  (fnil (if selected conj disj) #{}))
 
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]

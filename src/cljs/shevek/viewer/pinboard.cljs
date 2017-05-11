@@ -7,9 +7,9 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension]]
+            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
             [shevek.components :refer [dropdown checkbox toggle-checkbox-inside]]
-            [shevek.viewer.filter :refer [update-filter-or-remove init-filtered-dim toggle-filter-value filter-operators]]
+            [shevek.viewer.filter :refer [filter-operators]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
 
 (defn init-pinned-dim [dim]
@@ -38,28 +38,19 @@
 (defevh :dimension-values-searched [db dim search]
   (send-pinned-dim-query db dim (assoc dim :operator "search" :value search)))
 
-; TODO esto no quedó muy prolijo xq el update-in se ejecuta primero en realidad y el udpate-filter se encola para despues, ver de invertir para que el orden en el codigo sea el mismo q de ejecucion.
-(defevh :pinned-dimension-item-toggled [{:keys [viewer] :as db} {:keys [name] :as dim}
-                                        filter-dim toggled-value selected?]
-  (let [dim (init-filtered-dim dim)
-        filter-dim (or filter-dim dim)
-        new-values ((toggle-filter-value selected?) (:value filter-dim) toggled-value)]
-    (update-filter-or-remove dim {:operator (:operator filter-dim) :value new-values})
-    (update-in db [:viewer :filter] add-dimension dim)))
-
-(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search filter-dim]
+(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search]
   (let [formatted-value (format-dimension dim result)
         highlighted-value (highlight formatted-value search)
         value (result-value name result)
-        toggle-item #(dispatch :pinned-dimension-item-toggled dim filter-dim value %)
-        show-checkbox? (seq (:value filter-dim))]
+        toggle-item #(dispatch :pinned-dimension-item-toggled dim value %)
+        show-checkbox? (seq (:value dim))]
     [:div.item {:title formatted-value :on-click (cond
                                                    (time-dimension? dim) identity
                                                    show-checkbox? toggle-checkbox-inside
                                                    :else #(toggle-item true))}
      (if show-checkbox?
       [checkbox (str "cb-pinboard-item-" name "-" value) highlighted-value
-       {:checked (includes? (:value filter-dim) value) :on-change toggle-item}]
+       {:checked (includes? (:value dim) value) :on-change toggle-item}]
       highlighted-value)
      [:div.measure-value (format-measure measure result)]]))
 
@@ -80,24 +71,36 @@
     :selected granularity}
    [:i.ellipsis.horizontal.link.icon]])
 
-(defn- inclusion-exclusion-button [{:keys [operator value] :or {operator "include"} :as filter-dim}]
+(defn- filter-operators-button [{:keys [operator value] :as filter-dim} unfiltered-operator]
   [dropdown (filter-operators)
    {:class "top right pointing"
-    :on-change #(when value (update-filter-or-remove filter-dim {:operator % :value value}))
+    :on-change #(if value
+                  (dispatch :filter-options-changed filter-dim {:operator % :value value})
+                  (reset! unfiltered-operator %))
     :selected operator}
    [:i.ellipsis.horizontal.link.icon]])
 
-(defn- pinned-dimension-panel* [_]
+(defn- adjust-max-height [rc]
+  (let [panel (-> rc r/dom-node js/$)
+        items (-> panel (.find ".header, .items .item, .search.input") .toArray js->clj)
+        height (reduce + (map #(-> % js/$ (.outerHeight true)) items))]
+    (.css panel "max-height", (max (+ height 10) 100))))
+
+(defn pinned-dimension-panel [_]
   (let [searching (r/atom false)
-        search (r/atom "")]
+        search (r/atom "")
+        unfiltered-operator (r/atom "include")]
     (fn [{:keys [title name] :as dim}]
       (let [measure (viewer :pinboard :measure)
             results (viewer :results :pinboard name)
             filtered-results (filter-matching @search (partial format-dimension dim) results)
-            filter-dim (find-dimension name (viewer :filter))]
-        [:div.dimension.panel.ui.basic.segment (when-not @searching (loading-class [:results :pinboard name]))
+            filter-dim (or (find-dimension name (viewer :filter))
+                           (assoc (clean-dim dim) :operator @unfiltered-operator))]
+        [:div.dimension.panel.ui.basic.segment
+         (merge {:ref #(when % (adjust-max-height %))}
+                (when-not @searching (loading-class [:results :pinboard name])))
          [panel-header (str title " " (title-according-to-dim-type dim))
-          (when-not (time-dimension? dim) [inclusion-exclusion-button filter-dim])
+          (when-not (time-dimension? dim) [filter-operators-button filter-dim unfiltered-operator])
           (when-not (time-dimension? dim) [search-button searching])
           (when (time-dimension? dim) [time-granularity-button dim])
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
@@ -106,20 +109,9 @@
                                  :on-stop #(reset! searching false)}])
          (if results
            (if (seq filtered-results)
-             (into [:div.items] (map #(pinned-dimension-item dim % measure @search filter-dim) filtered-results))
+             (into [:div.items] (map #(pinned-dimension-item filter-dim % measure @search) filtered-results))
              [:div.items [:div.item.no-results (t :cubes/no-results)]])
            [:div.items.empty])]))))
-
-(defn- adjust-max-height [rc]
-  (let [panel (-> rc r/dom-node js/$)
-        items (-> panel (.find ".header, .item, .search.input") .toArray js->clj)
-        height (reduce + (map #(-> % js/$ (.outerHeight true)) items))]
-    (.css panel "max-height", (max (+ height 10) 100))))
-
-(def pinned-dimension-panel
-  (with-meta pinned-dimension-panel*
-    {:component-did-mount adjust-max-height
-     :component-did-update adjust-max-height}))
 
 (defn pinboard-panels []
   [:div.pinboard
