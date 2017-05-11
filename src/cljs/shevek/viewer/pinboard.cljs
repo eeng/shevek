@@ -38,19 +38,19 @@
 (defevh :dimension-values-searched [db dim search]
   (send-pinned-dim-query db dim (assoc dim :operator "search" :value search)))
 
-(defn- pinned-dimension-item [{:keys [name] :as dim} result measure search]
+(defn- pinned-dimension-item [{:keys [name] :as dim} filter-dim result measure search]
   (let [formatted-value (format-dimension dim result)
         highlighted-value (highlight formatted-value search)
         value (result-value name result)
-        toggle-item #(dispatch :pinned-dimension-item-toggled dim value %)
-        show-checkbox? (seq (:value dim))]
+        toggle-item #(dispatch :pinned-dimension-item-toggled filter-dim value %)
+        show-checkbox? (seq (:value filter-dim))]
     [:div.item {:title formatted-value :on-click (cond
                                                    (time-dimension? dim) identity
                                                    show-checkbox? toggle-checkbox-inside
                                                    :else #(toggle-item true))}
      (if show-checkbox?
       [checkbox (str "cb-pinboard-item-" name "-" value) highlighted-value
-       {:checked (includes? (:value dim) value) :on-change toggle-item}]
+       {:checked (includes? (:value filter-dim) value) :on-change toggle-item}]
       highlighted-value)
      [:div.measure-value (format-measure measure result)]]))
 
@@ -109,7 +109,7 @@
                                  :on-stop #(reset! searching false)}])
          (if results
            (if (seq filtered-results)
-             (into [:div.items] (map #(pinned-dimension-item filter-dim % measure @search) filtered-results))
+             (into [:div.items] (map #(pinned-dimension-item dim filter-dim % measure @search) filtered-results))
              [:div.items [:div.item.no-results (t :cubes/no-results)]])
            [:div.items.empty])]))))
 

@@ -41,9 +41,14 @@
 (defn send-main-query [{:keys [viewer] :as db}]
   (send-query db (assoc viewer :totals true) [:results :main]))
 
+(defn- remove-dim-unless-time [dim coll]
+  (if (time-dimension? dim)
+    coll
+    (remove (partial dim= dim) coll)))
+
 (defn send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (:cube viewer)
-                   :filter (->> (:filter viewer) (remove #(and (dim= dim %) (not (time-dimension? dim)))) vec)
+                   :filter (->> (:filter viewer) (remove-dim-unless-time dim) vec)
                    :split [dim]
                    :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filter add-dimension search-filter))]
@@ -53,7 +58,7 @@
   ([db] (send-pinboard-queries db nil))
   ([db except-dim]
    (->> (get-in db [:viewer :pinboard :dimensions])
-        (remove (partial dim= except-dim))
+        (remove-dim-unless-time except-dim)
         (reduce #(send-pinned-dim-query %1 %2) db))))
 
 (defn result-value [name result]
