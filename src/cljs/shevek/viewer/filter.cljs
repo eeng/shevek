@@ -166,15 +166,18 @@
     [normal-filter-popup popup dim]))
 
 (defn- filter-title [{:keys [title period interval operator value] :as dim}]
-  (cond
-    period (->> (name period) (str "cubes.period/") keyword t)
-    interval (format-interval interval)
-    :else [:div title " "
-           (when (seq value)
-             [:span.details {:class (when (= operator "exclude") "striked")}
-              (case operator
-                ("include" "exclude") (str "(" (count value) ")")
-                "")])]))
+  (let [details (if (= 1 (count value))
+                  (str/prune (first value) 15) 
+                  (count value))]
+    (cond
+      period (->> (name period) (str "cubes.period/") keyword t)
+      interval (format-interval interval)
+      :else [:div title " "
+             (when (seq value)
+               [:span.details {:class (when (= operator "exclude") "striked")}
+                (case operator
+                  ("include" "exclude") (str "(" details ")")
+                  "")])])))
 
 (defn- filter-item [{:keys [toggle]} dim]
   [:button.ui.green.compact.button.item
