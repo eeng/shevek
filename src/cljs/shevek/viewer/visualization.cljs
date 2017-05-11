@@ -27,7 +27,7 @@
   (let [rate (if (zero? max-value)
                0
                (/ measure-value max-value))]
-    (str (* rate 100) "%")))
+    (str (* (Math/abs rate) 100) "%")))
 
 (defn- pivot-table-row [result dim depth measures max-values]
   [:tr
@@ -38,7 +38,8 @@
                measure-value (measure-name result)]]
      [:td.right.aligned {:key measure-name}
       [:div.bg (when-not (totals-result? result dim)
-                 {:style {:width (calculate-rate measure-value (max-values measure-name))}})]
+                 {:class (when (neg? measure-value) "neg")
+                  :style {:width (calculate-rate measure-value (max-values measure-name))}})]
       (format-measure measure result)])])
 
 (defn- pivot-table-rows [results [dim & dims] depth measures max-values]
