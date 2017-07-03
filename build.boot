@@ -49,7 +49,7 @@
  '[deraen.boot-less :refer [less]]
  '[samestep.boot-refresh :refer [refresh]]
  '[metosin.boot-alt-test :refer [alt-test]]
- '[crisptrutski.boot-cljs-test :refer [test-cljs]]
+ '[crisptrutski.boot-cljs-test :refer [test-cljs] :rename {test-cljs alt-test-cljs}]
  '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]])
 
 (deftask run
@@ -96,26 +96,25 @@
         (run :main-namespace "shevek.app")
         (wait)))
 
-(deftask clj-test
-  "Continuos automatic testing of the backend."
-  []
-  (merge-env! :source-paths #{"test/clj" "test/cljc"} :resource-paths #{"test/resources"})
+(deftask test-config []
+  (merge-env! :source-paths #{"test/clj" "test/cljc" "test/cljs"} :resource-paths #{"test/resources"})
   (System/setProperty "conf" "test/resources/config.edn")
-  (comp (watch)
+  identity)
+
+(deftask test-clj
+  "Run the backend tests."
+  []
+  (comp (test-config)
         (alt-test :on-start 'shevek.test-helper/init)))
 
-(deftask cljs-test
-  "Continuos automatic testing of the frontend."
+(deftask test-cljs
+  "Run the frontend tests."
   []
-  (merge-env! :source-paths #{"test/cljs" "test/cljc"} :resource-paths #{"test/resources"})
-  (System/setProperty "conf" "test/resources/config.edn")
-  (comp (watch)
-        (test-cljs)))
+  (comp (test-config)
+        (alt-test-cljs)))
 
-(deftask testing
-  "Continuos automatic testing."
+(deftask test-all
+  "Run all tests."
   []
-  (merge-env! :source-paths #{"test/clj" "test/cljs"} :resource-paths #{"test/resources"})
-  (comp (dev)
-        (alt-test)
-        (test-cljs)))
+  (comp (test-clj)
+        (alt-test-cljs :exit? true)))
