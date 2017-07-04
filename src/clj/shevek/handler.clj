@@ -6,7 +6,12 @@
             [clojure.java.io :as io]
             [clojure.string :refer [split]]
             [shevek.logging :refer [wrap-request-logging]]
-            [shevek.lib.transit-handlers :as th]))
+            [shevek.lib.transit-handlers :as th]
+            ; Hay que colocar las api aca para que las resuelva el call-fn en los tests de aceptación (y posiblemente luego tb en production)
+            [shevek.reports.api]
+            [shevek.querying.api]
+            [shevek.users.api]
+            [shevek.schema.api]))
 
 (defn call-fn
   "Given a map like {:fn 'ns/func' :args [1 2]} calls (shevek.ns/func 1 2)"

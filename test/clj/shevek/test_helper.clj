@@ -6,8 +6,11 @@
             [clojure.test :refer [deftest testing]]
             [cuerdas.core :as str]))
 
-(defn init []
+(defn init-unit-tests []
   (mount/start-without #'shevek.app/nrepl #'shevek.server/web-server))
+
+(defn init-acceptance-tests []
+  (mount/start))
 
 (defmacro spec [description & body]
   (let [slug (symbol (str/slug description))]

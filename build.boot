@@ -10,7 +10,7 @@
                     [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [samestep/boot-refresh "0.1.0" :scope "test"]
-                    [metosin/boot-alt-test "0.3.0" :scope "test"]
+                    [metosin/boot-alt-test "0.3.2" :scope "test"]
                     [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
                     [binaryage/devtools "0.9.2" :scope "test"]
                     [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
@@ -40,7 +40,8 @@
                     [com.novemberain/monger "3.1.0"]
                     [bcrypt-clj "0.3.3"]
                     [cljsjs/numeral "2.0.6-0"]
-                    [org.clojure/core.match "0.3.0-alpha4"]])
+                    [org.clojure/core.match "0.3.0-alpha4"]
+                    [etaoin "0.1.6"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
@@ -57,7 +58,7 @@
   [m main-namespace NAMESPACE str   "The namespace containing a -main function to invoke."
    a arguments      EXPR      [edn] "An optional argument sequence to apply to the -main function."]
   (with-pre-wrap fs
-    (require (symbol main-namespace) :reload)
+    (require (symbol main-namespace))
     (if-let [f (resolve (symbol main-namespace "-main"))]
       (apply f arguments)
       (throw (ex-info "No -main method found" {:main-namespace main-namespace})))
@@ -105,7 +106,8 @@
   "Run the backend tests."
   []
   (comp (test-config)
-        (alt-test :on-start 'shevek.test-helper/init)))
+        (alt-test :test-matcher #"^(?!.*acceptance).*"
+                  :on-start 'shevek.test-helper/init-unit-tests)))
 
 (deftask test-cljs
   "Run the frontend tests."
@@ -113,8 +115,17 @@
   (comp (test-config)
         (alt-test-cljs)))
 
+(deftask test-acceptance
+  "Run the acceptance tests."
+  []
+  (comp (test-config)
+        (build)
+        (alt-test :test-matcher #".*acceptance.*"
+                  :on-start 'shevek.test-helper/init-acceptance-tests)))
+
 (deftask test-all
   "Run all tests."
   []
   (comp (test-clj)
-        (alt-test-cljs :exit? true)))
+        (alt-test-cljs :exit? true)
+        (test-acceptance)))

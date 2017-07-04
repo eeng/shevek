@@ -6,7 +6,7 @@
             [taoensso.timbre :as log]))
 
 (defn start-web-server [port]
-  (log/info "Starting web server on http://localhost:" port)
+  (log/info (str "Starting web server on http://localhost:" port))
   (run-server app {:port port}))
 
 (defstate web-server
