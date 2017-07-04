@@ -51,7 +51,8 @@
  '[samestep.boot-refresh :refer [refresh]]
  '[metosin.boot-alt-test :refer [alt-test]]
  '[crisptrutski.boot-cljs-test :refer [test-cljs] :rename {test-cljs alt-test-cljs}]
- '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]])
+ '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]]
+ '[shevek.app])
 
 (deftask run
   "Run the -main function in some namespace with arguments."
@@ -70,6 +71,11 @@
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (target)))
 
+(deftask start-app []
+  (comp (build)
+        (with-pass-thru _
+          (shevek.app/dev-start))))
+
 (deftask dev-config []
   (merge-env! :source-paths #{"dev/clj"} :resource-paths #{"dev/resources"})
   (System/setProperty "conf" "dev/resources/config.edn")
@@ -87,14 +93,13 @@
         (reload :asset-path "public")
         (cljs-repl)
         (cljs-devtools)
-        (build)))
+        (start-app)))
 
 (deftask dev-run
   "Runs the application in development mode, without REPL and code reloading."
   []
   (comp (dev-config)
-        (build)
-        (run :main-namespace "shevek.app")
+        (start-app)
         (wait)))
 
 (deftask test-config []
@@ -120,6 +125,7 @@
   []
   (comp (test-config)
         (build)
+        ; Hay que levantar la app (con nrepl) desde el on-start y no desde boot porque sino el test al correr en un pod no ve los mount states.
         (alt-test :test-matcher #".*acceptance.*"
                   :on-start 'shevek.test-helper/init-acceptance-tests)))
 

@@ -1,4 +1,4 @@
 {:env :test
  :mongodb-uri "mongodb://localhost/shevek-test"
- :port 3110
- :nrepl-port 3111}
+ :port 3200
+ :nrepl-port 3201}

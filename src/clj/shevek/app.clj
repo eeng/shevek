@@ -27,5 +27,8 @@
     (s/set-fn-validation! (not (env? :production)))
     (log/info "Starting app in" (env) "environment")))
 
+(defn dev-start []
+  (mount/start-without #'shevek.app/nrepl))
+
 (defn -main [& args]
   (mount/start))

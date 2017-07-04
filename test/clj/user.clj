@@ -1,5 +1,5 @@
 (ns user)
 
 (defn reset
-  "ProtoREPL call this function. Don't do anything on test REPLs, the reloading should be done by the task"
+  "If this function doesn't exists ProtoREPL will try to do his own code reloading, but we are already doing it on boot."
   [])
