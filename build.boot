@@ -74,7 +74,7 @@
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (target :dir #{(str "target/" env)})))
 
-(deftask start-app []
+(deftask build-and-start-app-for-dev []
   (comp (build :env "dev")
         (with-pass-thru _
           (shevek.app/dev-start))))
@@ -96,13 +96,13 @@
         (reload :asset-path "public")
         (cljs-repl)
         (cljs-devtools)
-        (start-app)))
+        (build-and-start-app-for-dev)))
 
 (deftask dev-run
   "Runs the application in development mode, without REPL and code reloading."
   []
   (comp (dev-config)
-        (start-app)
+        (build-and-start-app-for-dev)
         (wait)))
 
 (deftask test-config []
