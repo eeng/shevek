@@ -3,13 +3,8 @@
             [stub-http.core :refer :all]
             [shevek.asserts :refer [submaps?]]
             [shevek.lib.druid-driver :as druid]
-            [clojure.java.io :as io]
+            [shevek.support.druid :refer [druid-res]]
             [cheshire.core :refer [generate-string]]))
-
-(defn druid-res [name]
-  {:status 200
-   :content-type "application/json"
-   :body (-> (str "druid_responses/" name ".json") io/resource slurp)})
 
 (deftest datasources-test
   (with-routes!

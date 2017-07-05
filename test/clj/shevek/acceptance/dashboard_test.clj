@@ -1,9 +1,9 @@
 (ns shevek.acceptance.dashboard-test
   (:require [clojure.test :refer :all]
             [shevek.acceptance.test-helper :refer :all]
+            [etaoin.api :refer :all]
             [shevek.schemas.cube :refer [Cube]]
-            [shevek.makers :refer [make!]]
-            [etaoin.api :refer :all]))
+            [shevek.makers :refer [make!]]))
 
 (deftest dashboard
   (it "shows the available cubes" page

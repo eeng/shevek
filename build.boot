@@ -131,7 +131,7 @@
   (comp (test-config)
         (build :env "test")
         ; Hay que levantar la app (con nrepl) desde el on-start y no desde boot porque sino el test al correr en un pod no ve los mount states.
-        (alt-test :test-matcher #".*acceptance.*"
+        (alt-test :test-matcher #".*acceptance\.(?!test\-helper).*"
                   :on-start 'shevek.test-helper/init-acceptance-tests)))
 
 (deftask test-all

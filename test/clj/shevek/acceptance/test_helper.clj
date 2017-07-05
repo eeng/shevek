@@ -26,10 +26,18 @@
     (catch clojure.lang.ExceptionInfo _
       false)))
 
+(defn- element-text [driver selector]
+  (some->> (query-all driver {:css selector}) ; We can't use the query function because it throw error when the element is not found
+           first
+           (get-element-text-el driver)))
+
 (defn has-css? [driver selector attribute value]
   (case attribute
-    :text (waiting #(.contains (get-element-text-el driver (query driver {:css selector})) value))
+    :text (waiting #(.contains (or (element-text driver selector) "") value))
     :count (waiting #(= (count (query-all driver {:css selector})) value))))
 
 (defn has-title? [driver title]
   (has-css? driver "h1.header" :text title))
+
+(defn click-link [driver text]
+  (click driver {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a][1]" text)}))
