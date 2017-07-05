@@ -1,14 +1,22 @@
 (ns shevek.acceptance.dashboard-test
   (:require [clojure.test :refer :all]
-            [etaoin.api :refer :all]
-            [shevek.test-helper :refer [spec]]))
+            [shevek.acceptance.test-helper :refer :all]
+            [shevek.schemas.cube :refer [Cube]]
+            [shevek.makers :refer [make!]]
+            [etaoin.api :refer :all]))
 
 (deftest dashboard
-  (testing "muestra los cubos disponibles"
-    (with-chrome {} driver
-      (go driver "http://localhost:3200")
-      (wait-has-text driver {:tag "h1"} "Dashboard"))))
+  (it "shows the available cubes" page
+    (make! Cube {:title "Sales"})
+    (make! Cube {:title "Inventory"})
+    (visit page "/")
+    (is (has-title? page "Dashboard"))
+    (is (has-css? page ".cube.card:nth-child(1)" :text "Sales"))
+    (is (has-css? page ".cube.card:nth-child(2)" :text "Inventory")))
 
-#_(def driver (chrome))
-#_(go driver "http://localhost:3200")
-#_(wait-has-text driver {:tag "h1"} "Dashboard")
+  (it "the cubes are displayed also on the menu" page
+    (make! Cube {:title "Sales"})
+    (make! Cube {:title "Inventory"})
+    (visit page "/")
+    (click page {:css "#cubes-menu"})
+    (is (has-css? page "#cubes-popup .item" :count 2))))

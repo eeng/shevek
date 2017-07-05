@@ -12,6 +12,7 @@
 (defn init-acceptance-tests []
   (mount/start))
 
+; TODO REFACT no me convence esto xq no permite agrupar tests, hacer mejor algo como el it de acceptance q solo hace un testing
 (defmacro spec [description & body]
   (let [slug (symbol (str/slug description))]
     `(deftest ~slug
@@ -19,3 +20,7 @@
          (drop-db db)
          (init-db db)
          ~@body))))
+
+(defmacro pending [name & body]
+  (let [message (str "\n" name " is pending !!")]
+    `(testing ~name (println ~message))))

@@ -41,7 +41,7 @@
        [:div (t :cubes/no-results)])]))
 
 (defn- cubes-popup-activator [popup]
-  [:a.item {:on-click (popup :toggle)}
+  [:a#cubes-menu.item {:on-click (popup :toggle)}
    [:i.cubes.icon]
    (if (current-page? :viewer)
      (db/get-in [:cubes (current-cube-name) :title])
