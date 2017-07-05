@@ -1,7 +1,7 @@
 (set-env!
   :source-paths   #{"src/clj" "src/cljc" "src/cljs" "src/less"}
   :resource-paths #{"resources"}
-  :dependencies   '[[org.clojure/clojurescript "1.9.494"]
+  :dependencies   '[[org.clojure/clojurescript "1.9.671"]
                     [adzerk/boot-cljs "2.0.0" :scope "test"]
                     [adzerk/boot-reload "0.5.1" :scope "test"]
                     [com.cemerick/piggieback "0.2.1" :scope "test"] ; Needed by boot-cljs-repl
@@ -17,7 +17,7 @@
                     [doo "0.1.7" :scope "test"] ; Needed by boot-cljs-test
                     [pjstadig/humane-test-output "0.8.1" :scope "test"]
                     [proto-repl "0.3.1"]
-                    [reagent "0.6.0"]
+                    [reagent "0.7.0"]
                     [clj-http "2.3.0"]
                     [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
                     [tongue "0.1.4"]
@@ -34,7 +34,7 @@
                     [com.andrewmcveigh/cljs-time "0.5.0-alpha2"]
                     [com.taoensso/timbre "4.8.0"]
                     [com.rpl/specter "1.0.0"]
-                    [prismatic/schema "1.1.4"]
+                    [prismatic/schema "1.1.6"]
                     [metosin/schema-tools "0.9.0"]
                     [prismatic/schema-generators "0.1.0"]
                     [com.novemberain/monger "3.1.0"]
