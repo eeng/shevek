@@ -3,13 +3,12 @@
             [etaoin.api :refer :all]
             [shevek.test-helper :refer [spec]]))
 
-(deftest test-xxx
-  (with-chrome {} driver
-    (println (mount.core/running-states))
-    (go driver "http://localhost:3110")
-    (Thread/sleep 1000)))
-    ; (wait-has-text driver {:tag "h1"} "Dashboard")))
+(deftest dashboard
+  (testing "muestra los cubos disponibles"
+    (with-chrome {} driver
+      (go driver "http://localhost:3200")
+      (wait-has-text driver {:tag "h1"} "Dashboard"))))
 
 #_(def driver (chrome))
-#_(go driver "http://localhost:3110")
+#_(go driver "http://localhost:3200")
 #_(wait-has-text driver {:tag "h1"} "Dashboard")

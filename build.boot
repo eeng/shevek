@@ -65,14 +65,17 @@
       (throw (ex-info "No -main method found" {:main-namespace main-namespace})))
     fs))
 
-(deftask build []
+; Estaría bueno poder usar el env de cprop pero como se levanta con mount y eso sucede después del build no puedo.
+(deftask build
+  "Build ClojureScript a Less files."
+  [e env PATH str "Subdir of target where to put compiled files"]
   (comp (cljs)
         (less)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
-        (target)))
+        (target :dir #{(str "target/" env)})))
 
 (deftask start-app []
-  (comp (build)
+  (comp (build :env "dev")
         (with-pass-thru _
           (shevek.app/dev-start))))
 
@@ -105,6 +108,8 @@
 (deftask test-config []
   (merge-env! :source-paths #{"test/clj" "test/cljc" "test/cljs"} :resource-paths #{"test/resources"})
   (System/setProperty "conf" "test/resources/config.edn")
+  (task-options! cljs {:optimizations :none :source-map true}
+                 less {:source-map  true})
   identity)
 
 (deftask test-clj
@@ -124,7 +129,7 @@
   "Run the acceptance tests."
   []
   (comp (test-config)
-        (build)
+        (build :env "test")
         ; Hay que levantar la app (con nrepl) desde el on-start y no desde boot porque sino el test al correr en un pod no ve los mount states.
         (alt-test :test-matcher #".*acceptance.*"
                   :on-start 'shevek.test-helper/init-acceptance-tests)))
