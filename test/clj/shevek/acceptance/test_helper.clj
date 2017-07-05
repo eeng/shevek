@@ -8,16 +8,16 @@
 ; Por defecto etaoin espera 20 segs
 (alter-var-root #'etaoin.api/default-timeout (constantly 5))
 
-(defmacro it [description driver & body]
+(defmacro it [description page & body]
   `(testing ~description
-     (with-chrome {} ~driver
-       (with-postmortem ~driver {:dir "/tmp"}
+     (with-chrome {} ~page
+       (with-postmortem ~page {:dir "/tmp"}
          (drop-db db)
          (init-db db)
          ~@body))))
 
-(defn visit [driver path]
-  (go driver (str "http://localhost:" (config :port) path)))
+(defn visit [page path]
+  (go page (str "http://localhost:" (config :port) path)))
 
 (defn- waiting [pred]
   (try
@@ -26,18 +26,26 @@
     (catch clojure.lang.ExceptionInfo _
       false)))
 
-(defn- element-text [driver selector]
-  (some->> (query-all driver {:css selector}) ; We can't use the query function because it throw error when the element is not found
+(defn- element-text [page selector]
+  (some->> (query-all page {:css selector}) ; We can't use the query function because it throw error when the element is not found
            first
-           (get-element-text-el driver)))
+           (get-element-text-el page)))
 
-(defn has-css? [driver selector attribute value]
+(defn has-css? [page selector attribute value]
   (case attribute
-    :text (waiting #(.contains (or (element-text driver selector) "") value))
-    :count (waiting #(= (count (query-all driver {:css selector})) value))))
+    :text (waiting #(.contains (or (element-text page selector) "") value))
+    :count (waiting #(= (count (query-all page {:css selector})) value))))
 
-(defn has-title? [driver title]
-  (has-css? driver "h1.header" :text title))
+(defn has-title? [page title]
+  (has-css? page "h1.header" :text title))
 
-(defn click-link [driver text]
-  (click driver {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a][1]" text)}))
+(defn clickw [page q]
+  (wait-exists page q)
+  (click page q))
+
+(defn select [page q option]
+  (clickw page q)
+  (clickw page {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
+
+(defn click-link [page text]
+  (clickw page {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a][1]" text)}))
