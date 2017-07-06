@@ -1,5 +1,10 @@
 (ns shevek.lib.rpc
-  (:require [clojure.string :refer [split]]))
+  (:require [clojure.string :refer [split]]
+            ; Hay que colocar las api aca para que las resuelva el call-fn en los tests de aceptación (y posiblemente luego tb en production)
+            [shevek.reports.api]
+            [shevek.querying.api]
+            [shevek.users.api]
+            [shevek.schema.api]))
 
 (defn call-fn
   "Given a map like {:fn 'ns/func' :args [1 2]} calls (shevek.ns/func 1 2)"

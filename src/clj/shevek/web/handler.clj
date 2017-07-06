@@ -1,4 +1,4 @@
-(ns shevek.handler
+(ns shevek.web.handler
   (:require [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [ring.middleware.format :refer [wrap-restful-format]]
             [compojure.core :refer [defroutes GET POST]]
@@ -8,14 +8,11 @@
             [shevek.lib.transit-handlers :as th]
             [shevek.lib.rpc :as rpc]
             [shevek.lib.auth :as auth]
-            ; Hay que colocar las api aca para que las resuelva el call-fn en los tests de aceptación (y posiblemente luego tb en production)
-            [shevek.reports.api]
-            [shevek.querying.api]
-            [shevek.users.api]
-            [shevek.schema.api]))
+            [shevek.web.pages :as pages]))
 
 (defroutes app-routes
-  (GET "/" [] (-> "public/index.html" io/resource slurp))
+  (GET "/" [] (pages/index))
+  (GET "/login" {params :params} (pages/login params))
   (POST "/login" {params :params} (auth/login params))
   (POST "/rpc" {params :params} {:status 200 :body (rpc/call-fn params)})
   (resources "/")

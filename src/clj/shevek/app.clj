@@ -2,7 +2,7 @@
   (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [mount.core :as mount :refer [defstate]]
             [shevek.config :refer [config env? env]]
-            [shevek.server]
+            [shevek.web.server]
             [shevek.db]
             [shevek.dw]
             [taoensso.timbre :as log]

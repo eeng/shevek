@@ -8,7 +8,7 @@
             [spyscope.core]))
 
 (defn init-unit-tests []
-  (mount/start-without #'shevek.app/nrepl #'shevek.server/web-server))
+  (mount/start-without #'shevek.app/nrepl #'shevek.web.server/web-server))
 
 (defn init-acceptance-tests []
   (mount/start))

@@ -1,8 +1,8 @@
-(ns shevek.server
+(ns shevek.web.server
   (:require [mount.core :refer [defstate]]
             [org.httpkit.server :refer [run-server]]
             [shevek.config :refer [config]]
-            [shevek.handler :refer [app]]
+            [shevek.web.handler :refer [app]]
             [taoensso.timbre :as log]))
 
 (defn start-web-server [port]
