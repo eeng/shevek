@@ -3,7 +3,7 @@
             [shevek.lib.auth :refer [authenticate]]
             [shevek.test-helper :refer [it]]
             [shevek.config :refer [config]]
-            [shevek.asserts :refer [submap?]]
+            [shevek.asserts :refer [submap? without?]]
             [shevek.makers :refer [make!]]
             [shevek.users.repository :refer [User]]
             [shevek.db :refer [db]]
@@ -11,10 +11,12 @@
             [clj-time.core :as t]))
 
 (deftest authenticate-tests
-  (it "valid credentials should return a JSON Web Token"
+  (it "valid credentials should return a JSON Web Token with the user data (except password)"
     (make! User {:username "john" :password "secret123"})
-    (let [{:keys [token]} (authenticate db {:username "john" :password "secret123"})]
-      (is (submap? {:username "john"}  (jwt/unsign token (config :jwt-secret))))))
+    (let [{:keys [token]} (authenticate db {:username "john" :password "secret123"})
+          user (jwt/unsign token (config :jwt-secret))]
+      (is (submap? {:username "john"} user))
+      (is (without? :password user))))
 
   (it "non-existent user should return an error message"
     (let [{:keys [error]} (authenticate db {:username "john"})]

@@ -136,6 +136,7 @@
     (when dom-node
       (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
 
+; TODO ver si el auto-focus true (ver login) no soluciona ya esto
 ; El setTimeout es necesario xq sino no funcaba el focus en el search dentro de filter popups.
 (defn focused [& target]
   (r/create-class

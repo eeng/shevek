@@ -4,12 +4,14 @@
             [shevek.users.repository :as users]
             [shevek.config :refer [config]]
             [bcrypt-clj.auth :refer [check-password]]
-            [clj-time.core :as t]
-            [shevek.web.pages :as pages]
-            [ring.util.response :refer [redirect]]))
+            [clj-time.core :as t]))
 
-(defn- generate-token [{:keys [username]}]
-  (jwt/sign {:username username :exp (t/plus (t/now) (t/days 1))} (config :jwt-secret)))
+(def token-expiration (t/days 1))
+
+(defn- generate-token [user]
+  (let [token (-> (dissoc user :_id :password)
+                  (assoc :exp (t/plus (t/now) token-expiration)))]
+    (jwt/sign token (config :jwt-secret))))
 
 (defn authenticate [db {:keys [username password]}]
   (let [user (users/find-by-username db username)]
@@ -19,9 +21,7 @@
 
 (defn login [params]
   (let [{:keys [token] :as res} (authenticate db params)]
-    (if token
-      (redirect (str "/")) ; TODO poner el token en la cookie
-      (pages/login params))))
+    {:status (if token 201 401) :body res})) ;
 
 #_(def token (:token (authenticate db {:username "emma" :password "asdf654"})))
 #_(jwt/unsign token (config :jwt-secret))

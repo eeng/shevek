@@ -6,6 +6,7 @@
             [shevek.rpc :refer [loading?]]
             [shevek.components :refer [controlled-popup]]
             [shevek.components.modal :refer [modal]]
+            [shevek.login :as login :refer [logged-in?]]
             [shevek.dashboard :as dashboard]
             [shevek.admin.page :as admin]
             [shevek.settings :refer [settings-menu]]
@@ -16,7 +17,8 @@
             [shevek.dw :as dw]))
 
 (def pages
-  {:dashboard #'dashboard/page
+  {:login #'login/page
+   :dashboard #'dashboard/page
    :admin #'admin/page
    :viewer #'viewer/page})
 
@@ -65,9 +67,10 @@
     [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]])
 
 (defn layout []
-  [:div
-   [menu]
-   [:div.page
-    [(get pages (current-page) :div)]]
-   [modal]
-   [notification]])
+  (let [page (if (logged-in?) (current-page) :login)]
+    [:div
+     (when (logged-in?) [menu])
+     [:div.page
+      [(get pages page :div)]]
+     [modal]
+     [notification]]))

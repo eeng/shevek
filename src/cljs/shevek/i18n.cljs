@@ -68,11 +68,12 @@
             :title "Administration"
             :subtitle "Configure the users, cube descriptions and other stuff in this page"
             :users "Users"}
-    :users {:username "User Name"
+    :users {:username "Username"
             :fullname "Full Name"
             :email "Email"
             :password "Password"
-            :password-confirmation "Password Confirmation"}
+            :password-confirmation "Password Confirmation"
+            :invalid-credentials "Invalid username or password"}
     :date-formats {:minute "MMM d, h:mma"
                    :hour "MMM d, yyyy ha"
                    :day "MMM d, yyyy"
@@ -155,7 +156,8 @@
     :users {:username "Usuario"
             :fullname "Nombre"
             :email "Email"
-            :password-confirmation "Confirmación de Password"}
+            :password-confirmation "Confirmación de Password"
+            :invalid-credentials "Usuario y/o password incorrecto"}
     :date-formats {:minute "dd/MM HH:mm"
                    :hour "dd/MM/yy H 'hs'"
                    :day "dd/MM/yy"
