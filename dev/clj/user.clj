@@ -6,3 +6,9 @@
 
 ; Para transformar el REPL en bREPL:
 ; (in-ns 'boot.user) (start-repl)
+
+; Debugging acceptance test
+#_(do
+    (require '[etaoin.api :refer :all])
+    (def page (chrome))
+    (go page "http://localhost:3200"))

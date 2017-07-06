@@ -8,7 +8,7 @@
     (visit page "/")
     (is (has-text? page "Cube"))
     (is (not (has-text? page "Cubos")))
-    (clickw page {:id "settings-menu"})
+    (click-link page "Settings")
     (select page {:id "lang-dropdown"} "Español")
     (is (has-text? page "Cubos"))
     (is (not (has-text? page "Cube")))

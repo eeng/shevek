@@ -16,18 +16,23 @@
 (defn- classes [& css-classes]
   (->> css-classes (filter identity) (str/join " ")))
 
+(defn- name-from-field-path [path]
+  (str/join "-" (map name path)))
+
 (defn text-input [atom field & [{:as opts}]]
   (let [path (wrap-coll field)
         opts (merge {:type "text"
                      :value (get-in @atom path)
-                     :on-change #(swap! atom assoc-in path (.-target.value %))}
+                     :on-change #(swap! atom assoc-in path (.-target.value %))
+                     :name (name-from-field-path path)}
                     opts)]
     [:input opts]))
 
 (defn textarea [atom field & [{:as opts}]]
   (let [path (wrap-coll field)
         opts (merge {:value (get-in @atom path)
-                     :on-change #(swap! atom assoc-in path (.-target.value %))}
+                     :on-change #(swap! atom assoc-in path (.-target.value %))
+                     :name (name-from-field-path path)}
                     opts)]
     [:textarea opts]))
 

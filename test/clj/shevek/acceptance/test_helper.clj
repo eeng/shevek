@@ -48,4 +48,4 @@
   (clickw page {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
 
 (defn click-link [page text]
-  (clickw page {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a][1]" text)}))
+  (clickw page {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)}))

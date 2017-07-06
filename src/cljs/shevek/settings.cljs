@@ -64,7 +64,7 @@
        :on-change #(do (dispatch :settings-saved {:lang %}) (close))}]]])
 
 (defn- popup-activator [popup]
-  [:a#settings-menu.item {:on-click (popup :toggle)}
+  [:a.item {:on-click (popup :toggle)}
    [:i.setting.icon] (t :settings/menu)])
 
 (defn- settings-menu []
