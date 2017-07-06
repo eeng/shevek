@@ -42,7 +42,8 @@
                     [cljsjs/numeral "2.0.6-0"]
                     [org.clojure/core.match "0.3.0-alpha4"]
                     [etaoin "0.1.6" :scope "test"]
-                    [spyscope "0.1.5"]])
+                    [spyscope "0.1.5"]
+                    [buddy/buddy-sign "1.4.0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]

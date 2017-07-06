@@ -34,6 +34,9 @@
     (mq/fields [:username :fullname :email])
     (mq/sort {:username 1})))
 
+(defn find-by-username [db username]
+  (mc/find-one-as-map db "users" {:username username}))
+
 ;; Examples
 
 #_(save-user shevek.db/db {:username "ddchp" :fullname "Daniel Chavarini" :password "prueba" :email "auditor@vitolen.com"})

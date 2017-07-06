@@ -4,28 +4,20 @@
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
-            [clojure.string :refer [split]]
             [shevek.logging :refer [wrap-request-logging]]
             [shevek.lib.transit-handlers :as th]
+            [shevek.lib.rpc :as rpc]
+            [shevek.lib.auth :as auth]
             ; Hay que colocar las api aca para que las resuelva el call-fn en los tests de aceptación (y posiblemente luego tb en production)
             [shevek.reports.api]
             [shevek.querying.api]
             [shevek.users.api]
             [shevek.schema.api]))
 
-(defn call-fn
-  "Given a map like {:fn 'ns/func' :args [1 2]} calls (shevek.ns/func 1 2)"
-  [{fid :fn args :args :or {args []}}]
-  (let [[namespace-suffix fn-name] (split fid #"/")
-        namespace (str "shevek." namespace-suffix)
-        f (ns-resolve (symbol namespace) (symbol fn-name))]
-    (if f
-      (apply f args)
-      (throw (IllegalArgumentException. (str "There is no remote function with fid " fid))))))
-
 (defroutes app-routes
   (GET "/" [] (-> "public/index.html" io/resource slurp))
-  (POST "/rpc" {params :params} {:status 200 :body (call-fn params)})
+  (POST "/login" {params :params} (auth/login params))
+  (POST "/rpc" {params :params} {:status 200 :body (rpc/call-fn params)})
   (resources "/")
   (not-found (-> "public/404.html" io/resource slurp)))
 

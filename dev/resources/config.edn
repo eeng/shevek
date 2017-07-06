@@ -1,2 +1,3 @@
 {:env :development
- :druid-uri "http://10.0.1.13:8082"}
+ :druid-uri "http://10.0.1.13:8082"
+ :jwt-secret "bca6cbe12667824fe817a2fef73e1c2d3f2387859a08c549"}
