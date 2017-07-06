@@ -17,7 +17,8 @@
   (->> css-classes (filter identity) (str/join " ")))
 
 (defn- name-from-field-path [path]
-  (str/join "-" (map name path)))
+  (let [to-name #(if (keyword? %) (name %) (str %))]
+    (str/join "-" (map to-name path))))
 
 (defn text-input [atom field & [{:as opts}]]
   (let [path (wrap-coll field)
