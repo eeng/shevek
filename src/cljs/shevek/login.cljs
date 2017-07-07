@@ -27,7 +27,7 @@
           (js->clj $ :keywordize-keys true))))
 
 (defevh :login-successful [db {:keys [token]}]
-  (local-storage/store! "shevek.access-token" token)
+  (local-storage/set-item! "shevek.access-token" token)
   (-> (assoc db :current-user (extract-user token))
       (rpc/loaded :logging-in)))
 
@@ -47,7 +47,7 @@
   (dissoc db :current-user))
 
 (defevh :user-restored [db]
-  (assoc db :current-user (extract-user (local-storage/retrieve "shevek.access-token"))))
+  (assoc db :current-user (extract-user (local-storage/get-item "shevek.access-token"))))
 
 (defn page []
   (let [user (r/atom {})

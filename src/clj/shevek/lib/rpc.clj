@@ -15,3 +15,6 @@
     (if f
       (apply f args)
       (throw (IllegalArgumentException. (str "There is no remote function with fid " fid))))))
+
+(defn controller [{:keys [params]}]
+  {:status 200 :body (call-fn params)})

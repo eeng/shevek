@@ -4,7 +4,8 @@
             [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [shevek.i18n :refer [t]]
-            [shevek.components.modal :refer [show-modal]]))
+            [shevek.components.modal :refer [show-modal]]
+            [shevek.lib.local-storage :as local-storage]))
 
 (defn loading?
   ([] (seq (db/get :loading)))
@@ -30,7 +31,8 @@
   {:pre [(vector? args)]}
   (POST "/rpc" {:params {:fn fid :args args}
                 :handler handler
-                :error-handler #(dispatch :server-error %)}))
+                :error-handler #(dispatch :server-error %)
+                :headers {"Authorization" (str "Token " (local-storage/get-item "shevek.access-token"))}}))
 
 ;; Generic events to make remote queries (doesn't allow to process them before storing in the db)
 

@@ -14,9 +14,12 @@
     (events/listen EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (.setEnabled true)))
 
-(defn init []
-  (enable-console-print!)
+(defn init-reflow []
   (reflow/init (-> (i/router) (i/logger) (schema/checker)))
   (reflow/dispatch :settings-loaded)
-  (reflow/dispatch :user-restored)
+  (reflow/dispatch :user-restored))
+
+(defn init []
+  (enable-console-print!)
+  (init-reflow)
   (r/render-component [layout] (.getElementById js/document "app")))

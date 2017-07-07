@@ -19,7 +19,7 @@
       {:token (generate-token user)}
       {:error :invalid-credentials})))
 
-(defn login [params]
+(defn controller [{:keys [params]}]
   (let [{:keys [token] :as res} (authenticate db params)]
     {:status (if token 201 401) :body res})) ;
 

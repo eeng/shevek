@@ -16,6 +16,7 @@
                     [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
                     [doo "0.1.7" :scope "test"] ; Needed by boot-cljs-test
                     [pjstadig/humane-test-output "0.8.1" :scope "test"]
+                    [etaoin "0.1.6" :scope "test"]
                     [proto-repl "0.3.1"]
                     [reagent "0.7.0"]
                     [clj-http "2.3.0"]
@@ -38,12 +39,12 @@
                     [metosin/schema-tools "0.9.0"]
                     [prismatic/schema-generators "0.1.0"]
                     [com.novemberain/monger "3.1.0"]
-                    [bcrypt-clj "0.3.3"]
                     [cljsjs/numeral "2.0.6-0"]
                     [org.clojure/core.match "0.3.0-alpha4"]
-                    [etaoin "0.1.6" :scope "test"]
                     [spyscope "0.1.5"]
-                    [buddy/buddy-sign "1.4.0"]])
+                    [bcrypt-clj "0.3.3"]
+                    [buddy/buddy-sign "1.5.0"]
+                    [buddy/buddy-auth "1.4.1"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
