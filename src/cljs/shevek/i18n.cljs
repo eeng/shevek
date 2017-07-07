@@ -73,7 +73,8 @@
             :email "Email"
             :password "Password"
             :password-confirmation "Password Confirmation"
-            :invalid-credentials "Invalid username or password"}
+            :invalid-credentials "Invalid username or password"
+            :session-expired "Session expired, please login again"}
     :date-formats {:minute "MMM d, h:mma"
                    :hour "MMM d, yyyy ha"
                    :day "MMM d, yyyy"
@@ -157,7 +158,8 @@
             :fullname "Nombre"
             :email "Email"
             :password-confirmation "Confirmación de Password"
-            :invalid-credentials "Usuario y/o password incorrecto"}
+            :invalid-credentials "Usuario y/o password incorrecto"
+            :session-expired "Sesión expirada, por favor ingrese nuevamente"}
     :date-formats {:minute "dd/MM HH:mm"
                    :hour "dd/MM/yy H 'hs'"
                    :day "dd/MM/yy"

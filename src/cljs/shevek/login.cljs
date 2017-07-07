@@ -26,25 +26,32 @@
           (.parse js/JSON $)
           (js->clj $ :keywordize-keys true))))
 
+(defonce error (r/atom nil))
+
 (defevh :login-successful [db {:keys [token]}]
   (local-storage/set-item! "shevek.access-token" token)
   (-> (assoc db :current-user (extract-user token))
       (rpc/loaded :logging-in)))
 
-(defevh :login-failed [db user]
-  (swap! user assoc :error :users/invalid-credentials)
+(defevh :login-failed [db]
+  (reset! error :users/invalid-credentials)
   (rpc/loaded db :logging-in))
 
 (defevh :login [db user]
-  (swap! user dissoc :error)
-  (POST "/login" {:params (dissoc @user :error)
+  (reset! error nil)
+  (POST "/login" {:params @user
                   :handler #(dispatch :login-successful %)
-                  :error-handler #(dispatch :login-failed user)})
+                  :error-handler #(dispatch :login-failed)})
   (rpc/loading db :logging-in))
 
 (defevh :logout [db]
   (local-storage/remove-item! "shevek.access-token")
   (dissoc db :current-user))
+
+(defevh :session-expired [db]
+  (reset! error :users/session-expired)
+  (dispatch :logout)
+  db)
 
 (defevh :user-restored [db]
   (assoc db :current-user (extract-user (local-storage/get-item "shevek.access-token"))))
@@ -61,7 +68,7 @@
          [:div.content "Shevek"
           [:div.sub.header "Data Warehouse Visualization System"]]]
         [:div.ui.segment (rpc/loading-class :logging-in)
-         [:div.ui.form {:ref shortcuts :class (when (:error @user) "error")}
+         [:div.ui.form {:ref shortcuts :class (when @error "error")}
           [:div.field
            [:div.ui.left.icon.input
             [:i.user.icon]
@@ -70,7 +77,7 @@
            [:div.ui.left.icon.input
             [:i.lock.icon]
             [text-input user :password {:placeholder (t :users/password) :type "password"}]]]
-          (when (:error @user)
+          (when @error
             [:div.ui.error.message
-             (t (:error @user))])
+             (t @error)])
           [:button.ui.fluid.large.blue.primary.button {:on-click save} "Login"]]]]])))

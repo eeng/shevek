@@ -18,13 +18,21 @@
   ([db] (assoc db :loading {}))
   ([db key] (update db :loading dissoc key)))
 
-(defevh :server-error [db {:keys [status status-text response] :as error}]
+(defn handle-not-authenticated []
+  (dispatch :session-expired))
+
+(defn handle-app-error [{:keys [status status-text response]}]
   (show-modal {:class "small basic"
                :header [:div.ui.icon.red.header
                         [:i.warning.circle.icon]
                         (str "Error " status ": " status-text)]
                :content response
-               :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]})
+               :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]}))
+
+(defevh :server-error [db {:keys [status] :as error}]
+  (case status
+    401 (handle-not-authenticated)
+    (handle-app-error error))
   (loaded db))
 
 (defn call [fid & {:keys [args handler] :or {args []}}]
