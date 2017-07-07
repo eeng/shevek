@@ -36,7 +36,7 @@
 
 (defn has-css?
   ([page selector]
-   (wait-visible page {:css selector}))
+   (waiting #(e/exists? page {:css selector})))
   ([page selector attribute value]
    (case attribute
      :text (waiting #(.contains (or (element-text page selector) "") value))
@@ -70,9 +70,11 @@
   (wait-visible page (-> fields keys first))
   (e/fill-multi page fields))
 
-(defn login [page]
-  (make! User {:username "someuser" :password "secret123"})
-  (visit page "/")
-  (fill page {:name "username"} "someuser")
-  (fill page {:name "password"} "secret123" k/enter)
-  (has-css? page ".menu"))
+(defn login
+  ([page] (login page {:username "someuser" :password "secret123"}))
+  ([page {:keys [username password] :as user}]
+   (make! User user)
+   (visit page "/")
+   (fill page {:name "username"} username)
+   (fill page {:name "password"} password k/enter)
+   (has-css? page ".menu")))
