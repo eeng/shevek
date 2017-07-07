@@ -1,5 +1,5 @@
 (ns shevek.acceptance.test-helper
-  (:require [etaoin.api :refer :all]
+  (:require [etaoin.api :as e :refer [wait-predicate wait-visible wait-exists query query-all get-element-text-el go with-chrome with-postmortem]]
             [etaoin.keys :as k]
             [clojure.test :refer [testing]]
             [monger.db :refer [drop-db]]
@@ -9,7 +9,7 @@
             [shevek.makers :refer [make!]]))
 
 ; Por defecto etaoin espera 20 segs
-(alter-var-root #'etaoin.api/default-timeout (constantly 5))
+(alter-var-root #'e/default-timeout (constantly 5))
 
 (defmacro it [description page & body]
   `(testing ~description
@@ -45,16 +45,30 @@
 (defn has-title? [page title]
   (has-css? page "h1.header" :text title))
 
-(defn clickw [page q]
+(defn has-text? [page text]
+  (waiting #(e/has-text? page text)))
+
+(defn has-no-text? [page text]
+  (waiting #(not (e/has-text? page text))))
+
+(defn click [page q]
   (wait-exists page q)
-  (click page q))
+  (e/click page q))
 
 (defn select [page q option]
-  (clickw page q)
-  (clickw page {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
+  (click page q)
+  (click page {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
 
 (defn click-link [page text]
-  (clickw page {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)}))
+  (click page {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)}))
+
+(defn fill [page field & values]
+  (wait-visible page field)
+  (apply e/fill page field values))
+
+(defn fill-multi [page fields]
+  (wait-visible page (-> fields keys first))
+  (e/fill-multi page fields))
 
 (defn login [page]
   (make! User {:username "someuser" :password "secret123"})

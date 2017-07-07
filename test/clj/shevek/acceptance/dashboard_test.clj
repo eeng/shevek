@@ -1,7 +1,6 @@
 (ns shevek.acceptance.dashboard-test
   (:require [clojure.test :refer :all]
             [shevek.acceptance.test-helper :refer :all]
-            [etaoin.api :refer :all]
             [shevek.schemas.cube :refer [Cube]]
             [shevek.makers :refer [make!]]))
 
@@ -18,5 +17,5 @@
     (make! Cube {:title "Sales"})
     (make! Cube {:title "Inventory"})
     (login page)
-    (clickw page {:css "#cubes-menu"})
+    (click page {:css "#cubes-menu"})
     (is (has-css? page "#cubes-popup .item" :count 2))))

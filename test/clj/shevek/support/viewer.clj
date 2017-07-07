@@ -1,6 +1,5 @@
 (ns shevek.support.viewer
   (:require [shevek.acceptance.test-helper :refer :all]
-            [etaoin.api :refer :all]
             [shevek.makers :refer [make!]]
             [shevek.schemas.cube :refer [Cube]]))
 

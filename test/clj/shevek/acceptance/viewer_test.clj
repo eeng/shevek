@@ -1,7 +1,7 @@
 (ns shevek.acceptance.viewer-test
   (:require [clojure.test :refer :all]
             [shevek.acceptance.test-helper :refer :all]
-            [etaoin.api :refer :all]
+            [etaoin.api :refer [refresh]]
             [shevek.support.druid :refer [with-fake-druid query-req-matching druid-res]]
             [shevek.support.viewer :refer [make-wikiticker-cube go-to-viewer]]))
 
