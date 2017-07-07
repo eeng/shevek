@@ -5,7 +5,7 @@
             [shevek.asserts :refer [without?]]
             [shevek.users.repository :refer [User find-users save-user reload]]
             [shevek.db :refer [db]]
-            [buddy.hashers :as hashers]))
+            [bcrypt-clj.auth :refer [check-password]]))
 
 (deftest save-user-tests
   (it "should throw error if username already exists"
@@ -13,19 +13,19 @@
     (is (thrown? com.mongodb.DuplicateKeyException (make! User {:username "ddchp"}))))
 
   (it "on create should encrypt password"
-    (is (hashers/check "pass1234" (:password (make! User {:password "pass1234"})))))
+    (is (check-password "pass1234" (:password (make! User {:password "pass1234"})))))
 
   (it "on update should not change password if blank"
     (let [new-user (make! User {:password "pass1234" :fullname "N1"})
           changed-user (->> (assoc new-user :password "" :fullname "N2")
                             (save-user db) (reload db))]
-      (is (hashers/check "pass1234" (:password changed-user)))))
+      (is (check-password "pass1234" (:password changed-user)))))
 
   (it "on update should not change password if :password key is not present"
     (let [new-user (make! User {:password "pass1234" :fullname "N1"})
           changed-user (->> (dissoc new-user :password)
                             (save-user db) (reload db))]
-      (is (hashers/check "pass1234" (:password changed-user))))))
+      (is (check-password "pass1234" (:password changed-user))))))
 
 (deftest find-users-tests
   (it "should return users sorted by username"

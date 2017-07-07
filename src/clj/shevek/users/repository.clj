@@ -2,7 +2,7 @@
   (:require [schema.core :as s]
             [monger.collection :as mc]
             [monger.query :as mq]
-            [buddy.hashers :as hashers]))
+            [bcrypt-clj.auth :refer [crypt-password]]))
 
 (s/defschema User
   {:username s/Str
@@ -13,7 +13,7 @@
 
 (defn- encrypt-password [{:keys [password] :as user}]
   (if (seq password)
-    (assoc user :password (hashers/derive password))
+    (assoc user :password (crypt-password password))
     (dissoc user :password)))
 
 (defn reload [db {:keys [_id]}]

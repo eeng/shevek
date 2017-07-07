@@ -3,7 +3,7 @@
             [shevek.db :refer [db]]
             [shevek.users.repository :as users]
             [shevek.config :refer [config]]
-            [buddy.hashers :as hashers]
+            [bcrypt-clj.auth :refer [check-password]]
             [clj-time.core :as t]))
 
 (def token-expiration (t/days 1))
@@ -15,7 +15,7 @@
 
 (defn authenticate [db {:keys [username password]}]
   (let [user (users/find-by-username db username)]
-    (if (and user (hashers/check password (:password user)))
+    (if (and user (check-password password (:password user)))
       {:token (generate-token user)}
       {:error :invalid-credentials})))
 
