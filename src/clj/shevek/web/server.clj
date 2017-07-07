@@ -7,7 +7,7 @@
 
 (defn start-web-server [port]
   (log/info (str "Starting web server on http://localhost:" port))
-  (run-server app {:port port}))
+  (run-server (app) {:port port}))
 
 (defstate web-server
   :start (start-web-server (config :port))

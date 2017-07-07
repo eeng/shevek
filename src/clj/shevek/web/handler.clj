@@ -26,12 +26,11 @@
   (resources "/")
   (not-found (-> "public/404.html" io/resource slurp)))
 
-(def auth-backend (backends/jws {:secret (config :jwt-secret)}))
-
-; TODO Para habilitar el anti-forgery habría que setearlo en una var en el index con (anti-forgery-field) y luego en los POST de cljs-ajax agregarlo al header X-CSRF-Token UPDATE, creo que no haria falta un anti-forgery con los JWT.
-(def app (-> app-routes
-             (wrap-request-logging)
-             (wrap-authentication auth-backend)
-             (wrap-restful-format :params-options {:transit-json {:handlers th/read-handlers}}
-                                  :response-options {:transit-json {:handlers th/write-handlers}})
-             (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))
+; This needs to be a defn a not a def because of the config which will only be available after mount/start
+(defn app []
+  (-> app-routes
+      (wrap-request-logging)
+      (wrap-authentication (backends/jws {:secret (config :jwt-secret)}))
+      (wrap-restful-format :params-options {:transit-json {:handlers th/read-handlers}}
+                           :response-options {:transit-json {:handlers th/write-handlers}})
+      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))
