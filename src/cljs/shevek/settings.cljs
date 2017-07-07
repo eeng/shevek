@@ -10,9 +10,6 @@
             [schema-tools.core :as st]
             [cuerdas.core :as str]))
 
-(defn load-settings []
-  (dispatch :settings-loaded))
-
 (defn save-settings! [db]
   (local-storage/store! "shevek.settings" (db :settings))
   db)

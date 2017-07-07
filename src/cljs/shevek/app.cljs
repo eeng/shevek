@@ -1,7 +1,6 @@
 (ns shevek.app
   (:require [reagent.core :as r]
             [shevek.layout :refer [layout]]
-            [shevek.settings :refer [load-settings]]
             [shevek.schemas.interceptor :as schema]
             [reflow.core :as reflow]
             [reflow.interceptors :as i]
@@ -18,5 +17,6 @@
 (defn init []
   (enable-console-print!)
   (reflow/init (-> (i/router) (i/logger) (schema/checker)))
-  (load-settings)
+  (reflow/dispatch :settings-loaded)
+  (reflow/dispatch :user-restored)
   (r/render-component [layout] (.getElementById js/document "app")))

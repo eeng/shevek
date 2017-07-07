@@ -16,3 +16,6 @@
 
 (defn retrieve [key]
   (-> key get-item str read-string))
+
+(defn remove-item! [key]
+  (.removeItem js/localStorage key))

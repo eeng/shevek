@@ -6,6 +6,7 @@
             [reflow.core :refer [dispatch]]
             [shevek.rpc :as rpc]
             [shevek.components :refer [text-input focused kb-shortcuts]]
+            [shevek.lib.local-storage :as local-storage]
             [ajax.core :refer [POST]]
             [clojure.string :as str]
             [goog.crypt.base64 :as b64]))
@@ -17,34 +18,40 @@
   (some? (current-user)))
 
 (defn extract-user [token]
-  (as-> token $
-        (str/split $ #"\.")
-        (second $)
-        (b64/decodeString $)
-        (.parse js/JSON $)
-        (js->clj $ :keywordize-keys true)))
+  (when token
+    (as-> token $
+          (str/split $ #"\.")
+          (second $)
+          (b64/decodeString $)
+          (.parse js/JSON $)
+          (js->clj $ :keywordize-keys true))))
 
-(defevh :user/login-successful [db {:keys [token]}]
+(defevh :login-successful [db {:keys [token]}]
+  (local-storage/store! "shevek.access-token" token)
   (-> (assoc db :current-user (extract-user token))
       (rpc/loaded :logging-in)))
 
-(defevh :user/login-failed [db user]
+(defevh :login-failed [db user]
   (swap! user assoc :error :users/invalid-credentials)
   (rpc/loaded db :logging-in))
 
-(defevh :user/login [db user]
+(defevh :login [db user]
   (swap! user dissoc :error)
   (POST "/login" {:params (dissoc @user :error)
-                  :handler #(dispatch :user/login-successful %)
-                  :error-handler #(dispatch :user/login-failed user)})
+                  :handler #(dispatch :login-successful %)
+                  :error-handler #(dispatch :login-failed user)})
   (rpc/loading db :logging-in))
 
-(defevh :user/logout [db]
+(defevh :logout [db]
+  (local-storage/remove-item! "shevek.access-token")
   (dissoc db :current-user))
+
+(defevh :user-restored [db]
+  (assoc db :current-user (extract-user (local-storage/retrieve "shevek.access-token"))))
 
 (defn page []
   (let [user (r/atom {})
-        save #(dispatch :user/login user)
+        save #(dispatch :login user)
         shortcuts (kb-shortcuts :enter save)]
     (fn []
       [:div#login.ui.center.aligned.grid

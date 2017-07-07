@@ -16,9 +16,6 @@
 (defevh :navigate [db page]
   (assoc db :page page))
 
-(defroute "/login" []
-  (dispatch :navigate :login))
-
 (defroute "/" []
   (dispatch :navigate :dashboard))
 
