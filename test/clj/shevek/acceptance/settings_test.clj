@@ -5,7 +5,7 @@
 
 (deftest settings
   (it "allows to change language" page
-    (visit page "/")
+    (login page)
     (is (has-text? page "Cube"))
     (is (not (has-text? page "Cubos")))
     (click-link page "Settings")

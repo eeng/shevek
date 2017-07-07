@@ -60,6 +60,6 @@
 
 (defn go-to-viewer [page]
   (make-wikiticker-cube)
-  (visit page "/")
+  (login page)
   (click page {:css "#cubes-menu"})
   (click-link page "Wikiticker"))

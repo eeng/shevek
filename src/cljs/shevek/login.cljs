@@ -8,8 +8,7 @@
             [shevek.components :refer [text-input focused kb-shortcuts]]
             [shevek.lib.local-storage :as local-storage]
             [ajax.core :refer [POST]]
-            [clojure.string :as str]
-            [goog.crypt.base64 :as b64]))
+            [cljsjs.jwt-decode]))
 
 (defn current-user []
   (db/get :current-user))
@@ -19,12 +18,7 @@
 
 (defn extract-user [token]
   (when token
-    (as-> token $
-          (str/split $ #"\.")
-          (second $)
-          (b64/decodeString $)
-          (.parse js/JSON $)
-          (js->clj $ :keywordize-keys true))))
+    (js->clj (js/jwt_decode token) :keywordize-keys true)))
 
 (defonce error (r/atom nil))
 

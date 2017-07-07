@@ -44,7 +44,8 @@
                     [spyscope "0.1.5"]
                     [bcrypt-clj "0.3.3"]
                     [buddy/buddy-sign "1.5.0"]
-                    [buddy/buddy-auth "1.4.1"]])
+                    [buddy/buddy-auth "1.4.1"]
+                    [cljsjs/jwt-decode "2.1.0-0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
@@ -133,6 +134,7 @@
   []
   (task-options! target {:dir #{"target/test"}})
   (comp (test-config)
+        (build)
         ; Hay que levantar la app (con nrepl) desde el on-start y no desde boot porque sino el test al correr en un pod no ve los mount states.
         (alt-test :test-matcher #".*acceptance\.(?!test\-helper).*"
                   :on-start 'shevek.test-helper/init-acceptance-tests)))
