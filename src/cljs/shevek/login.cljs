@@ -39,6 +39,9 @@
                   :error-handler #(dispatch :user/login-failed user)})
   (rpc/loading db :logging-in))
 
+(defevh :user/logout [db]
+  (dissoc db :current-user))
+
 (defn page []
   (let [user (r/atom {})
         save #(dispatch :user/login user)

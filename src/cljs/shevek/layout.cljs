@@ -64,7 +64,7 @@
     [settings-menu]
     [:a.item {:href "#/admin" :class (current-page-class :admin)}
      [:i.users.icon] (t :admin/menu)]
-    [:a.item {:href "#/logout"} [:i.sign.out.icon] (t :menu/logout)]]])
+    [:a.item {:on-click #(dispatch :user/logout)} [:i.sign.out.icon] (t :menu/logout)]]])
 
 (defn layout []
   (let [page (if (logged-in?) (current-page) :login)]
