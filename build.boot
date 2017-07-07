@@ -78,7 +78,6 @@
         (target)))
 
 (deftask build-and-start-app-for-dev []
-  (task-options! target {:dir #{"target/dev"}})
   (comp (build)
         (with-pass-thru _
           (shevek.app/dev-start))))
@@ -87,7 +86,8 @@
   (merge-env! :source-paths #{"dev/clj"} :resource-paths #{"dev/resources"})
   (System/setProperty "conf" "dev/resources/config.edn")
   (task-options! cljs {:optimizations :none :source-map true}
-                 less {:source-map  true})
+                 less {:source-map  true}
+                 target {:dir #{"target/dev"}})
   identity)
 
 (deftask dev
@@ -113,7 +113,8 @@
   (merge-env! :source-paths #{"test/clj" "test/cljc" "test/cljs"} :resource-paths #{"test/resources"})
   (System/setProperty "conf" "test/resources/config.edn")
   (task-options! cljs {:optimizations :none :source-map true}
-                 less {:source-map  true})
+                 less {:source-map  true}
+                 target {:dir #{"target/test"}})
   identity)
 
 (deftask test-clj
@@ -132,7 +133,6 @@
 (deftask test-acceptance
   "Run the acceptance tests."
   []
-  (task-options! target {:dir #{"target/test"}})
   (comp (test-config)
         (build)
         ; Hay que levantar la app (con nrepl) desde el on-start y no desde boot porque sino el test al correr en un pod no ve los mount states.
