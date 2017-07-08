@@ -59,15 +59,18 @@
  '[shevek.app])
 
 (deftask run
-  "Run the -main function in some namespace with arguments."
-  [m main-namespace NAMESPACE str   "The namespace containing a -main function to invoke."
-   a arguments      EXPR      [edn] "An optional argument sequence to apply to the -main function."]
-  (with-pre-wrap fs
-    (require (symbol main-namespace))
-    (if-let [f (resolve (symbol main-namespace "-main"))]
-      (apply f arguments)
-      (throw (ex-info "No -main method found" {:main-namespace main-namespace})))
-    fs))
+  "Involke a function in some namespace with arguments."
+  [n namespace NAMESPACE str   "The namespace containing the function to invoke."
+   f function  FUNCTION  str   "The function to invoke. Leave empty to call -main."
+   a arguments EXPR      [edn] "An optional argument sequence to apply to the function."]
+  (with-pre-wrap fileset
+    (require (symbol namespace))
+    (let [function (or function "-main")
+          f (resolve (symbol namespace function))]
+      (if f
+        (apply f arguments)
+        (throw (ex-info "Function not found" {:namespace namespace :function function}))))
+    fileset))
 
 (deftask build
   "Build ClojureScript a Less files."
@@ -80,7 +83,7 @@
 (deftask build-and-start-app-for-dev []
   (comp (build)
         (with-pass-thru _
-          (shevek.app/dev-start))))
+          (shevek.app/start-without-nrepl))))
 
 (deftask dev-config []
   (merge-env! :source-paths #{"dev/clj"} :resource-paths #{"dev/resources"})
@@ -145,3 +148,8 @@
   (comp (test-clj)
         (alt-test-cljs :exit? true)
         (test-acceptance)))
+
+(deftask seed
+  "Seeds the application data."
+  []
+  (run :namespace "shevek.schema.seed" :function "seed!"))

@@ -1,17 +1,16 @@
 (ns shevek.test-helper
-  (:require [mount.core :as mount]
-            [monger.db :refer [drop-db]]
-            [shevek.app]
+  (:require [monger.db :refer [drop-db]]
+            [shevek.app :refer [start start-db]]
             [shevek.db :refer [db init-db]]
             [clojure.test :refer [deftest testing]]
             [cuerdas.core :as str]
             [spyscope.core]))
 
 (defn init-unit-tests []
-  (mount/start-without #'shevek.app/nrepl #'shevek.web.server/web-server))
+  (start-db))
 
 (defn init-acceptance-tests []
-  (mount/start))
+  (start))
 
 (defmacro it [description & body]
   `(testing ~description
