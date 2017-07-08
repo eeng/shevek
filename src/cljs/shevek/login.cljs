@@ -52,8 +52,8 @@
 
 (defn page []
   (let [user (r/atom {})
-        save #(dispatch :login user)
-        shortcuts (kb-shortcuts :enter save)]
+        login #(dispatch :login user)
+        shortcuts (kb-shortcuts :enter login)]
     (fn []
       [:div#login.ui.center.aligned.grid
        [:div.column
@@ -74,4 +74,4 @@
           (when @error
             [:div.ui.error.message
              (t @error)])
-          [:button.ui.fluid.large.blue.primary.button {:on-click save} "Login"]]]]])))
+          [:button.ui.fluid.large.blue.primary.button {:on-click login} "Login"]]]]])))

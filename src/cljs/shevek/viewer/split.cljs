@@ -46,7 +46,7 @@
 
 (defn- split-popup [_ dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by :granularity]))
-        posible-sort-bys (conj (current-cube :measures) dim)]
+        posible-sort-bys (conj (current-cube :measures) (select-keys dim [:name :title :type]))]
     (fn [{:keys [close]} dim]
       (let [desc (get-in @opts [:sort-by :descending])
             current-granularity (@opts :granularity)]
