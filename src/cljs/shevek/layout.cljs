@@ -14,6 +14,7 @@
             [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.reports.menu :refer [reports-menu]]
+            [shevek.login :refer [current-user]]
             [shevek.dw :as dw]))
 
 (def pages
@@ -61,6 +62,9 @@
    [cubes-menu]
    [reports-menu]
    [:div.right.menu
+    [:div.item
+     [:i.user.icon]
+     (:fullname (current-user))]
     [settings-menu]
     [:a.item {:href "#/admin" :class (current-page-class :admin)}
      [:i.users.icon] (t :admin/menu)]

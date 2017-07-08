@@ -29,7 +29,7 @@
     (with-redefs [token-expiration (t/seconds 1)]
       (login page))
     (Thread/sleep 1100)
-    (when (e/has-text? page "Admin")
-      (click-link page "Admin"))
+    (when (e/has-text? page "Manage")
+      (click-link page "Manage"))
     (is (has-text? page "Session expired"))
     (is (has-css? page "#login"))))
