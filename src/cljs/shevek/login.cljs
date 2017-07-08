@@ -6,7 +6,7 @@
             [reflow.core :refer [dispatch]]
             [shevek.rpc :as rpc]
             [shevek.components :refer [text-input focused kb-shortcuts]]
-            [shevek.lib.local-storage :as local-storage]
+            [shevek.lib.session-storage :as session-storage]
             [ajax.core :refer [POST]]
             [cljsjs.jwt-decode]))
 
@@ -23,7 +23,7 @@
 (defonce error (r/atom nil))
 
 (defevh :login-successful [db {:keys [token]}]
-  (local-storage/set-item! "shevek.access-token" token)
+  (session-storage/set-item! "shevek.access-token" token)
   (-> (assoc db :current-user (extract-user token))
       (rpc/loaded :logging-in)))
 
@@ -39,7 +39,7 @@
   (rpc/loading db :logging-in))
 
 (defevh :logout [db]
-  (local-storage/remove-item! "shevek.access-token")
+  (session-storage/remove-item! "shevek.access-token")
   (dissoc db :current-user))
 
 (defevh :session-expired [db]
@@ -48,7 +48,7 @@
   db)
 
 (defevh :user-restored [db]
-  (assoc db :current-user (extract-user (local-storage/get-item "shevek.access-token"))))
+  (assoc db :current-user (extract-user (session-storage/get-item "shevek.access-token"))))
 
 (defn page []
   (let [user (r/atom {})

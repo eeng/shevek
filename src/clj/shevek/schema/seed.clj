@@ -8,7 +8,7 @@
 
 (defn create-users []
   (log/info "Seeding users...")
-  (users/create-or-update-by db :username {:username "admin" :fullname "Desarrollo" :password "admin321"}))
+  (users/create-or-update-by db :username {:username "admin" :fullname "Administrator" :password "asdf654"}))
 
 (defn create-cubes []
   (log/info "Seeding schema...")

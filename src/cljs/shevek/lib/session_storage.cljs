@@ -1,15 +1,15 @@
-(ns shevek.lib.local-storage
+(ns shevek.lib.session-storage
   (:require [cljs.reader :refer [read-string]]))
 
 (defn set-item! [key val]
   "For storing simple values."
-  (.setItem js/localStorage key val))
+  (.setItem js/sessionStorage key val))
 
 (defn get-item [key]
-  (.getItem js/localStorage key))
+  (.getItem js/sessionStorage key))
 
 (defn remove-item! [key]
-  (.removeItem js/localStorage key))
+  (.removeItem js/sessionStorage key))
 
 (defn store!
   "For storing maps or other compound values."
