@@ -1,5 +1,5 @@
 (ns shevek.acceptance.test-helper
-  (:require [etaoin.api :as e :refer [wait-predicate wait-visible wait-exists query query-all get-element-text-el go with-chrome with-postmortem]]
+  (:require [etaoin.api :as e :refer [wait-predicate wait-visible wait-exists query query-all get-element-text-el go with-chrome with-postmortem exists?]]
             [etaoin.keys :as k]
             [clojure.test :refer [testing]]
             [monger.db :refer [drop-db]]
@@ -19,6 +19,10 @@
          (init-db db)
          ~@body))))
 
+(defmacro pending [& args]
+  (let [message (str "\n" name " is pending !!")]
+    `(testing ~name (println ~message))))
+
 (defn visit [page path]
   (go page (str "http://localhost:" (config :port) path)))
 
@@ -36,7 +40,7 @@
 
 (defn has-css?
   ([page selector]
-   (waiting #(e/exists? page {:css selector})))
+   (waiting #(exists? page {:css selector})))
   ([page selector attribute value]
    (case attribute
      :text (waiting #(.contains (or (element-text page selector) "") value))
@@ -71,10 +75,11 @@
   (e/fill-multi page fields))
 
 (defn login
-  ([page] (login page {:username "someuser" :password "secret123"}))
+  ([page] (login page {:username "max" :password "secret123"}))
   ([page {:keys [username password] :as user}]
    (make! User user)
-   (visit page "/")
+   (when-not (exists? page {:css "#login"})
+     (visit page "/"))
    (fill page {:name "username"} username)
    (fill page {:name "password"} password k/enter)
    (has-css? page ".menu")))

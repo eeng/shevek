@@ -29,20 +29,22 @@
         (send-main-query)
         (send-pinboard-queries))))
 
+(defevh :viewer-initialized [db]
+  (rpc/call "schema.api/cube" :args [(get-in db [:viewer :cube :name])] :handler #(dispatch :cube-arrived %))
+  (rpc/loading db :cube-metadata))
+
+(defn prepare-cube [db cube report]
+  (if (current-page? :viewer)
+    (dispatch :viewer-initialized)
+    (navigate "/viewer"))
+  (assoc db :viewer {:cube {:name cube}} :current-report report)) ; So we can display immediately the cube in the menu
+
 (defevh :cube-selected [db cube]
-  (navigate "/viewer")
-  (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (-> (assoc db :viewer {:cube {:name cube}}) ; So we can display immediately the cube in the menu
-      (dissoc :current-report)
-      (rpc/loading :cube-metadata)))
+  (prepare-cube db cube nil))
 
 (defevh :viewer-restored [db encoded-report]
   (if-let [{:keys [cube] :as report} (restore-report-from-url encoded-report)]
-    (do
-      (dispatch :navigate :viewer)
-      (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-      (-> (assoc db :viewer {:cube {:name cube}} :current-report report)
-          (rpc/loading :cube-metadata)))
+    (prepare-cube db cube report)
     (do
       (navigate "/")
       db)))
@@ -62,6 +64,7 @@
       (send-pinboard-queries)))
 
 (defn page []
+  (dispatch :viewer-initialized)
   [:div#viewer
    [:div.left-column
     [dimensions-panel]

@@ -10,6 +10,7 @@
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
+            [shevek.viewer.page :as viewer]
             [cuerdas.core :as str]))
 
 ; TODO Muy parecido a lo de users, de nuevo el patron de call, loading y loaded
@@ -25,10 +26,7 @@
   (dispatch :reports-requested))
 
 (defevh :report-selected [db {:keys [cube] :as report}]
-  (navigate "/viewer")
-  (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-  (-> (assoc db :viewer {:cube {:name cube}} :current-report report)
-      (rpc/loading :cube-metadata)))
+  (viewer/prepare-cube db cube report))
 
 (defevh :report-saved [db {:keys [name] :as report} editing-current?]
   (notify (t :reports/saved name))
