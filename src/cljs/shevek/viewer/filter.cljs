@@ -8,7 +8,8 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-time]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
-            [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]))
+            [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
+            [shevek.components.drag-and-drop :refer [drag-over handle-drop]]))
 
 (defn send-queries [db dim]
   (-> (send-main-query db)
@@ -190,7 +191,8 @@
 (defn filter-panel []
   (let [[last-added-filter last-added-at] (viewer :last-added-filter)
         added-ms-ago (- (js/Date.) last-added-at)]
-    [:div.filter.panel
+    [:div.filter.panel {:on-drag-over drag-over
+                        :on-drop (handle-drop #(dispatch :dimension-added-to-filter %))}
      [panel-header (t :cubes/filter)]
      (for [dim (viewer :filter)]
        ^{:key (:name dim)}
