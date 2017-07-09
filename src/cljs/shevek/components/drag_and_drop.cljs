@@ -2,11 +2,7 @@
   (:require [cljs.reader :refer [read-string]]))
 
 (defn drag-start [event transfer-data]
-  (.. event -target -classList (add "dragging"))
   (.. event -dataTransfer (setData "application/x-clojure-data" transfer-data)))
-
-(defn drag-end [event]
-  (.. event -target -classList (remove "dragging")))
 
 (defn handle-drop [handler]
   (fn [event]

@@ -9,7 +9,7 @@
             [shevek.lib.dates :refer [format-date parse-time]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
-            [shevek.components.drag-and-drop :refer [drag-over handle-drop]]))
+            [shevek.components.drag-and-drop :refer [drag-over handle-drop drag-start]]))
 
 (defn send-queries [db dim]
   (-> (send-main-query db)
@@ -182,7 +182,8 @@
 
 (defn- filter-item [{:keys [toggle]} dim]
   [:button.ui.green.compact.button.item
-   {:class (when-not (time-dimension? dim) "right labeled icon") :on-click toggle}
+   {:class (when-not (time-dimension? dim) "right labeled icon") :on-click toggle
+    :draggable true :on-drag-start #(drag-start % (clean-dim dim))}
    (when-not (time-dimension? dim)
      [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
    (filter-title dim)])

@@ -3,11 +3,11 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
-            [shevek.dw :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension]]
+            [shevek.dw :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
             [shevek.components :refer [controlled-popup select]]
-            [shevek.components.drag-and-drop :refer [drag-over handle-drop]]))
+            [shevek.components.drag-and-drop :refer [drag-over handle-drop drag-start]]))
 
 ; TODO el limit distinto no funca bien cuando se reemplaza el filter
 ; TODO el PT1H deberia ser solo cuando hay pocos dias en el intervalo actual
@@ -47,7 +47,7 @@
 
 (defn- split-popup [_ dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by :granularity]))
-        posible-sort-bys (conj (current-cube :measures) (select-keys dim [:name :title :type]))]
+        posible-sort-bys (conj (current-cube :measures) (clean-dim dim))]
     (fn [{:keys [close]} dim]
       (let [desc (get-in @opts [:sort-by :descending])
             current-granularity (@opts :granularity)]
@@ -82,7 +82,8 @@
           [:button.ui.compact.button {:on-click close} (t :actions/cancel)]]]))))
 
 (defn- split-item [{:keys [toggle]} {:keys [title] :as dim}]
-  [:button.ui.orange.compact.right.labeled.icon.button {:on-click toggle}
+  [:button.ui.orange.compact.right.labeled.icon.button
+   {:on-click toggle :draggable true :on-drag-start #(drag-start % (clean-dim dim))}
    [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-split dim)}]
    title])
 

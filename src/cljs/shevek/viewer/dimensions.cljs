@@ -5,7 +5,7 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
             [shevek.components :refer [controlled-popup]]
-            [shevek.components.drag-and-drop :refer [drag-start drag-end]]
+            [shevek.components.drag-and-drop :refer [drag-start]]
             [shevek.lib.react :refer [rmap]]
             [shevek.viewer.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
 
@@ -38,8 +38,7 @@
               :class (when (popup :opened?) "active")
               :on-click (popup :toggle)
               :draggable true
-              :on-drag-start #(drag-start % dimension)
-              :on-drag-end drag-end}
+              :on-drag-start #(drag-start % dimension)}
    [:i.icon {:class (type-icon type name)}]
    (highlight title search)])
 
