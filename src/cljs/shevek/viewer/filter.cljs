@@ -192,8 +192,7 @@
 (defn filter-panel []
   (let [[last-added-filter last-added-at] (viewer :last-added-filter)
         added-ms-ago (- (js/Date.) last-added-at)]
-    [:div.filter.panel {:on-drag-over drag-over
-                        :on-drop (handle-drop #(dispatch :dimension-added-to-filter %))}
+    [:div.filter.panel {:on-drag-over drag-over :on-drop (handle-drop #(dispatch :dimension-added-to-filter %))}
      [panel-header (t :cubes/filter)]
      (for [dim (viewer :filter)]
        ^{:key (:name dim)}

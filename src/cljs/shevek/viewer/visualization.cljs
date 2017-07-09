@@ -8,7 +8,8 @@
             [shevek.lib.collections :refer [detect]]
             [shevek.navegation :refer [current-page?]]
             [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result?]]))
+            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result?]]
+            [shevek.components.drag-and-drop :refer [drag-over handle-drop]]))
 
 (defn- sort-results-according-to-selected-measures [viewer]
   (let [result (first (get-in viewer [:results :main]))]
@@ -94,5 +95,7 @@
          [pivot-table-visualization viewer]))]))
 
 (defn visualization-panel []
-  [:div.visualization-container.zone.panel.ui.basic.segment (rpc/loading-class [:results :main])
+  [:div.visualization-container.zone.panel.ui.basic.segment
+   {:class (when (rpc/loading? [:results :main]) "loading")
+    :on-drag-over drag-over :on-drop (handle-drop #(dispatch :dimension-replaced-split %))}
    [visualization (db/get :viewer)]])

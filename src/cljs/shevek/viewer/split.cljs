@@ -88,8 +88,7 @@
    title])
 
 (defn split-panel []
-  [:div.split.panel {:on-drag-over drag-over
-                     :on-drop (handle-drop #(dispatch :dimension-added-to-split %))}
+  [:div.split.panel {:on-drag-over drag-over :on-drop (handle-drop #(dispatch :dimension-added-to-split %))}
    [panel-header (t :cubes/split)]
    (rmap (controlled-popup split-item split-popup {:position "bottom center"})
          (viewer :split)
