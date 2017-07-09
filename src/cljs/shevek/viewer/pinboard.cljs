@@ -115,7 +115,7 @@
            [:div.items.empty])]))))
 
 (defn pinboard-panels []
-  [:div.pinboard
+  [:div.pinboard {:on-drag-over drag-over :on-drop (handle-drop #(dispatch :dimension-pinned %))}
    [:div.panel
     [panel-header (t :cubes/pinboard)
      [dropdown (map (juxt :title :name) (current-cube :measures))
@@ -125,8 +125,6 @@
      (for [dim (viewer :pinboard :dimensions)]
        ^{:key (dim :name)} [pinned-dimension-panel dim])
      [:div.panel.ui.basic.segment.no-pinned
-      {:on-drag-over drag-over
-       :on-drop (handle-drop #(dispatch :dimension-pinned %))}
       [:div.icon-hint
        [:i.pin.icon]
        [:div.text (t :cubes/no-pinned)]]])])
