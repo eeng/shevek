@@ -9,22 +9,21 @@
             [shevek.components :refer [controlled-popup select]]
             [shevek.components.drag-and-drop :refer [drag-over handle-drop drag-start]]))
 
-; TODO el limit distinto no funca bien cuando se reemplaza el filter
 ; TODO el PT1H deberia ser solo cuando hay pocos dias en el intervalo actual
-(defn- init-splitted-dim [dim {:keys [viewer]}]
-  (let [other-dims-in-split (remove #(dim= % dim) (:split viewer))]
-    (cond-> (assoc dim
-                   :limit (if (seq other-dims-in-split) 5 50)
-                   :sort-by (assoc (-> viewer :measures first)
-                                   :descending (not (time-dimension? dim))))
-            (time-dimension? dim) (assoc :granularity "PT1H"))))
+(defn- init-splitted-dim [dim {:keys [viewer]} limit]
+  (cond-> (assoc dim
+                 :limit limit
+                 :sort-by (assoc (-> viewer :measures first)
+                                 :descending (not (time-dimension? dim))))
+          (time-dimension? dim) (assoc :granularity "PT1H")))
 
-(defevh :dimension-added-to-split [db dim]
-  (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim dim db))
-      (send-main-query)))
+(defevh :dimension-added-to-split [{:keys [viewer] :as db} dim]
+  (let [limit (if (seq (:split viewer)) 5 50)]
+    (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim dim db limit))
+        (send-main-query))))
 
 (defevh :dimension-replaced-split [db dim]
-  (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
+  (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db 50)])
       (send-main-query)))
 
 (defevh :dimension-removed-from-split [db dim]
