@@ -3,19 +3,18 @@
   (:require [reagent.core :as r]
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
-            [shevek.dw :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim]]
+            [shevek.dw :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim default-granularity]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
             [shevek.components :refer [controlled-popup select]]
             [shevek.components.drag-and-drop :refer [drag-over handle-drop drag-start]]))
 
-; TODO el PT1H deberia ser solo cuando hay pocos dias en el intervalo actual
 (defn- init-splitted-dim [dim {:keys [viewer]} limit]
   (cond-> (assoc dim
                  :limit limit
                  :sort-by (assoc (-> viewer :measures first)
                                  :descending (not (time-dimension? dim))))
-          (time-dimension? dim) (assoc :granularity "PT1H")))
+          (time-dimension? dim) (assoc :granularity (default-granularity viewer))))
 
 (defevh :dimension-added-to-split [{:keys [viewer] :as db} dim]
   (let [limit (if (seq (:split viewer)) 5 50)]

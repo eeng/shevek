@@ -1,6 +1,6 @@
 (ns shevek.dw-test
   (:require-macros [cljs.test :refer [deftest testing is]])
-  (:require [shevek.dw :refer [to-interval format-period]]
+  (:require [shevek.dw :refer [to-interval format-period default-granularity]]
             [shevek.lib.dates :refer [parse-time now]]))
 
 (deftest to-interval-test []
@@ -101,3 +101,22 @@
     (with-redefs [now (constantly (parse-time "2016-04-03T17:30"))]
       (is (= "Apr 3, 2016" (format-period :current-day nil)))
       (is (= "Mar 28, 2016 - Apr 3, 2016" (format-period :current-week nil))))))
+
+(deftest default-granularity-test
+  (letfn [(time-dim
+           ([period] {:name "__time" :period period})
+           ([from to] {:name "__time" :interval [(parse-time from) (parse-time to)]}))]
+
+    (testing "when the period span less than a week it should be PT1H"
+      (is (= "PT1H" (default-granularity {:filter [(time-dim :latest-day)]})))
+      (is (= "PT1H" (default-granularity {:filter [(time-dim "2016-01-01" "2016-01-02")]})))
+      (is (= "PT1H" (default-granularity {:filter [(time-dim "2016-01-01" "2016-01-08")]}))))
+
+    (testing "when the period span between than a week and few months it should be P1D"
+      (is (= "P1D" (default-granularity {:filter [(time-dim :current-month)]})))
+      (is (= "P1D" (default-granularity {:filter [(time-dim "2016-01-01" "2016-01-09")]})))
+      (is (= "P1D" (default-granularity {:filter [(time-dim "2016-01-01" "2016-02-31")]}))))
+
+    (testing "when the period span more than a few months it should be P1M"
+      (is (= "P1M" (default-granularity {:filter [(time-dim :current-year)]})))
+      (is (= "P1M" (default-granularity {:filter [(time-dim "2016-01-01" "2016-04-01")]}))))))

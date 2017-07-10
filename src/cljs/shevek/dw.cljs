@@ -105,3 +105,16 @@
   (let [formatter (d/formatter
                    (if (str/starts-with? (name period) "latest") :minute :day))]
     (format-interval (to-interval period max-time) formatter)))
+
+(defn effective-interval [{:keys [filter cube]}]
+  (let [{:keys [period interval]} (time-dimension filter)
+        interval (when interval [(first interval) (d/end-of-day (second interval))])]
+    (if period (to-interval period (:max-time cube)) interval)))
+
+(defn default-granularity [viewer]
+  (let [[from to] (effective-interval viewer)
+        span (t/in-days (t/interval from to))]
+    (cond
+      (<= span 7) "PT1H"
+      (<= span 90) "P1D"
+      :else "P1M")))

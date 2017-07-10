@@ -7,18 +7,19 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
+            [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim default-granularity]]
             [shevek.components :refer [dropdown checkbox toggle-checkbox-inside]]
             [shevek.components.drag-and-drop :refer [drag-over handle-drop]]
             [shevek.viewer.filter :refer [filter-operators]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
 
-(defn init-pinned-dim [dim]
+(defn init-pinned-dim [dim viewer]
   (cond-> (assoc dim :limit 100)
-          (time-dimension? dim) (assoc :granularity "PT6H" :sort-by (assoc dim :descending true))))
+          (time-dimension? dim) (assoc :granularity (default-granularity viewer)
+                                       :sort-by (assoc dim :descending true))))
 
-(defevh :dimension-pinned [db dim]
-  (let [dim (init-pinned-dim dim)]
+(defevh :dimension-pinned [{:keys [viewer] :as db} dim]
+  (let [dim (init-pinned-dim dim viewer)]
     (-> (update-in db [:viewer :pinboard :dimensions] add-dimension dim)
         (send-pinned-dim-query dim))))
 

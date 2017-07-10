@@ -50,15 +50,13 @@
    :pinboard {:measure (-> pinboard :measure :name)
               :dimensions (map viewer-dim->report (:dimensions pinboard))}})
 
-(defn- add-interval [{:keys [filter] :as q} max-time]
-  (let [{:keys [period interval]} (dw/time-dimension filter)
-        interval (when interval [(first interval) (end-of-day (second interval))])]
-    (setval [:filter ALL dw/time-dimension? :interval]
-            (mapv to-iso8601 (if period (dw/to-interval period max-time) interval))
-            q)))
+(defn- add-str-interval [viewer]
+  (setval [:filter ALL dw/time-dimension? :interval]
+          (mapv to-iso8601 (dw/effective-interval viewer))
+          viewer))
 
 (defn viewer->query [{:keys [cube] :as viewer}]
-  (-> (add-interval viewer (cube :max-time))
+  (-> (add-str-interval viewer)
       (assoc :cube (cube :name))
       (st/select-schema Query)))
 
