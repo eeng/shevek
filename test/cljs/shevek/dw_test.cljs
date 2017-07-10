@@ -115,7 +115,7 @@
     (testing "when the period span between than a week and few months it should be P1D"
       (is (= "P1D" (default-granularity {:filter [(time-dim :current-month)]})))
       (is (= "P1D" (default-granularity {:filter [(time-dim "2016-01-01" "2016-01-09")]})))
-      (is (= "P1D" (default-granularity {:filter [(time-dim "2016-01-01" "2016-02-31")]}))))
+      (is (= "P1D" (default-granularity {:filter [(time-dim "2016-01-01" "2016-02-28")]}))))
 
     (testing "when the period span more than a few months it should be P1M"
       (is (= "P1M" (default-granularity {:filter [(time-dim :current-year)]})))

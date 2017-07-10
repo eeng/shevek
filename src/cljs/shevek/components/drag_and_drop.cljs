@@ -7,7 +7,7 @@
                        (.text (.. event -target -innerText))
                        (.appendTo "body")
                        (.get 0))]
-    (.. event -dataTransfer (setDragImage drag-image -10 20))))
+    (.. event -dataTransfer (setDragImage drag-image 5 20))))
 
 (defn handle-drop [handler]
   (fn [event]
