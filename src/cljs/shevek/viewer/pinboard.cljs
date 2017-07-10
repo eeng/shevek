@@ -9,7 +9,7 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.dw :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim default-granularity]]
             [shevek.components :refer [dropdown checkbox toggle-checkbox-inside]]
-            [shevek.components.drag-and-drop :refer [drag-over handle-drop]]
+            [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.filter :refer [filter-operators]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
 
@@ -116,7 +116,7 @@
            [:div.items.empty])]))))
 
 (defn pinboard-panels []
-  [:div.pinboard {:on-drag-over drag-over :on-drop (handle-drop #(dispatch :dimension-pinned %))}
+  [:div.pinboard (droppable #(dispatch :dimension-pinned %))
    [:div.panel
     [panel-header (t :cubes/pinboard)
      [dropdown (map (juxt :title :name) (current-cube :measures))

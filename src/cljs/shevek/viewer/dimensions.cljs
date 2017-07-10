@@ -5,7 +5,7 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
             [shevek.components :refer [controlled-popup]]
-            [shevek.components.drag-and-drop :refer [drag-start]]
+            [shevek.components.drag-and-drop :refer [draggable]]
             [shevek.lib.react :refer [rmap]]
             [shevek.viewer.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
 
@@ -34,11 +34,10 @@
       "font")))
 
 (defn- dimension-item [search popup {:keys [name title type description] :as dimension}]
-  [:div.item {:title description
-              :class (when (popup :opened?) "active")
-              :on-click (popup :toggle)
-              :draggable true
-              :on-drag-start #(drag-start % dimension)}
+  [:div.item (assoc (draggable dimension)
+                    :title description
+                    :class (when (popup :opened?) "active")
+                    :on-click (popup :toggle))
    [:i.icon {:class (type-icon type name)}]
    (highlight title search)])
 

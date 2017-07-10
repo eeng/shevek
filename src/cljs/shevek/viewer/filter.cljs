@@ -9,7 +9,7 @@
             [shevek.lib.dates :refer [format-date parse-time]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
-            [shevek.components.drag-and-drop :refer [drag-over handle-drop drag-start]]))
+            [shevek.components.drag-and-drop :refer [draggable droppable]]))
 
 (defn send-queries [db dim]
   (-> (send-main-query db)
@@ -182,8 +182,9 @@
 
 (defn- filter-item [{:keys [toggle]} dim]
   [:button.ui.green.compact.button.item
-   {:class (when-not (time-dimension? dim) "right labeled icon") :on-click toggle
-    :draggable true :on-drag-start #(drag-start % (clean-dim dim))}
+   (assoc (draggable (clean-dim dim))
+          :class (when-not (time-dimension? dim) "right labeled icon")
+          :on-click toggle)
    (when-not (time-dimension? dim)
      [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
    (filter-title dim)])
@@ -192,7 +193,7 @@
 (defn filter-panel []
   (let [[last-added-filter last-added-at] (viewer :last-added-filter)
         added-ms-ago (- (js/Date.) last-added-at)]
-    [:div.filter.panel {:on-drag-over drag-over :on-drop (handle-drop #(dispatch :dimension-added-to-filter %))}
+    [:div.filter.panel (droppable #(dispatch :dimension-added-to-filter %))
      [panel-header (t :cubes/filter)]
      (for [dim (viewer :filter)]
        ^{:key (:name dim)}

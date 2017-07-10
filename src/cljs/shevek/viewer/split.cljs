@@ -7,7 +7,7 @@
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
             [shevek.components :refer [controlled-popup select]]
-            [shevek.components.drag-and-drop :refer [drag-over handle-drop drag-start]]))
+            [shevek.components.drag-and-drop :refer [draggable droppable]]))
 
 (defn- init-splitted-dim [dim {:keys [viewer]} limit]
   (cond-> (assoc dim
@@ -81,12 +81,12 @@
 
 (defn- split-item [{:keys [toggle]} {:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
-   {:on-click toggle :draggable true :on-drag-start #(drag-start % (clean-dim dim))}
+   (assoc (draggable (clean-dim dim)) :on-click toggle)
    [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-split dim)}]
    title])
 
 (defn split-panel []
-  [:div.split.panel {:on-drag-over drag-over :on-drop (handle-drop #(dispatch :dimension-added-to-split %))}
+  [:div.split.panel (droppable #(dispatch :dimension-added-to-split %))
    [panel-header (t :cubes/split)]
    (rmap (controlled-popup split-item split-popup {:position "bottom center"})
          (viewer :split)
