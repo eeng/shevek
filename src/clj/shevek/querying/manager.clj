@@ -1,7 +1,9 @@
 (ns shevek.querying.manager
   (:require [shevek.lib.collections :refer [assoc-if-seq]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
-            [shevek.lib.druid-driver :refer [send-query]]))
+            [shevek.lib.druid-driver :refer [send-query]]
+            [shevek.schemas.query :refer [Query]]
+            [schema.core :as s]))
 
 (defn- send-query-and-simplify-results [dw q]
   (let [dq (to-druid-query q)
@@ -22,8 +24,7 @@
                                :filter (add-filter-for-dim filter dim %)))))
            doall))))
 
-; FIXME s/defn Query
-(defn query [dw {:keys [totals] :as q}]
+(s/defn query [dw {:keys [totals] :as q} :- Query]
   (concat (if totals (send-query-and-simplify-results dw q) [])
           (send-queries-for-split dw q)))
 
@@ -89,6 +90,6 @@
              :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
 #_(query dw {:cube "wikiticker"
-             :split [{:name "page" :limit 5 :sort-by {:name "page" :type "STRING" :descending false}}]
+             :split [{:name "page" :limit 5 :sort-by {:name "page" :descending false}}]
              :measures [{:name "count" :expression "(sum $count)"}]
              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
