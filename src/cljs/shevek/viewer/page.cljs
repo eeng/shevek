@@ -3,9 +3,10 @@
   (:require [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [shevek.rpc :as rpc]
-            [shevek.dw :as dw]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.lib.util :refer [every]]
+            [shevek.lib.dw.cubes :refer [set-cube-defaults]]
+            [shevek.lib.dw.time :refer [parse-max-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
@@ -22,7 +23,7 @@
     (build-new-viewer cube)))
 
 (defevh :cube-arrived [{:keys [current-report] :as db} {:keys [name] :as cube}]
-  (let [cube (dw/set-cube-defaults cube)
+  (let [cube (set-cube-defaults cube)
         {:keys [pinboard] :as viewer} (init-viewer cube current-report)]
     (-> (assoc db :viewer viewer)
         (rpc/loaded :cube-metadata)
@@ -50,7 +51,7 @@
       db)))
 
 (defevh :max-time-arrived [db max-time]
-  (assoc-in db [:viewer :cube :max-time] (dw/parse-max-time max-time)))
+  (assoc-in db [:viewer :cube :max-time] (parse-max-time max-time)))
 
 (defn fetch-max-time []
   (when (current-page? :viewer)

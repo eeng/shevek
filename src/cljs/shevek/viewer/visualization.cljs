@@ -4,7 +4,6 @@
             [reflow.core :refer [dispatch]]
             [reflow.db :as db]
             [shevek.i18n :refer [t]]
-            [shevek.dw :as dw]
             [shevek.lib.collections :refer [detect]]
             [shevek.navegation :refer [current-page?]]
             [shevek.rpc :as rpc]

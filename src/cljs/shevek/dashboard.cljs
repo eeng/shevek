@@ -5,7 +5,7 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.components :refer [page-title loader]]
-            [shevek.dw :as dw]
+            [shevek.lib.dw.cubes :refer [cubes-list set-cube-defaults]]
             [shevek.reports.menu :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]
@@ -18,7 +18,7 @@
     [:div.meta description]]])
 
 (defn- cubes-cards []
-  (let [cubes (dw/cubes-list)]
+  (let [cubes (cubes-list)]
     (if (seq cubes)
       [:div.ui.cards (rmap cube-card cubes :name)]
       [:div.tip [:i.info.circle.icon] (t :cubes/missing)])))
@@ -32,7 +32,7 @@
       (rpc/loaded [:dashboard name])))
 
 (defevh :dashboard/cube-arrived [db cube {:keys [name] :as report}]
-  (let [viewer (report->viewer report (dw/set-cube-defaults cube))
+  (let [viewer (report->viewer report (set-cube-defaults cube))
         q (viewer->query (assoc viewer :totals true))]
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :dashboard/query-executed % name))
     (update-in db [:dashboard name] merge viewer)))

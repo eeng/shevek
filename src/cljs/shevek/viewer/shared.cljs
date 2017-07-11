@@ -8,7 +8,7 @@
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
-            [shevek.dw :refer [dim= add-dimension time-dimension?]]
+            [shevek.lib.dw.dims :refer [dim= add-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components :refer [focused kb-shortcuts]]
             [shevek.reports.url :refer [store-in-url]]

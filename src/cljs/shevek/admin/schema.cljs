@@ -3,7 +3,7 @@
   (:require [shevek.i18n :refer [t]]
             [shevek.components :refer [page-title select text-input input-field kb-shortcuts focused]]
             [shevek.lib.react :refer [rmap]]
-            [shevek.dw :as dw]
+            [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]
             [shevek.rpc :as rpc]
             [reagent.core :as r]
             [reflow.db :as db]
@@ -97,8 +97,8 @@
        [measures-table original-cube edited-cube (t :cubes/measures)]])))
 
 (defn schema-section []
-  (dw/fetch-cubes)
+  (fetch-cubes)
   (fn []
     [:section
      [:h2.ui.app.header (t :cubes/menu)]
-     (rmap cube-details (dw/cubes-list) :name)]))
+     (rmap cube-details (cubes-list) :name)]))

@@ -6,7 +6,7 @@
             [shevek.rpc :refer [loading?]]
             [shevek.rpc :as rpc]
             [shevek.components :refer [checkbox toggle-checkbox-inside]]
-            [shevek.dw :refer [add-dimension remove-dimension includes-dim?]]
+            [shevek.lib.dw.dims :refer [add-dimension remove-dimension includes-dim?]]
             [shevek.viewer.shared :refer [current-cube viewer panel-header send-main-query]]
             [shevek.reports.url :refer [store-in-url]]))
 
@@ -16,7 +16,7 @@
 
 (defn- measure-item [{:keys [name title description] :as dim} selected-measures]
   [:div.item {:on-click toggle-checkbox-inside :title description}
-   [checkbox (str "cb-measure-" name) title 
+   [checkbox (str "cb-measure-" name) title
     {:checked (includes-dim? selected-measures dim) :on-change #(dispatch :measure-toggled dim %)}]])
 
 (defn- measures-panel []

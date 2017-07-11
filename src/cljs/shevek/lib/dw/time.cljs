@@ -1,79 +1,12 @@
-(ns shevek.dw
-  (:require-macros [reflow.macros :refer [defevh]])
-  (:require [reflow.core :refer [dispatch]]
-            [cuerdas.core :as str]
-            [shevek.rpc :as rpc]
-            [shevek.lib.collections :refer [detect]]
-            [shevek.lib.dates :as d :refer [parse-time]]
-            [shevek.lib.collections :refer [detect]]
-            [cljs-time.core :as t]
+(ns shevek.lib.dw.time
+  (:require [cljs-time.core :as t]
             [cljs-time.format :as f]
-            [reflow.db :as db]
-            [com.rpl.specter :refer [setval ALL transform]]
-            [shevek.schemas.cube :refer [Dimension]]
-            [schema-tools.core :as st]))
+            [shevek.lib.dates :as d :refer [parse-time]]
+            [cuerdas.core :as str]
+            [shevek.lib.dw.dims :refer [time-dimension]]))
 
 (defn parse-max-time [max-time]
   (d/round-to-next-minute (parse-time max-time)))
-
-(defn set-cube-defaults [{:keys [max-time] :as cube}]
-  (cond-> cube
-          max-time (update :max-time parse-max-time)))
-
-(defn- to-map-with-name-as-key [cubes]
-  (zipmap (map :name cubes) cubes))
-
-(defevh :cubes-arrived [db cubes]
-  (-> (assoc db :cubes (to-map-with-name-as-key cubes))
-      (rpc/loaded :cubes)))
-
-(defevh :cubes-requested [db]
-  (rpc/call "schema.api/cubes" :handler #(dispatch :cubes-arrived %))
-  (rpc/loading db :cubes))
-
-(defn fetch-cubes []
-  (dispatch :cubes-requested))
-
-(defn cubes-list []
-  (vals (db/get :cubes)))
-
-(defn time-dimension? [{:keys [name]}]
-  (= name "__time"))
-
-; TODO esto fallaría si no hay una dimension __time
-(defn time-dimension [dimensions]
-  (some #(when (time-dimension? %) %) dimensions))
-
-(defn dim= [dim1 dim2]
-  (= (:name dim1) (:name dim2)))
-
-; TODO algunos de estos metodos no corresponderian en el shared?
-(defn find-dimension [name dimensions]
-  (detect #(= (:name %) name) dimensions))
-
-(defn includes-dim? [coll dim]
-  (some #(dim= % dim) coll))
-
-(defn add-dimension [coll dim]
-  (let [coll (or coll [])]
-    (if (includes-dim? coll dim)
-      coll
-      (conj coll dim))))
-
-(defn remove-dimension [coll dim]
-  (vec (remove #(dim= dim %) coll)))
-
-(defn replace-dimension
-  ([coll dim] (replace-dimension coll dim dim))
-  ([coll old-dim new-dim]
-   (transform [ALL] #(condp dim= %
-                       old-dim new-dim
-                       new-dim old-dim
-                       %)
-              coll)))
-
-(defn clean-dim [dim]
-  (st/select-schema dim Dimension))
 
 (defn to-interval [period max-time]
   (let [now (d/now)

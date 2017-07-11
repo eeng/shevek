@@ -1,12 +1,13 @@
 (ns shevek.schemas.conversion
-  (:require [shevek.dw :as dw]
+  (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension time-dimension?]]
+            [shevek.lib.dw.time :refer [effective-interval]]
             [shevek.lib.dates :refer [to-iso8601 end-of-day format-date parse-time]]
             [shevek.schemas.query :refer [Query]]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]))
 
 (defn- build-time-filter [{:keys [dimensions] :as cube}]
-  (assoc (dw/time-dimension dimensions)
+  (assoc (time-dimension dimensions)
          :period :latest-day))
 
 (defn- build-new-viewer [{:keys [measures] :as cube}]
@@ -18,11 +19,11 @@
 
 (defn- report-dim->viewer [{:keys [name period interval sort-by value] :as dim}
                            {:keys [dimensions measures]}]
-  (cond-> (merge dim (dw/find-dimension name dimensions))
+  (cond-> (merge dim (find-dimension name dimensions))
           period (update :period keyword)
           interval (update :interval (partial map parse-time))
           value (update :value set)
-          sort-by (update :sort-by merge (dw/find-dimension (:name sort-by) (concat dimensions measures)))))
+          sort-by (update :sort-by merge (find-dimension (:name sort-by) (concat dimensions measures)))))
 
 (defn- report-dims->viewer [coll cube]
   (mapv #(report-dim->viewer % cube) coll))
@@ -31,8 +32,8 @@
   {:cube cube
    :filter (report-dims->viewer (report :filter) cube)
    :split (report-dims->viewer (report :split) cube)
-   :measures (mapv #(dw/find-dimension % (cube :measures)) (report :measures))
-   :pinboard {:measure (dw/find-dimension (:measure pinboard) (cube :measures))
+   :measures (mapv #(find-dimension % (cube :measures)) (report :measures))
+   :pinboard {:measure (find-dimension (:measure pinboard) (cube :measures))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
 (defn- viewer-dim->report [{:keys [period interval value sort-by] :as dim}]
@@ -51,8 +52,8 @@
               :dimensions (map viewer-dim->report (:dimensions pinboard))}})
 
 (defn- add-str-interval [viewer]
-  (setval [:filter ALL dw/time-dimension? :interval]
-          (mapv to-iso8601 (dw/effective-interval viewer))
+  (setval [:filter ALL time-dimension? :interval]
+          (mapv to-iso8601 (effective-interval viewer))
           viewer))
 
 (defn viewer->query [{:keys [cube] :as viewer}]

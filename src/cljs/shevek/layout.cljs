@@ -15,7 +15,7 @@
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.reports.menu :refer [reports-menu]]
             [shevek.login :refer [current-user]]
-            [shevek.dw :as dw]))
+            [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]))
 
 (def pages
   {:login #'login/page
@@ -27,7 +27,7 @@
   (when (current-page? page) "active"))
 
 (defn- cubes-popup-content [{:keys [close]}]
-  (let [cubes (dw/cubes-list)
+  (let [cubes (cubes-list)
         select-cube #(do (dispatch :cube-selected %) (close))]
     [:div#cubes-popup
      [:h3.ui.sub.orange.header (t :cubes/title)]
@@ -51,7 +51,7 @@
      (t :cubes/menu))])
 
 (defn- cubes-menu []
-  (dw/fetch-cubes)
+  (fetch-cubes)
   (fn []
     [(controlled-popup cubes-popup-activator cubes-popup-content {:position "bottom left"})]))
 

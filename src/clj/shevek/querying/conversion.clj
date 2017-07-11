@@ -1,19 +1,8 @@
 (ns shevek.querying.conversion
   (:require [clojure.string :as str]
             [shevek.lib.collections :refer [assoc-if-seq]]
-            [shevek.querying.expression :refer [measure->druid]]))
-
-; TODO repetida en el client
-(defn dim= [dim1 dim2]
-  (= (:name dim1) (:name dim2)))
-
-; TODO repetida en el client
-(defn includes-dim? [coll dim]
-  (some #(dim= % dim) coll))
-
-; TODO repetida en el client
-(defn time-dimension? [{:keys [name interval]}]
-  (or (= name "__time") interval))
+            [shevek.querying.expression :refer [measure->druid]]
+            [shevek.lib.dw.dims :refer [time-dimension? includes-dim?]]))
 
 (defn make-tig
   "tig = Temporary ID Generator, counter for generating temporary field names used in aggregations that are later refered in post-aggregations"
