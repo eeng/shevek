@@ -8,7 +8,8 @@
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
             [shevek.components :refer [controlled-popup select]]
-            [shevek.components.drag-and-drop :refer [draggable droppable]]))
+            [shevek.components.drag-and-drop :refer [draggable droppable]]
+            [cuerdas.core :as str]))
 
 (defn- init-splitted-dim [dim {:keys [viewer]} limit]
   (cond-> (assoc dim
@@ -78,7 +79,7 @@
           [:div.field
            [:label (t :cubes/limit)]
            [select (map (juxt identity identity) [5 10 25 50 100])
-            {:selected (:limit @opts) :on-change #(swap! opts assoc :limit %)}]]
+            {:selected (:limit @opts) :on-change #(swap! opts assoc :limit (str/parse-int %))}]]
           [:button.ui.primary.compact.button
            {:on-click #(do (close) (dispatch :split-options-changed dim @opts))}
            (t :actions/ok)]

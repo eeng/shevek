@@ -21,7 +21,7 @@
 
 (s/defschema Split
   {:name s/Str
-   (s/optional-key :limit) (s/cond-pre s/Int s/Str)
+   (s/optional-key :limit) s/Int
    (s/optional-key :sort-by) SortBy
    (s/optional-key :granularity) s/Str})
 

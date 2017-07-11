@@ -88,8 +88,9 @@
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]
   (condp = queryType
     "topN" (-> results first :result)
-    "timeseries" (map (fn [{:keys [result timestamp]}]
-                        (if dimension
-                          (assoc result :__time timestamp)
-                          result))
-                      results)))
+    "timeseries" (cond->> results
+                          (:limit dimension) (take (:limit dimension))
+                          true (map (fn [{:keys [result timestamp]}]
+                                     (if dimension
+                                       (assoc result :__time timestamp)
+                                       result))))))

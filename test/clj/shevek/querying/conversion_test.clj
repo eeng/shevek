@@ -139,9 +139,20 @@
 
   (testing "timeseries results"
     (is (submaps? [{:__time "2015" :count 1}
-                   {:__time "2016" :count 2}]
+                   {:__time "2016" :count 2}
+                   {:__time "2017" :count 3}]
                   (from-druid-results
                    {:dimension {:name "__time"}}
                    {:queryType "timeseries"}
                    [{:result {:count 1} :timestamp "2015"}
-                    {:result {:count 2} :timestamp "2016"}])))))
+                    {:result {:count 2} :timestamp "2016"}
+                    {:result {:count 3} :timestamp "2017"}]))))
+
+  (testing "timeseries with limit should chop results"
+    (is (submaps? [{:count 1} {:count 2}]
+                  (from-druid-results
+                   {:dimension {:name "__time" :limit 2}}
+                   {:queryType "timeseries"}
+                   [{:result {:count 1} :timestamp "2015"}
+                    {:result {:count 2} :timestamp "2016"}
+                    {:result {:count 3} :timestamp "2017"}])))))
