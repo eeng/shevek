@@ -16,16 +16,20 @@
                                  :descending (not (time-dimension? dim))))
           (time-dimension? dim) (assoc :granularity (default-granularity viewer))))
 
-(defevh :dimension-added-to-split [{:keys [viewer] :as db} dim]
+(defevh :splid-dimension-added [{:keys [viewer] :as db} dim]
   (let [limit (if (seq (:split viewer)) 5 50)]
     (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim dim db limit))
         (send-main-query))))
 
-(defevh :dimension-replaced-split [db dim]
+(defevh :split-replaced [db dim]
   (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db 50)])
       (send-main-query)))
 
-(defevh :dimension-removed-from-split [db dim]
+(defevh :split-dimension-replaced [db old-dim new-dim]
+  (-> (update-in db [:viewer :split] replace-dimension old-dim (init-splitted-dim new-dim db 50))
+      (send-main-query)))
+
+(defevh :split-dimension-removed [db dim]
   (-> (update-in db [:viewer :split] remove-dimension dim)
       (send-main-query)))
 
@@ -81,12 +85,14 @@
 
 (defn- split-item [{:keys [toggle]} {:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
-   (assoc (draggable (clean-dim dim)) :on-click toggle)
-   [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-split dim)}]
+   (merge {:on-click toggle}
+          (draggable (clean-dim dim))
+          (droppable #(dispatch :split-dimension-replaced dim %)))
+   [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
    title])
 
 (defn split-panel []
-  [:div.split.panel (droppable #(dispatch :dimension-added-to-split %))
+  [:div.split.panel (droppable #(dispatch :splid-dimension-added %))
    [panel-header (t :cubes/split)]
    (rmap (controlled-popup split-item split-popup {:position "bottom center"})
          (viewer :split)

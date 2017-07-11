@@ -16,7 +16,8 @@
   (fn [event]
     (let [transfer-data (read-string (.. event -dataTransfer (getData "application/x-clojure-data")))]
       (handler transfer-data)
-      (.preventDefault event))))
+      (.preventDefault event)
+      (.stopPropagation event))))
 
 (defn drag-over [event]
   (.preventDefault event))

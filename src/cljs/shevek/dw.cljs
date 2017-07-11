@@ -9,7 +9,7 @@
             [cljs-time.core :as t]
             [cljs-time.format :as f]
             [reflow.db :as db]
-            [com.rpl.specter :refer [setval ALL]]
+            [com.rpl.specter :refer [setval ALL transform]]
             [shevek.schemas.cube :refer [Dimension]]
             [schema-tools.core :as st]))
 
@@ -63,8 +63,14 @@
 (defn remove-dimension [coll dim]
   (vec (remove #(dim= dim %) coll)))
 
-(defn replace-dimension [coll dim]
-  (setval [ALL (partial dim= dim)] dim coll))
+(defn replace-dimension
+  ([coll dim] (replace-dimension coll dim dim))
+  ([coll old-dim new-dim]
+   (transform [ALL] #(condp dim= %
+                       old-dim new-dim
+                       new-dim old-dim
+                       %)
+              coll)))
 
 (defn clean-dim [dim]
   (st/select-schema dim Dimension))

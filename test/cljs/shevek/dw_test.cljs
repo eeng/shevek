@@ -1,6 +1,6 @@
 (ns shevek.dw-test
   (:require-macros [cljs.test :refer [deftest testing is]])
-  (:require [shevek.dw :refer [to-interval format-period default-granularity]]
+  (:require [shevek.dw :refer [to-interval format-period default-granularity replace-dimension]]
             [shevek.lib.dates :refer [parse-time now]]))
 
 (deftest to-interval-test []
@@ -120,3 +120,20 @@
     (testing "when the period span more than a few months it should be P1M"
       (is (= "P1M" (default-granularity {:filter [(time-dim :current-year)]})))
       (is (= "P1M" (default-granularity {:filter [(time-dim "2016-01-01" "2016-04-01")]}))))))
+
+(deftest replace-dimension-test
+  (testing "changing a dimension's fields"
+    (is (= [{:name "a"} {:name "b" :descending true} {:name "c"}]
+           (replace-dimension [{:name "a"} {:name "b"} {:name "c"}] {:name "b" :descending true}))))
+
+  (testing "replacing one dimension by another not already present in the collection"
+    (is (= [{:name "c"} {:name "b"}]
+           (replace-dimension [{:name "a"} {:name "b"}] {:name "a"} {:name "c"})))
+    (is (= [{:name "a"} {:name "c"}]
+           (replace-dimension [{:name "a"} {:name "b"}] {:name "b"} {:name "c"}))))
+
+  (testing "replacing one dimension by another already present in the collection switch places"
+    (is (= [{:name "b"} {:name "a"}]
+           (replace-dimension [{:name "a"} {:name "b"}] {:name "a"} {:name "b"})))
+    (is (= [{:name "b"} {:name "a"}]
+           (replace-dimension [{:name "a"} {:name "b"}] {:name "b"} {:name "a"})))))

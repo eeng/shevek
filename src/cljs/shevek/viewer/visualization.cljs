@@ -96,6 +96,6 @@
 
 (defn visualization-panel []
   [:div.visualization-container.zone.panel.ui.basic.segment
-   (merge (droppable #(dispatch :dimension-replaced-split %))
+   (merge (droppable #(dispatch :split-replaced %))
           (rpc/loading-class [:results :main]))
    [visualization (db/get :viewer)]])
