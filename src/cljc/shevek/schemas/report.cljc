@@ -21,7 +21,6 @@
 (s/defschema Pinboard
   {:measure s/Str :dimensions [Split]})
 
-; TODO falta el user
 (s/defschema Report
   {(s/optional-key :_id) s/Any
    (s/optional-key :name) s/Str ; Optional when restored from URL

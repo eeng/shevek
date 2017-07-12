@@ -2,7 +2,7 @@
   (:require [schema.core :as s]))
 
 (s/defschema NTD
-  {:name s/Str
+  {:name (s/constrained s/Str #(> (count %) 1))
    :title s/Str
    (s/optional-key :description) (s/maybe s/Str)})
 

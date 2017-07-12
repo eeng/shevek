@@ -42,7 +42,6 @@
       field
       {:type "inverted" :metric field})))
 
-; TODO el threshold en las timeseries query no existe, quizas habria que limitar en mem nomas
 (defn- add-query-type-dependant-fields [{:keys [dimension measures] :as q}
                                         {:keys [queryType] :as dq}]
   (condp = queryType
