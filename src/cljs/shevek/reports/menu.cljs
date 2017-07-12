@@ -7,7 +7,7 @@
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.components.popup :refer [controlled-popup]]
-            [shevek.components.form :refer [kb-shortcuts focused input-field]]
+            [shevek.components.form :refer [kb-shortcuts input-field]]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
@@ -60,7 +60,7 @@
         shortcuts (kb-shortcuts :enter save :escape close)]
     (fn []
       [:div.ui.form {:ref shortcuts}
-       [focused input-field report :name {:label (t :reports/name) :class "required"}]
+       [input-field report :name {:label (t :reports/name) :class "required" :auto-focus true}]
        [input-field report :description {:label (t :reports/description) :as :textarea :rows 2}]
        [input-field report :pin-in-dashboard {:label (t :reports/pin-in-dashboard) :as :checkbox :input-class "toggle"}]
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]

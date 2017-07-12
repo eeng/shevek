@@ -10,7 +10,7 @@
             [shevek.rpc :as rpc]
             [shevek.lib.dw.dims :refer [dim= add-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
-            [shevek.components.form :refer [focused kb-shortcuts]]
+            [shevek.components.form :refer [kb-shortcuts]]
             [shevek.reports.url :refer [store-in-url]]
             [schema.core :as s]
             [goog.string :as str]))
@@ -100,19 +100,16 @@
 (defn- search-button [searching]
   [:i.search.link.icon {:on-click #(swap! searching not)}])
 
-(defn- search-input* [search {:keys [on-change on-stop] :or {on-change identity on-stop identity}}]
+(defn search-input [search {:keys [on-change on-stop] :or {on-change identity on-stop identity}}]
   (let [change #(on-change (reset! search %))
         clear #(do (when (seq @search) (change ""))
                  (on-stop))]
      [:div.ui.icon.small.fluid.input.search {:ref (kb-shortcuts :enter on-stop :escape clear)}
       [:input {:type "text" :placeholder (t :input/search) :value @search
-               :on-change #(change (.-target.value %))}]
+               :on-change #(change (.-target.value %)) :auto-focus true}]
       (if (seq @search)
         [:i.link.remove.circle.icon {:on-click clear}]
         [:i.search.icon])]))
-
-(defn search-input [& args]
-  (into [focused search-input*] args))
 
 (defn- highlight [value search]
   (if (seq search)

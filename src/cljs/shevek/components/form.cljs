@@ -93,14 +93,3 @@
   (fn [dom-node]
     (when dom-node
       (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
-
-; TODO ver si el auto-focus true (ver login) no soluciona ya esto
-; El setTimeout es necesario xq sino no funcaba el focus en el search dentro de filter popups.
-(defn focused [& target]
-  (r/create-class
-   {:reagent-render #(vec target)
-    :component-did-mount (fn [rc]
-                           (js/setTimeout #(-> rc r/dom-node js/$
-                                               (.find "input") (.addBack "input")
-                                               .focus .select)
-                                          0))}))

@@ -2,7 +2,7 @@
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title mail-to]]
-            [shevek.components.form :refer [input-field kb-shortcuts focused]]
+            [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
@@ -52,7 +52,7 @@
        [:div.five.wide.column
         [:div.ui.segment.form-container (rpc/loading-class :saving-user)
          [:div.ui.form {:ref shortcuts}
-          [focused input-field edited-user :username {:label (t :users/username) :class "required"}]
+          [input-field edited-user :username {:label (t :users/username) :class "required" :auto-focus true}]
           [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
           [input-field edited-user :password {:label (t :users/password) :class "required" :type "password"}]
           [input-field edited-user :password-confirmation {:label (t :users/password-confirmation)

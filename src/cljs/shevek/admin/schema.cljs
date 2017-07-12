@@ -2,7 +2,7 @@
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title]]
-            [shevek.components.form :refer [select text-input input-field kb-shortcuts focused]]
+            [shevek.components.form :refer [select text-input input-field kb-shortcuts]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]
             [shevek.rpc :as rpc]
@@ -79,7 +79,7 @@
     (if @edited-cube
       [:div.ui.form
        [:div.fields
-        [focused input-field edited-cube :title {:label (t :cubes.schema/title) :class "six wide"}]
+        [input-field edited-cube :title {:label (t :cubes.schema/title) :class "six wide" :auto-focus true}]
         [input-field edited-cube :description {:label (t :cubes.schema/description) :class "ten wide"}]]]
       [:h3.ui.header
        [:i.cube.icon]
