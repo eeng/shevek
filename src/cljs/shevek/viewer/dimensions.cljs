@@ -15,16 +15,13 @@
     :on-click #(do (close) (dispatch event name))}
    [:i.icon {:class icon}]])
 
-; TODO Pivot hace una query para traer la cardinality exacta dependiente de los filtros. La que tengo aca es para toda la historia y es aproximada.
-(defn- dimension-popup [popup {:keys [cardinality] :as dim}]
+(defn- dimension-popup [popup dim]
   [:div.popup-content
    [:div.buttons
     [dimension-popup-button popup "green" "filter" :dimension-added-to-filter dim]
     [dimension-popup-button popup "orange" "square" :split-replaced dim]
     [dimension-popup-button popup "orange" "plus" :splid-dimension-added dim]
-    [dimension-popup-button popup "yellow" "pin" :dimension-pinned dim]]
-   (when cardinality
-     [:div.details (str cardinality " values")])])
+    [dimension-popup-button popup "yellow" "pin" :dimension-pinned dim]]])
 
 (defn- type-icon [type name]
   (let [effective-type (if (= name "__time") "TIME" type)]
