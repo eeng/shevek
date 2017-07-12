@@ -15,7 +15,7 @@
             [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
 
 (defn init-pinned-dim [dim viewer]
-  (cond-> (assoc dim :limit 100)
+  (cond-> (assoc (clean-dim dim) :limit 100)
           (time-dimension? dim) (assoc :granularity (default-granularity viewer)
                                        :sort-by (assoc dim :descending true))))
 

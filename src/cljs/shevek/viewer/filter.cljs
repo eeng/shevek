@@ -20,7 +20,7 @@
   (fnil (if selected conj disj) #{}))
 
 (defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
-  (-> (update-in db [:viewer :filter] add-dimension (assoc dim :operator "include"))
+  (-> (update-in db [:viewer :filter] add-dimension (assoc (clean-dim dim) :operator "include"))
       (assoc-in [:viewer :last-added-filter] [name (js/Date.)])))
 
 (defevh :filter-options-changed [db dim opts]
@@ -183,7 +183,7 @@
 
 (defn- filter-item [{:keys [toggle]} dim]
   [:button.ui.green.compact.button.item
-   (assoc (draggable (clean-dim dim))
+   (assoc (draggable dim)
           :class (when-not (time-dimension? dim) "right labeled icon")
           :on-click toggle)
    (when-not (time-dimension? dim)

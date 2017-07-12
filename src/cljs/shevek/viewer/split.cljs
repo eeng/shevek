@@ -11,24 +11,23 @@
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [cuerdas.core :as str]))
 
-(defn- init-splitted-dim [dim {:keys [viewer]} limit]
-  (cond-> (assoc dim
-                 :limit limit
-                 :sort-by (assoc (-> viewer :measures first)
-                                 :descending (not (time-dimension? dim))))
-          (time-dimension? dim) (assoc :granularity (default-granularity viewer))))
+(defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
+  (cond-> (assoc (clean-dim dim)
+                 :limit (or limit 50)
+                 :sort-by (or sort-by (assoc (-> viewer :measures first) :descending (not (time-dimension? dim)))))
+          (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer)))))
 
 (defevh :splid-dimension-added [{:keys [viewer] :as db} dim]
-  (let [limit (if (seq (:split viewer)) 5 50)]
-    (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim dim db limit))
+  (let [limit (when (seq (:split viewer)) 5)]
+    (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
         (send-main-query))))
 
 (defevh :split-replaced [db dim]
-  (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db 50)])
+  (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
       (send-main-query)))
 
 (defevh :split-dimension-replaced [db old-dim new-dim]
-  (-> (update-in db [:viewer :split] replace-dimension old-dim (init-splitted-dim new-dim db 50))
+  (-> (update-in db [:viewer :split] replace-dimension old-dim (init-splitted-dim new-dim db))
       (send-main-query)))
 
 (defevh :split-dimension-removed [db dim]
@@ -88,7 +87,7 @@
 (defn- split-item [{:keys [toggle]} {:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
    (merge {:on-click toggle}
-          (draggable (clean-dim dim))
+          (draggable dim)
           (droppable #(dispatch :split-dimension-replaced dim %)))
    [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
    title])

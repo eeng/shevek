@@ -13,7 +13,7 @@
 
 (s/defschema Split
   (assoc Dimension
-         :limit (s/cond-pre s/Int s/Str)
+         :limit s/Int
          (s/optional-key :sort-by) SortBy
          (s/optional-key :granularity) s/Str))
 
