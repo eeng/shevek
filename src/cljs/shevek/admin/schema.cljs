@@ -1,5 +1,5 @@
 (ns shevek.admin.schema
-  (:require-macros [reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title]]
             [shevek.components.form :refer [select text-input input-field kb-shortcuts]]
@@ -7,8 +7,8 @@
             [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]
             [shevek.rpc :as rpc]
             [reagent.core :as r]
-            [reflow.db :as db]
-            [reflow.core :refer [dispatch]]))
+            [shevek.reflow.db :as db]
+            [shevek.reflow.core :refer [dispatch]]))
 
 (defn- input-or-text [dim edited-cube coll-key i field]
   (if @edited-cube

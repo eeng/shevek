@@ -1,7 +1,7 @@
 (ns shevek.viewer.filter
-  (:require-macros [reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
-            [reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim]]

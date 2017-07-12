@@ -2,8 +2,8 @@
   (:require [reagent.core :as r]
             [shevek.layout :refer [layout]]
             [shevek.schemas.interceptor :as schema]
-            [reflow.core :as reflow]
-            [reflow.interceptors :as i]
+            [shevek.reflow.core :as reflow]
+            [shevek.reflow.interceptors :as i]
             [secretary.core :as secretary]
             [goog.events :as events]
             [goog.history.EventType :as EventType])

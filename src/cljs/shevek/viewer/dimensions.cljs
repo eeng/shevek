@@ -1,7 +1,7 @@
 (ns shevek.viewer.dimensions
-  (:require-macros [reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
-            [reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
             [shevek.components.popup :refer [controlled-popup]]

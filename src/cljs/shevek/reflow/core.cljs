@@ -1,9 +1,9 @@
-(ns reflow.core
+(ns shevek.reflow.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan put! <!]]
-            [reflow.db :refer [app-db]]
+            [shevek.reflow.db :refer [app-db]]
             [shevek.lib.logger :refer [log]]
-            [reflow.interceptors :as i]))
+            [shevek.reflow.interceptors :as i]))
 
 (defonce events (chan))
 (defonce coordinator (atom nil))

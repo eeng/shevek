@@ -1,7 +1,7 @@
 (ns shevek.viewer.pinboard
-  (:require-macros [reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
-            [reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.lib.collections :refer [includes?]]
             [shevek.lib.react :refer [without-propagation]]

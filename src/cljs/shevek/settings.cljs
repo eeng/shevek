@@ -1,7 +1,7 @@
 (ns shevek.settings
-  (:require-macros [reflow.macros :refer [defevh]])
-  (:require [reflow.core :refer [dispatch]]
-            [reflow.db :as db]
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
+  (:require [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.local-storage :as local-storage]
             [shevek.components.form :refer [select]]

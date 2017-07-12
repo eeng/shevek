@@ -1,8 +1,8 @@
 (ns shevek.viewer.visualization
   (:require [reagent.core :as r]
             [clojure.string :as str]
-            [reflow.core :refer [dispatch]]
-            [reflow.db :as db]
+            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.collections :refer [detect]]
             [shevek.navegation :refer [current-page?]]

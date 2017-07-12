@@ -1,6 +1,6 @@
 (ns shevek.i18n
   (:require [tongue.core :as tongue]
-            [reflow.db :as db]))
+            [shevek.reflow.db :as db]))
 
 (def translations
   {:en

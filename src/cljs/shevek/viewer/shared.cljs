@@ -1,7 +1,7 @@
 (ns shevek.viewer.shared
-  (:require-macros [reflow.macros :refer [defevh]])
-  (:require [reflow.core :refer [dispatch]]
-            [reflow.db :as db]
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
+  (:require [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.db :as db]
             [reagent.core :as r]
             [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
             [shevek.lib.number :as num]

@@ -1,5 +1,5 @@
 (ns shevek.admin.users
-  (:require-macros [reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title mail-to]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
@@ -7,8 +7,8 @@
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
             [reagent.core :as r]
-            [reflow.db :as db]
-            [reflow.core :refer [dispatch]]))
+            [shevek.reflow.db :as db]
+            [shevek.reflow.core :refer [dispatch]]))
 
 (defevh :users-arrived [db users]
   (-> (assoc db :users users)
