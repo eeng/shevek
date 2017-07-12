@@ -9,7 +9,8 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-time]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
-            [shevek.components :refer [controlled-popup select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
+            [shevek.components :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
+            [shevek.components.popup :refer [controlled-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]))
 
 (defn send-queries [db dim]

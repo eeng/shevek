@@ -4,7 +4,7 @@
             [reflow.core :refer [dispatch]]
             [shevek.navegation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
-            [shevek.components :refer [controlled-popup]]
+            [shevek.components.popup :refer [controlled-popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.login :as login :refer [logged-in?]]
             [shevek.dashboard :as dashboard]

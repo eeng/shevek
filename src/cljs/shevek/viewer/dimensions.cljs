@@ -4,7 +4,7 @@
             [reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.components :refer [controlled-popup]]
+            [shevek.components.popup :refer [controlled-popup]]
             [shevek.components.drag-and-drop :refer [draggable]]
             [shevek.lib.react :refer [rmap]]
             [shevek.viewer.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
