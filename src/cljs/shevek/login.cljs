@@ -40,7 +40,7 @@
 
 (defevh :logout [db]
   (session-storage/remove-item! "shevek.access-token")
-  (dissoc db :current-user))
+  (select-keys db [:page :settings]))
 
 (defevh :session-expired [db]
   (reset! error :users/session-expired)

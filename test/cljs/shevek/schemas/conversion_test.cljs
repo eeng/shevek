@@ -1,7 +1,7 @@
 (ns shevek.schemas.conversion-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [pjstadig.humane-test-output]
-            [shevek.asserts :refer [submap? submaps?]]
+            [shevek.asserts :refer [submap? submaps? without?]]
             [shevek.schemas.conversion :refer [viewer->report report->viewer]]
             [shevek.lib.dates :refer [parse-time]]))
 
@@ -38,7 +38,10 @@
            (-> {:pinboard {:measure {:name "count" :type "..."}
                            :dimensions [{:name "time" :type "..." :granularity "PT1H"
                                          :sort-by {:name "time" :title "..." :descending false}}]}}
-               viewer->report :pinboard)))))
+               viewer->report :pinboard))))
+
+  (testing "should not store user-id as the URL"
+    (is (without? :user-id (viewer->report {})))))
 
 (deftest report->viewer-tests
   (testing "should convert back to keywords, dates and sets and add title and other fields"

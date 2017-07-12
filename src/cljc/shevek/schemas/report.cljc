@@ -31,4 +31,4 @@
    :filter [Filter]
    :split [Split]
    :pinboard Pinboard
-   :user-id s/Any})
+   (s/optional-key :user-id) s/Any})

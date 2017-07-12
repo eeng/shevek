@@ -31,8 +31,13 @@
         (send-pinboard-queries))))
 
 (defevh :viewer-initialized [db]
-  (rpc/call "schema.api/cube" :args [(get-in db [:viewer :cube :name])] :handler #(dispatch :cube-arrived %))
-  (rpc/loading db :cube-metadata))
+  (if-let [cube (get-in db [:viewer :cube :name])]
+    (do
+      (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
+      (rpc/loading db :cube-metadata))
+    (do
+      (navigate "/")
+      db)))
 
 (defn prepare-cube [db cube report]
   (if (current-page? :viewer)
@@ -44,11 +49,8 @@
   (prepare-cube db cube nil))
 
 (defevh :viewer-restored [db encoded-report]
-  (if-let [{:keys [cube] :as report} (restore-report-from-url encoded-report)]
-    (prepare-cube db cube report)
-    (do
-      (navigate "/")
-      db)))
+  (let [{:keys [cube] :as report} (restore-report-from-url encoded-report)]
+    (prepare-cube db cube report)))
 
 (defevh :max-time-arrived [db max-time]
   (assoc-in db [:viewer :cube :max-time] (parse-max-time max-time)))
