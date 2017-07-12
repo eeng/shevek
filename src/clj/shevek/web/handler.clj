@@ -7,7 +7,7 @@
             [shevek.logging :refer [wrap-request-logging]]
             [shevek.lib.transit-handlers :as th]
             [shevek.lib.rpc :as rpc]
-            [shevek.lib.auth :as auth]
+            [shevek.lib.auth :as auth :refer [wrap-current-user]]
             [shevek.config :refer [config]]
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
@@ -30,6 +30,7 @@
 (defn app []
   (-> app-routes
       (wrap-request-logging)
+      (wrap-current-user)
       (wrap-authentication (backends/jws {:secret (config :jwt-secret)}))
       (wrap-restful-format :params-options {:transit-json {:handlers th/read-handlers}}
                            :response-options {:transit-json {:handlers th/write-handlers}})

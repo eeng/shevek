@@ -30,4 +30,5 @@
    :measures [s/Str]
    :filter [Filter]
    :split [Split]
-   :pinboard Pinboard})
+   :pinboard Pinboard
+   :user-id s/Any})

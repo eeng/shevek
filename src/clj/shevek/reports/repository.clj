@@ -11,6 +11,7 @@
   (mc/remove-by-id db "reports" _id)
   true)
 
-(defn find-reports [db]
+(defn find-reports [db user-id]
   (mq/with-collection db "reports"
+    (mq/find {:user-id user-id})
     (mq/sort {:name 1})))
