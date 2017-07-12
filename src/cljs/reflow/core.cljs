@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [chan put! <!]]
             [reflow.db :refer [app-db]]
-            [reflow.utils :refer [log]]
+            [shevek.lib.logger :refer [log]]
             [reflow.interceptors :as i]))
 
 (defonce events (chan))
@@ -18,7 +18,7 @@
   (try
     (swap! app-db handler event)
     (catch js/Error e
-      (console.log e))))
+      (log e))))
 
 (defn- start-coordinator [app-db handler]
   (go-loop []

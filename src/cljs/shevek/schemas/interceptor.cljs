@@ -1,7 +1,7 @@
 (ns shevek.schemas.interceptor
   (:require [schema.core :as s]
             [shevek.schemas.app-db :refer [AppDB]]
-            [shevek.lib.util :refer [debug?]]))
+            [shevek.lib.logger :refer [debug?]]))
 
 (defn checker [interceptor]
   (if debug?

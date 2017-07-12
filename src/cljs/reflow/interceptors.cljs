@@ -1,8 +1,6 @@
 (ns reflow.interceptors
-  (:require [reflow.utils :refer [log]]
+  (:require [shevek.lib.logger :refer [log debug?]]
             [clojure.data :as data]))
-
-(def debug? ^boolean goog.DEBUG)
 
 (defn logger [interceptor]
   (fn [db event]

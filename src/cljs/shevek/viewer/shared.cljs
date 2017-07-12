@@ -13,7 +13,8 @@
             [shevek.components.form :refer [kb-shortcuts]]
             [shevek.reports.url :refer [store-in-url]]
             [schema.core :as s]
-            [goog.string :as str]))
+            [goog.string :as str]
+            [shevek.lib.logger :refer [log]]))
 
 (defn- viewer [& keys]
   (db/get-in (into [:viewer] keys)))
@@ -33,7 +34,7 @@
 
 (defn send-query [db viewer results-keys]
   (store-in-url viewer)
-  (console.log "Sending query from viewer" viewer) ; TODO no me convence loggear con esto, no habria que usar el logger mas sofisticado? Tb en el interceptor logger
+  (log "Sending query from viewer" viewer)
   (let [q (viewer->query viewer)]
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
