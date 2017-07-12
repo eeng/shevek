@@ -1,17 +1,8 @@
-; TODO mover esto dentro de la carpeta components y quizas separar en varios.
-(ns shevek.components
+(ns shevek.components.form
   (:require [reagent.core :as r :refer [dom-node create-class]]
-            [shevek.i18n :refer [t]]
             [shevek.lib.collections :refer [detect wrap-coll]]
             [shevek.lib.react :refer [with-react-keys]]
-            [shevek.rpc :refer [loading?]]
             [cuerdas.core :as str]))
-
-(defn page-title [title subtitle icon-class]
-  [:h1.ui.header
-   [:i.icon {:class icon-class}]
-   [:div.content title
-    [:div.sub.header subtitle]]])
 
 (defn- classes [& css-classes]
   (->> css-classes (filter identity) (str/join " ")))
@@ -113,11 +104,3 @@
                                                (.find "input") (.addBack "input")
                                                .focus .select)
                                           0))}))
-
-(defn mail-to [address]
-  (when (seq address)
-    [:a {:href (str "mailto:" address)} address]))
-
-(defn loader [loading-key]
-  (when (loading? loading-key)
-    [:div.ui.active.inverted.dimmer [:div.ui.loader]]))

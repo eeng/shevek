@@ -10,7 +10,7 @@
             [shevek.rpc :as rpc]
             [shevek.lib.dw.dims :refer [dim= add-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
-            [shevek.components :refer [focused kb-shortcuts]]
+            [shevek.components.form :refer [focused kb-shortcuts]]
             [shevek.reports.url :refer [store-in-url]]
             [schema.core :as s]
             [goog.string :as str]))

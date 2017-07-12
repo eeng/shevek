@@ -5,7 +5,7 @@
             [reflow.db :as db]
             [reflow.core :refer [dispatch]]
             [shevek.rpc :as rpc]
-            [shevek.components :refer [text-input focused kb-shortcuts]]
+            [shevek.components.form :refer [text-input focused kb-shortcuts]]
             [shevek.lib.session-storage :as session-storage]
             [ajax.core :refer [POST]]
             [cljsjs.jwt-decode]))

@@ -7,7 +7,7 @@
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.components.popup :refer [controlled-popup]]
-            [shevek.components :refer [kb-shortcuts focused input-field]]
+            [shevek.components.form :refer [kb-shortcuts focused input-field]]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]

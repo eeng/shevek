@@ -7,8 +7,8 @@
             [shevek.lib.dw.time :refer [default-granularity]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
-            [shevek.components :refer [controlled-popup select]]
             [shevek.components.popup :refer [controlled-popup]]
+            [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [cuerdas.core :as str]))
 

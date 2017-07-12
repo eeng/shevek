@@ -1,6 +1,6 @@
 (ns shevek.admin.page
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title]]
+            [shevek.components.text :refer [page-title]]
             [shevek.admin.users :refer [users-section]]
             [shevek.admin.schema :refer [schema-section]]))
 

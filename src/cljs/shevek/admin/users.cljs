@@ -1,7 +1,8 @@
 (ns shevek.admin.users
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title input-field kb-shortcuts focused mail-to]]
+            [shevek.components.text :refer [page-title mail-to]]
+            [shevek.components.form :refer [input-field kb-shortcuts focused]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]

@@ -4,7 +4,7 @@
             [reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
-            [shevek.components :refer [page-title loader]]
+            [shevek.components.text :refer [page-title loader]]
             [shevek.lib.dw.cubes :refer [cubes-list set-cube-defaults]]
             [shevek.reports.menu :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]

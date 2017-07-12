@@ -1,7 +1,8 @@
 (ns shevek.admin.schema
   (:require-macros [reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
-            [shevek.components :refer [page-title select text-input input-field kb-shortcuts focused]]
+            [shevek.components.text :refer [page-title]]
+            [shevek.components.form :refer [select text-input input-field kb-shortcuts focused]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]
             [shevek.rpc :as rpc]

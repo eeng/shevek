@@ -4,7 +4,7 @@
             [reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.local-storage :as local-storage]
-            [shevek.components :refer [select]]
+            [shevek.components.form :refer [select]]
             [shevek.components.popup :refer [controlled-popup]]
             [shevek.navegation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
