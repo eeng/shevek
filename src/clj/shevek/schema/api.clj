@@ -4,17 +4,17 @@
             [shevek.db :refer [db]]
             [shevek.dw :refer [dw]]))
 
-(defn cubes []
+(defn cubes [_]
   (r/find-cubes db))
 
-(defn max-time [cube-name]
+(defn max-time [_ cube-name]
   (:max-time (m/time-boundary dw cube-name)))
 
-(defn cube [name]
+(defn cube [req name]
   (assoc (r/find-cube db name)
-         :max-time (max-time name)))
+         :max-time (max-time req name)))
 
-(defn save-cube [cube]
+(defn save-cube [_ cube]
   (r/save-cube db cube))
 
 ;; Examples

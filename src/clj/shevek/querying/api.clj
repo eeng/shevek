@@ -2,5 +2,5 @@
   (:require [shevek.dw :refer [dw]]
             [shevek.querying.manager :as m]))
 
-(defn query [q]
+(defn query [_ q]
   (m/query dw q))
