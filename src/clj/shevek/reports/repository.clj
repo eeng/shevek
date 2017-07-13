@@ -2,10 +2,11 @@
   (:require [schema.core :as s]
             [shevek.schemas.report :refer [Report]]
             [monger.collection :as mc]
-            [monger.query :as mq]))
+            [monger.query :as mq]
+            [shevek.lib.mongodb :refer [timestamp]]))
 
 (s/defn save-report [db report :- Report]
-  (mc/save-and-return db "reports" report))
+  (mc/save-and-return db "reports" (timestamp report)))
 
 (s/defn delete-report [db {:keys [_id]}]
   (mc/remove-by-id db "reports" _id)
