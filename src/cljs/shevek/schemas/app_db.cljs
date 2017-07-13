@@ -7,7 +7,6 @@
 
 (s/defschema Settings
   {(s/optional-key :lang) s/Str
-   (s/optional-key :time-zone) s/Str
    (s/optional-key :auto-refresh) s/Int})
 
 (s/defschema Dashboard

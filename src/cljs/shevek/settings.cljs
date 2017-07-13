@@ -9,8 +9,7 @@
             [shevek.navegation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
             [schema-tools.core :as st]
-            [cuerdas.core :as str]
-            [cljs-time.core :refer [default-time-zone]]))
+            [cuerdas.core :as str]))
 
 (defn save-settings! [db]
   (local-storage/store! "shevek.settings" (db :settings))
@@ -34,26 +33,11 @@
     (st/select-schema settings Settings)
     (catch js/Error _ {})))
 
-(def tz-data
-  (->> [{:id "America/Argentina/Buenos_Aires" :offset "UTC-03:00" :label "Buenos Aires"}
-        {:id "America/Los_Angeles" :offset "UTC-08:00" :label "Los Angeles"}
-        {:id "America/New_York" :offset "UTC-05:00" :label "New York"}
-        {:id "UTC" :offset "UTC+00:00" :label "UTC"}
-        {:id "Europe/Berlin" :offset "UTC+01:00" :label "Berlin"}
-        {:id "Africa/Cairo" :offset "UTC+02:00" :label "Cairo"}
-        {:id "Asia/Qatar" :offset "UTC+03:00" :label "Qatar"}
-        {:id "Asia/Hong_Kong" :offset "UTC+08:00" :label "Hong Kong"}]
-       (sort-by :id)))
-
-(defn current-time-zone []
-  (or (some #(when (= (:offset %) (:id (default-time-zone))) (:id %)) tz-data)
-      "UTC"))
-
 (defevh :settings-loaded [db]
   (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "shevek.settings"))
-        settings (merge {:lang "en" :time-zone (current-time-zone)} settings)]
+        default-settings {:lang "en"}]
     (set-auto-refresh-interval! auto-refresh)
-    (assoc db :settings settings)))
+    (assoc db :settings (merge default-settings settings))))
 
 (defevh :settings-saved [db new-settings]
   (-> db (update :settings merge new-settings) save-settings!))
@@ -75,13 +59,7 @@
     [:label (t :settings/lang)]
     [select [["English" "en"] ["Español" "es"]]
       {:selected (db/get-in [:settings :lang])
-       :on-change #(dispatch :settings-saved {:lang %})}]]
-   [:div.field
-    [:label (t :settings/time-zone)]
-    [select (map (juxt :label :id) tz-data)
-      {:selected (db/get-in [:settings :time-zone])
-       :on-change #(dispatch :settings-saved {:time-zone %})
-       :class "search selection"}]]])
+       :on-change #(dispatch :settings-saved {:lang %})}]]])
 
 (defn- popup-activator [popup]
   [:a.item {:on-click (popup :toggle)}
