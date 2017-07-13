@@ -6,15 +6,22 @@
             [clojure.string :as str]
             [shevek.i18n :refer [translation]]))
 
-;; TODO todas estas funciones van a trabajar con el timezone en UTC. Ver como influye eso al usar la local
-
 ; El f/unparse es lentísimo supongo que xq prueba con varios formatos, pero aca por ahora solo parseamos iso8601 asi que con esto basta.
-(defn parse-time [time]
-  (let [parsed (.parse js/Date time)]
+(defn parse-time [str]
+  (let [parsed (.parse js/Date str)]
     (when-not (js/isNaN parsed)
-      (c/from-long parsed))))
+      (t/to-default-time-zone (c/from-long parsed)))))
 
-(def now t/now)
+(defn parse-date [str]
+  (let [parsed (.parse js/Date str)]
+    (when-not (js/isNaN parsed)
+      (t/from-default-time-zone (c/from-long parsed)))))
+
+(defn date-time [& args]
+  (apply t/local-date-time args))
+
+(defn now []
+  (t/to-default-time-zone (t/now)))
 
 (defn yesterday []
   (t/minus (now) (t/days 1)))
@@ -44,22 +51,22 @@
   (-> time t/month (/ 3) Math.ceil))
 
 (defn beginning-of-quarter [time]
-  (t/date-time (t/year time) (- (* (quarter time) 3) 2)))
+  (date-time (t/year time) (- (* (quarter time) 3) 2)))
 
 (defn end-of-quarter [time]
-  (end-of-month (t/date-time (t/year time) (* (quarter time) 3))))
+  (end-of-month (date-time (t/year time) (* (quarter time) 3))))
 
 (defn beginning-of-year [time]
-  (t/date-time (t/year time)))
+  (date-time (t/year time)))
 
 (defn end-of-year [time]
-  (end-of-month (t/date-time (t/year time) 12)))
+  (end-of-month (date-time (t/year time) 12)))
 
 (defn round-to-next-minute [time]
-  (t/date-time (t/year time) (t/month time) (t/day time) (t/hour time) (inc (t/minute time)) 0))
+  (date-time (t/year time) (t/month time) (t/day time) (t/hour time) (inc (t/minute time)) 0))
 
 (defn to-iso8601 [time]
-  (f/unparse (:date-time f/formatters) time))
+  (f/unparse (:date-time f/formatters) (t/to-utc-time-zone time)))
 
 (defn format-date [time]
   (f/unparse (:date f/formatters) time))
@@ -81,4 +88,4 @@
                     #"P(\d+)D" (formatter :day)
                     #"P(\d+)W" (formatter :day)
                     #"P(\d+)M" (formatter :month))]
-    (->> time parse-time t/to-default-time-zone (f/unparse formatter))))
+    (->> time parse-time (f/unparse formatter))))

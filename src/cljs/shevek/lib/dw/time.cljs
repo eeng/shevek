@@ -36,7 +36,6 @@
   ([interval] (format-interval interval (d/formatter :day)))
   ([interval formatter]
    (->> interval
-        (map t/to-default-time-zone)
         (map #(f/unparse formatter %))
         distinct
         (str/join " - "))))
@@ -47,9 +46,10 @@
     (format-interval (to-interval period max-time) formatter)))
 
 (defn effective-interval [{:keys [filter cube]}]
-  (let [{:keys [period interval]} (time-dimension filter)
-        interval (when interval [(first interval) (d/end-of-day (second interval))])]
-    (if period (to-interval period (:max-time cube)) interval)))
+  (let [{:keys [period interval]} (time-dimension filter)]
+    (if period
+      (to-interval period (:max-time cube))
+      [(first interval) (d/end-of-day (second interval))])))
 
 (defn default-granularity [viewer]
   (let [[from to] (effective-interval viewer)

@@ -1,7 +1,7 @@
 (ns shevek.schemas.conversion
   (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension time-dimension?]]
             [shevek.lib.dw.time :refer [effective-interval]]
-            [shevek.lib.dates :refer [to-iso8601 end-of-day format-date parse-time]]
+            [shevek.lib.dates :refer [to-iso8601 end-of-day parse-time]]
             [shevek.schemas.query :refer [Query]]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]))
@@ -39,7 +39,7 @@
 (defn- viewer-dim->report [{:keys [period interval value sort-by] :as dim}]
   (cond-> (dissoc dim :type :title :description :format :expression)
           period (update :period name)
-          interval (update :interval (partial map format-date))
+          interval (update :interval (partial map to-iso8601))
           value (update :value vec)
           sort-by (update :sort-by viewer-dim->report)))
 

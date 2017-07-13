@@ -3,7 +3,7 @@
   (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [submap? submaps? without?]]
             [shevek.schemas.conversion :refer [viewer->report report->viewer]]
-            [shevek.lib.dates :refer [parse-time]]))
+            [shevek.lib.dates :refer [date-time]]))
 
 (deftest viewer->report-tests
   (testing "should store only the cube id"
@@ -16,10 +16,10 @@
 
   (testing "in each filter should store only the dimension name besides its own fields and converted keywords, dates and sets"
     (is (= [{:name "time" :period "current-day"}
-            {:name "time2" :interval ["2018-04-04" "2018-04-05"]}
+            {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
             {:name "page" :operator "exclude" :value [nil]}]
            (-> {:filter [{:name "time" :type "..." :period :current-day}
-                         {:name "time2" :interval [(parse-time "2018-04-04") (parse-time "2018-04-05")]}
+                         {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
                          {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
                viewer->report :filter))))
 
@@ -46,10 +46,10 @@
 (deftest report->viewer-tests
   (testing "should convert back to keywords, dates and sets and add title and other fields"
     (is (= [{:name "time" :title "Fecha" :period :current-day}
-            {:name "time2" :interval [(parse-time "2018-04-04") (parse-time "2018-04-05")]}
+            {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
             {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
            (-> {:filter [{:name "time" :period "current-day"}
-                         {:name "time2" :interval ["2018-04-04" "2018-04-05"]}
+                         {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
                          {:name "page" :operator "exclude" :value [nil]}]}
                (report->viewer {:dimensions [{:name "time" :title "Fecha"}
                                              {:name "page" :title "Pag"}]})

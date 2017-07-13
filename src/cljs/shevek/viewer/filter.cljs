@@ -7,7 +7,7 @@
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim]]
             [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.lib.dates :refer [format-date parse-time]]
+            [shevek.lib.dates :refer [format-date parse-date]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
             [shevek.components.popup :refer [controlled-popup]]
@@ -89,7 +89,7 @@
 (defn- specific-period-time-filter [{:keys [close]} {:keys [period interval] :as dim}]
   (let [interval (or interval (to-interval period (current-cube :max-time)))
         form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
-        parse #(map parse-time ((juxt :from :to) %))
+        parse #(map parse-date ((juxt :from :to) %))
         accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})
         shortcuts (kb-shortcuts :enter accept :escape close)]
     (fn []
