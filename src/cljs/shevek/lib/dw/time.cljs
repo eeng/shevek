@@ -36,6 +36,7 @@
   ([interval] (format-interval interval (d/formatter :day)))
   ([interval formatter]
    (->> interval
+        (map t/to-default-time-zone)
         (map #(f/unparse formatter %))
         distinct
         (str/join " - "))))

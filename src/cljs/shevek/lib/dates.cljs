@@ -81,4 +81,4 @@
                     #"P(\d+)D" (formatter :day)
                     #"P(\d+)W" (formatter :day)
                     #"P(\d+)M" (formatter :month))]
-    (f/unparse formatter (parse-time time))))
+    (->> time parse-time t/to-default-time-zone (f/unparse formatter))))
