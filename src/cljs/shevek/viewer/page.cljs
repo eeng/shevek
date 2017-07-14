@@ -1,5 +1,5 @@
 (ns shevek.viewer.page
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh defevhi]])
   (:require [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
@@ -14,14 +14,15 @@
             [shevek.viewer.visualization :refer [visualization-panel]]
             [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
-            [shevek.reports.url :refer [restore-report-from-url]]))
+            [shevek.reports.url :refer [store-viewer-in-url restore-report-from-url]]))
 
 (defn- init-viewer [cube current-report]
   (if current-report
     (report->viewer current-report cube)
     (build-new-viewer cube)))
 
-(defevh :cube-arrived [{:keys [current-report] :as db} {:keys [name] :as cube}]
+(defevhi :cube-arrived [{:keys [current-report] :as db} {:keys [name] :as cube}]
+  {:after [store-viewer-in-url]}
   (let [cube (set-cube-defaults cube)
         {:keys [pinboard] :as viewer} (init-viewer cube current-report)]
     (-> (assoc db :viewer viewer)
@@ -31,12 +32,10 @@
 
 (defevh :viewer-initialized [db]
   (if-let [cube (get-in db [:viewer :cube :name])]
-    (do
+    (do ; TODO las mimas tres lineas
       (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
       (rpc/loading db :cube-metadata))
-    (do
-      (navigate "/")
-      db)))
+    (navigate "/")))
 
 (defn prepare-cube [db cube report]
   (if (current-page? :viewer)
@@ -57,11 +56,9 @@
       (send-pinboard-queries)))
 
 (defevh :viewer-refresh [db]
-  (if (rpc/loading?)
-    db
-    (do ; TODO las dos lineas y el do de nuevo
-      (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))
-      (rpc/loading db [:results :main]))))
+  (when-not (rpc/loading?)
+    (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))
+    (rpc/loading db [:results :main])))
 
 (defn page []
   (dispatch :viewer-initialized)

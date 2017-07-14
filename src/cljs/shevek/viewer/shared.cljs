@@ -11,7 +11,7 @@
             [shevek.lib.dw.dims :refer [dim= add-dimension remove-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components.form :refer [kb-shortcuts]]
-            [shevek.reports.url :refer [store-in-url]]
+            [shevek.reports.url :refer [store-viewer-in-url]]
             [schema.core :as s]
             [goog.string :as str]
             [shevek.lib.logger :as log]))
@@ -33,9 +33,8 @@
       (rpc/loaded results-keys)))
 
 (defn send-query [db viewer results-keys]
-  (store-in-url viewer)
-  (log/info "Sending query from viewer" viewer)
   (let [q (viewer->query viewer)]
+    (log/info "Sending query" q)
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
 

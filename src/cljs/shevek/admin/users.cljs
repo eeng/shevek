@@ -32,16 +32,14 @@
      :email (v/email {:optional? true})}))
 
 (defevh :user-changed [db edited-user cancel]
-  (if (v/valid?! edited-user validate-user)
+  (when (v/valid?! edited-user validate-user)
     (do ; TODO estas dos lineas call y loading se repiten mucho me parece y hacen q se necesite el do, ver si no las podemos combinar en una nueva fn
       (rpc/call "users.api/save" :args [(dissoc @edited-user :password-confirmation)]
                 :handler #(do (dispatch :user-saved) (cancel)))
-      (rpc/loading db :saving-user))
-    db))
+      (rpc/loading db :saving-user))))
 
 (defevh :user-deleted [db user]
-  (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %))
-  db)
+  (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %)))
 
 (defn- user-form [edited-user]
   (let [cancel #(reset! edited-user nil)

@@ -1,5 +1,5 @@
 (ns shevek.viewer.pinboard
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh defevhi]])
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [debounce regex-escape]]
@@ -12,28 +12,33 @@
             [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.filter :refer [filter-operators]]
-            [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
+            [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]
+            [shevek.reports.url :refer [store-viewer-in-url]]))
 
 (defn init-pinned-dim [dim viewer]
   (cond-> (assoc (clean-dim dim) :limit 100)
           (time-dimension? dim) (assoc :granularity (default-granularity viewer)
                                        :sort-by (assoc dim :descending true))))
 
-(defevh :dimension-pinned [{:keys [viewer] :as db} dim]
+(defevhi :dimension-pinned [{:keys [viewer] :as db} dim]
+  {:after [store-viewer-in-url]}
   (let [dim (init-pinned-dim dim viewer)]
     (-> (update-in db [:viewer :pinboard :dimensions] add-dimension dim)
         (send-pinned-dim-query dim))))
 
-(defevh :dimension-unpinned [db dim]
+(defevhi :dimension-unpinned [db dim]
+  {:after [store-viewer-in-url]}
   (update-in db [:viewer :pinboard :dimensions] remove-dimension dim))
 
 ; TODO al cambiar la measure se muestra temporalmente un cero en todas las filas. Ver si se puede evitar.
-(defevh :pinboard-measure-selected [db measure-name]
+(defevhi :pinboard-measure-selected [db measure-name]
+  {:after [store-viewer-in-url]}
   (-> (assoc-in db [:viewer :pinboard :measure]
                 (find-dimension measure-name (current-cube :measures)))
       (send-pinboard-queries)))
 
-(defevh :pinned-time-granularity-changed [db dim granularity]
+(defevhi :pinned-time-granularity-changed [db dim granularity]
+  {:after [store-viewer-in-url]}
   (let [new-time-dim (assoc dim :granularity granularity)]
     (-> (update-in db [:viewer :pinboard :dimensions] replace-dimension new-time-dim)
         (send-pinned-dim-query new-time-dim))))

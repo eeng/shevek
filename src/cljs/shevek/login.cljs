@@ -44,8 +44,7 @@
 
 (defevh :session-expired [db]
   (reset! error :users/session-expired)
-  (dispatch :logout)
-  db)
+  (dispatch :logout))
 
 (defevh :user-restored [db]
   (assoc db :current-user (extract-user (session-storage/get-item "shevek.access-token"))))

@@ -1,5 +1,5 @@
 (ns shevek.viewer.split
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevhi]])
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
@@ -10,7 +10,8 @@
             [shevek.components.popup :refer [controlled-popup]]
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
-            [cuerdas.core :as str]))
+            [cuerdas.core :as str]
+            [shevek.reports.url :refer [store-viewer-in-url]]))
 
 (defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
   (cond-> (assoc (clean-dim dim)
@@ -18,28 +19,34 @@
                  :sort-by (or sort-by (assoc (-> viewer :measures first) :descending (not (time-dimension? dim)))))
           (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer)))))
 
-(defevh :split-dimension-added [{:keys [viewer] :as db} dim]
+(defevhi :split-dimension-added [{:keys [viewer] :as db} dim]
+  {:after [store-viewer-in-url]}
   (let [limit (when (seq (:split viewer)) 5)]
     (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
         (send-main-query))))
 
-(defevh :split-replaced [db dim]
+(defevhi :split-replaced [db dim]
+  {:after [store-viewer-in-url]}
   (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
       (send-main-query)))
 
-(defevh :split-dimension-replaced [db old-dim new-dim]
+(defevhi :split-dimension-replaced [db old-dim new-dim]
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :split] replace-dimension old-dim (init-splitted-dim new-dim db))
       (send-main-query)))
 
-(defevh :split-dimension-removed [db dim]
+(defevhi :split-dimension-removed [db dim]
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :split] remove-dimension dim)
       (send-main-query)))
 
-(defevh :split-options-changed [db dim opts]
+(defevhi :split-options-changed [db dim opts]
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :split] replace-dimension (merge dim opts))
       (send-main-query)))
 
-(defevh :splits-sorted-by [db sort-bys descending]
+(defevhi :splits-sorted-by [db sort-bys descending]
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :split]
                  (fn [splits]
                    (->> (zipmap splits sort-bys)

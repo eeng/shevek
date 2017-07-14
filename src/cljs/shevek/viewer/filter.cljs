@@ -1,5 +1,5 @@
 (ns shevek.viewer.filter
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
+  (:require-macros [shevek.reflow.macros :refer [defevh defevhi]])
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
@@ -11,7 +11,8 @@
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
             [shevek.components.popup :refer [controlled-popup]]
-            [shevek.components.drag-and-drop :refer [draggable droppable]]))
+            [shevek.components.drag-and-drop :refer [draggable droppable]]
+            [shevek.reports.url :refer [store-viewer-in-url]]))
 
 (defn send-queries [db dim]
   (-> (send-main-query db)
@@ -20,15 +21,18 @@
 (defn toggle-filter-value [selected]
   (fnil (if selected conj disj) #{}))
 
-(defevh :dimension-added-to-filter [db {:keys [name] :as dim}]
+(defevhi :dimension-added-to-filter [db {:keys [name] :as dim}]
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :filter] add-dimension (assoc (clean-dim dim) :operator "include"))
       (assoc-in [:viewer :last-added-filter] [name (js/Date.)])))
 
-(defevh :filter-options-changed [db dim opts]
+(defevhi :filter-options-changed [db dim opts]
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :filter] replace-dimension (merge (clean-dim dim) opts))
       (send-queries dim)))
 
-(defevh :dimension-removed-from-filter [db dim]
+(defevhi :dimension-removed-from-filter [db dim]
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :filter] remove-dimension dim)
       (send-queries dim)))
 
@@ -37,12 +41,12 @@
     (dispatch :dimension-removed-from-filter dim)
     (dispatch :filter-options-changed dim opts)))
 
-(defevh :pinned-dimension-item-toggled [db dim toggled-value selected?]
+(defevhi :pinned-dimension-item-toggled [db dim toggled-value selected?]
+  {:after [store-viewer-in-url]}
   (let [already-in-filter? (:value dim)
         toggle (toggle-filter-value selected?)]
     (if already-in-filter?
-      (do (update-filter-or-remove dim {:operator (:operator dim) :value (toggle (:value dim) toggled-value)})
-        db)
+      (update-filter-or-remove dim {:operator (:operator dim) :value (toggle (:value dim) toggled-value)})
       (-> (update-in db [:viewer :filter] add-dimension (assoc dim :value #{toggled-value}))
           (send-queries dim)))))
 
