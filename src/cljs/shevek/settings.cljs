@@ -34,9 +34,10 @@
     (st/select-schema settings Settings)
     (catch js/Error _ {})))
 
+(def default-settings {:lang "en" :auto-refresh 60})
+
 (defevh :settings-loaded [db]
-  (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "shevek.settings"))
-        default-settings {:lang "en"}]
+  (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "shevek.settings"))]
     (set-auto-refresh-interval! auto-refresh)
     (assoc db :settings (merge default-settings settings))))
 
