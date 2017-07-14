@@ -20,7 +20,7 @@
    [:div.buttons
     [dimension-popup-button popup "green" "filter" :dimension-added-to-filter dim]
     [dimension-popup-button popup "orange" "square" :split-replaced dim]
-    [dimension-popup-button popup "orange" "plus" :splid-dimension-added dim]
+    [dimension-popup-button popup "orange" "plus" :split-dimension-added dim]
     [dimension-popup-button popup "yellow" "pin" :dimension-pinned dim]]])
 
 (defn- type-icon [type name]

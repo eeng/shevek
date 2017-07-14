@@ -18,7 +18,7 @@
                  :sort-by (or sort-by (assoc (-> viewer :measures first) :descending (not (time-dimension? dim)))))
           (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer)))))
 
-(defevh :splid-dimension-added [{:keys [viewer] :as db} dim]
+(defevh :split-dimension-added [{:keys [viewer] :as db} dim]
   (let [limit (when (seq (:split viewer)) 5)]
     (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
         (send-main-query))))
@@ -94,7 +94,7 @@
    title])
 
 (defn split-panel []
-  [:div.split.panel (droppable #(dispatch :splid-dimension-added %))
+  [:div.split.panel (droppable #(dispatch :split-dimension-added %))
    [panel-header (t :cubes/split)]
    (rmap (controlled-popup split-item split-popup {:position "bottom center"})
          (viewer :split)
