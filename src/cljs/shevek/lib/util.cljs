@@ -14,9 +14,6 @@
   [f wait]
   (partial (variable-debounce f) wait))
 
-(defn every [secs f]
-  (js/setInterval f (* 1000 secs)))
-
 (def regex-char-esc-smap
   (let [esc-chars "()&^%$#!?*."]
     (zipmap esc-chars

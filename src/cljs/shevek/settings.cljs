@@ -3,6 +3,7 @@
   (:require [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
+            [shevek.rpc :as rpc]
             [shevek.lib.local-storage :as local-storage]
             [shevek.components.form :refer [select]]
             [shevek.components.popup :refer [controlled-popup]]
@@ -17,7 +18,7 @@
 
 (defn refresh-page []
   (let [refresh-events {:dashboard :dashboard/refresh
-                        :viewer :viewer/refresh}
+                        :viewer :viewer-refresh}
         event (refresh-events (current-page))]
     (when event (dispatch event))))
 
@@ -53,7 +54,8 @@
                      (set-auto-refresh-interval! auto-refresh)
                      (dispatch :settings-saved {:auto-refresh auto-refresh}))}]
     [:button.ui.fluid.button
-     {:on-click #(refresh-page)}
+     (assoc (rpc/loading-class [:results :main])
+            :on-click #(refresh-page))
      (t :settings/update-now)]]
    [:div#lang-dropdown.field
     [:label (t :settings/lang)]

@@ -4,7 +4,6 @@
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.navegation :refer [current-page? navigate]]
-            [shevek.lib.util :refer [every]]
             [shevek.lib.dw.cubes :refer [set-cube-defaults]]
             [shevek.lib.dw.time :refer [parse-max-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
@@ -53,18 +52,16 @@
     (prepare-cube db cube report)))
 
 (defevh :max-time-arrived [db max-time]
-  (assoc-in db [:viewer :cube :max-time] (parse-max-time max-time)))
-
-(defn fetch-max-time []
-  (when (current-page? :viewer)
-    (let [name (current-cube-name)]
-      (rpc/call "schema.api/max-time" :args [name] :handler #(dispatch :max-time-arrived %)))))
-
-(defonce _interval (every 60 fetch-max-time))
-
-(defevh :viewer/refresh [db]
-  (-> (send-main-query db)
+  (-> (assoc-in db [:viewer :cube :max-time] (parse-max-time max-time))
+      (send-main-query)
       (send-pinboard-queries)))
+
+(defevh :viewer-refresh [db]
+  (if (rpc/loading?)
+    db
+    (do ; TODO las dos lineas y el do de nuevo
+      (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))
+      (rpc/loading db [:results :main]))))
 
 (defn page []
   (dispatch :viewer-initialized)

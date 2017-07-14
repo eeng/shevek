@@ -12,7 +12,7 @@
             [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.filter :refer [filter-operators]]
-            [shevek.viewer.shared :refer [current-cube panel-header viewer send-query format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
+            [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]))
 
 (defn init-pinned-dim [dim viewer]
   (cond-> (assoc (clean-dim dim) :limit 100)
