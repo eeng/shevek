@@ -1,17 +1,17 @@
 (ns shevek.reflow.interceptors
-  (:require [shevek.lib.logger :refer [log debug?]]
+  (:require [shevek.lib.logger :as log :refer [debug?]]
             [clojure.data :as data]))
 
 (defn logger [interceptor]
   (fn [db event]
-    (log "Handling event" event "...")
+    (log/info "Handling event" event "...")
     (if debug?
       (let [new-db (interceptor db event)
             [only-before only-after] (data/diff db new-db)
             db-changed? (or (some? only-before) (some? only-after))]
         (if db-changed?
-          (log "Finished event with changes: before" only-before "after" only-after)
-          (log "Finished event with no changes."))
+          (log/info "Finished event with changes: before" only-before "after" only-after)
+          (log/info "Finished event with no changes."))
         new-db)
       (interceptor db event))))
 

@@ -8,13 +8,13 @@
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
-            [shevek.lib.dw.dims :refer [dim= add-dimension time-dimension?]]
+            [shevek.lib.dw.dims :refer [dim= add-dimension remove-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components.form :refer [kb-shortcuts]]
             [shevek.reports.url :refer [store-in-url]]
             [schema.core :as s]
             [goog.string :as str]
-            [shevek.lib.logger :refer [log]]))
+            [shevek.lib.logger :as log]))
 
 (defn- viewer [& keys]
   (db/get-in (into [:viewer] keys)))
@@ -34,7 +34,7 @@
 
 (defn send-query [db viewer results-keys]
   (store-in-url viewer)
-  (log "Sending query from viewer" viewer)
+  (log/info "Sending query from viewer" viewer)
   (let [q (viewer->query viewer)]
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
     (rpc/loading db results-keys)))
@@ -45,11 +45,11 @@
 (defn- remove-dim-unless-time [dim coll]
   (if (time-dimension? dim)
     coll
-    (remove (partial dim= dim) coll)))
+    (remove-dimension coll dim)))
 
 (defn send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (:cube viewer)
-                   :filter (->> (:filter viewer) (remove-dim-unless-time dim) vec)
+                   :filter (remove-dim-unless-time dim (:filter viewer))
                    :split [dim]
                    :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filter add-dimension search-filter))]
