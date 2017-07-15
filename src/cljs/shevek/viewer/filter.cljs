@@ -4,13 +4,13 @@
             [shevek.reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
-            [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim]]
+            [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension]]
             [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-date]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
-            [shevek.components.popup :refer [controlled-popup]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.reports.url :refer [store-viewer-in-url]]))
 
@@ -23,7 +23,7 @@
 
 (defevhi :dimension-added-to-filter [db {:keys [name] :as dim}]
   {:after [store-viewer-in-url]}
-  (-> (update-in db [:viewer :filter] add-dimension (assoc (clean-dim dim) :operator "include"))
+  (-> (update-in db [:viewer :filter] add-dimension (assoc (clean-dim dim) :operator "include" :value #{}))
       (assoc-in [:viewer :last-added-filter] [name (js/Date.)])))
 
 (defevhi :filter-options-changed [db dim opts]
@@ -71,7 +71,8 @@
        [:button.ui.button {:key period
                            :class (when (= period (:period dim)) "active")
                            :on-click #(when-not (= period (:period dim))
-                                        (dispatch :filter-options-changed dim {:period period}))
+                                        (dispatch :filter-options-changed dim {:period period})
+                                        (close-popup))
                            :on-mouse-over #(reset! showed-period period)
                            :on-mouse-out #(reset! showed-period (dim :period))}
         (available-relative-periods period)])]])
@@ -90,12 +91,13 @@
                         (format-period @showed-period (current-cube :max-time))
                         (format-interval interval))]])))
 
-(defn- specific-period-time-filter [{:keys [close]} {:keys [period interval] :as dim}]
+(defn- specific-period-time-filter [{:keys [period interval] :as dim}]
   (let [interval (or interval (to-interval period (current-cube :max-time)))
         form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
         parse #(map parse-date ((juxt :from :to) %))
-        accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})
-        shortcuts (kb-shortcuts :enter accept :escape close)]
+        accept #(do (close-popup)
+                  (dispatch :filter-options-changed dim {:interval (parse @form-interval)}))
+        shortcuts (kb-shortcuts :enter accept :escape close-popup)]
     (fn []
       (let [[from to] (parse @form-interval)
             valid? (and from to (<= from to))]
@@ -105,14 +107,14 @@
           [input-field form-interval :to]]
          [:div
           [:button.ui.primary.compact.button {:on-click accept :class (when-not valid? "disabled")} (t :actions/ok)]
-          [:button.ui.compact.button {:on-click (without-propagation close)} (t :actions/cancel)]]]))))
+          [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
 
 (defn- menu-item-for-period-type [period-type period-type-value]
   [:a.item {:class (when (= @period-type period-type-value) "active")
             :on-click #(reset! period-type period-type-value)}
    (->> (name period-type-value) (str "cubes.period/") keyword t)])
 
-(defn- time-filter-popup [popup {:keys [period] :as dim}]
+(defn- time-filter-popup [{:keys [period] :as dim}]
   (let [period-type (r/atom (if period :relative :specific))]
     (fn []
       [:div.time-filter
@@ -121,7 +123,7 @@
         [menu-item-for-period-type period-type :specific]]
        (if (= @period-type :relative)
          [relative-period-time-filter dim]
-         [specific-period-time-filter popup dim])])))
+         [specific-period-time-filter dim])])))
 
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
@@ -145,14 +147,15 @@
                       "include" "check square"
                       "exclude" "minus square")}]])
 
-(defn- normal-filter-popup [{:keys [close]} {:keys [name] :as dim}]
+(defn- normal-filter-popup [dim]
   (let [opts (r/atom (select-keys dim [:operator :value]))
         search (r/atom "")]
-    (fn []
+    (dispatch :filter-values-requested dim "")
+    (fn [{:keys [name] :as dim}]
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector opts]
-        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %) :on-stop close}]]
+        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %)}]]
        [:div.items-container
         (into [:div.items]
           (map #(dimension-value-item dim % opts @search)
@@ -160,17 +163,17 @@
                     (filter-matching @search (partial format-dimension dim)))))]
        [:div
         [:button.ui.primary.compact.button
-         {:on-click #(update-filter-or-remove dim @opts)
+         {:on-click #(do (update-filter-or-remove dim @opts) (close-popup))
           :class (when (= @opts (select-keys dim [:operator :value])) "disabled")}
          (t :actions/ok)]
         [:button.ui.compact.button
-         {:on-click (without-propagation close)}
+         {:on-click close-popup}
          (t :actions/cancel)]]])))
 
-(defn- filter-popup [popup dim]
+(defn- filter-popup [dim]
   (if (time-dimension? dim)
-    [time-filter-popup popup dim]
-    [normal-filter-popup popup dim]))
+    ^{:key (hash dim)} [time-filter-popup dim]
+    ^{:key (hash dim)} [normal-filter-popup dim]))
 
 (defn- filter-title [{:keys [title period interval operator value] :as dim}]
   (let [details (if (= (count value) 1)
@@ -186,27 +189,27 @@
                   ("include" "exclude") (str "(" details ")")
                   "")])])))
 
-(defn- filter-item [{:keys [toggle]} dim]
+(defevh :filter-popup-closed [{:keys [viewer]} {:keys [name]}]
+  (if-let [dim (find-dimension name (:filter viewer))]
+    (when (and (not (time-dimension? dim)) (empty? (dim :value)))
+      (dispatch :dimension-removed-from-filter dim))))
+
+(defn- filter-item [dim init-open?]
   [:button.ui.green.compact.button.item
    (assoc (draggable dim)
           :class (when-not (time-dimension? dim) "right labeled icon")
-          :on-click toggle)
+          :on-click #(show-popup % [filter-popup dim] {:position "bottom center"
+                                                         :on-close (fn [] (dispatch :filter-popup-closed dim))})
+          :ref #(when (and % init-open?) (-> % r/dom-node js/$ .click)))
    (when-not (time-dimension? dim)
      [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
    (filter-title dim)])
 
-; TODO Lo del init-open? no me parece muy robusto ni prolijo, pero es lo único que se me ocurre por ahora. Revisar.
 (defn filter-panel []
   (let [[last-added-filter last-added-at] (viewer :last-added-filter)
         added-ms-ago (- (js/Date.) last-added-at)]
     [:div.filter.panel (droppable #(dispatch :dimension-added-to-filter %))
      [panel-header (t :cubes/filter)]
-     (for [dim (viewer :filter)]
-       ^{:key (:name dim)}
-       [(controlled-popup filter-item filter-popup
-                          {:position "bottom center"
-                           :init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 250))
-                           :on-open #(when-not (time-dimension? dim) (dispatch :filter-values-requested dim ""))
-                           :on-close #(when (and (not (time-dimension? dim)) (empty? (dim :value)))
-                                        (dispatch :dimension-removed-from-filter dim))})
-        dim])]))
+     (for [dim (viewer :filter)
+           :let [init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 250))]]
+       ^{:key (hash dim)} [filter-item dim init-open?])]))

@@ -7,7 +7,7 @@
             [shevek.lib.dw.time :refer [default-granularity]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
-            [shevek.components.popup :refer [controlled-popup]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [cuerdas.core :as str]
@@ -26,22 +26,22 @@
         (send-main-query))))
 
 (defevhi :split-replaced [db dim]
-  {:after [store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
       (send-main-query)))
 
 (defevhi :split-dimension-replaced [db old-dim new-dim]
-  {:after [store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] replace-dimension old-dim (init-splitted-dim new-dim db))
       (send-main-query)))
 
 (defevhi :split-dimension-removed [db dim]
-  {:after [store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] remove-dimension dim)
       (send-main-query)))
 
 (defevhi :split-options-changed [db dim opts]
-  {:after [store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] replace-dimension (merge dim opts))
       (send-main-query)))
 
@@ -56,10 +56,10 @@
 
 (def granularities {"PT5M" "5m", "PT1H" "1H", "P1D" "1D", "P1W" "1W", "P1M" "1M"})
 
-(defn- split-popup [_ dim]
+(defn- split-popup [dim]
   (let [opts (r/atom (select-keys dim [:limit :sort-by :granularity]))
         posible-sort-bys (conj (current-cube :measures) (clean-dim dim))]
-    (fn [{:keys [close]} dim]
+    (fn [dim]
       (let [desc (get-in @opts [:sort-by :descending])
             current-granularity (@opts :granularity)]
         [:div.split.popup
@@ -88,13 +88,13 @@
            [select (map (juxt identity identity) [5 10 25 50 100])
             {:selected (:limit @opts) :on-change #(swap! opts assoc :limit (str/parse-int %))}]]
           [:button.ui.primary.compact.button
-           {:on-click #(do (close) (dispatch :split-options-changed dim @opts))}
+           {:on-click #(dispatch :split-options-changed dim @opts)}
            (t :actions/ok)]
-          [:button.ui.compact.button {:on-click close} (t :actions/cancel)]]]))))
+          [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
 
-(defn- split-item [{:keys [toggle]} {:keys [title] :as dim}]
+(defn- split-item [{:keys [title] :as dim}]
   [:button.ui.orange.compact.right.labeled.icon.button
-   (merge {:on-click toggle}
+   (merge {:on-click #(show-popup % ^{:key (hash dim)} [split-popup dim] {:position "bottom center"})}
           (draggable dim)
           (droppable #(dispatch :split-dimension-replaced dim %)))
    [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
@@ -103,6 +103,5 @@
 (defn split-panel []
   [:div.split.panel (droppable #(dispatch :split-dimension-added %))
    [panel-header (t :cubes/split)]
-   (rmap (controlled-popup split-item split-popup {:position "bottom center"})
-         (viewer :split)
-         :name)])
+   (for [dim (viewer :split)]
+     ^{:key (hash dim)} [split-item dim])])

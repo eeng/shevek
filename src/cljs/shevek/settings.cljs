@@ -6,7 +6,7 @@
             [shevek.rpc :as rpc]
             [shevek.lib.local-storage :as local-storage]
             [shevek.components.form :refer [select]]
-            [shevek.components.popup :refer [toggle-popup]]
+            [shevek.components.popup :refer [show-popup]]
             [shevek.navegation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
             [schema-tools.core :as st]
@@ -65,5 +65,5 @@
        :on-change #(dispatch :settings-saved {:lang %})}]]])
 
 (defn- settings-menu []
-  [:a.item {:on-click #(toggle-popup % popup-content {:position "bottom right"})}
+  [:a.item {:on-click #(show-popup % popup-content {:position "bottom right"})}
    [:i.setting.icon] (t :settings/menu)])

@@ -6,7 +6,7 @@
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.components.popup :refer [toggle-popup close-popup]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [kb-shortcuts input-field]]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
@@ -108,5 +108,5 @@
 
 (defn- reports-menu []
   (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
-    [:a.item {:on-click #(toggle-popup % popup-content {:position "bottom left"})}
+    [:a.item {:on-click #(show-popup % popup-content {:position "bottom left"})}
      [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/menu))]))

@@ -4,24 +4,23 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.components.popup :refer [controlled-popup]]
+            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.components.drag-and-drop :refer [draggable]]
-            [shevek.lib.react :refer [rmap]]
             [shevek.viewer.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
 
-(defn dimension-popup-button [{:keys [close]} color icon event name]
+(defn dimension-popup-button [color icon event name]
   [:button.ui.circular.icon.button
    {:class color
-    :on-click #(do (close) (dispatch event name))}
+    :on-click #(do (close-popup) (dispatch event name))}
    [:i.icon {:class icon}]])
 
-(defn- dimension-popup [popup dim]
+(defn- dimension-popup [dim]
   [:div.popup-content
    [:div.buttons
-    [dimension-popup-button popup "green" "filter" :dimension-added-to-filter dim]
-    [dimension-popup-button popup "orange" "square" :split-replaced dim]
-    [dimension-popup-button popup "orange" "plus" :split-dimension-added dim]
-    [dimension-popup-button popup "yellow" "pin" :dimension-pinned dim]]])
+    [dimension-popup-button "green" "filter" :dimension-added-to-filter dim]
+    [dimension-popup-button "orange" "square" :split-replaced dim]
+    [dimension-popup-button "orange" "plus" :split-dimension-added dim]
+    [dimension-popup-button "yellow" "pin" :dimension-pinned dim]]])
 
 (defn- type-icon [type name]
   (let [effective-type (if (= name "__time") "TIME" type)]
@@ -30,11 +29,11 @@
       "LONG" "hashtag"
       "font")))
 
-(defn- dimension-item [search popup {:keys [name title type description] :as dimension}]
-  [:div.item (assoc (draggable dimension)
+(defn- dimension-item [search {:keys [name title type description] :as dim}]
+  [:div.item (assoc (draggable dim)
                     :title description
-                    :class (when (popup :opened?) "active")
-                    :on-click (popup :toggle))
+                    :class (when (popup-opened? name) "active")
+                    :on-click #(show-popup % [dimension-popup dim] {:position "right center" :distanceAway -30 :id name}))
    [:i.icon {:class (type-icon type name)}]
    (highlight title search)])
 
@@ -51,7 +50,5 @@
          (when @searching
            [search-input search {:on-stop #(reset! searching false)}])
          [:div.items
-          (rmap (controlled-popup (partial dimension-item search-text) dimension-popup
-                                  {:position "right center" :distanceAway -30})
-                filtered-dims
-                :name)]]))))
+          (for [dim filtered-dims]
+            ^{:key (:name dim)} [dimension-item search-text dim])]]))))

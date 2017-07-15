@@ -1,3 +1,6 @@
+@panel-separator: 1px solid #f0f0f0;
+@panel-horizontal-padding: 14px;
+
 #viewer {
   position: absolute;
   top: 40px;
@@ -21,9 +24,6 @@
     flex: 1;
     margin: @gutter 0;
   }
-
-  @panel-separator: 1px solid #f0f0f0;
-  @panel-horizontal-padding: 14px;
 
   .panel {
     background-color: white;
@@ -63,33 +63,6 @@
 
     &.loading { color: inherit !important; } // Semantic le pone un color transparent y hace que no se vea el texto que queda debajo del loading
     &.loading:before { background-color: rgba(255, 255, 255, 0.4); } // Tiene 0.8 de transparencia en Semantic
-    .items {
-      overflow-y: auto;
-      .overflow-shadow;
-      .item {
-        padding: 5px @panel-horizontal-padding;
-        .icon {
-          color: #ccc;
-          margin-right: 7px;
-        }
-        &:not(.no-results) { .selectable; }
-        &.has-checkbox {
-          padding: 6px 1em 5px; // Un pixel menos abajo por el que le agregué en el segment value para el bold
-          .ui.checkbox {
-            display: block;
-          }
-          .segment-value {
-            padding-bottom: 1px; // Necesario para que se vea el borde .bold en los label de checkboxes
-          }
-        }
-        .segment-value {
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-        }
-        .bold { border-bottom: 1px solid #7bb1e8 }
-      }
-    }
 
     .search.input {
       margin: 0 (@panel-horizontal-padding - 1px) .7em;
@@ -100,10 +73,7 @@
   .dimensions {
     flex: 71 1 0%;
     .segment-value { display: inline }
-    .popup-content {
-      .buttons { white-space: nowrap; }
-      text-align: center;
-    }
+    .item > * { pointer-events: none }
   }
   .measures { flex: 29 1 0%; }
   .dimensions, .measures { padding-bottom: 8px; }
@@ -113,71 +83,19 @@
     align-items: center;
     h2 { width: 67px; }
 
-    @content-width: 230px;
-
-    .popup .time-filter {
-      width: @content-width;
-      .relative.period-type {
-        .periods {
-          margin-bottom: .7em;
-          .sub.header {
-            padding: 0;
-            padding-bottom: .2em;
-          }
-        }
-        .ui.label {
-          width: 100%;
-          text-align: center;
-          margin: .5em 0 .4em 0;
-        }
-      }
-    }
-
-    .popup .normal-filter {
-      width: @content-width;
-      .top-inputs {
-        display: flex;
-        .ui.input {
-          flex: 1;
-          margin: 0;
-        }
-        .dropdown.icon {
-          padding: 10px;
-        }
-      }
-      .items-container {
-        position: relative;
-        margin: .7em -1em .2em -1em;
-        .overflow-shadow;
-      }
-      .items {
-        height: 300px;
-      }
-    }
-
-    .popup .time-filter, .popup .split {
-      .periods {
-        .button { padding: 10px 0; }
-      }
-    }
-
-    .popup .ui.form {
-      width: @content-width;
-      .flex {
-        display: flex;
-        .button {
-          margin: 0;
-          margin-left: .5em
-        }
-      }
-    }
-
     .button {
       .details {
         font-weight: 100;
         color: rgba(255, 255, 255, 0.8);
         &.striked { text-decoration: line-through; }
       }
+    }
+  }
+
+  .dimensions, .filter, .split {
+    .item {
+      > * { pointer-events: none }
+      .close.icon { pointer-events: auto }
     }
   }
 
@@ -245,4 +163,95 @@
   padding: 2px 6px;
   background: white;
   opacity: 0.9;
+}
+
+#viewer, .popup {
+  .items {
+    overflow-y: auto;
+    .overflow-shadow;
+    .item {
+      padding: 5px @panel-horizontal-padding;
+      .icon {
+        color: #ccc;
+        margin-right: 7px;
+      }
+      &:not(.no-results) { .selectable; }
+      &.has-checkbox {
+        padding: 6px 1em 5px; // Un pixel menos abajo por el que le agregué en el segment value para el bold
+        .ui.checkbox {
+          display: block;
+        }
+        .segment-value {
+          padding-bottom: 1px; // Necesario para que se vea el borde .bold en los label de checkboxes
+        }
+      }
+      .segment-value {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .bold { border-bottom: 1px solid #7bb1e8 }
+    }
+  }
+}
+
+.popup {
+  @content-width: 230px;
+
+  .time-filter {
+    width: @content-width;
+    .relative.period-type {
+      .periods {
+        margin-bottom: .7em;
+        .sub.header {
+          padding: 0;
+          padding-bottom: .2em;
+        }
+      }
+      .ui.label {
+        width: 100%;
+        text-align: center;
+        margin: .5em 0 .4em 0;
+      }
+    }
+  }
+
+  .normal-filter {
+    width: @content-width;
+    .top-inputs {
+      display: flex;
+      .ui.input {
+        flex: 1;
+        margin: 0;
+      }
+      .dropdown.icon {
+        padding: 10px;
+      }
+    }
+    .items-container {
+      position: relative;
+      margin: .7em -1em .2em -1em;
+      .overflow-shadow;
+    }
+    .items {
+      height: 300px;
+    }
+  }
+
+  .time-filter, .split {
+    .periods {
+      .button { padding: 10px 0; }
+    }
+  }
+
+  .ui.form {
+    width: @content-width;
+    .flex {
+      display: flex;
+      .button {
+        margin: 0;
+        margin-left: .5em
+      }
+    }
+  }
 }
