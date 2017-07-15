@@ -6,7 +6,7 @@
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.components.popup :refer [toggle-popup]]
+            [shevek.components.popup :refer [toggle-popup close-popup]]
             [shevek.components.form :refer [kb-shortcuts input-field]]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
@@ -50,14 +50,15 @@
   (rpc/call "reports.api/delete-report" :args [report] :handler fetch-reports)
   (rpc/loading db :save-report))
 
-(defn- save-report-form [{:keys [close]} form-data]
+(defn- save-report-form [form-data]
   (let [report (r/cursor form-data [:report])
         valid? #(seq (:name @report))
         cancel #(reset! form-data nil)
         save #(when (valid?)
                 (dispatch :save-report @report)
-                (if (:editing? @form-data) (cancel) (close)))
-        shortcuts (kb-shortcuts :enter save :escape close)]
+                (when-not (:editing? @form-data) (close-popup))
+                (cancel))
+        shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
       [:div.ui.form {:ref shortcuts}
        [input-field report :name {:label (t :reports/name) :class "required" :auto-focus true}]
@@ -66,15 +67,15 @@
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
-(defn- reports-list [{:keys [close]} form-data current-report]
+(defn- reports-list [form-data current-report]
   (let [reports (db/get :reports)
         show-actions? (current-page? :viewer)
         save #(if (:_id current-report)
-                (do (dispatch :save-report current-report) (close))
+                (do (dispatch :save-report current-report) (close-popup))
                 (reset! form-data {:report current-report :editing? false}))
         save-as #(reset! form-data {:report (dissoc current-report :_id :name) :editing? false})
         edit #(reset! form-data {:report % :editing? true})
-        select-report #(do (dispatch :report-selected %) (close))
+        select-report #(do (dispatch :report-selected %) (close-popup))
         cubes (db/get :cubes)]
     [:div
      (when show-actions?
@@ -95,15 +96,15 @@
            [:div.description description]])]
        [:div (t :cubes/no-results)])]))
 
-(defn- popup-content [popup]
+(defn- popup-content []
   (fetch-reports)
   (let [form-data (r/atom nil)
         current-report (or (db/get :current-report) {:pin-in-dashboard false})]
     (fn []
       [:div#reports-popup
        (if @form-data
-         [save-report-form popup form-data]
-         [reports-list popup form-data current-report])])))
+         [save-report-form form-data]
+         [reports-list form-data current-report])])))
 
 (defn- reports-menu []
   (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
