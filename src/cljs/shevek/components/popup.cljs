@@ -41,12 +41,15 @@
         new-opened (not (and opened? (= content new-content)))]
     (reset! popup-data {:opened? new-opened :content new-content :activator (.-target event) :opts popup-opts})))
 
+(defn close-popup []
+  (swap! popup-data assoc :opened? false))
+
 (defn- popup* []
   (let [{:keys [content]} @popup-data]
     [:div.ui.special.popup (when content [content])]))
 
 (defn- component-did-update []
-  (let [{:keys [opened? activator opts]} @popup-data
+  (let [{:keys [opened? activator optsq]} @popup-data
         activator (-> activator r/dom-node js/$)]
     (if opened?
       (-> activator
@@ -57,4 +60,15 @@
       (.popup activator "hide"))))
 
 (defn popup []
-  (r/create-class {:reagent-render popup* :component-did-update component-did-update}))
+  (let [node-listener (atom nil)
+        handle-click-outside (fn [container event]
+                               (when (and (@popup-data :opened?)
+                                          (not (.contains (r/dom-node container) (.-target event)))
+                                          (not (.contains (@popup-data :activator) (.-target event))))
+                                  (close-popup)))]
+    (r/create-class {:reagent-render popup*
+                     :component-did-update component-did-update
+                     :component-did-mount (fn [container]
+                                            (reset! node-listener (partial handle-click-outside container))
+                                            (.addEventListener js/document "click" @node-listener true))
+                     :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)})))

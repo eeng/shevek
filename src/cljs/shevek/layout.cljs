@@ -4,7 +4,7 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.navegation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
-            [shevek.components.popup :refer [popup toggle-popup]]
+            [shevek.components.popup :refer [popup toggle-popup close-popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.login :as login :refer [logged-in?]]
             [shevek.dashboard :as dashboard]
@@ -26,9 +26,9 @@
 (defn current-page-class [page]
   (when (current-page? page) "active"))
 
-(defn- cubes-popup-content [{:keys [close]}]
+(defn- cubes-popup-content []
   (let [cubes (cubes-list)
-        select-cube #(do (dispatch :cube-selected %) (close))]
+        select-cube #(do (dispatch :cube-selected %) (close-popup))]
     [:div#cubes-popup
      [:h3.ui.sub.orange.header (t :cubes/title)]
      (if (seq cubes)
@@ -42,13 +42,6 @@
               [:div.header title]
               [:div.description description]]]))]
        [:div (t :cubes/no-results)])]))
-
-(defn- cubes-popup-activator [popup]
-  [:a#cubes-menu.item {:on-click (popup :toggle)}
-   [:i.cubes.icon]
-   (if (current-page? :viewer)
-     (db/get-in [:cubes (current-cube-name) :title])
-     (t :cubes/menu))])
 
 (defn- cubes-menu []
   (fetch-cubes)
