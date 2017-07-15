@@ -4,7 +4,7 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.navegation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
-            [shevek.components.popup :refer [controlled-popup]]
+            [shevek.components.popup :refer [popup toggle-popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.login :as login :refer [logged-in?]]
             [shevek.dashboard :as dashboard]
@@ -53,7 +53,11 @@
 (defn- cubes-menu []
   (fetch-cubes)
   (fn []
-    [(controlled-popup cubes-popup-activator cubes-popup-content {:position "bottom left"})]))
+    [:a#cubes-menu.item {:on-click #(toggle-popup % cubes-popup-content {:position "bottom left"})}
+     [:i.cubes.icon]
+     (if (current-page? :viewer)
+       (db/get-in [:cubes (current-cube-name) :title])
+       (t :cubes/menu))]))
 
 (defn- menu []
   [:div.ui.fixed.inverted.menu
@@ -76,5 +80,6 @@
      (when (logged-in?) [menu])
      [:div.page
       [(get pages page :div)]]
+     [popup]
      [modal]
      [notification]]))

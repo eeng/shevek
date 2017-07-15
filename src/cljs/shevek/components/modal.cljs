@@ -16,7 +16,7 @@
                      :onHidden (fn [] (swap! modal-data {:opened? false}))})
         (.modal "show"))))
 
-(defn- modal []
+(defn modal []
   (let [{:keys [opened? class header content actions]} @modal-data]
     (when opened?
       [:div.ui.modal {:ref bind-modal-events :class class}

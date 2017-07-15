@@ -6,7 +6,7 @@
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.components.popup :refer [controlled-popup]]
+            [shevek.components.popup :refer [toggle-popup]]
             [shevek.components.form :refer [kb-shortcuts input-field]]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
@@ -105,10 +105,7 @@
          [save-report-form popup form-data]
          [reports-list popup form-data current-report])])))
 
-(defn- popup-activator [popup]
-  (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
-    [:a.item {:on-click (popup :toggle)}
-     [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/menu))]))
-
 (defn- reports-menu []
-  [(controlled-popup popup-activator popup-content {:position "bottom left"})])
+  (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
+    [:a.item {:on-click #(toggle-popup % popup-content {:position "bottom left"})}
+     [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/menu))]))

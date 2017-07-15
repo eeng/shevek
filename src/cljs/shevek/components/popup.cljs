@@ -33,3 +33,31 @@
                                 (.addEventListener js/document "click" @node-listener true))
         :component-did-update #(when @opened (show-popup %))
         :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)}))))
+
+(defonce popup-data (r/atom {}))
+
+(defn toggle-popup [event new-content popup-opts]
+  (let [{:keys [opened? content]} @popup-data
+        new-popup (if (and opened? (= content new-content))
+                    {}
+                    {:opened? true :content new-content :activator (.-target event) :opts popup-opts})]
+    (reset! popup-data new-popup)))
+
+(defn- popup* []
+  (let [{:keys [opened? content]} @popup-data]
+    (when opened?
+      [:div.ui.special.popup [content]])))
+
+(defn- component-did-update []
+  (let [{:keys [opened? activator opts]} @popup-data
+        activator (-> activator r/dom-node js/$)]
+    (if opened?
+      (-> activator
+          (.popup (clj->js (assoc (@popup-data :opts)
+                                  :inline true :on "manual" :target activator
+                                  :popup ".special.popup" :movePopup false)))
+          (.popup "show"))
+      (.popup activator "destroy"))))
+
+(defn popup []
+  (r/create-class {:reagent-render popup* :component-did-update component-did-update}))

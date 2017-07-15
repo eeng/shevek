@@ -2,6 +2,9 @@ body {
   background-color: #F7F7F7;
 }
 
+// Without this a click on the icon would wrongly position the popup as the target of the event is the icon
+.ui.menu a.item i.icon { pointer-events: none }
+
 .page {
   padding-top: 40px;
   padding-bottom: 60px;
