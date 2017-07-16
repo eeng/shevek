@@ -1,5 +1,5 @@
 (ns shevek.lib.dates-test
-  (:require-macros [cljs.test :refer [deftest testing is are]])
+  (:require-macros [cljs.test :refer [deftest testing is]])
   (:require [shevek.lib.dates :as d]
             [cljs-time.core :as t]))
 
