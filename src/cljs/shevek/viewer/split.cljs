@@ -7,7 +7,7 @@
             [shevek.lib.dw.time :refer [default-granularity]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
-            [shevek.components.popup :refer [show-popup close-popup destroy-popup]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [cuerdas.core :as str]
@@ -36,7 +36,7 @@
       (send-main-query)))
 
 (defevhi :split-dimension-removed [db dim]
-  {:after [destroy-popup store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] remove-dimension dim)
       (send-main-query)))
 
@@ -92,13 +92,15 @@
            (t :actions/ok)]
           [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
 
+; The timestamp is so if a split is removed a then re-added, the popup is regenerated
 (defn- split-item [{:keys [title] :as dim}]
-  [:button.ui.orange.compact.right.labeled.icon.button
-   (merge {:on-click #(show-popup % ^{:key (hash dim)} [split-popup dim] {:position "bottom center"})}
-          (draggable dim)
-          (droppable #(dispatch :split-dimension-replaced dim %)))
-   [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
-   title])
+  (let [popup-key (-> dim (assoc :timestamp (js/Date.)) hash)]
+    [:button.ui.orange.compact.right.labeled.icon.button
+     (merge {:on-click #(show-popup % ^{:key popup-key} [split-popup dim] {:position "bottom center"})}
+            (draggable dim)
+            (droppable #(dispatch :split-dimension-replaced dim %)))
+     [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
+     title]))
 
 (defn split-panel []
   [:div.split.panel (droppable #(dispatch :split-dimension-added %))

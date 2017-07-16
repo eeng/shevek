@@ -14,10 +14,6 @@
   (let [{:keys [on-close]} @popup-data]
     (when on-close (on-close))))
 
-(defn destroy-popup []
-  (close-popup)
-  (js/setTimeout #(swap! popup-data dissoc :content) 200))
-
 (defn popup-opened? [id]
   (and (@popup-data :opened?) (= id (@popup-data :id))))
 

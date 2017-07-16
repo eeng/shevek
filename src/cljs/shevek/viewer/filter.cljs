@@ -10,7 +10,7 @@
             [shevek.lib.dates :refer [format-date parse-date]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
-            [shevek.components.popup :refer [show-popup close-popup destroy-popup]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.reports.url :refer [store-viewer-in-url]]))
 
@@ -32,7 +32,7 @@
       (send-queries dim)))
 
 (defevhi :dimension-removed-from-filter [db dim]
-  {:after [destroy-popup store-viewer-in-url]}
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :filter] remove-dimension dim)
       (send-queries dim)))
 
@@ -172,8 +172,8 @@
 
 (defn- filter-popup [dim]
   (if (time-dimension? dim)
-    ^{:key (hash dim)} [time-filter-popup dim]
-    ^{:key (hash dim)} [normal-filter-popup dim]))
+    ^{:key (:name dim)} [time-filter-popup dim]
+    ^{:key (:name dim)} [normal-filter-popup dim]))
 
 (defn- filter-title [{:keys [title period interval operator value] :as dim}]
   (let [details (if (= (count value) 1)
@@ -194,16 +194,18 @@
     (when (and (not (time-dimension? dim)) (empty? (dim :value)))
       (dispatch :dimension-removed-from-filter dim))))
 
-(defn- filter-item [dim init-open?]
-  [:button.ui.green.compact.button.item
-   (assoc (draggable dim)
-          :class (when-not (time-dimension? dim) "right labeled icon")
-          :on-click #(show-popup % [filter-popup dim] {:position "bottom center"
-                                                       :on-close (fn [] (dispatch :filter-popup-closed dim))})
-          :ref #(when (and % init-open?) (-> % r/dom-node js/$ .click)))
-   (when-not (time-dimension? dim)
-     [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
-   (filter-title dim)])
+(defn- filter-item [{:keys [name]} init-open?]
+  (let [popup-key (hash {:name name :timestamp (js/Date.)})]
+    (fn [dim init-open?]
+      [:button.ui.green.compact.button.item
+       (assoc (draggable dim)
+              :class (when-not (time-dimension? dim) "right labeled icon")
+              :on-click (fn [el] (show-popup el ^{:key popup-key} [filter-popup dim]
+                                             {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
+              :ref #(when (and % init-open?) (-> % r/dom-node js/$ .click)))
+       (when-not (time-dimension? dim)
+         [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
+       (filter-title dim)])))
 
 (defn filter-panel []
   (let [[last-added-filter last-added-at] (viewer :last-added-filter)
@@ -212,4 +214,4 @@
      [panel-header (t :cubes/filter)]
      (for [dim (viewer :filter)
            :let [init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 250))]]
-       ^{:key (hash dim)} [filter-item dim init-open?])]))
+       ^{:key (:name dim)} [filter-item dim init-open?])]))
