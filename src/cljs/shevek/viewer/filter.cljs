@@ -21,10 +21,12 @@
 (defn toggle-filter-value [selected]
   (fnil (if selected conj disj) #{}))
 
+(def last-added-filter (r/atom nil))
+
 (defevhi :dimension-added-to-filter [db {:keys [name] :as dim}]
   {:after [store-viewer-in-url]}
-  (-> (update-in db [:viewer :filter] add-dimension (assoc (clean-dim dim) :operator "include" :value #{}))
-      (assoc-in [:viewer :last-added-filter] [name (js/Date.)])))
+  (reset! last-added-filter name)
+  (update-in db [:viewer :filter] add-dimension (assoc (clean-dim dim) :operator "include" :value #{})))
 
 (defevhi :filter-options-changed [db dim opts]
   {:after [store-viewer-in-url]}
@@ -194,24 +196,24 @@
     (when (and (not (time-dimension? dim)) (empty? (dim :value)))
       (dispatch :dimension-removed-from-filter dim))))
 
-(defn- filter-item [{:keys [name]} init-open?]
-  (let [popup-key (hash {:name name :timestamp (js/Date.)})]
-    (fn [dim init-open?]
+(defn- filter-item [{:keys [name]}]
+  (let [popup-key (hash {:name name :timestamp (js/Date.)})
+        show-popup-when-added #(when (and % (= name @last-added-filter))
+                                (reset! last-added-filter nil)
+                                (-> % r/dom-node js/$ .click))]
+    (fn [dim]
       [:button.ui.green.compact.button.item
        (assoc (draggable dim)
               :class (when-not (time-dimension? dim) "right labeled icon")
               :on-click (fn [el] (show-popup el ^{:key popup-key} [filter-popup dim]
                                              {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
-              :ref #(when (and % init-open?) (-> % r/dom-node js/$ .click)))
+              :ref show-popup-when-added)
        (when-not (time-dimension? dim)
          [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
        (filter-title dim)])))
 
 (defn filter-panel []
-  (let [[last-added-filter last-added-at] (viewer :last-added-filter)
-        added-ms-ago (- (js/Date.) last-added-at)]
-    [:div.filter.panel (droppable #(dispatch :dimension-added-to-filter %))
-     [panel-header (t :cubes/filter)]
-     (for [dim (viewer :filter)
-           :let [init-open? (and (= (dim :name) last-added-filter) (< added-ms-ago 250))]]
-       ^{:key (:name dim)} [filter-item dim init-open?])]))
+  [:div.filter.panel (droppable #(dispatch :dimension-added-to-filter %))
+   [panel-header (t :cubes/filter)]
+   (for [dim (viewer :filter)]
+     ^{:key (:name dim)} [filter-item dim])])
