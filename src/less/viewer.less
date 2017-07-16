@@ -73,7 +73,6 @@
   .dimensions {
     flex: 71 1 0%;
     .segment-value { display: inline }
-    .item > * { pointer-events: none }
   }
   .measures { flex: 29 1 0%; }
   .dimensions, .measures { padding-bottom: 8px; }
@@ -89,13 +88,6 @@
         color: rgba(255, 255, 255, 0.8);
         &.striked { text-decoration: line-through; }
       }
-    }
-  }
-
-  .dimensions, .filter, .split {
-    .item {
-      > * { pointer-events: none }
-      .close.icon { pointer-events: auto }
     }
   }
 
