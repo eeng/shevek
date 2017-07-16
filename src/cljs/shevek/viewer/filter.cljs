@@ -10,7 +10,7 @@
             [shevek.lib.dates :refer [format-date parse-date]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
-            [shevek.components.popup :refer [show-popup close-popup]]
+            [shevek.components.popup :refer [show-popup close-popup destroy-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.reports.url :refer [store-viewer-in-url]]))
 
@@ -32,7 +32,7 @@
       (send-queries dim)))
 
 (defevhi :dimension-removed-from-filter [db dim]
-  {:after [store-viewer-in-url]}
+  {:after [destroy-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :filter] remove-dimension dim)
       (send-queries dim)))
 
@@ -199,7 +199,7 @@
    (assoc (draggable dim)
           :class (when-not (time-dimension? dim) "right labeled icon")
           :on-click #(show-popup % [filter-popup dim] {:position "bottom center"
-                                                         :on-close (fn [] (dispatch :filter-popup-closed dim))})
+                                                       :on-close (fn [] (dispatch :filter-popup-closed dim))})
           :ref #(when (and % init-open?) (-> % r/dom-node js/$ .click)))
    (when-not (time-dimension? dim)
      [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])

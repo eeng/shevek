@@ -7,7 +7,7 @@
             [shevek.lib.dw.time :refer [default-granularity]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
-            [shevek.components.popup :refer [show-popup close-popup]]
+            [shevek.components.popup :refer [show-popup close-popup destroy-popup]]
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [cuerdas.core :as str]
@@ -36,7 +36,7 @@
       (send-main-query)))
 
 (defevhi :split-dimension-removed [db dim]
-  {:after [close-popup store-viewer-in-url]}
+  {:after [destroy-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] remove-dimension dim)
       (send-main-query)))
 
