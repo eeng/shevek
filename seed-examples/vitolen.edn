@@ -21,7 +21,8 @@
                 {:name "rubro_clase" :title "Clase de Lente"}
                 {:name "rubro_tags" :title "Tag"}
                 {:name "tasa_iva" :title "Tasa de IVA"}
-                {:name "condicion_iva" :title "Condición IVA"}]
+                {:name "condicion_iva" :title "Condición IVA"}
+                {:name "despacho_preferencial" :title "Despacho Preferencial" :type "BOOL"}]
    :measures [{:name "importe"
                :title "Importe Total"
                :expression "(/ (sum $importe) 100)"
@@ -71,4 +72,13 @@
               {:name "duration"
                :title "Duration (ms)"
                :expression "(/ (sum $duration) (sum $requests))"
-               :format "0"}]}]}
+               :format "0"}]}
+  {:name "wikiticker"
+   :description "Druid quickstart sample of Wikipedia edits"
+   :dimensions [{:name "isMinor" :type "BOOL"}
+                {:name "isUnpatrolled" :type "BOOL"}
+                {:name "isAnonymous" :type "BOOL"}
+                {:name "isRobot" :type "BOOL"}
+                {:name "isNew" :type "BOOL"}
+                {:name "regionIsoCode" :title "Region ISO Code"}
+                {:name "countryIsoCode" :title "Country ISO Code"}]}]}

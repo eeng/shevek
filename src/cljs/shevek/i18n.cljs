@@ -93,7 +93,9 @@
                  :regex "doesn't match pattern"
                  :email "is not a valid email address"
                  :password "must have a combination of at least 7 letters and numbers (or symbols)"
-                 :confirmation "doesn't match the previous value"}}
+                 :confirmation "doesn't match the previous value"}
+    :boolean {:true "Yes"
+              :false "No"}}
 
    :es
    {:menu {:logout "Salir"}
@@ -179,7 +181,9 @@
     :validation {:required "este campo es obligatorio"
                  :email "no es una dirección válida"
                  :password "debería tener al menos 7 letras y números (o símbolos)"
-                 :confirmation "no coincide con el valor anterior"}}
+                 :confirmation "no coincide con el valor anterior"}
+    :boolean {:true "Si"
+              :false "No"}}
 
    :tongue/fallback :en})
 
