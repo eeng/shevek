@@ -81,7 +81,7 @@
 
 (defn- relative-period-time-filter [{:keys [period interval] :as dim}]
   (let [showed-period (r/atom period)]
-    (fn []
+    (fn [dim]
       [:div.relative.period-type
        [period-buttons dim showed-period (t :cubes.period/latest)
         [:latest-hour :latest-day :latest-7days :latest-30days :latest-90days]]
@@ -118,7 +118,7 @@
 
 (defn- time-filter-popup [{:keys [period] :as dim}]
   (let [period-type (r/atom (if period :relative :specific))]
-    (fn []
+    (fn [dim]
       [:div.time-filter
        [:div.ui.secondary.pointing.fluid.two.item.menu
         [menu-item-for-period-type period-type :relative]
@@ -172,9 +172,10 @@
          {:on-click close-popup}
          (t :actions/cancel)]]])))
 
+; The time filter use the values in the dim and not an internal r/atom to keep state so we need to use the entire dim as a key so the popup gets rerender when the period change
 (defn- filter-popup [dim]
   (if (time-dimension? dim)
-    ^{:key (:name dim)} [time-filter-popup dim]
+    ^{:key (hash dim)} [time-filter-popup dim]
     ^{:key (:name dim)} [normal-filter-popup dim]))
 
 (defn- filter-title [{:keys [title period interval operator value] :as dim}]
