@@ -7,8 +7,9 @@
             [shevek.lib.collections :refer [detect]]
             [shevek.navegation :refer [current-page?]]
             [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result?]]
-            [shevek.components.drag-and-drop :refer [droppable]]))
+            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? result-value]]
+            [shevek.components.drag-and-drop :refer [droppable]]
+            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]))
 
 (defn- sort-results-according-to-selected-measures [viewer]
   (let [result (first (get-in viewer [:results :main]))]
@@ -29,24 +30,50 @@
                (/ measure-value max-value))]
     (str (* (Math/abs rate) 100) "%")))
 
-(defn- pivot-table-row [result dim depth measures max-values]
-  [:tr
-   [:td
-    [:div {:class (str "depth-" depth)} (format-dimension dim result)]]
-   (for [measure measures
-         :let [measure-name (-> measure :name keyword)
-               measure-value (measure-name result)]]
-     [:td.right.aligned {:key measure-name}
-      [:div.bg (when-not (totals-result? result dim)
-                 {:class (when (neg? measure-value) "neg")
-                  :style {:width (calculate-rate measure-value (max-values measure-name))}})]
-      (format-measure measure result)])])
+(defn- row-popup [dim-display-value filter-path]
+  [:div
+   [:div.dimension-value dim-display-value]
+   [:div.buttons
+    [:button.ui.primary.compact.button
+     {:on-click #(dispatch :pivot-table-row-filtered filter-path "include")}
+     (t :actions/select)]
+    [:button.ui.compact.button
+     {:on-click #(dispatch :pivot-table-row-filtered filter-path "exclude")}
+     (t :cubes.operator/exclude)]
+    [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
 
-(defn- pivot-table-rows [results [dim & dims] depth measures max-values]
-  (when dim
-    (mapcat #(into [(pivot-table-row % dim depth measures max-values)]
-                   (pivot-table-rows (:_results %) dims (inc depth) measures max-values))
-            results)))
+; TODO PERF cada vez q se clickea una row se renderizan todas las otras, ver de mejorar
+(defn- pivot-table-row [result dim depth measures max-values value-result-path]
+  (let [dim-display-value (format-dimension dim result)
+        filter-path (map (fn [[d r]] [d (result-value d r)]) value-result-path)
+        row-key (hash filter-path)
+        totals-row (totals-result? result dim)]
+    [:tr {:on-click #(when-not totals-row
+                       (show-popup % ^{:key (hash result)} [row-popup dim-display-value filter-path]
+                                   {:position "top center" :distanceAway 135 :setFluidWidth true
+                                    :class "pivot-table-popup" :id row-key}))
+          :class (when (and (not totals-row) (popup-opened? row-key)) "active")}
+     [:td
+      [:div {:class (str "depth-" depth)} dim-display-value]]
+     (for [measure measures
+           :let [measure-name (-> measure :name keyword)
+                 measure-value (measure-name result)]]
+       [:td.right.aligned {:key measure-name}
+        [:div.bg (when-not totals-row
+                   {:class (when (neg? measure-value) "neg")
+                    :style {:width (calculate-rate measure-value (max-values measure-name))}})]
+        (format-measure measure result)])]))
+
+(defn- pivot-table-rows
+  ([results dims depth measures max-values]
+   (pivot-table-rows results dims depth measures max-values []))
+  ([results [dim & dims] depth measures max-values value-result-path]
+   (when dim
+     (mapcat (fn [result]
+               (let [new-path (conj value-result-path [dim result])]
+                 (into [(pivot-table-row result dim depth measures max-values new-path)]
+                       (pivot-table-rows (:_results result) dims (inc depth) measures max-values new-path))))
+             results))))
 
 (defn- calculate-max-values [measures results]
   (reduce (fn [max-values measure-name]

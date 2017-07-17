@@ -39,3 +39,11 @@
                        new-dim old-dim
                        %)
               coll)))
+
+(defn add-or-replace [coll dim]
+  (if (includes-dim? coll dim)
+    (replace-dimension coll dim)
+    (conj coll dim)))
+
+(defn merge-dimensions [current-dims other-dims]
+  (reduce add-or-replace current-dims other-dims))

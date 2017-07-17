@@ -61,11 +61,12 @@
         (remove-dim-unless-time except-dim)
         (reduce #(send-pinned-dim-query %1 %2) db))))
 
-(defn result-value [name result]
+; TODO renombrar a dim-value
+(defn result-value [{:keys [name]} result]
   (->> name keyword (get result)))
 
-(defn format-measure [{:keys [name type format]} result]
-  (let [value (or (result-value name result) 0)
+(defn format-measure [{:keys [type format] :as dim} result]
+  (let [value (or (result-value dim result) 0)
         value (condp = type
                 "doubleSum" (str/format "%.2f" value)
                 "hyperUnique" (str/format "%.0f" value)
@@ -82,10 +83,10 @@
     (time-dimension? dim) (format-time-according-to-period value granularity)
     :else value))
 
-(defn format-dimension [{:keys [name] :as dim} result]
+(defn format-dimension [dim result]
   (if (totals-result? result dim)
     "Total"
-    (format-dim-value (result-value name result) dim)))
+    (format-dim-value (result-value dim result) dim)))
 
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text

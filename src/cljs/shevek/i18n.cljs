@@ -86,7 +86,8 @@
               :save-as "Save As"
               :new "New"
               :delete "Delete"
-              :close "Close"}
+              :close "Close"
+              :select "Select"}
     :input {:search "Search"}
     :validation {:required "can't be blank"
                  :regex "doesn't match pattern"
@@ -172,7 +173,8 @@
               :save-as "Guardar Como"
               :new "Nuevo"
               :delete "Eliminar"
-              :close "Cerrar"}
+              :close "Cerrar"
+              :select "Seleccionar"}
     :input {:search "Buscar"}
     :validation {:required "este campo es obligatorio"
                  :email "no es una dirección válida"

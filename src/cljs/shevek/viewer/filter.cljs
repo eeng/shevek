@@ -4,7 +4,7 @@
             [shevek.reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
-            [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension]]
+            [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension merge-dimensions]]
             [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-date]]
@@ -14,23 +14,26 @@
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.reports.url :refer [store-viewer-in-url]]))
 
-(defn send-queries [db dim]
+(defn send-queries [db dont-query-pinboard-dim]
   (-> (send-main-query db)
-      (send-pinboard-queries dim)))
+      (send-pinboard-queries dont-query-pinboard-dim)))
 
 (defn toggle-filter-value [selected]
   (fnil (if selected conj disj) #{}))
 
 (def last-added-filter (r/atom nil))
 
+(defn build-filter [dim opts]
+  (merge (clean-dim dim) opts))
+
 (defevhi :dimension-added-to-filter [db {:keys [name] :as dim}]
   {:after [store-viewer-in-url]}
   (reset! last-added-filter name)
-  (update-in db [:viewer :filter] add-dimension (assoc (clean-dim dim) :operator "include" :value #{})))
+  (update-in db [:viewer :filter] add-dimension (build-filter dim {:operator "include" :value #{}})))
 
 (defevhi :filter-options-changed [db dim opts]
-  {:after [store-viewer-in-url]}
-  (-> (update-in db [:viewer :filter] replace-dimension (merge (clean-dim dim) opts))
+  {:after [close-popup store-viewer-in-url]}
+  (-> (update-in db [:viewer :filter] replace-dimension (build-filter dim opts))
       (send-queries dim)))
 
 (defevhi :dimension-removed-from-filter [db dim]
@@ -44,13 +47,19 @@
     (dispatch :filter-options-changed dim opts)))
 
 (defevhi :pinned-dimension-item-toggled [db dim toggled-value selected?]
-  {:after [store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (let [already-in-filter? (:value dim)
         toggle (toggle-filter-value selected?)]
     (if already-in-filter?
       (update-filter-or-remove dim {:operator (:operator dim) :value (toggle (:value dim) toggled-value)})
       (-> (update-in db [:viewer :filter] add-dimension (assoc dim :value #{toggled-value}))
           (send-queries dim)))))
+
+(defevhi :pivot-table-row-filtered [db filter-path operator]
+  {:after [close-popup store-viewer-in-url]}
+  (let [new-filters (map #(build-filter (first %) {:operator operator :value #{(second %)}}) filter-path)]
+    (-> (update-in db [:viewer :filter] merge-dimensions new-filters)
+        (send-queries nil))))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim} search]
   (send-query db {:cube (viewer :cube)
@@ -73,8 +82,7 @@
        [:button.ui.button {:key period
                            :class (when (= period (:period dim)) "active")
                            :on-click #(when-not (= period (:period dim))
-                                        (dispatch :filter-options-changed dim {:period period})
-                                        (close-popup))
+                                        (dispatch :filter-options-changed dim {:period period}))
                            :on-mouse-over #(reset! showed-period period)
                            :on-mouse-out #(reset! showed-period (dim :period))}
         (available-relative-periods period)])]])
@@ -97,8 +105,7 @@
   (let [interval (or interval (to-interval period (current-cube :max-time)))
         form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
         parse #(map parse-date ((juxt :from :to) %))
-        accept #(do (close-popup)
-                  (dispatch :filter-options-changed dim {:interval (parse @form-interval)}))
+        accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})
         shortcuts (kb-shortcuts :enter accept :escape close-popup)]
     (fn []
       (let [[from to] (parse @form-interval)
@@ -129,7 +136,7 @@
 
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
-  (let [value (result-value name result)
+  (let [value (result-value dim result)
         label (format-dimension dim result)]
     [:div.item.has-checkbox {:on-click toggle-checkbox-inside :title label}
      [checkbox (str "cb-filter-" name "-" (str/slug label)) (highlight label search)

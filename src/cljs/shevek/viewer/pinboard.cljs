@@ -16,9 +16,10 @@
             [shevek.reports.url :refer [store-viewer-in-url]]))
 
 (defn init-pinned-dim [dim viewer]
-  (cond-> (assoc (clean-dim dim) :limit 100)
-          (time-dimension? dim) (assoc :granularity (default-granularity viewer)
-                                       :sort-by (assoc dim :descending true))))
+  (let [dim (clean-dim dim)]
+    (cond-> (assoc dim :limit 100)
+            (time-dimension? dim) (assoc :granularity (default-granularity viewer)
+                                         :sort-by (assoc dim :descending true)))))
 
 (defevhi :dimension-pinned [{:keys [viewer] :as db} dim]
   {:after [store-viewer-in-url]}
@@ -49,7 +50,7 @@
 (defn- pinned-dimension-item [{:keys [name] :as dim} filter-dim result measure search]
   (let [formatted-value (format-dimension dim result)
         highlighted-value (highlight formatted-value search)
-        value (result-value name result)
+        value (result-value dim result)
         toggle-item #(dispatch :pinned-dimension-item-toggled filter-dim value %)
         show-checkbox? (seq (:value filter-dim))]
     [:div.item {:title formatted-value :on-click (cond
