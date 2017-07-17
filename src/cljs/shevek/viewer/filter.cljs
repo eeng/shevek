@@ -8,7 +8,7 @@
             [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-date]]
-            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube result-value send-pinboard-queries]]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube dimension-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
@@ -136,7 +136,7 @@
 
 ; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
-  (let [value (result-value dim result)
+  (let [value (dimension-value dim result)
         label (format-dimension dim result)]
     [:div.item.has-checkbox {:on-click toggle-checkbox-inside :title label}
      [checkbox (str "cb-filter-" name "-" (str/slug label)) (highlight label search)

@@ -61,12 +61,11 @@
         (remove-dim-unless-time except-dim)
         (reduce #(send-pinned-dim-query %1 %2) db))))
 
-; TODO renombrar a dim-value
-(defn result-value [{:keys [name]} result]
+(defn dimension-value [{:keys [name]} result]
   (->> name keyword (get result)))
 
 (defn format-measure [{:keys [type format] :as dim} result]
-  (let [value (or (result-value dim result) 0)
+  (let [value (or (dimension-value dim result) 0)
         value (condp = type
                 "doubleSum" (str/format "%.2f" value)
                 "hyperUnique" (str/format "%.0f" value)
@@ -86,7 +85,7 @@
 (defn format-dimension [dim result]
   (if (totals-result? result dim)
     "Total"
-    (format-dim-value (result-value dim result) dim)))
+    (format-dim-value (dimension-value dim result) dim)))
 
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text

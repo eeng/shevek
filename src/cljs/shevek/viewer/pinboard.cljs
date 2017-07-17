@@ -12,7 +12,7 @@
             [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.filter :refer [filter-operators]]
-            [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch result-value send-pinned-dim-query send-pinboard-queries]]
+            [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries]]
             [shevek.reports.url :refer [store-viewer-in-url]]))
 
 (defn init-pinned-dim [dim viewer]
@@ -50,7 +50,7 @@
 (defn- pinned-dimension-item [{:keys [name] :as dim} filter-dim result measure search]
   (let [formatted-value (format-dimension dim result)
         highlighted-value (highlight formatted-value search)
-        value (result-value dim result)
+        value (dimension-value dim result)
         toggle-item #(dispatch :pinned-dimension-item-toggled filter-dim value %)
         show-checkbox? (seq (:value filter-dim))]
     [:div.item {:title formatted-value :on-click (cond

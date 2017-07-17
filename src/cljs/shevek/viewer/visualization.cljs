@@ -7,7 +7,7 @@
             [shevek.lib.collections :refer [detect]]
             [shevek.navegation :refer [current-page?]]
             [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? result-value]]
+            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]))
 
@@ -45,7 +45,7 @@
 ; TODO PERF cada vez q se clickea una row se renderizan todas las otras, ver de mejorar
 (defn- pivot-table-row [result dim depth measures max-values value-result-path]
   (let [dim-display-value (format-dimension dim result)
-        filter-path (map (fn [[d r]] [d (result-value d r)]) value-result-path)
+        filter-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
         row-key (hash filter-path)
         totals-row (totals-result? result dim)]
     [:tr {:on-click #(when-not totals-row
