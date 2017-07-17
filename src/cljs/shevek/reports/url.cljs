@@ -4,7 +4,10 @@
             [shevek.lib.base64 :as b64]))
 
 (defn store [encoded-report]
-  (.replaceState js/history {}, nil, (str "/#/viewer/" (js/encodeURI encoded-report))))
+  (let [current-path (.-hash js/location)
+        next-path (str "#/viewer/" (js/encodeURI encoded-report))]
+    (when (not= next-path current-path)
+      (.pushState js/history {}, nil, next-path))))
 
 (defn- store-viewer-in-url [{:keys [viewer]}]
   (-> viewer viewer->report pr-str b64/encode store))
