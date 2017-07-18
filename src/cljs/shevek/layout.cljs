@@ -9,12 +9,12 @@
             [shevek.login :as login :refer [logged-in?]]
             [shevek.dashboard :as dashboard]
             [shevek.admin.page :as admin]
-            [shevek.settings :refer [settings-menu]]
             [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
             [shevek.menu.cubes :refer [cubes-menu]]
             [shevek.menu.reports :refer [reports-menu]]
             [shevek.menu.share :refer [share-menu]]
+            [shevek.menu.settings :refer [settings-menu]]
             [shevek.login :refer [current-user]]))
 
 (def pages
