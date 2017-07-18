@@ -5,7 +5,7 @@
             [shevek.rpc :as rpc]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.lib.dw.cubes :refer [set-cube-defaults]]
-            [shevek.lib.dw.time :refer [parse-max-time]]
+            [shevek.lib.dates :refer [parse-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
@@ -51,14 +51,14 @@
     (prepare-cube db cube report)))
 
 (defevh :max-time-arrived [db max-time]
-  (-> (assoc-in db [:viewer :cube :max-time] (parse-max-time max-time))
-      (send-main-query)
-      (send-pinboard-queries)))
+  (if-let [new-data (> (parse-time max-time) (get-in db [:viewer :cube :max-time]))]
+    (-> (assoc-in db [:viewer :cube :max-time] (parse-time max-time))
+        (send-main-query)
+        (send-pinboard-queries))))
 
 (defevh :viewer-refresh [db]
   (when-not (rpc/loading?)
-    (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))
-    (rpc/loading db [:results :main])))
+    (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))))
 
 (defn page []
   (dispatch :viewer-initialized)

@@ -7,11 +7,11 @@
 
 (deftest to-interval-test []
   (testing "period :latest-hour"
-    (is (= [(d 2017 3 6 16 27 30) (d 2017 3 6 17 27 30)]
+    (is (= [(d 2017 3 6 16 28) (d 2017 3 6 17 28)]
            (to-interval :latest-hour (d 2017 3 6 17 27 30)))))
 
   (testing "period :latest-day"
-    (is (= [(d 2017 3 5 17 28) (d 2017 3 6 17 28)]
+    (is (= [(d 2017 3 5 17 29) (d 2017 3 6 17 29)]
            (to-interval :latest-day (d 2017 3 6 17 28)))))
 
   (testing "period :current-day"
@@ -96,8 +96,8 @@
 
 (deftest format-period-test
   (testing "periods :latest-xx"
-    (is (= "Apr 24, 4:42pm - Apr 24, 5:42pm" (format-period :latest-hour (d 2000 4 24 17 42))))
-    (is (= "Apr 23, 5:42pm - Apr 24, 5:42pm" (format-period :latest-day (d 2000 4 24 17 42)))))
+    (is (= "Apr 24, 4:42pm - Apr 24, 5:42pm" (format-period :latest-hour (d 2000 4 24 17 41 59))))
+    (is (= "Apr 23, 5:42pm - Apr 24, 5:42pm" (format-period :latest-day (d 2000 4 24 17 41 59)))))
 
   (testing "periods :current-xx"
     (with-redefs [now (constantly (d 2016 4 3 17 30))]
