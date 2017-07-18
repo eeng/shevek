@@ -4,7 +4,7 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.navegation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
-            [shevek.components.popup :refer [popup show-popup close-popup]]
+            [shevek.components.popup :refer [popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.login :as login :refer [logged-in?]]
             [shevek.dashboard :as dashboard]
@@ -12,11 +12,10 @@
             [shevek.settings :refer [settings-menu]]
             [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
-            [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.reports.menu :refer [reports-menu]]
+            [shevek.menu.cubes :refer [cubes-menu]]
             [shevek.menu.share :refer [share-menu]]
-            [shevek.login :refer [current-user]]
-            [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]))
+            [shevek.login :refer [current-user]]))
 
 (def pages
   {:login #'login/page
@@ -26,32 +25,6 @@
 
 (defn current-page-class [page]
   (when (current-page? page) "active"))
-
-(defn- cubes-popup-content []
-  (let [cubes (cubes-list)
-        select-cube #(do (dispatch :cube-selected %) (close-popup))]
-    [:div#cubes-popup
-     [:h3.ui.sub.orange.header (t :cubes/title)]
-     (if (seq cubes)
-       [:div.ui.relaxed.middle.aligned.selection.list
-        (doall
-          (for [{:keys [name title description] :or {description (t :cubes/no-desc)}} cubes
-                :let [selected? (and (current-page? :viewer) (= name (current-cube-name)))]]
-            [:div.item {:key name :on-click #(select-cube name)}
-             [:i.large.middle.aligned.cube.icon {:class (when selected? "orange")}]
-             [:div.content
-              [:div.header title]
-              [:div.description description]]]))]
-       [:div (t :cubes/no-results)])]))
-
-(defn- cubes-menu []
-  (fetch-cubes)
-  (fn []
-    [:a#cubes-menu.item {:on-click #(show-popup % cubes-popup-content {:position "bottom left"})}
-     [:i.cubes.icon]
-     (if (current-page? :viewer)
-       (db/get-in [:cubes (current-cube-name) :title])
-       (t :cubes/menu))]))
 
 (defn- menu []
   [:div.ui.fixed.inverted.menu
