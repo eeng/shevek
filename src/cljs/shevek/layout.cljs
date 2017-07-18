@@ -12,8 +12,8 @@
             [shevek.settings :refer [settings-menu]]
             [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
-            [shevek.reports.menu :refer [reports-menu]]
             [shevek.menu.cubes :refer [cubes-menu]]
+            [shevek.menu.reports :refer [reports-menu]]
             [shevek.menu.share :refer [share-menu]]
             [shevek.login :refer [current-user]]))
 

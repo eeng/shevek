@@ -6,7 +6,7 @@
             [shevek.rpc :as rpc]
             [shevek.components.text :refer [page-title loader]]
             [shevek.lib.dw.cubes :refer [cubes-list set-cube-defaults]]
-            [shevek.reports.menu :refer [fetch-reports]]
+            [shevek.menu.reports :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]
             [shevek.viewer.visualization :refer [visualization]]))

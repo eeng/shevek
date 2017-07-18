@@ -1,4 +1,4 @@
-(ns shevek.reports.menu
+(ns shevek.menu.reports
   (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [shevek.reflow.db :as db]
