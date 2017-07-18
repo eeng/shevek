@@ -30,7 +30,7 @@
 
 ;; Examples
 
-(require '[shevek.dw :refer [dw]])
+#_(require '[shevek.dw :refer [dw]])
 
 ; Totals query
 #_(query dw {:cube "wikiticker"

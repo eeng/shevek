@@ -1,9 +1,12 @@
 (ns shevek.schemas.query
   (:require [schema.core :as s]))
 
+(s/defschema Interval
+  [(s/one s/Str "from") (s/one s/Str "to")])
+
 (s/defschema TimeFilter
   {(s/optional-key :name) s/Str
-   :interval [(s/one s/Str "from") (s/one s/Str "to")]})
+   :interval Interval})
 
 (s/defschema NormalFilter
   {:name s/Str
@@ -31,3 +34,9 @@
    (s/optional-key :split) [Split]
    :measures [Measure]
    (s/optional-key :totals) s/Bool})
+
+(s/defschema RawQuery
+  {:cube s/Str
+   :filter [(s/one TimeFilter "tf") NormalFilter]
+   (s/optional-key :paging) {(s/optional-key :pagingIdentifiers) {s/Keyword s/Int}
+                             :threshold s/Int}})
