@@ -14,6 +14,7 @@
             [shevek.viewer.page :as viewer]
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.reports.menu :refer [reports-menu]]
+            [shevek.menu.share :refer [share-menu]]
             [shevek.login :refer [current-user]]
             [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]))
 
@@ -59,6 +60,7 @@
    [cubes-menu]
    [reports-menu]
    [:div.right.menu
+    [share-menu]
     [:div.item
      [:i.user.icon]
      (:fullname (current-user))]
