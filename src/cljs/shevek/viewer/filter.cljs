@@ -12,7 +12,7 @@
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
-            [shevek.reports.url :refer [store-viewer-in-url]]))
+            [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defn send-queries [db dont-query-pinboard-dim]
   (-> (send-main-query db)

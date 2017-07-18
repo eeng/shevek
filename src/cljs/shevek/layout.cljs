@@ -34,12 +34,10 @@
    [reports-menu]
    [:div.right.menu
     [share-menu]
-    [:div.item
-     [:i.user.icon]
-     (:fullname (current-user))]
     [settings-menu]
     [:a.item {:href "#/admin" :class (current-page-class :admin)}
      [:i.users.icon] (t :admin/menu)]
+    [:div.item [:i.user.icon] (:fullname (current-user))]
     [:a.item {:on-click #(dispatch :logout)} [:i.sign.out.icon] (t :menu/logout)]]])
 
 (defn layout []

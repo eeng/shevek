@@ -11,7 +11,7 @@
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [cuerdas.core :as str]
-            [shevek.reports.url :refer [store-viewer-in-url]]))
+            [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
   (cond-> (assoc (clean-dim dim)

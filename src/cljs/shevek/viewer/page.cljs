@@ -14,7 +14,7 @@
             [shevek.viewer.visualization :refer [visualization-panel]]
             [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
-            [shevek.reports.url :refer [store-viewer-in-url restore-report-from-url]]))
+            [shevek.viewer.url :refer [store-viewer-in-url restore-report-from-url]]))
 
 (defn- init-viewer [cube current-report]
   (if current-report

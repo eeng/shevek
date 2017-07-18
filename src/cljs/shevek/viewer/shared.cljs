@@ -11,7 +11,7 @@
             [shevek.lib.dw.dims :refer [dim= add-dimension remove-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components.form :refer [kb-shortcuts]]
-            [shevek.reports.url :refer [store-viewer-in-url]]
+            [shevek.viewer.url :refer [store-viewer-in-url]]
             [schema.core :as s]
             [goog.string :as str]
             [shevek.lib.logger :as log]))
