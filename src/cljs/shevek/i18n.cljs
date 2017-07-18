@@ -59,8 +59,9 @@
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
               :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
-    :share {:view-raw-data "View raw data"
-            :generate-url "Generate URL"}
+    :share {:generate-url "Generate URL"}
+    :raw-data {:menu "View raw data"
+               :title "Raw Event Data"}
     :settings {:menu "Settings"
                :lang "Language"
                :update-now "Update Now"
@@ -156,8 +157,9 @@
                :update-now "Actualizar Ahora"
                :auto-refresh "Refrescar Automáticamente"
                :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])}
-    :share {:view-raw-data "Ver datos desagregados"
-            :generate-url "Copiar URL"}
+    :share {:generate-url "Copiar URL"}
+    :raw-data {:menu "Ver datos desagregados"
+               :title "Datos Desagregados"}
     :admin {:menu "Configurar"
             :title "Administración"
             :subtitle "Configure los usuarios, descripciones de cubos y otras cuestiones aquí"

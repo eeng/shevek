@@ -13,7 +13,8 @@
             [shevek.components.form :refer [kb-shortcuts]]
             [shevek.viewer.url :refer [store-viewer-in-url]]
             [schema.core :as s]
-            [goog.string :as str]
+            [goog.string :as gstr]
+            [cuerdas.core :as str]
             [shevek.lib.logger :as log]))
 
 (defn- viewer [& keys]
@@ -67,8 +68,8 @@
 (defn format-measure [{:keys [type format] :as dim} result]
   (let [value (or (dimension-value dim result) 0)
         value (condp = type
-                "doubleSum" (str/format "%.2f" value)
-                "hyperUnique" (str/format "%.0f" value)
+                "doubleSum" (gstr/format "%.2f" value)
+                "hyperUnique" (gstr/format "%.0f" value)
                 value)]
     (cond-> value
             format (num/format format))))
@@ -81,6 +82,7 @@
     (nil? value) "Ø"
     (time-dimension? dim) (format-time-according-to-period value granularity)
     (= "BOOL" type) (t (keyword (str "boolean/" value)))
+    (sequential? value) (str/join ", " value)
     :else value))
 
 (defn format-dimension [dim result]

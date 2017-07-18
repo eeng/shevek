@@ -7,7 +7,7 @@
   [:div.ui.relaxed.middle.aligned.selection.list
    [:div.item {:on-click #(do (dispatch :viewer/raw-data-requested) (close-popup))}
     [:i.align.justify.icon]
-    [:div.content (t :share/view-raw-data)]]
+    [:div.content (t :raw-data/menu)]]
    [:div.item
     [:i.copy.icon]
     [:div.content (t :share/generate-url)]]])
