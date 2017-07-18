@@ -35,8 +35,16 @@
    :measures [Measure]
    (s/optional-key :totals) s/Bool})
 
+(s/defschema Paging
+  {(s/optional-key :pagingIdentifiers) {s/Keyword s/Int}
+   (s/optional-key :threshold) s/Int})
+
 (s/defschema RawQuery
   {:cube s/Str
    :filter [(s/one TimeFilter "tf") NormalFilter]
-   (s/optional-key :paging) {(s/optional-key :pagingIdentifiers) {s/Keyword s/Int}
-                             :threshold s/Int}})
+   (s/optional-key :paging) Paging})
+
+(s/defschema Result {s/Keyword s/Any})
+
+(s/defschema RawQueryResults
+  {:results [Result] :paging Paging})

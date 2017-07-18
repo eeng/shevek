@@ -1,5 +1,5 @@
 (ns shevek.querying.raw
-  (:require [shevek.schemas.query :refer [RawQuery]]
+  (:require [shevek.schemas.query :refer [RawQuery RawQueryResults]]
             [schema.core :as s]
             [shevek.querying.conversion :refer [add-druid-filters]]
             [shevek.lib.druid-driver :refer [send-query]]))
@@ -17,7 +17,7 @@
     {:results (map :event events)
      :paging (assoc paging :pagingIdentifiers pagingIdentifiers)}))
 
-(s/defn query [dw q :- RawQuery]
+(s/defn query :- RawQueryResults [dw q :- RawQuery]
   (let [dq (to-druid-query q)
         dr (send-query dw dq)]
     (from-druid-results q dr)))

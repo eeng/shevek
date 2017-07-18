@@ -33,7 +33,7 @@
    [cubes-menu]
    [reports-menu]
    [:div.right.menu
-    [share-menu]
+    (when (current-page? :viewer) [share-menu])
     [settings-menu]
     [:a.item {:href "#/admin" :class (current-page-class :admin)}
      [:i.users.icon] (t :admin/menu)]

@@ -2,7 +2,7 @@
   (:require [schema.core :as s]
             [schema-tools.core :as st]
             [shevek.schemas.cube :refer [Dimension Measure]]
-            [shevek.schemas.viewer :refer [Viewer Cube Result]]
+            [shevek.schemas.viewer :refer [Viewer Cube]]
             [shevek.schemas.report :refer [Report]]))
 
 (s/defschema Settings

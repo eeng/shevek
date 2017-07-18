@@ -1,4 +1,5 @@
 (ns shevek.viewer.visualization
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [clojure.string :as str]
             [shevek.reflow.core :refer [dispatch]]
@@ -9,7 +10,17 @@
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
             [shevek.components.drag-and-drop :refer [droppable]]
-            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]))
+            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
+            [shevek.schemas.conversion :refer [viewer->raw-query]]))
+
+(defevh :viewer/raw-data-arrived [db results]
+  (-> (assoc-in db [:viewer :results :raw] results)
+      (rpc/loaded [:results :raw])))
+
+(defevh :viewer/raw-data-requested [{:keys [viewer] :as db}]
+  (let [q (viewer->raw-query viewer)]
+    (rpc/call "querying.api/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
+    (rpc/loading db [:results :raw])))
 
 (defn- sort-results-according-to-selected-measures [viewer]
   (let [result (first (get-in viewer [:results :main]))]
