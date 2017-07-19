@@ -10,19 +10,19 @@
 ; :observeChanges true es necesario para que se centre bien verticalmente cuando cambia el contenido
 (defn- bind-modal-events [dom-node]
   (when dom-node
-    (-> dom-node js/$
-        (.modal #js {:detachable false
-                     :observeChanges true
-                     :onHidden (fn [] (swap! modal-data {:opened? false}))})
-        (.modal "show"))))
+    (let [opts (assoc (:js-opts @modal-data)
+                      :detachable false
+                      :observeChanges true
+                      :onHidden #(swap! modal-data {:opened? false}))]
+      (-> dom-node js/$ (.modal (clj->js opts)) (.modal "show")))))
 
 (defn modal []
-  (let [{:keys [opened? class header content actions]} @modal-data]
+  (let [{:keys [opened? class scrolling header content actions]} @modal-data]
     (when opened?
       [:div.ui.modal {:ref bind-modal-events :class class}
        (if (vector? header)
          header
          [:div.header header])
-       [:div.content content]
+       [:div.content {:class (when scrolling "scrolling")} content]
        (when actions
          (into [:div.actions] actions))])))

@@ -2,7 +2,8 @@
   (:require [shevek.schemas.query :refer [RawQuery RawQueryResults]]
             [schema.core :as s]
             [shevek.querying.conversion :refer [add-druid-filters]]
-            [shevek.lib.druid-driver :refer [send-query]]))
+            [shevek.lib.druid-driver :refer [send-query]]
+            [clojure.set :refer [rename-keys]]))
 
 ; fromNext should not be necessary on the next version of Druid
 (defn to-druid-query [{:keys [cube filter paging] :or {paging {:threshold 100}}}]
@@ -14,7 +15,7 @@
 
 (defn from-druid-results [{:keys [paging]} dr]
   (let [{:keys [events pagingIdentifiers]} (-> dr first :result)]
-    {:results (map :event events)
+    {:results (map (comp #(rename-keys % {:timestamp :__time}) :event) events)
      :paging (assoc paging :pagingIdentifiers pagingIdentifiers)}))
 
 (s/defn query :- RawQueryResults [dw q :- RawQuery]

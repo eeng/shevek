@@ -102,4 +102,4 @@
   (fn []
     [:section
      [:h2.ui.app.header (t :cubes/menu)]
-     (rmap cube-details (cubes-list) :name)]))
+     (rmap cube-details :name (cubes-list))]))

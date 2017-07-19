@@ -33,8 +33,9 @@
                  (from-druid-results {:paging {:threshold 3 :pagingIdentifiers {:... 4}}}
                                      [{:result {:pagingIdentifiers {:... 5}}}]))))
 
-  (testing "should return the events"
-    (is (submap? {:results [{:region "Argentina" :added 1} {:region "Brasil" :added 2}]}
+  (testing "should return the events with the timestamp as __time"
+    (is (submap? {:results [{:region "Argentina" :added 1 :__time "2015"}
+                            {:region "Brasil" :added 2 :__time "2016"}]}
                  (from-druid-results {}
-                                     [{:result {:events [{:event {:region "Argentina" :added 1}}
-                                                         {:event {:region "Brasil" :added 2}}]}}])))))
+                                     [{:result {:events [{:event {:region "Argentina" :added 1 :timestamp "2015"}}
+                                                         {:event {:region "Brasil" :added 2 :timestamp "2016"}}]}}])))))

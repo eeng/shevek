@@ -4,6 +4,7 @@
             [shevek.reflow.db :as db]
             [reagent.core :as r]
             [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
+            [shevek.lib.dw.time :refer [format-interval]]
             [shevek.lib.number :as num]
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
@@ -82,7 +83,6 @@
     (nil? value) "Ø"
     (time-dimension? dim) (format-time-according-to-period value granularity)
     (= "BOOL" type) (t (keyword (str "boolean/" value)))
-    (sequential? value) (str/join ", " value)
     :else value))
 
 (defn format-dimension [dim result]
@@ -121,3 +121,17 @@
     [:div.segment-value value]))
 
 (def debounce-dispatch (debounce dispatch 500))
+
+(defn filter-title [{:keys [title period interval operator value] :as dim}]
+  (let [details (if (= (count value) 1)
+                  (-> (first value) (format-dim-value dim) (str/prune 15))
+                  (count value))]
+    (cond
+      period [:span (->> (name period) (str "cubes.period/") keyword t)]
+      interval [:span (format-interval interval)]
+      :else [:span title " "
+             (when (seq value)
+               [:span.details {:class (when (= operator "exclude") "striked")}
+                (case operator
+                  ("include" "exclude") (str "(" details ")")
+                  "")])])))

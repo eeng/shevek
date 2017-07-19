@@ -61,7 +61,8 @@
               :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
     :share {:generate-url "Generate URL"}
     :raw-data {:menu "View raw data"
-               :title "Raw Event Data"}
+               :title "Raw Event Data"
+               :showing "Showing the first {1} events matching: "}
     :settings {:menu "Settings"
                :lang "Language"
                :update-now "Update Now"
@@ -78,7 +79,8 @@
             :password-confirmation "Password Confirmation"
             :invalid-credentials "Invalid username or password"
             :session-expired "Session expired, please login again"}
-    :date-formats {:minute "MMM d, h:mma"
+    :date-formats {:second "yyyy-MM-dd HH:mm:ss"
+                   :minute "MMM d, h:mma"
                    :hour "MMM d, yyyy ha"
                    :day "MMM d, yyyy"
                    :month "MMM yyyy"}
@@ -159,7 +161,8 @@
                :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])}
     :share {:generate-url "Copiar URL"}
     :raw-data {:menu "Ver datos desagregados"
-               :title "Datos Desagregados"}
+               :title "Datos Desagregados"
+               :showing "Primeros {1} eventos según filtro: "}
     :admin {:menu "Configurar"
             :title "Administración"
             :subtitle "Configure los usuarios, descripciones de cubos y otras cuestiones aquí"
@@ -170,7 +173,8 @@
             :password-confirmation "Confirmación de Password"
             :invalid-credentials "Usuario y/o password incorrecto"
             :session-expired "Sesión expirada, por favor ingrese nuevamente"}
-    :date-formats {:minute "dd/MM HH:mm"
+    :date-formats {:second "dd/MM/yyyy HH:mm:ss"
+                   :minute "dd/MM HH:mm"
                    :hour "dd/MM/yy H 'hs'"
                    :day "dd/MM/yy"
                    :month "MM/yy"}

@@ -5,7 +5,7 @@
             [shevek.i18n :refer [t]]
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim]]
             [shevek.lib.dw.time :refer [default-granularity]]
-            [shevek.lib.react :refer [rmap without-propagation]]
+            [shevek.lib.react :refer [without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [select]]

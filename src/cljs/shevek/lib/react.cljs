@@ -1,6 +1,6 @@
 (ns shevek.lib.react)
 
-(defn rmap [component-fn coll key-fn]
+(defn rmap [component-fn key-fn coll]
   (for [x coll]
     ^{:key (key-fn x)} [component-fn x]))
 

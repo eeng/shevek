@@ -89,3 +89,6 @@
                     #"P(\d+)W" (formatter :day)
                     #"P(\d+)M" (formatter :month))]
     (->> time parse-time (f/unparse formatter))))
+
+(defn format-time [time]
+  (f/unparse (formatter :second) time))

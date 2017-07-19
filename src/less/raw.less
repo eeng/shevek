@@ -1,7 +1,15 @@
-#row-data {
-  overflow: auto;
+.modal.raw-data {
+  .scrolling.content {
+    height: calc(70vh);
+    .subcontent { height: 90% }
+    .subcontent .loading { height: 100% }
+  }
   .measure {
     background-color: #eee;
     text-align: right;
+  }
+  .filter {
+    font-style: italic;
+    .striked { text-decoration: line-through; }
   }
 }
