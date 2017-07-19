@@ -17,15 +17,19 @@
             [shevek.viewer.url :refer [store-viewer-in-url restore-report-from-url]]
             [shevek.viewer.raw]))
 
-(defn- init-viewer [cube current-report]
-  (if current-report
-    (report->viewer current-report cube)
-    (build-new-viewer cube)))
+(defn- already-build? [viewer]
+  (some? (:measures viewer)))
 
-(defevhi :cube-arrived [{:keys [current-report] :as db} {:keys [name] :as cube}]
+(defn- init-viewer [cube current-viewer current-report]
+  (cond
+    (already-build? current-viewer) current-viewer ; Should only happen on dev when boot-reload refresh the page. Without it the viewer would be recreated everytime difficulting development
+    current-report (report->viewer current-report cube)
+    :else (build-new-viewer cube)))
+
+(defevhi :cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
   {:after [store-viewer-in-url]}
   (let [cube (set-cube-defaults cube)
-        {:keys [pinboard] :as viewer} (init-viewer cube current-report)]
+        {:keys [pinboard] :as viewer} (init-viewer cube viewer current-report)]
     (-> (assoc db :viewer viewer)
         (rpc/loaded :cube-metadata)
         (send-main-query)
