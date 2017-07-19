@@ -62,7 +62,8 @@
     :share {:generate-url "Generate URL"}
     :raw-data {:menu "View raw data"
                :title "Raw Event Data"
-               :showing "Showing the first {1} events matching: "}
+               :showing "Showing the first {1} events matching: "
+               :button "Raw Data"}
     :settings {:menu "Settings"
                :lang "Language"
                :update-now "Update Now"
@@ -162,7 +163,8 @@
     :share {:generate-url "Copiar URL"}
     :raw-data {:menu "Ver datos desagregados"
                :title "Datos Desagregados"
-               :showing "Primeros {1} eventos según filtro: "}
+               :showing "Primeros {1} eventos según filtro: "
+               :button "Datos Desagregados"}
     :admin {:menu "Configurar"
             :title "Administración"
             :subtitle "Configure los usuarios, descripciones de cubos y otras cuestiones aquí"

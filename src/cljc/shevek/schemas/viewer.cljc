@@ -29,8 +29,8 @@
          :operator s/Str
          (s/optional-key :value) #{(s/maybe s/Str)}))
 
-(s/defschema Filter
-  (s/if #{:period :interval} TimeFilter NormalFilter))
+(s/defschema Filters
+  [(s/one TimeFilter "tf") NormalFilter])
 
 (s/defschema Pinboard
   {:measure Measure :dimensions [Split]})
@@ -47,7 +47,8 @@
 
 (s/defschema Viewer
   {:cube Cube
-   (s/optional-key :filter) [(s/one TimeFilter "tf") NormalFilter]
+   (s/optional-key :filter) Filters
+   (s/optional-key :raw-data-filter) Filters
    (s/optional-key :split) [Split]
    (s/optional-key :arrived-split) [Split]
    (s/optional-key :measures) [Measure]

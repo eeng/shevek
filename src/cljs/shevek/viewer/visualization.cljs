@@ -10,7 +10,8 @@
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
             [shevek.components.drag-and-drop :refer [droppable]]
-            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]))
+            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
+            [shevek.viewer.filter :refer [build-filter]]))
 
 (defn- sort-results-according-to-selected-measures [viewer]
   (let [result (first (get-in viewer [:results :main]))]
@@ -31,9 +32,9 @@
                (/ measure-value max-value))]
     (str (* (Math/abs rate) 100) "%")))
 
-(defn- row-popup [dim-display-value filter-path]
+(defn- row-popup [dim result filter-path]
   [:div
-   [:div.dimension-value dim-display-value]
+   [:div.dimension-value (format-dimension dim result)]
    [:div.buttons
     [:button.ui.primary.compact.button
      {:on-click #(dispatch :pivot-table-row-filtered filter-path "include")}
@@ -41,21 +42,24 @@
     [:button.ui.compact.button
      {:on-click #(dispatch :pivot-table-row-filtered filter-path "exclude")}
      (t :cubes.operator/exclude)]
+    [:button.ui.compact.button
+     {:on-click #(do (close-popup)
+                   (dispatch :viewer/raw-data-requested (build-filter dim {:operator "include" :value #{(dimension-value dim result)}})))}
+     (t :raw-data/button)]
     [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
 
 ; TODO PERF cada vez q se clickea una row se renderizan todas las otras, ver de mejorar
 (defn- pivot-table-row [result dim depth measures max-values value-result-path]
-  (let [dim-display-value (format-dimension dim result)
-        filter-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
+  (let [filter-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
         row-key (hash filter-path)
         totals-row (totals-result? result dim)]
     [:tr {:on-click #(when-not totals-row
-                       (show-popup % ^{:key (hash result)} [row-popup dim-display-value filter-path]
+                       (show-popup % ^{:key (hash result)} [row-popup dim result filter-path]
                                    {:position "top center" :distanceAway 135 :setFluidWidth true
                                     :class "pivot-table-popup" :id row-key}))
           :class (when (and (not totals-row) (popup-opened? row-key)) "active")}
      [:td
-      [:div {:class (str "depth-" depth)} dim-display-value]]
+      [:div {:class (str "depth-" depth)} (format-dimension dim result)]]
      (for [measure measures
            :let [measure-name (-> measure :name keyword)
                  measure-value (measure-name result)]]

@@ -7,7 +7,7 @@
             [shevek.i18n :refer [t]]
             [shevek.components.modal :refer [show-modal]]
             [shevek.viewer.shared :refer [current-cube dimension-value format-measure viewer filter-title]]
-            [shevek.lib.dw.dims :refer [time-dimension?]]
+            [shevek.lib.dw.dims :refer [time-dimension? add-dimension]]
             [cuerdas.core :as str]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.dates :refer [parse-time format-time]]))
@@ -48,7 +48,7 @@
 
 (defn modal-content []
   [:div.subcontent
-   [:div (t :raw-data/showing limit) [filters->str (viewer :filter)]]
+   [:div (t :raw-data/showing limit) [filters->str (viewer :raw-data-filter)]]
    (if (rpc/loading? [:results :raw])
     [:div.ui.basic.segment.loading]
     [raw-data-table])])
@@ -57,14 +57,17 @@
   (-> (assoc-in db [:viewer :results :raw] results)
       (rpc/loaded [:results :raw])))
 
-(defevh :viewer/raw-data-requested [{:keys [viewer] :as db}]
+(defevh :viewer/raw-data-requested [{:keys [viewer] :as db} additional-filter]
   (show-modal {:header (t :raw-data/title)
                :content [modal-content]
                :actions [[:div.ui.cancel.button (t :actions/close)]]
                :class "large raw-data"
                :scrolling true
                :js-opts {:duration 0}}) ; Otherwise if the data arrive before the animation finish it would'n get correctly positioned
-  (let [q (-> (viewer->raw-query viewer)
+  (let [viewer (cond-> viewer
+                       additional-filter (update :filter add-dimension additional-filter))
+        q (-> (viewer->raw-query viewer)
               (assoc-in [:paging :threshold] limit))]
     (rpc/call "querying.api/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
-    (rpc/loading db [:results :raw])))
+    (-> (assoc-in db [:viewer :raw-data-filter] (:filter viewer))
+        (rpc/loading [:results :raw]))))
