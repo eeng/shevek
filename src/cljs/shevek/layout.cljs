@@ -35,8 +35,8 @@
    [:div.right.menu
     (when (current-page? :viewer) [share-menu])
     [settings-menu]
-    [:a.item {:href "#/admin" :class (current-page-class :admin)}
-     [:i.users.icon] (t :admin/menu)]
+    [:a.icon.item {:href "#/admin" :class (current-page-class :admin) :title (t :admin/menu)}
+     [:i.users.icon]]
     [:div.item [:i.user.icon] (:fullname (current-user))]
     [:a.item {:on-click #(dispatch :logout)} [:i.sign.out.icon] (t :menu/logout)]]])
 

@@ -65,5 +65,6 @@
        :on-change #(dispatch :settings-saved {:lang %})}]]])
 
 (defn- settings-menu []
-  [:a.item {:on-click #(show-popup % popup-content {:position "bottom right"})}
-   [:i.setting.icon] (t :settings/menu)])
+  [:a.icon.item {:on-click #(show-popup % popup-content {:position "bottom right"})
+                 :title (t :settings/menu)}
+   [:i.setting.icon]])
