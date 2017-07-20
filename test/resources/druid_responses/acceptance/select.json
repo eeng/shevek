@@ -1,0 +1,90 @@
+[{
+  "timestamp": "2015-09-12T00:46:58.771Z",
+  "result": {
+    "pagingIdentifiers": {
+      "wikiticker_2015-09-12T00:00:00.000Z_2015-09-13T00:00:00.000Z_2017-03-06T17:19:18.522Z": 1
+    },
+    "dimensions": [
+      "isRobot",
+      "countryIsoCode",
+      "regionName",
+      "channel",
+      "isUnpatrolled",
+      "isNew",
+      "isMinor",
+      "isAnonymous",
+      "cityName",
+      "metroCode",
+      "namespace",
+      "comment",
+      "countryName",
+      "page",
+      "user",
+      "regionIsoCode"
+    ],
+    "metrics": [
+      "deleted",
+      "added",
+      "count",
+      "delta",
+      "user_unique"
+    ],
+    "events": [{
+        "segmentId": "wikiticker_2015-09-12T00:00:00.000Z_2015-09-13T00:00:00.000Z_2017-03-06T17:19:18.522Z",
+        "offset": 0,
+        "event": {
+          "timestamp": "2015-09-12T19:58:29.617Z",
+          "isRobot": "false",
+          "countryIsoCode": "AR",
+          "regionName": "Buenos Aires",
+          "channel": "#es.wikipedia",
+          "isUnpatrolled": "false",
+          "isNew": "false",
+          "isMinor": "false",
+          "isAnonymous": "true",
+          "cityName": "Hurlingham",
+          "metroCode": null,
+          "namespace": "Main",
+          "comment": "/* Historia de la organización */",
+          "countryName": "Argentina",
+          "page": "Movimiento Socialista de los Trabajadores",
+          "user": "190.173.72.25",
+          "regionIsoCode": "B",
+          "deleted": 5,
+          "added": 0,
+          "count": 1,
+          "delta": -5,
+          "user_unique": "AQAAAQAAAAL3EA=="
+        }
+      },
+      {
+        "segmentId": "wikiticker_2015-09-12T00:00:00.000Z_2015-09-13T00:00:00.000Z_2017-03-06T17:19:18.522Z",
+        "offset": 1,
+        "event": {
+          "timestamp": "2015-09-12T23:50:46.436Z",
+          "isRobot": "false",
+          "countryIsoCode": "AR",
+          "regionName": "La Pampa",
+          "channel": "#es.wikipedia",
+          "isUnpatrolled": "false",
+          "isNew": "false",
+          "isMinor": "false",
+          "isAnonymous": "true",
+          "cityName": "San Miguel",
+          "metroCode": null,
+          "namespace": "Main",
+          "comment": "cambio de unidades de medidas por otra mas usual.",
+          "countryName": "Argentina",
+          "page": "Observatorio Astronómico de Mercedes",
+          "user": "181.16.102.20",
+          "regionIsoCode": "L",
+          "deleted": 2,
+          "added": 0,
+          "count": 1,
+          "delta": -2,
+          "user_unique": "AQAAAQAAAAN9IA=="
+        }
+      }
+    ]
+  }
+}]

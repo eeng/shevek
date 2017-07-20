@@ -6,7 +6,8 @@
             [shevek.db :refer [db init-db]]
             [shevek.config :refer [config]]
             [shevek.users.repository :refer [User]]
-            [shevek.makers :refer [make!]]))
+            [shevek.makers :refer [make!]]
+            [clojure.string :as str]))
 
 ; Por defecto etaoin espera 20 segs
 (alter-var-root #'e/default-timeout (constantly 5))
@@ -64,7 +65,9 @@
   (click page {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
 
 (defn click-link [page text]
-  (click page {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)}))
+  (click page {:xpath (str/join "|"
+                                [(format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)
+                                 (format "//*[(self::a or self::button) and contains(@title,'%s')]" text)])}))
 
 (defn fill [page field & values]
   (wait-visible page field)

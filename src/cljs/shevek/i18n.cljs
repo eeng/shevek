@@ -59,7 +59,8 @@
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
               :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
-    :share {:generate-url "Generate URL"}
+    :share {:title "Share"
+            :generate-url "Generate URL"}
     :raw-data {:menu "View raw data"
                :title "Raw Event Data"
                :showing "Showing the first {1} events matching: "
@@ -160,7 +161,8 @@
                :update-now "Actualizar Ahora"
                :auto-refresh "Refrescar Automáticamente"
                :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])}
-    :share {:generate-url "Copiar URL"}
+    :share {:title "Compartir"
+            :generate-url "Copiar URL"}
     :raw-data {:menu "Ver datos desagregados"
                :title "Datos Desagregados"
                :showing "Primeros {1} eventos según filtro: "
