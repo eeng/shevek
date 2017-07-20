@@ -48,10 +48,10 @@
 
 (defn modal-content []
   [:div.subcontent
-   [:div (t :raw-data/showing limit) [filters->str (viewer :raw-data-filter)]]
+   [:p (t :raw-data/showing limit) [filters->str (viewer :raw-data-filter)]]
    (if (rpc/loading? [:results :raw])
     [:div.ui.basic.segment.loading]
-    [raw-data-table])])
+    [:div.table-container [raw-data-table]])])
 
 (defevh :viewer/raw-data-arrived [db results]
   (-> (assoc-in db [:viewer :results :raw] results)
@@ -62,8 +62,7 @@
                :content [modal-content]
                :actions [[:div.ui.cancel.button (t :actions/close)]]
                :class "large raw-data"
-               :scrolling true
-               :js-opts {:duration 0}}) ; Otherwise if the data arrive before the animation finish it would'n get correctly positioned
+               :js-opts {:observeChanges false}})
   (let [viewer (cond-> viewer
                        additional-filter (update :filter add-dimension additional-filter))
         q (-> (viewer->raw-query viewer)

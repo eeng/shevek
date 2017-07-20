@@ -1,8 +1,11 @@
 .modal.raw-data {
-  .scrolling.content {
+  .content {
     height: calc(70vh);
-    .subcontent { height: 90% }
-    .subcontent .loading { height: 100% }
+    .subcontent, .loading { height: 100% }
+    .table-container {
+      overflow: auto;
+      height: calc(100% - 2.5em);
+    }
   }
   .measure {
     background-color: #eee;
