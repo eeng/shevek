@@ -57,7 +57,7 @@
         save #(when (valid?)
                 (dispatch :save-report @report)
                 (when-not (:editing? @form-data) (close-popup))
-                (cancel))
+                (js/setTimeout cancel 300))
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
       [:div.ui.form {:ref shortcuts}
