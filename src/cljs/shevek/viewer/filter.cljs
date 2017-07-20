@@ -193,10 +193,10 @@
 (defn- filter-item [{:keys [name]}]
   (let [popup-key (hash {:name name :timestamp (js/Date.)})
         show-popup-when-added #(when (and % (= name @last-added-filter))
-                                (reset! last-added-filter nil)
-                                (-> % r/dom-node js/$ .click))]
+                                 (reset! last-added-filter nil)
+                                 (-> % r/dom-node js/$ (.find "span") .click))]
     (fn [dim]
-      [:button.ui.green.compact.button.item
+      [:a.ui.green.compact.button.item
        (assoc (draggable dim)
               :class (when-not (time-dimension? dim) "right labeled icon")
               :on-click (fn [el] (show-popup el ^{:key popup-key} [filter-popup dim]

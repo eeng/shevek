@@ -93,10 +93,11 @@
           [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
 
 ; The timestamp is so if a split is removed a then re-added, the popup is regenerated
+; The button has to be a link otherwise Firefox wouldn't fire the click event on the icon
 (defn- split-item [{:keys [title] :as dim}]
   (let [popup-key (-> dim (assoc :timestamp (js/Date.)) hash)]
     (fn []
-      [:button.ui.orange.compact.right.labeled.icon.button
+      [:a.ui.orange.compact.right.labeled.icon.button
        (merge {:on-click #(show-popup % ^{:key popup-key} [split-popup dim] {:position "bottom center"})}
               (draggable dim)
               (droppable #(dispatch :split-dimension-replaced dim %)))
