@@ -67,16 +67,36 @@
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
+(defn hold-to-confirm [holding seconds-to-confirm i18n-title-key f]
+  (let [timeout #(when @holding (f))]
+    {:on-mouse-down #(reset! holding (js/setTimeout timeout (* seconds-to-confirm 1000)))
+     :on-mouse-up #(swap! holding js/clearTimeout)
+     :on-click #(.stopPropagation %)
+     :class (when @holding "holding")
+     :title (t i18n-title-key seconds-to-confirm)}))
+
+(defn- report-item [_ form-data]
+  (let [holding (r/atom nil)
+        select-report #(do (dispatch :report-selected %) (close-popup))
+        cubes (db/get :cubes)
+        edit #(reset! form-data {:report % :editing? true})]
+    (fn [{:keys [_id name description cube] :as report} _]
+      [:div.item {:on-click #(select-report report)}
+       [:div.right.floated.content
+        [:div.cube (:title (cubes cube))]
+        [:div.item-actions
+         [:i.write.icon {:on-click (without-propagation edit report) :title (t :actions/edit)}]
+         [:i.trash.icon (hold-to-confirm holding 2 :reports/hold-delete #(dispatch :delete-report report))]]]
+       [:div.header name]
+       [:div.description description]])))
+
 (defn- reports-list [form-data current-report]
   (let [reports (db/get :reports)
         show-actions? (current-page? :viewer)
         save #(if (:_id current-report)
                 (do (dispatch :save-report current-report) (close-popup))
                 (reset! form-data {:report current-report :editing? false}))
-        save-as #(reset! form-data {:report (dissoc current-report :_id :name) :editing? false})
-        edit #(reset! form-data {:report % :editing? true})
-        select-report #(do (dispatch :report-selected %) (close-popup))
-        cubes (db/get :cubes)]
+        save-as #(reset! form-data {:report (dissoc current-report :_id :name) :editing? false})]
     [:div
      (when show-actions?
        [:div.actions
@@ -85,15 +105,8 @@
      [:h3.ui.sub.orange.header {:class (when show-actions? "has-actions")} (t :reports/title)]
      (if (seq reports)
        [:div.ui.relaxed.middle.aligned.selection.list
-        (for [{:keys [_id name description cube] :as report} reports]
-          [:div.item {:key _id :on-click #(select-report report)}
-           [:div.right.floated.content
-            [:div.cube (:title (cubes cube))]
-            [:div.item-actions
-             [:i.write.icon {:on-click (without-propagation edit report)}]
-             [:i.trash.icon {:on-click (without-propagation dispatch :delete-report report)}]]]
-           [:div.header name]
-           [:div.description description]])]
+        (for [report reports]
+          ^{:key (:_id report)} [report-item report form-data])]
        [:div (t :cubes/no-results)])]))
 
 (defn- popup-content []

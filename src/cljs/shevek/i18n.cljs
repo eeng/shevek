@@ -58,7 +58,8 @@
               :description "Description"
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
-              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
+              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
+              :hold-delete "Hold for {1} seconds to delete this report"}
     :share {:title "Share"
             :generate-url "Generate URL"}
     :raw-data {:menu "View raw data"
@@ -155,7 +156,8 @@
               :description "Descripción"
               :pin-in-dashboard "Mostrar en dashboard"
               :saved "Reporte '{1}' guardado correctamente"
-              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
+              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
+              :hold-delete "Clickee y mantenga presionado por {1} segundos para eliminar el reporte"}
     :settings {:menu "Preferencias"
                :lang "Lenguaje"
                :update-now "Actualizar Ahora"
