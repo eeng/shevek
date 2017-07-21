@@ -2,7 +2,8 @@
   (:require [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
-            [cuerdas.core :as str]))
+            [cuerdas.core :as str]
+            [taoensso.timbre :refer [debug]]))
 
 (defn- discover-cubes [dw]
   (for [cube-name (cubes dw)]
@@ -51,6 +52,8 @@
         (save-cube db (update-cube (corresponding new-cube existing-cubes) new-cube))))))
 
 (defn discover! [dw db]
-  (update-cubes db (discover-cubes dw)))
+  (debug "Discovering cubes...")
+  (update-cubes db (discover-cubes dw))
+  (debug "Done."))
 
 #_(discover! shevek.dw/dw shevek.db/db)

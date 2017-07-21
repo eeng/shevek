@@ -5,6 +5,7 @@
             [shevek.web.server]
             [shevek.db]
             [shevek.dw]
+            [shevek.schema.refresher]
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as appenders]
             [schema.core :as s])

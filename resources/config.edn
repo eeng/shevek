@@ -2,4 +2,7 @@
  :nrepl-port 4001
  :env :production
  :mongodb-uri "mongodb://localhost/shevek"
- :druid-uri "http://localhost:8082"}
+ :druid-uri "http://localhost:8082"
+
+ ; Set to 0 to disable auto discovery (in seconds)
+ :datasources-refresh-interval 60}
