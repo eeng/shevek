@@ -9,15 +9,18 @@
 
 (def token-expiration (t/days 1))
 
-(defn- generate-token [{:keys [_id] :as user}]
+(defn generate-token [{:keys [_id] :as user}]
   (let [token (-> (dissoc user :_id :password)
                   (assoc :id (str _id) :exp (t/plus (t/now) token-expiration)))]
     (jwt/sign token (config :jwt-secret))))
 
+(defn generate-token-response [user]
+  {:token (generate-token user)})
+
 (defn authenticate [db {:keys [username password]}]
   (let [user (users/find-by-username db username)]
     (if (and user (check-password password (:password user)))
-      {:token (generate-token user)}
+      (generate-token-response user)
       {:error :invalid-credentials})))
 
 (defn controller [{:keys [params]}]

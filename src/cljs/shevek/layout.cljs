@@ -15,13 +15,14 @@
             [shevek.menu.reports :refer [reports-menu]]
             [shevek.menu.share :refer [share-menu]]
             [shevek.menu.settings :refer [settings-menu]]
-            [shevek.login :refer [current-user]]))
+            [shevek.menu.account :as account :refer [account-menu]]))
 
 (def pages
   {:login #'login/page
    :dashboard #'dashboard/page
    :admin #'admin/page
-   :viewer #'viewer/page})
+   :viewer #'viewer/page
+   :account #'account/page})
 
 (defn current-page-class [page]
   (when (current-page? page) "active"))
@@ -37,8 +38,9 @@
     [settings-menu]
     [:a.icon.item {:href "#/admin" :class (current-page-class :admin) :title (t :admin/menu)}
      [:i.users.icon]]
-    [:div.item [:i.user.icon] (:fullname (current-user))]
-    [:a.item {:on-click #(dispatch :logout)} [:i.sign.out.icon] (t :menu/logout)]]])
+    [account-menu]
+    [:a.item {:on-click #(dispatch :logout)}
+     [:i.sign.out.icon] (t :menu/logout)]]])
 
 (defn layout []
   (let [page (if (logged-in?) (current-page) :login)]

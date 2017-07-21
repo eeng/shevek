@@ -8,7 +8,8 @@
             [shevek.rpc :as rpc]
             [reagent.core :as r]
             [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch]]))
+            [shevek.reflow.core :refer [dispatch]]
+            [shevek.lib.util :refer [new-record?]]))
 
 (defevh :users-arrived [db users]
   (-> (assoc db :users users)
@@ -27,16 +28,16 @@
     {:username (v/required)
      :fullname (v/required)
      :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
-                        {:when #(or (nil? (:_id %)) (seq (:password %))) :msg :validation/password})
+                        {:when #(or (new-record? %) (seq (:password %))) :msg :validation/password})
      :password-confirmation (v/confirmation :password {:when (comp seq :password)})
      :email (v/email {:optional? true})}))
 
 (defevh :user-changed [db edited-user cancel]
   (when (v/valid?! edited-user validate-user)
-    (do ; TODO estas dos lineas call y loading se repiten mucho me parece y hacen q se necesite el do, ver si no las podemos combinar en una nueva fn
-      (rpc/call "users.api/save" :args [(dissoc @edited-user :password-confirmation)]
-                :handler #(do (dispatch :user-saved) (cancel)))
-      (rpc/loading db :saving-user))))
+    (rpc/call "users.api/save"
+              :args [(dissoc @edited-user :password-confirmation)]
+              :handler #(do (dispatch :user-saved) (cancel)))
+    (rpc/loading db :saving-user)))
 
 (defevh :user-deleted [db user]
   (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %)))
@@ -46,18 +47,21 @@
         save #(dispatch :user-changed edited-user cancel)
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
-      [:div.ui.grid
-       [:div.five.wide.column
-        [:div.ui.segment.form-container (rpc/loading-class :saving-user)
-         [:div.ui.form {:ref shortcuts}
-          [input-field edited-user :username {:label (t :users/username) :class "required" :auto-focus true}]
-          [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
-          [input-field edited-user :password {:label (t :users/password) :class "required" :type "password"}]
-          [input-field edited-user :password-confirmation {:label (t :users/password-confirmation)
-                                                           :class "required" :type "password"}]
-          [input-field edited-user :email {:label (t :users/email)}]
-          [:button.ui.primary.button {:on-click save} (t :actions/save)]
-          [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]])))
+      (let [new-user? (new-record? @edited-user)]
+        [:div.ui.grid
+         [:div.five.wide.column
+          [:div.ui.segment.form-container (rpc/loading-class :saving-user)
+           [:div.ui.form {:ref shortcuts}
+            [input-field edited-user :username {:label (t :users/username) :class "required" :auto-focus true}]
+            [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
+            [input-field edited-user :password {:label (t :users/password) :class (when new-user? "required")
+                                                :type "password" :placeholder (when-not new-user? (t :users/password-hint))}]
+            [input-field edited-user :password-confirmation {:label (t :users/password-confirmation)
+                                                             :placeholder (when-not new-user? (t :users/password-hint))
+                                                             :class (when new-user? "required") :type "password"}]
+            [input-field edited-user :email {:label (t :users/email)}]
+            [:button.ui.primary.button {:on-click save} (t :actions/save)]
+            [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]]))))
 
 (defn- user-row [{:keys [username fullname email] :as original-user} edited-user]
   [:tr
