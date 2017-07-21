@@ -14,7 +14,7 @@
   (log/info (str "Starting nrepl server on http://localhost:" port))
   (start-server :port port))
 
-(defstate ^{:on-reload :noop} nrepl
+(defstate nrepl
   :start (start-nrepl (config :nrepl-port))
   :stop (stop-server nrepl))
 

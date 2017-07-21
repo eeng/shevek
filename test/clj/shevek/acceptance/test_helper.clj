@@ -35,9 +35,9 @@
       false)))
 
 (defn- element-text [page selector]
-  (some->> (query-all page {:css selector}) ; We can't use the query function because it throw error when the element is not found
-           first
-           (get-element-text-el page)))
+  (->> (query-all page {:css selector})
+       (map #(get-element-text-el page %))
+       (str/join "")))
 
 (defn has-css?
   ([page selector]
@@ -78,7 +78,7 @@
   (e/fill-multi page fields))
 
 (defn login
-  ([page] (login page {:username "max" :password "secret123"}))
+  ([page] (login page {:username "max" :fullname "Max" :password "secret123"}))
   ([page {:keys [username password] :as user}]
    (make! User user)
    (when-not (exists? page {:css "#login"})
