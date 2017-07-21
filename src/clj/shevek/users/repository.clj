@@ -24,8 +24,11 @@
     (assoc user :password (crypt-password password))
     (dissoc user :password)))
 
+(defn find-by-id [db id]
+  (mc/find-map-by-id db "users" id))
+
 (defn reload [db {:keys [_id]}]
-  (mc/find-map-by-id db "users" _id))
+  (find-by-id db _id))
 
 (defn create-or-update-by [db field user]
   (let [value (field user)

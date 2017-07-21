@@ -8,7 +8,7 @@
             [shevek.components.form :refer [checkbox toggle-checkbox-inside]]
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension includes-dim?]]
             [shevek.viewer.shared :refer [current-cube viewer panel-header send-main-query]]
-            [shevek.reports.url :refer [store-viewer-in-url]]))
+            [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defevhi :measure-toggled [db dim selected]
   {:after [store-viewer-in-url]}

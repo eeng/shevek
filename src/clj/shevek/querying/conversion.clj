@@ -42,8 +42,8 @@
       field
       {:type "inverted" :metric field})))
 
-(defn- add-query-type-dependant-fields [{:keys [dimension measures] :as q}
-                                        {:keys [queryType] :as dq}]
+(defn- add-query-type-dependant-fields [{:keys [queryType] :as dq}
+                                        {:keys [dimension measures] :as q}]
   (condp = queryType
     "topN"
     (assoc dq
@@ -68,21 +68,24 @@
     [sort-by]
     []))
 
-(defn measures->druid [measures]
+(defn add-druid-measures [dq measures]
   (let [tig (make-tig)]
     (->> measures
          (map #(measure->druid % tig))
-         (reduce (partial merge-with concat)))))
+         (reduce (partial merge-with concat))
+         (merge dq))))
 
-(defn to-druid-query [{:keys [cube measures dimension] :as q}]
-  (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? (:filter q))]
-    (as-> {:queryType (calculate-query-type q)
-           :dataSource {:type "table" :name cube}
-           :intervals (str/join "/" (-> time-filters first :interval))}
-          dq
-          (merge dq (measures->druid (concat measures (sort-by-derived-measures dimension measures))))
-          (add-query-type-dependant-fields q dq)
-          (assoc-if-seq dq :filter (->> normal-filters (filter with-value?) to-druid-filter)))))
+(defn add-druid-filters [dq filters]
+  (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? filters)]
+    (-> (assoc dq :intervals (str/join "/" (-> time-filters first :interval)))
+        (assoc-if-seq :filter (->> normal-filters (filter with-value?) to-druid-filter)))))
+
+(defn to-druid-query [{:keys [cube filter measures dimension] :as q}]
+  (-> {:queryType (calculate-query-type q)
+       :dataSource {:type "table" :name cube}}
+      (add-druid-filters filter)
+      (add-druid-measures (concat measures (sort-by-derived-measures dimension measures)))
+      (add-query-type-dependant-fields q)))
 
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]
   (condp = queryType

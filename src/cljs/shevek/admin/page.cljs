@@ -6,6 +6,6 @@
 
 (defn page []
  [:div#settings.ui.container
-  [page-title (t :admin/title) (t :admin/subtitle) "settings"]
+  [page-title (t :admin/title) (t :admin/subtitle) "users"]
   [users-section]
   [schema-section]])

@@ -4,6 +4,7 @@
             [shevek.reflow.db :as db]
             [reagent.core :as r]
             [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
+            [shevek.lib.dw.time :refer [format-interval]]
             [shevek.lib.number :as num]
             [shevek.lib.util :refer [debounce regex-escape]]
             [shevek.i18n :refer [t]]
@@ -11,9 +12,10 @@
             [shevek.lib.dw.dims :refer [dim= add-dimension remove-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components.form :refer [kb-shortcuts]]
-            [shevek.reports.url :refer [store-viewer-in-url]]
+            [shevek.viewer.url :refer [store-viewer-in-url]]
             [schema.core :as s]
-            [goog.string :as str]
+            [goog.string :as gstr]
+            [cuerdas.core :as str]
             [shevek.lib.logger :as log]))
 
 (defn- viewer [& keys]
@@ -67,8 +69,8 @@
 (defn format-measure [{:keys [type format] :as dim} result]
   (let [value (or (dimension-value dim result) 0)
         value (condp = type
-                "doubleSum" (str/format "%.2f" value)
-                "hyperUnique" (str/format "%.0f" value)
+                "doubleSum" (gstr/format "%.2f" value)
+                "hyperUnique" (gstr/format "%.0f" value)
                 value)]
     (cond-> value
             format (num/format format))))
@@ -119,3 +121,17 @@
     [:div.segment-value value]))
 
 (def debounce-dispatch (debounce dispatch 500))
+
+(defn filter-title [{:keys [title period interval operator value] :as dim}]
+  (let [details (if (= (count value) 1)
+                  (-> (first value) (format-dim-value dim) (str/prune 15))
+                  (count value))]
+    (cond
+      period [:span (->> (name period) (str "cubes.period/") keyword t)]
+      interval [:span (format-interval interval)]
+      :else [:span title " "
+             (when (seq value)
+               [:span.details {:class (when (= operator "exclude") "striked")}
+                (case operator
+                  ("include" "exclude") (str "(" details ")")
+                  "")])])))

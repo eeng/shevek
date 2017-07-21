@@ -1,4 +1,4 @@
-(ns shevek.settings
+(ns shevek.menu.settings
   (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
@@ -13,7 +13,7 @@
             [cuerdas.core :as str]))
 
 (defn save-settings! [db]
-  (local-storage/store! "shevek.settings" (db :settings))
+  (local-storage/store! "shevek.menu.settings" (db :settings))
   db)
 
 (defn refresh-page []
@@ -37,7 +37,7 @@
 (def default-settings {:lang "en" :auto-refresh 60})
 
 (defevh :settings-loaded [db]
-  (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "shevek.settings"))]
+  (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "shevek.menu.settings"))]
     (set-auto-refresh-interval! auto-refresh)
     (assoc db :settings (merge default-settings settings))))
 
@@ -65,5 +65,6 @@
        :on-change #(dispatch :settings-saved {:lang %})}]]])
 
 (defn- settings-menu []
-  [:a.item {:on-click #(show-popup % popup-content {:position "bottom right"})}
-   [:i.setting.icon] (t :settings/menu)])
+  [:a.icon.item {:on-click #(show-popup % popup-content {:position "bottom right"})
+                 :title (t :settings/menu)}
+   [:i.setting.icon]])

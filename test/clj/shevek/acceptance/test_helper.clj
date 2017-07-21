@@ -6,7 +6,8 @@
             [shevek.db :refer [db init-db]]
             [shevek.config :refer [config]]
             [shevek.users.repository :refer [User]]
-            [shevek.makers :refer [make!]]))
+            [shevek.makers :refer [make!]]
+            [clojure.string :as str]))
 
 ; Por defecto etaoin espera 20 segs
 (alter-var-root #'e/default-timeout (constantly 5))
@@ -34,9 +35,9 @@
       false)))
 
 (defn- element-text [page selector]
-  (some->> (query-all page {:css selector}) ; We can't use the query function because it throw error when the element is not found
-           first
-           (get-element-text-el page)))
+  (->> (query-all page {:css selector})
+       (map #(get-element-text-el page %))
+       (str/join "")))
 
 (defn has-css?
   ([page selector]
@@ -64,7 +65,9 @@
   (click page {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
 
 (defn click-link [page text]
-  (click page {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)}))
+  (click page {:xpath (str/join "|"
+                                [(format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)
+                                 (format "//*[(self::a or self::button) and contains(@title,'%s')]" text)])}))
 
 (defn fill [page field & values]
   (wait-visible page field)
@@ -75,7 +78,7 @@
   (e/fill-multi page fields))
 
 (defn login
-  ([page] (login page {:username "max" :password "secret123"}))
+  ([page] (login page {:username "max" :fullname "Max" :password "secret123"}))
   ([page {:keys [username password] :as user}]
    (make! User user)
    (when-not (exists? page {:css "#login"})

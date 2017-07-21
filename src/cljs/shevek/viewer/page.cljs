@@ -5,7 +5,7 @@
             [shevek.rpc :as rpc]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.lib.dw.cubes :refer [set-cube-defaults]]
-            [shevek.lib.dw.time :refer [parse-max-time]]
+            [shevek.lib.dates :refer [parse-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
@@ -14,17 +14,22 @@
             [shevek.viewer.visualization :refer [visualization-panel]]
             [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
-            [shevek.reports.url :refer [store-viewer-in-url restore-report-from-url]]))
+            [shevek.viewer.url :refer [store-viewer-in-url restore-report-from-url]]
+            [shevek.viewer.raw]))
 
-(defn- init-viewer [cube current-report]
-  (if current-report
-    (report->viewer current-report cube)
-    (build-new-viewer cube)))
+(defn- already-build? [viewer]
+  (some? (:measures viewer)))
 
-(defevhi :cube-arrived [{:keys [current-report] :as db} {:keys [name] :as cube}]
+(defn- init-viewer [cube current-viewer current-report]
+  (cond
+    (already-build? current-viewer) current-viewer ; Should only happen on dev when boot-reload refresh the page. Without it the viewer would be recreated everytime difficulting development
+    current-report (report->viewer current-report cube)
+    :else (build-new-viewer cube)))
+
+(defevhi :cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
   {:after [store-viewer-in-url]}
   (let [cube (set-cube-defaults cube)
-        {:keys [pinboard] :as viewer} (init-viewer cube current-report)]
+        {:keys [pinboard] :as viewer} (init-viewer cube viewer current-report)]
     (-> (assoc db :viewer viewer)
         (rpc/loaded :cube-metadata)
         (send-main-query)
@@ -51,14 +56,14 @@
     (prepare-cube db cube report)))
 
 (defevh :max-time-arrived [db max-time]
-  (-> (assoc-in db [:viewer :cube :max-time] (parse-max-time max-time))
-      (send-main-query)
-      (send-pinboard-queries)))
+  (if-let [new-data (> (parse-time max-time) (get-in db [:viewer :cube :max-time]))]
+    (-> (assoc-in db [:viewer :cube :max-time] (parse-time max-time))
+        (send-main-query)
+        (send-pinboard-queries))))
 
 (defevh :viewer-refresh [db]
   (when-not (rpc/loading?)
-    (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))
-    (rpc/loading db [:results :main])))
+    (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))))
 
 (defn page []
   (dispatch :viewer-initialized)

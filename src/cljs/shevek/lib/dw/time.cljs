@@ -5,12 +5,9 @@
             [cuerdas.core :as str]
             [shevek.lib.dw.dims :refer [time-dimension]]))
 
-(defn parse-max-time [max-time]
-  (d/round-to-next-minute (parse-time max-time)))
-
 (defn to-interval [period max-time]
   (let [now (d/now)
-        max-time (or max-time now)
+        max-time (d/round-to-next-minute (or max-time now))
         day-of-last-week (t/minus (d/beginning-of-week now) (t/days 1))
         day-of-last-month (t/minus (d/beginning-of-month now) (t/days 1))
         day-of-last-quarter (t/minus (d/beginning-of-quarter now) (t/days 1))

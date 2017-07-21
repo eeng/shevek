@@ -21,7 +21,7 @@
   (let [{:keys [content class]} @popup-data]
     [:div.ui.special.popup {:class class}
      (when content
-       (if (vector? content) content [content]))]))
+       (if (fn? content) [content] content))]))
 
 (defn- component-did-update []
   (let [{:keys [opened? activator js-opts]} @popup-data

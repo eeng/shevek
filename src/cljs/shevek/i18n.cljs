@@ -58,7 +58,15 @@
               :description "Description"
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
-              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
+              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
+              :hold-delete "Hold for {1} seconds to delete this report"}
+    :share {:title "Share"
+            :copy-url "Copy URL"
+            :copied "URL Copied!"}
+    :raw-data {:menu "View raw data"
+               :title "Raw Event Data"
+               :showing "Showing the first {1} events matching: "
+               :button "Raw Data"}
     :settings {:menu "Settings"
                :lang "Language"
                :update-now "Update Now"
@@ -74,8 +82,16 @@
             :password "Password"
             :password-confirmation "Password Confirmation"
             :invalid-credentials "Invalid username or password"
-            :session-expired "Session expired, please login again"}
-    :date-formats {:minute "MMM d, h:mma"
+            :session-expired "Session expired, please login again"
+            :password-hint "Leave blank if you don't want to change it"}
+    :account {:title "Your Account"
+              :subtitle "Edit your profile details here"
+              :current-password "Current Password"
+              :new-password "New Password"
+              :saved "Your account has been saved"
+              :invalid-current-password "is incorrect"}
+    :date-formats {:second "yyyy-MM-dd HH:mm:ss"
+                   :minute "MMM d, h:mma"
                    :hour "MMM d, yyyy ha"
                    :day "MMM d, yyyy"
                    :month "MMM yyyy"}
@@ -148,7 +164,15 @@
               :description "Descripción"
               :pin-in-dashboard "Mostrar en dashboard"
               :saved "Reporte '{1}' guardado correctamente"
-              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
+              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
+              :hold-delete "Clickee y mantenga presionado por {1} segundos para eliminar el reporte"}
+    :share {:title "Compartir"
+            :copy-url "Copiar URL"
+            :copied "URL Copiado!"}
+    :raw-data {:menu "Ver datos desagregados"
+               :title "Datos Desagregados"
+               :showing "Primeros {1} eventos según filtro: "
+               :button "Datos Desagregados"}
     :settings {:menu "Preferencias"
                :lang "Lenguaje"
                :update-now "Actualizar Ahora"
@@ -163,8 +187,16 @@
             :email "Email"
             :password-confirmation "Confirmación de Password"
             :invalid-credentials "Usuario y/o password incorrecto"
-            :session-expired "Sesión expirada, por favor ingrese nuevamente"}
-    :date-formats {:minute "dd/MM HH:mm"
+            :session-expired "Sesión expirada, por favor ingrese nuevamente"
+            :password-hint "Dejar en blanco para no cambiarlo"}
+    :account {:title "Tu Cuenta"
+              :subtitle "Aquí podés cambiar los detalles de tu perfil"
+              :current-password "Password Actual"
+              :new-password "Nuevo Password"
+              :saved "Tu cuenta se grabó correctamente"
+              :invalid-current-password "es incorrecto"}
+    :date-formats {:second "dd/MM/yyyy HH:mm:ss"
+                   :minute "dd/MM HH:mm"
                    :hour "dd/MM/yy H 'hs'"
                    :day "dd/MM/yy"
                    :month "MM/yy"}

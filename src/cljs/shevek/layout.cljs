@@ -4,53 +4,28 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.navegation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
-            [shevek.components.popup :refer [popup show-popup close-popup]]
+            [shevek.components.popup :refer [popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.login :as login :refer [logged-in?]]
             [shevek.dashboard :as dashboard]
             [shevek.admin.page :as admin]
-            [shevek.settings :refer [settings-menu]]
             [shevek.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
-            [shevek.viewer.shared :refer [current-cube-name]]
-            [shevek.reports.menu :refer [reports-menu]]
-            [shevek.login :refer [current-user]]
-            [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]))
+            [shevek.menu.cubes :refer [cubes-menu]]
+            [shevek.menu.reports :refer [reports-menu]]
+            [shevek.menu.share :refer [share-menu]]
+            [shevek.menu.settings :refer [settings-menu]]
+            [shevek.menu.account :as account :refer [account-menu]]))
 
 (def pages
   {:login #'login/page
    :dashboard #'dashboard/page
    :admin #'admin/page
-   :viewer #'viewer/page})
+   :viewer #'viewer/page
+   :account #'account/page})
 
 (defn current-page-class [page]
   (when (current-page? page) "active"))
-
-(defn- cubes-popup-content []
-  (let [cubes (cubes-list)
-        select-cube #(do (dispatch :cube-selected %) (close-popup))]
-    [:div#cubes-popup
-     [:h3.ui.sub.orange.header (t :cubes/title)]
-     (if (seq cubes)
-       [:div.ui.relaxed.middle.aligned.selection.list
-        (doall
-          (for [{:keys [name title description] :or {description (t :cubes/no-desc)}} cubes
-                :let [selected? (and (current-page? :viewer) (= name (current-cube-name)))]]
-            [:div.item {:key name :on-click #(select-cube name)}
-             [:i.large.middle.aligned.cube.icon {:class (when selected? "orange")}]
-             [:div.content
-              [:div.header title]
-              [:div.description description]]]))]
-       [:div (t :cubes/no-results)])]))
-
-(defn- cubes-menu []
-  (fetch-cubes)
-  (fn []
-    [:a#cubes-menu.item {:on-click #(show-popup % cubes-popup-content {:position "bottom left"})}
-     [:i.cubes.icon]
-     (if (current-page? :viewer)
-       (db/get-in [:cubes (current-cube-name) :title])
-       (t :cubes/menu))]))
 
 (defn- menu []
   [:div.ui.fixed.inverted.menu
@@ -59,13 +34,13 @@
    [cubes-menu]
    [reports-menu]
    [:div.right.menu
-    [:div.item
-     [:i.user.icon]
-     (:fullname (current-user))]
+    (when (current-page? :viewer) [share-menu])
     [settings-menu]
-    [:a.item {:href "#/admin" :class (current-page-class :admin)}
-     [:i.users.icon] (t :admin/menu)]
-    [:a.item {:on-click #(dispatch :logout)} [:i.sign.out.icon] (t :menu/logout)]]])
+    [:a.icon.item {:href "#/admin" :class (current-page-class :admin) :title (t :admin/menu)}
+     [:i.users.icon]]
+    [account-menu]
+    [:a.item {:on-click #(dispatch :logout)}
+     [:i.sign.out.icon] (t :menu/logout)]]])
 
 (defn layout []
   (let [page (if (logged-in?) (current-page) :login)]

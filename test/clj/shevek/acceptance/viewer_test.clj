@@ -44,4 +44,15 @@
          (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
         (login page)
         (visit page "/#/viewer/CHANGEDezpjdWJlICJ3aWtpdGlja2VyIiwgOm1lYXN1cmVzICgiZGVsZXRlZCIgImNvdW50IiksIDpmaWx0ZXIgKHs6bmFtZSAiX190aW1lIiwgOnBlcmlvZCAibGF0ZXN0LWRheSJ9KSwgOnNwbGl0ICgpLCA6cGluYm9hcmQgezptZWFzdXJlICJkZWxldGVkIiwgOmRpbWVuc2lvbnMgKCl9fQ==")
-        (is (has-title? page "Dashboard"))))))
+        (is (has-title? page "Dashboard")))))
+
+  (it "raw data modal" page
+    (with-fake-druid
+      {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
+       (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")
+       (query-req-matching #"queryType.*select") (druid-res "acceptance/select")}
+      (go-to-viewer page)
+      (click-link page "Share")
+      (click-link page "View raw data")
+      (is (has-css? page ".raw-data" :text "Showing the first 100 events matching: Latest Day"))
+      (is (has-css? page ".raw-data tbody tr" :count 2)))))

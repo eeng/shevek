@@ -23,3 +23,6 @@
   (->> string
        (replace regex-char-esc-smap)
        (apply str)))
+
+(defn new-record? [{:keys [_id id]}]
+  (and (nil? _id) (nil? id)))

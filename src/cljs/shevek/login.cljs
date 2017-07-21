@@ -18,7 +18,9 @@
 
 (defn extract-user [token]
   (when token
-    (js->clj (js/jwt_decode token) :keywordize-keys true)))
+    (try
+      (js->clj (js/jwt_decode token) :keywordize-keys true)
+      (catch js/Error _ {}))))
 
 (defonce error (r/atom nil))
 

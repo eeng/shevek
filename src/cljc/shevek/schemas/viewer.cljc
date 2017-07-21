@@ -1,6 +1,7 @@
 (ns shevek.schemas.viewer
   (:require [schema.core :as s]
-            [shevek.schemas.cube :refer [Dimension Measure]]))
+            [shevek.schemas.cube :refer [Dimension Measure]]
+            [shevek.schemas.query :refer [Result RawQueryResults]]))
 
 (s/defschema DimensionSortBy
   (assoc Dimension :descending s/Bool))
@@ -28,13 +29,11 @@
          :operator s/Str
          (s/optional-key :value) #{(s/maybe s/Str)}))
 
-(s/defschema Filter
-  (s/if #{:period :interval} TimeFilter NormalFilter))
+(s/defschema Filters
+  [(s/one TimeFilter "tf") NormalFilter])
 
 (s/defschema Pinboard
   {:measure Measure :dimensions [Split]})
-
-(s/defschema Result {s/Keyword s/Any})
 
 ; In the Viewer the Cube is slightly different from the schemas.cube.Cube: it starts only with the name and later receives a max-time
 (s/defschema Cube
@@ -48,9 +47,13 @@
 
 (s/defschema Viewer
   {:cube Cube
-   (s/optional-key :filter) [(s/one TimeFilter "tf") NormalFilter]
+   (s/optional-key :filter) Filters
+   (s/optional-key :raw-data-filter) Filters
    (s/optional-key :split) [Split]
    (s/optional-key :arrived-split) [Split]
    (s/optional-key :measures) [Measure]
    (s/optional-key :pinboard) Pinboard
-   (s/optional-key :results) {(s/enum :main :pinboard :filter) (s/cond-pre [Result] {s/Str [Result]})}})
+   (s/optional-key :results) {(s/optional-key :main) [Result]
+                              (s/optional-key :filter) {s/Str [Result]}
+                              (s/optional-key :pinboard) {s/Str [Result]}
+                              (s/optional-key :raw) RawQueryResults}})

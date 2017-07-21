@@ -19,9 +19,9 @@
 (defn validate [state validation-map]
   (reduce apply-validator state (as-single-field-validator-pairs validation-map)))
 
-(defn valid?! [atom validation-fn]
+(defn valid?! [atom validations]
   (swap! atom dissoc :errors)
-  (let [{:keys [errors]} (validation-fn @atom)]
+  (let [{:keys [errors]} (validate @atom validations)]
     (if errors
       (do (swap! atom assoc :errors errors) false)
       true)))

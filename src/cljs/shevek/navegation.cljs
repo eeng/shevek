@@ -27,3 +27,6 @@
 
 (defroute "/admin" []
   (dispatch :navigate :admin))
+
+(defroute "/account" []
+  (dispatch :navigate :account))

@@ -3,11 +3,11 @@
   (:require [shevek.reflow.core :refer [dispatch]]
             [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]
-            [shevek.lib.dw.time :refer [parse-max-time]]))
+            [shevek.lib.dates :refer [parse-time]]))
 
 (defn set-cube-defaults [{:keys [max-time] :as cube}]
   (cond-> cube
-          max-time (update :max-time parse-max-time)))
+          max-time (update :max-time parse-time)))
 
 (defn- to-map-with-name-as-key [cubes]
   (zipmap (map :name cubes) cubes))

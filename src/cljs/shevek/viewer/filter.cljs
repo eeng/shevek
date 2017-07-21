@@ -8,11 +8,11 @@
             [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-date]]
-            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube dimension-value send-pinboard-queries]]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube dimension-value send-pinboard-queries filter-title]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
-            [shevek.reports.url :refer [store-viewer-in-url]]))
+            [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defn send-queries [db dont-query-pinboard-dim]
   (-> (send-main-query db)
@@ -185,20 +185,6 @@
     ^{:key (hash dim)} [time-filter-popup dim]
     ^{:key (:name dim)} [normal-filter-popup dim]))
 
-(defn- filter-title [{:keys [title period interval operator value] :as dim}]
-  (let [details (if (= (count value) 1)
-                  (-> (first value) (format-dim-value dim) (str/prune 15))
-                  (count value))]
-    (cond
-      period (->> (name period) (str "cubes.period/") keyword t)
-      interval (format-interval interval)
-      :else [:div title " "
-             (when (seq value)
-               [:span.details {:class (when (= operator "exclude") "striked")}
-                (case operator
-                  ("include" "exclude") (str "(" details ")")
-                  "")])])))
-
 (defevh :filter-popup-closed [{:keys [viewer]} {:keys [name]}]
   (if-let [dim (find-dimension name (:filter viewer))]
     (when (and (not (time-dimension? dim)) (empty? (dim :value)))
@@ -207,10 +193,10 @@
 (defn- filter-item [{:keys [name]}]
   (let [popup-key (hash {:name name :timestamp (js/Date.)})
         show-popup-when-added #(when (and % (= name @last-added-filter))
-                                (reset! last-added-filter nil)
-                                (-> % r/dom-node js/$ .click))]
+                                 (reset! last-added-filter nil)
+                                 (-> % r/dom-node js/$ (.find "span") .click))]
     (fn [dim]
-      [:button.ui.green.compact.button.item
+      [:a.ui.green.compact.button.item
        (assoc (draggable dim)
               :class (when-not (time-dimension? dim) "right labeled icon")
               :on-click (fn [el] (show-popup el ^{:key popup-key} [filter-popup dim]

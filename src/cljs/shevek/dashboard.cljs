@@ -6,7 +6,7 @@
             [shevek.rpc :as rpc]
             [shevek.components.text :refer [page-title loader]]
             [shevek.lib.dw.cubes :refer [cubes-list set-cube-defaults]]
-            [shevek.reports.menu :refer [fetch-reports]]
+            [shevek.menu.reports :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]
             [shevek.viewer.visualization :refer [visualization]]))
@@ -20,7 +20,7 @@
 (defn- cubes-cards []
   (let [cubes (cubes-list)]
     (if (seq cubes)
-      [:div.ui.cards (rmap cube-card cubes :name)]
+      [:div.ui.cards (rmap cube-card :name cubes)]
       [:div.tip [:i.info.circle.icon] (t :cubes/missing)])))
 
 (defn dashboard-reports []
@@ -57,7 +57,7 @@
   (fn []
     (let [reports (dashboard-reports)]
       (if (seq reports)
-        [:div.ui.two.stackable.cards (rmap report-card reports :name)]
+        [:div.ui.two.stackable.cards (rmap report-card :name reports)]
         [:div.tip [:i.info.circle.icon] (t :reports/none)]))))
 
 (defn page []

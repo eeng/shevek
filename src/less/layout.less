@@ -2,6 +2,13 @@ body {
   background-color: #F7F7F7;
 }
 
+.ui.fixed.menu {
+  .icon.item {
+    padding-left: 0.9em;
+    padding-right: 0.9em;
+  }
+}
+
 .page {
   padding-top: 40px;
   padding-bottom: 60px;
@@ -39,7 +46,7 @@ body {
       .middle.aligned.icon { color: black }
       .content { padding-left: .3em }
       .right.content {
-        .dimmed;
+        .muted;
         font-size: .9em;
         .cube { display: block; }
         .item-actions { display: none; }
@@ -51,6 +58,7 @@ body {
             display: block;
             .icon:hover { color: black }
             .icon:last-child { margin-right: 0; }
+            .icon.holding { color: #d41c1c; }
           }
         }
       }
@@ -65,18 +73,11 @@ body {
 }
 
 #notification {
-  .border-radius;
-  @width: 500px;
-  position: absolute;
-  bottom: 40px;
+  position: fixed;
+  bottom: 4em;
+  transform: translate(-50%, 0);
   left: 50%;
-  width: @width;
-  margin-left: -@width / 2;
-  text-align: center;
-  padding: 10px;
-  color: #2c662d;
-  background-color: rgba(193, 226, 176, 0.86);
-  .box-shadow(0 0 0 1px #a3c293 inset, 0px 8px 36px -15px rgba(0, 0, 0, 0.75));
+  .box-shadow(0 0 0 1px #a3c293 inset, 0px 7px 36px -15px rgba(0, 0, 0, 0.75));
   &.visible {
     visibility: visible;
     opacity: 1;
@@ -87,4 +88,5 @@ body {
     opacity: 0;
     transition: visibility 0s 250ms, opacity 250ms linear;
   }
+  .message .icon { margin-right: .4em }
 }

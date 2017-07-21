@@ -2,7 +2,7 @@
   (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension time-dimension?]]
             [shevek.lib.dw.time :refer [effective-interval]]
             [shevek.lib.dates :refer [to-iso8601 end-of-day parse-time]]
-            [shevek.schemas.query :refer [Query]]
+            [shevek.schemas.query :refer [Query RawQuery]]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]))
 
@@ -60,6 +60,11 @@
   (-> (add-str-interval viewer)
       (assoc :cube (cube :name))
       (st/select-schema Query)))
+
+(defn viewer->raw-query [{:keys [cube] :as viewer}]
+  (-> (add-str-interval viewer)
+      (assoc :cube (cube :name))
+      (st/select-schema RawQuery)))
 
 (defn report->query [report cube]
   (-> report (report->viewer cube) (assoc :totals true) viewer->query))

@@ -1,4 +1,4 @@
-(ns shevek.querying.manager
+(ns shevek.querying.aggregation
   (:require [shevek.lib.collections :refer [assoc-if-seq]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
             [shevek.lib.druid-driver :refer [send-query]]
@@ -30,7 +30,7 @@
 
 ;; Examples
 
-(require '[shevek.dw :refer [dw]])
+#_(require '[shevek.dw :refer [dw]])
 
 ; Totals query
 #_(query dw {:cube "wikiticker"

@@ -1,4 +1,4 @@
-(ns shevek.reports.url
+(ns shevek.viewer.url
   (:require [shevek.schemas.conversion :refer [viewer->report]]
             [cljs.reader :refer [read-string]]
             [shevek.lib.base64 :as b64]))
