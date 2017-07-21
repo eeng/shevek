@@ -10,8 +10,6 @@
             [shevek.db :refer [db]]
             [com.rpl.specter :refer [select ALL]]))
 
-;; discover use cases
-
 (deftest discover-tests
   (it "initial descovery should save all cubes with their dimensions and metrics"
     (with-redefs [cubes (constantly ["wikiticker" "vtol_stats"])

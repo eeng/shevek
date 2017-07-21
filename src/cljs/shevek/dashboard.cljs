@@ -5,7 +5,7 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.components.text :refer [page-title loader]]
-            [shevek.lib.dw.cubes :refer [cubes-list set-cube-defaults]]
+            [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list set-cube-defaults]]
             [shevek.menu.reports :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]
@@ -69,6 +69,8 @@
    [reports-cards]])
 
 ; TODO esto funca y queda simple pero hace demasiados requests al server. Ver de hacer solo las queries de los viewers. Aunque a favor tiene que no hace falta actualizar los max-time periodicamente.
+; UPDATE: agregué despues el fetch-cubes asi se van refrescando si aparecen nuevos, si ahi traemos todo el cubo entero se podria solucionar capaz lo planteado antes
 (defevh :dashboard/refresh [db]
+  (fetch-cubes)
   (doseq [report (dashboard-reports)]
     (dispatch :dashboard/cube-requested report)))
