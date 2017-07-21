@@ -1,4 +1,4 @@
-(ns shevek.querying.manager
+(ns shevek.querying.aggregation
   (:require [shevek.lib.collections :refer [assoc-if-seq]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
             [shevek.lib.druid-driver :refer [send-query]]

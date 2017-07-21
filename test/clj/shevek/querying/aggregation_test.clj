@@ -1,7 +1,7 @@
-(ns shevek.querying.manager-test
+(ns shevek.querying.aggregation-test
   (:require [clojure.test :refer :all]
             [shevek.asserts :refer [submaps?]]
-            [shevek.querying.manager :refer [query]]
+            [shevek.querying.aggregation :refer [query]]
             [shevek.lib.druid-driver :as druid]))
 
 (def dw :dw)
