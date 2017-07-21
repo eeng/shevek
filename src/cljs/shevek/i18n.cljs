@@ -60,7 +60,9 @@
               :saved "Report '{1}' saved!"
               :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
               :hold-delete "Hold for {1} seconds to delete this report"}
-    :share {:title "Share"}
+    :share {:title "Share"
+            :copy-url "Copy URL"
+            :copied "URL Copied!"}
     :raw-data {:menu "View raw data"
                :title "Raw Event Data"
                :showing "Showing the first {1} events matching: "
@@ -164,7 +166,9 @@
               :saved "Reporte '{1}' guardado correctamente"
               :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
               :hold-delete "Clickee y mantenga presionado por {1} segundos para eliminar el reporte"}
-    :share {:title "Compartir"}
+    :share {:title "Compartir"
+            :copy-url "Copiar URL"
+            :copied "URL Copiado!"}
     :raw-data {:menu "Ver datos desagregados"
                :title "Datos Desagregados"
                :showing "Primeros {1} eventos según filtro: "

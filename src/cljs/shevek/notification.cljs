@@ -6,7 +6,7 @@
 
 (def hide-after (variable-debounce #(swap! state assoc :showed? false)))
 
-(defn notify [message & {:keys [timeout] :or {timeout 5000} :as opts}]
+(defn notify [message & {:keys [timeout] :or {timeout 3000} :as opts}]
   (reset! state (assoc opts :message message :showed? true))
   (when (pos? timeout) (hide-after timeout)))
 
