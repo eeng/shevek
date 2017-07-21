@@ -73,17 +73,10 @@ body {
 }
 
 #notification {
-  .border-radius;
-  @width: 500px;
-  position: absolute;
-  bottom: 40px;
+  position: fixed;
+  bottom: 3em;
+  transform: translate(-50%, 0);
   left: 50%;
-  width: @width;
-  margin-left: -@width / 2;
-  text-align: center;
-  padding: 10px;
-  color: #2c662d;
-  background-color: rgba(193, 226, 176, 0.86);
   .box-shadow(0 0 0 1px #a3c293 inset, 0px 8px 36px -15px rgba(0, 0, 0, 0.75));
   &.visible {
     visibility: visible;
@@ -95,4 +88,5 @@ body {
     opacity: 0;
     transition: visibility 0s 250ms, opacity 250ms linear;
   }
+  .message .icon { margin-right: .4em }
 }

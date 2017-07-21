@@ -8,10 +8,12 @@
 
 (defn notify [message & {:keys [timeout] :or {timeout 5000} :as opts}]
   (reset! state (assoc opts :message message :showed? true))
-  (hide-after timeout))
+  (when (pos? timeout) (hide-after timeout)))
 
 (defn notification []
   (let [{:keys [showed? message]} @state]
     [:div#notification
      {:class (if showed? "visible" "hidden")}
-     message]))
+     [:div.ui.positive.icon.message
+      [:i.checkmark.icon]
+      [:div.content message]]]))
