@@ -149,8 +149,3 @@
   (comp (test-clj)
         (alt-test-cljs :exit? true)
         (test-acceptance)))
-
-(deftask seed
-  "Seeds the application data."
-  []
-  (run :namespace "shevek.schema.seed" :function "seed!"))

@@ -1,23 +1,19 @@
 (ns shevek.schema.seed
   (:require [clojure.edn :as edn]
-            [shevek.db :refer [db]]
             [shevek.users.repository :as users]
             [shevek.schema.manager :refer [update-cubes]]
-            [shevek.app :refer [start-db]]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :refer [debug]]))
 
-(defn create-users []
-  (log/info "Seeding users...")
-  (users/create-or-update-by db :username {:username "admin" :fullname "Administrator" :password "asdf654"}))
+(defn users [db]
+  (when-not (users/find-by-username db "admin")
+    (debug "Seeding admin user.")
+    (users/save-user db {:username "admin" :fullname "Administrator" :password "asdf654"})))
 
-(defn create-cubes []
-  (log/info "Seeding schema...")
+(defn cubes [db]
+  (debug "Seeding schema.")
   (let [{:keys [cubes]} (-> "seed-examples/vitolen.edn" slurp edn/read-string)]
     (update-cubes db cubes)))
 
-(defn seed! []
-  (start-db)
-  (create-users)
-  (create-cubes))
-
-#_(seed!)
+(defn seed! [db]
+  (users db)
+  (cubes db))
