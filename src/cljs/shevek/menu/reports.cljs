@@ -12,6 +12,7 @@
             [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
             [shevek.viewer.page :as viewer]
+            [shevek.lib.util :refer [new-record?]]
             [cuerdas.core :as str]))
 
 ; TODO Muy parecido a lo de users, de nuevo el patron de call, loading y loaded
@@ -35,10 +36,12 @@
   (cond-> (rpc/loaded db :save-report)
           editing-current? (assoc :current-report report)))
 
+(defn- current-report? [db report]
+  (= (:_id report) (get-in db [:current-report :_id])))
+
 (defevh :save-report [db report]
-  (let [editing-current? (or (nil? (:_id report))
-                             (and (= (:_id report) (get-in db [:current-report :_id]))
-                                  (current-page? :viewer)))
+  (let [editing-current? (or (new-record? report)
+                             (and (current-report? db report) (current-page? :viewer)))
         report (if editing-current?
                  (merge report (viewer->report (db :viewer)))
                  report)]
@@ -46,9 +49,9 @@
     (rpc/loading db :save-report)))
 
 (defevh :delete-report [db report]
-  ; TODO unificar estas dos lineas ya que siempre que hay un call debe haber un loading
   (rpc/call "reports.api/delete-report" :args [report] :handler fetch-reports)
-  (rpc/loading db :save-report))
+  (cond-> (rpc/loading db :save-report)
+          (current-report? db report) (dissoc :current-report)))
 
 (defn- save-report-form [form-data]
   (let [report (r/cursor form-data [:report])
@@ -90,12 +93,13 @@
        [:div.header name]
        [:div.description description]])))
 
-(defn- reports-list [form-data current-report]
-  (let [reports (db/get :reports)
+(defn- reports-list [form-data]
+  (let [current-report (or (db/get :current-report) {:pin-in-dashboard false})
+        reports (db/get :reports)
         show-actions? (current-page? :viewer)
-        save #(if (:_id current-report)
-                (do (dispatch :save-report current-report) (close-popup))
-                (reset! form-data {:report current-report :editing? false}))
+        save #(if (new-record? current-report)
+                (reset! form-data {:report current-report :editing? false})
+                (do (dispatch :save-report current-report) (close-popup)))
         save-as #(reset! form-data {:report (dissoc current-report :_id :name) :editing? false})]
     [:div
      (when show-actions?
@@ -111,13 +115,12 @@
 
 (defn- popup-content []
   (fetch-reports)
-  (let [form-data (r/atom nil)
-        current-report (or (db/get :current-report) {:pin-in-dashboard false})]
+  (let [form-data (r/atom nil)]
     (fn []
       [:div#reports-popup
        (if @form-data
          [save-report-form form-data]
-         [reports-list form-data current-report])])))
+         [reports-list form-data])])))
 
 (defn- reports-menu []
   (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
