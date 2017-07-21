@@ -17,7 +17,7 @@
 
 (defn wrap-request-logging [handler]
   (fn [{:keys [request-method uri query-string params identity] :as req}]
-    (let [ps (filtered-params params [:password :password-confirmation])]
+    (let [ps (filtered-params params [:password :password-confirmation :current-password])]
       (log/info (user-field identity) "Started" request-method uri (str query-string))
       (when (seq ps)
         (log/info (user-field identity) :params ps))

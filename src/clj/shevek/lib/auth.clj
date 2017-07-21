@@ -14,17 +14,18 @@
                   (assoc :id (str _id) :exp (t/plus (t/now) token-expiration)))]
     (jwt/sign token (config :jwt-secret))))
 
-(defn generate-token-response [user]
-  {:token (generate-token user)})
-
-(defn authenticate [db {:keys [username password]}]
+(defn authenticate [db username password]
   (let [user (users/find-by-username db username)]
-    (if (and user (check-password password (:password user)))
-      (generate-token-response user)
-      {:error :invalid-credentials})))
+    (when (and user (check-password password (:password user)))
+      user)))
+
+(defn authenticate-and-generate-token [db {:keys [username password]}]
+  (if-let [user (authenticate db username password)]
+    {:token (generate-token user)}
+    {:error :invalid-credentials}))
 
 (defn controller [{:keys [params]}]
-  (let [{:keys [token] :as res} (authenticate db params)]
+  (let [{:keys [token] :as res} (authenticate-and-generate-token db params)]
     {:status (if token 201 401) :body res})) ;
 
 (defn wrap-current-user

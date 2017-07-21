@@ -23,17 +23,16 @@
   (dispatch :users-requested)
   (rpc/loaded db :saving-user))
 
-(defn validate-user [user]
-  (v/validate user
-    {:username (v/required)
-     :fullname (v/required)
-     :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
-                        {:when #(or (new-record? %) (seq (:password %))) :msg :validation/password})
-     :password-confirmation (v/confirmation :password {:when (comp seq :password)})
-     :email (v/email {:optional? true})}))
+(def user-validations
+  {:username (v/required)
+   :fullname (v/required)
+   :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
+                      {:when #(or (new-record? %) (seq (:password %))) :msg :validation/password})
+   :password-confirmation (v/confirmation :password {:when (comp seq :password)})
+   :email (v/email {:optional? true})})
 
 (defevh :user-changed [db edited-user cancel]
-  (when (v/valid?! edited-user validate-user)
+  (when (v/valid?! edited-user user-validations)
     (rpc/call "users.api/save"
               :args [(dissoc @edited-user :password-confirmation)]
               :handler #(do (dispatch :user-saved) (cancel)))
@@ -50,7 +49,7 @@
       (let [new-user? (new-record? @edited-user)]
         [:div.ui.grid
          [:div.five.wide.column
-          [:div.ui.segment.form-container (rpc/loading-class :saving-user)
+          [:div.ui.segment (rpc/loading-class :saving-user)
            [:div.ui.form {:ref shortcuts}
             [input-field edited-user :username {:label (t :users/username) :class "required" :auto-focus true}]
             [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]

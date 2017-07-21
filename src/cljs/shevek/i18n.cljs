@@ -70,9 +70,6 @@
                :update-now "Update Now"
                :auto-refresh "Auto Update"
                :auto-refresh-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 10 minutes" 600] ["Every 30 minutes" 1800]])}
-    :account {:title "Your Account"
-              :subtitle "Edit your profile details here"
-              :saved "Your account has been saved"}
     :admin {:menu "Manage"
             :title "Management"
             :subtitle "Configure the users, cube descriptions and other stuff in this page"
@@ -85,6 +82,12 @@
             :invalid-credentials "Invalid username or password"
             :session-expired "Session expired, please login again"
             :password-hint "Leave blank if you don't want to change it"}
+    :account {:title "Your Account"
+              :subtitle "Edit your profile details here"
+              :current-password "Current Password"
+              :new-password "New Password"
+              :saved "Your account has been saved"
+              :invalid-current-password "is incorrect"}
     :date-formats {:second "yyyy-MM-dd HH:mm:ss"
                    :minute "MMM d, h:mma"
                    :hour "MMM d, yyyy ha"
@@ -171,9 +174,6 @@
                :update-now "Actualizar Ahora"
                :auto-refresh "Refrescar Automáticamente"
                :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])}
-    :account {:title "Tu Cuenta"
-              :subtitle "Aquí podés cambiar los detalles de tu perfil"
-              :saved "Tu cuenta se grabó correctamente"}
     :admin {:menu "Configurar"
             :title "Administración"
             :subtitle "Configure los usuarios, descripciones de cubos y otras cuestiones aquí"
@@ -185,6 +185,12 @@
             :invalid-credentials "Usuario y/o password incorrecto"
             :session-expired "Sesión expirada, por favor ingrese nuevamente"
             :password-hint "Dejar en blanco para no cambiarlo"}
+    :account {:title "Tu Cuenta"
+              :subtitle "Aquí podés cambiar los detalles de tu perfil"
+              :current-password "Password Actual"
+              :new-password "Nuevo Password"
+              :saved "Tu cuenta se grabó correctamente"
+              :invalid-current-password "es incorrecto"}
     :date-formats {:second "dd/MM/yyyy HH:mm:ss"
                    :minute "dd/MM HH:mm"
                    :hour "dd/MM/yy H 'hs'"
