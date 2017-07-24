@@ -63,22 +63,20 @@
             [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]]))))
 
 (defn- user-row [{:keys [username fullname email] :as original-user} edited-user]
-  (let [holding (r/atom nil)]
-    (fn []
-      [:tr
-       [:td username]
-       [:td fullname]
-       [:td (mail-to email)]
-       [:td.collapsing
-        [:button.ui.compact.basic.button
-         {:on-click #(reset! edited-user original-user)}
-         (t :actions/edit)]
-        [:button.ui.compact.basic.red.button
-         (hold-to-confirm holding #(dispatch :user-deleted original-user))
-         (t :actions/delete)]]])))
+  [:tr
+   [:td username]
+   [:td fullname]
+   [:td (mail-to email)]
+   [:td.collapsing
+    [:button.ui.compact.basic.button
+     {:on-click #(reset! edited-user original-user)}
+     (t :actions/edit)]
+    [:button.ui.compact.basic.red.button
+     (hold-to-confirm #(dispatch :user-deleted original-user))
+     (t :actions/delete)]]])
 
 (defn- users-table [edited-user]
-  [:table.ui.basic.table
+  [:table.ui.table
    [:thead>tr
     [:th.three.wide (t :users/username)]
     [:th.five.wide (t :users/fullname)]

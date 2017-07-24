@@ -1,5 +1,5 @@
 (ns shevek.components.form
-  (:require [reagent.core :as r :refer [dom-node create-class]]
+  (:require [reagent.core :as r]
             [shevek.lib.collections :refer [detect wrap-coll]]
             [shevek.lib.react :refer [with-react-keys]]
             [cuerdas.core :as str]
@@ -58,7 +58,7 @@
 
 ; El selected-title es necesario xq semantic muestra la opción seleccionada en el on-change nomás, y en el mount inicial sólo si selected no es nil. En el pinboard measure por ej. el selected arranca en nil y luego cuando llega la metadata se updatea con el selected, pero no se reflejaba en el dropdown xq ya se había ejecutado el $(..).dropdown() antes.
 (defn- dropdown [coll {:keys [placeholder selected class on-change] :or {on-change identity}} & content]
-  (let [bind-events #(when % (-> % dom-node js/$ (.dropdown #js {:onChange on-change})))]
+  (let [bind-events #(when % (-> % r/dom-node js/$ (.dropdown #js {:onChange on-change})))]
     [:div.ui.dropdown {:class class :ref bind-events}
      [:input {:type "hidden" :value (or selected "")}]
      (with-react-keys (if (seq content)
@@ -95,11 +95,22 @@
     (when dom-node
       (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
 
-(defn hold-to-confirm [holding f & {:keys [seconds-to-confirm i18n-title-key]
-                                    :or {seconds-to-confirm 2 i18n-title-key :actions/hold-delete}}]
-  (let [timeout #(when @holding (f))]
-    {:on-mouse-down #(reset! holding (js/setTimeout timeout (* seconds-to-confirm 1000)))
-     :on-mouse-up #(swap! holding js/clearTimeout)
-     :on-click #(.stopPropagation %)
-     :class (when @holding "holding")
-     :title (t i18n-title-key seconds-to-confirm)}))
+(defonce holding (r/atom nil))
+
+(defn cancel-timeout []
+  (when @holding
+    (swap! holding js/clearTimeout)))
+
+(defonce mouseup-listener
+  (do
+    (.addEventListener js/document "mouseup" cancel-timeout true)
+    true))
+
+(defn start-timeout [seconds action]
+  (reset! holding (js/setTimeout action (* seconds 1000))))
+
+(defn hold-to-confirm [on-confirm & {:keys [seconds-to-confirm i18n-title-key]
+                                     :or {seconds-to-confirm 2 i18n-title-key :actions/hold-delete}}]
+  {:on-mouse-down #(start-timeout seconds-to-confirm on-confirm)
+   :on-click #(.stopPropagation %)
+   :title (t i18n-title-key seconds-to-confirm)})

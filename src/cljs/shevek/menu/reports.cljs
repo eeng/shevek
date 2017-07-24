@@ -71,8 +71,7 @@
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
 (defn- report-item [_ form-data]
-  (let [holding (r/atom nil)
-        select-report #(do (dispatch :report-selected %) (close-popup))
+  (let [select-report #(do (dispatch :report-selected %) (close-popup))
         cubes (db/get :cubes)
         edit #(reset! form-data {:report % :editing? true})]
     (fn [{:keys [_id name description cube] :as report} _]
@@ -81,7 +80,7 @@
         [:div.cube (:title (cubes cube))]
         [:div.item-actions
          [:i.write.icon {:on-click (without-propagation edit report) :title (t :actions/edit)}]
-         [:i.trash.icon (hold-to-confirm holding #(dispatch :delete-report report))]]]
+         [:i.trash.icon (hold-to-confirm #(dispatch :delete-report report))]]]
        [:div.header name]
        [:div.description description]])))
 
