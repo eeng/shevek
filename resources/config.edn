@@ -39,14 +39,18 @@
               {:name "importe_productos"
                :title "Importe Productos"
                :expression "(/ (where {$grupo_item \"Productos\"} (sum $importe)) 100)"
-               :format "$0.00a"}
+               :format "$0.00a"
+               :favorite true}
               {:name "importe_impuestos"
                :title "Importe Impuestos"
                :expression "(/ (where {$grupo_item \"Impuestos\"} (sum $importe)) 100)"
                :format "$0.00a"}
               {:name "ultimo_nro_cbte"
                :title "Último Cbte"
-               :format "0,0"}]}
+               :format "0,0"}
+              {:name "unidades"
+               :title "Unidades"
+               :favorite true}]}
   {:name "eventos_pedidos"
    :title "Eventos de Pedidos"
    :description "Métricas de eventos producidos sobre pedidos cargados en VTOL"

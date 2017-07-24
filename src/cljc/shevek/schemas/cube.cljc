@@ -13,7 +13,8 @@
   (assoc NTD
          (s/optional-key :type) s/Str
          :expression s/Str
-         (s/optional-key :format) s/Str))
+         (s/optional-key :format) s/Str
+         (s/optional-key :favorite) s/Bool))
 
 (s/defschema Cube
   (assoc NTD
