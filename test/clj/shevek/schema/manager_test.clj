@@ -20,7 +20,7 @@
                                     [{:name "added" :type "longSum"}]]
                       "vtol_stats" [[{:name "path" :type "LONG"}]
                                     [{:name "requests" :type "hyperUnique"}]]))]
-      (let [cubes (discover! nil db)]
+      (let [cubes (do (discover! nil db) (find-cubes db))]
         (is (submaps? [{:name "wikiticker"} {:name "vtol_stats"}] cubes))
         (is (submaps? [{:name "region" :type "STRING"}
                        {:name "path" :type "LONG"}]
