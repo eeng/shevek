@@ -7,7 +7,7 @@
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.components.popup :refer [show-popup close-popup]]
-            [shevek.components.form :refer [kb-shortcuts input-field]]
+            [shevek.components.form :refer [kb-shortcuts input-field hold-to-confirm]]
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
@@ -70,14 +70,6 @@
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
-(defn hold-to-confirm [holding seconds-to-confirm i18n-title-key f]
-  (let [timeout #(when @holding (f))]
-    {:on-mouse-down #(reset! holding (js/setTimeout timeout (* seconds-to-confirm 1000)))
-     :on-mouse-up #(swap! holding js/clearTimeout)
-     :on-click #(.stopPropagation %)
-     :class (when @holding "holding")
-     :title (t i18n-title-key seconds-to-confirm)}))
-
 (defn- report-item [_ form-data]
   (let [holding (r/atom nil)
         select-report #(do (dispatch :report-selected %) (close-popup))
@@ -89,7 +81,7 @@
         [:div.cube (:title (cubes cube))]
         [:div.item-actions
          [:i.write.icon {:on-click (without-propagation edit report) :title (t :actions/edit)}]
-         [:i.trash.icon (hold-to-confirm holding 2 :reports/hold-delete #(dispatch :delete-report report))]]]
+         [:i.trash.icon (hold-to-confirm holding #(dispatch :delete-report report))]]]
        [:div.header name]
        [:div.description description]])))
 

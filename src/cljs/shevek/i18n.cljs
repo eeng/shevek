@@ -58,8 +58,7 @@
               :description "Description"
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
-              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
-              :hold-delete "Hold for {1} seconds to delete this report"}
+              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
     :share {:title "Share"
             :copy-url "Copy URL"
             :copied "URL Copied!"}
@@ -74,7 +73,7 @@
                :auto-refresh-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 10 minutes" 600] ["Every 30 minutes" 1800]])}
     :admin {:menu "Manage"
             :title "Management"
-            :subtitle "Configure the users, cube descriptions and other stuff in this page"
+            :subtitle "Configure the users who will be using the system and their permissions"
             :users "Users"}
     :users {:username "Username"
             :fullname "Full Name"
@@ -103,7 +102,8 @@
               :new "New"
               :delete "Delete"
               :close "Close"
-              :select "Select"}
+              :select "Select"
+              :hold-delete "Hold for {1} seconds to delete this record"}
     :input {:search "Search"}
     :validation {:required "can't be blank"
                  :regex "doesn't match pattern"
@@ -164,8 +164,7 @@
               :description "Descripción"
               :pin-in-dashboard "Mostrar en dashboard"
               :saved "Reporte '{1}' guardado correctamente"
-              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
-              :hold-delete "Clickee y mantenga presionado por {1} segundos para eliminar el reporte"}
+              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
     :share {:title "Compartir"
             :copy-url "Copiar URL"
             :copied "URL Copiado!"}
@@ -180,7 +179,7 @@
                :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])}
     :admin {:menu "Configurar"
             :title "Administración"
-            :subtitle "Configure los usuarios, descripciones de cubos y otras cuestiones aquí"
+            :subtitle "Configure los usuarios que podrán acceder al sistema y sus permisos"
             :users "Usuarios"}
     :users {:username "Usuario"
             :fullname "Nombre"
@@ -208,7 +207,8 @@
               :new "Nuevo"
               :delete "Eliminar"
               :close "Cerrar"
-              :select "Seleccionar"}
+              :select "Seleccionar"
+              :hold-delete "Clickee y mantenga presionado por {1} segundos para eliminar el reporte"}
     :input {:search "Buscar"}
     :validation {:required "este campo es obligatorio"
                  :email "no es una dirección válida"

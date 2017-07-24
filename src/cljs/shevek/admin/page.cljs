@@ -4,6 +4,6 @@
             [shevek.admin.users :refer [users-section]]))
 
 (defn page []
- [:div#settings.ui.container
+ [:div#admin.ui.container
   [page-title (t :admin/title) (t :admin/subtitle) "users"]
   [users-section]])

@@ -2,7 +2,7 @@
   (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title mail-to]]
-            [shevek.components.form :refer [input-field kb-shortcuts]]
+            [shevek.components.form :refer [input-field kb-shortcuts hold-to-confirm]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
@@ -63,17 +63,19 @@
             [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]]))))
 
 (defn- user-row [{:keys [username fullname email] :as original-user} edited-user]
-  [:tr
-   [:td username]
-   [:td fullname]
-   [:td (mail-to email)]
-   [:td.collapsing
-    [:button.ui.compact.basic.button
-     {:on-click #(reset! edited-user original-user)}
-     (t :actions/edit)]
-    [:button.ui.compact.basic.red.button
-     {:on-click #(dispatch :user-deleted original-user)}
-     (t :actions/delete)]]])
+  (let [holding (r/atom nil)]
+    (fn []
+      [:tr
+       [:td username]
+       [:td fullname]
+       [:td (mail-to email)]
+       [:td.collapsing
+        [:button.ui.compact.basic.button
+         {:on-click #(reset! edited-user original-user)}
+         (t :actions/edit)]
+        [:button.ui.compact.basic.red.button
+         (hold-to-confirm holding #(dispatch :user-deleted original-user))
+         (t :actions/delete)]]])))
 
 (defn- users-table [edited-user]
   [:table.ui.basic.table

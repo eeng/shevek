@@ -2,7 +2,8 @@
   (:require [reagent.core :as r :refer [dom-node create-class]]
             [shevek.lib.collections :refer [detect wrap-coll]]
             [shevek.lib.react :refer [with-react-keys]]
-            [cuerdas.core :as str]))
+            [cuerdas.core :as str]
+            [shevek.i18n :refer [t]]))
 
 (defn- classes [& css-classes]
   (->> css-classes (filter identity) (str/join " ")))
@@ -93,3 +94,12 @@
   (fn [dom-node]
     (when dom-node
       (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
+
+(defn hold-to-confirm [holding f & {:keys [seconds-to-confirm i18n-title-key]
+                                    :or {seconds-to-confirm 2 i18n-title-key :actions/hold-delete}}]
+  (let [timeout #(when @holding (f))]
+    {:on-mouse-down #(reset! holding (js/setTimeout timeout (* seconds-to-confirm 1000)))
+     :on-mouse-up #(swap! holding js/clearTimeout)
+     :on-click #(.stopPropagation %)
+     :class (when @holding "holding")
+     :title (t i18n-title-key seconds-to-confirm)}))
