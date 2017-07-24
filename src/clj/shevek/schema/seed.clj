@@ -17,3 +17,5 @@
 (defn seed! [db]
   (users db)
   (cubes db))
+
+#_(seed! shevek.db/db)

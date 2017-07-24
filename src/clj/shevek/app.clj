@@ -2,10 +2,11 @@
   (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [mount.core :as mount :refer [defstate]]
             [shevek.config :refer [config env? env]]
-            [shevek.web.server]
-            [shevek.db]
+            [shevek.web.server :refer [web-server]]
+            [shevek.db :refer [db]]
             [shevek.dw]
-            [shevek.schema.refresher]
+            [shevek.schema.refresher :refer [refresher]]
+            [shevek.schema.seed :refer [seed!]]
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as appenders]
             [schema.core :as s])
@@ -29,13 +30,17 @@
     (log/info "Starting app in" (env) "environment")))
 
 (defn start-without-nrepl []
-  (mount/start-without #'shevek.app/nrepl))
+  (mount/start-without #'nrepl))
 
 (defn start-db []
-  (mount/start-without #'shevek.app/nrepl #'shevek.web.server/web-server))
+  (mount/start-without #'nrepl #'web-server #'refresher))
 
 (defn start []
   (mount/start))
+
+(defn seed []
+  (start-db)
+  (seed! db))
 
 (defn -main [& args]
   (start))
