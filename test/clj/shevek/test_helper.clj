@@ -1,6 +1,8 @@
 (ns shevek.test-helper
   (:require [monger.db :refer [drop-db]]
             [shevek.app :refer [start start-db]]
+            [mount.core :as mount]
+            [shevek.schema.refresher :refer [refresher]]
             [shevek.db :refer [db init-db]]
             [clojure.test :refer [deftest testing]]
             [cuerdas.core :as str]
@@ -10,7 +12,7 @@
   (start-db))
 
 (defn init-acceptance-tests []
-  (start))
+  (mount/start-without #'refresher))
 
 (defmacro it [description & body]
   `(testing ~description
