@@ -105,7 +105,7 @@
               :delete "Delete"
               :close "Close"
               :select "Select"
-              :hold-delete "Hold for {1} seconds to delete this record"}
+              :hold-delete "You must click the button and hold for {1} seconds to confirm"}
     :input {:search "Search"}
     :validation {:required "can't be blank"
                  :regex "doesn't match pattern"
@@ -211,7 +211,7 @@
               :delete "Eliminar"
               :close "Cerrar"
               :select "Seleccionar"
-              :hold-delete "Clickee y mantenga presionado por {1} segundos para eliminar el reporte"}
+              :hold-delete "Clickee en el botón y mantenga presionado por {1} segundos para confirmar"}
     :input {:search "Buscar"}
     :validation {:required "este campo es obligatorio"
                  :email "no es una dirección válida"

@@ -3,7 +3,8 @@
             [shevek.lib.collections :refer [detect wrap-coll]]
             [shevek.lib.react :refer [with-react-keys]]
             [cuerdas.core :as str]
-            [shevek.i18n :refer [t]]))
+            [shevek.i18n :refer [t]]
+            [shevek.notification :refer [notify]]))
 
 (defn- classes [& css-classes]
   (->> css-classes (filter identity) (str/join " ")))
@@ -96,21 +97,24 @@
       (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
 
 (defonce holding (r/atom nil))
+(def holding-time 2)
 
 (defn cancel-timeout []
   (when @holding
-    (swap! holding js/clearTimeout)))
+    (swap! holding js/clearTimeout)
+    (notify (t :actions/hold-delete holding-time) :type :info)))
 
 (defonce mouseup-listener
   (do
     (.addEventListener js/document "mouseup" cancel-timeout true)
     true))
 
-(defn start-timeout [seconds action]
-  (reset! holding (js/setTimeout action (* seconds 1000))))
+(defn start-timeout [action]
+  (let [later (fn []
+                (action)
+                (reset! holding nil))]
+    (reset! holding (js/setTimeout later (* holding-time 1000)))))
 
-(defn hold-to-confirm [on-confirm & {:keys [seconds-to-confirm i18n-title-key]
-                                     :or {seconds-to-confirm 2 i18n-title-key :actions/hold-delete}}]
-  {:on-mouse-down #(start-timeout seconds-to-confirm on-confirm)
-   :on-click #(.stopPropagation %)
-   :title (t i18n-title-key seconds-to-confirm)})
+(defn hold-to-confirm [on-confirm]
+  {:on-mouse-down #(start-timeout on-confirm)
+   :on-click #(.stopPropagation %)})
