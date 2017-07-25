@@ -26,7 +26,7 @@
 (def user-validations
   {:username (v/required)
    :fullname (v/required)
-   :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
+   :password (v/regex #"\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z"
                       {:when #(or (new-record? %) (seq (:password %))) :msg :validation/password})
    :password-confirmation (v/confirmation :password {:when (comp seq :password)})
    :email (v/email {:optional? true})})
