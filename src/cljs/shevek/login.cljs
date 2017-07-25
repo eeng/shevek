@@ -16,6 +16,9 @@
 (defn logged-in? []
   (some? (current-user)))
 
+(defn admin? []
+  (:admin (current-user)))
+
 (defn extract-user [token]
   (when token
     (try

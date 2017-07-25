@@ -5,7 +5,7 @@
 
 (deftest call-fn-tests
   (it "allows to functions"
-    (is (= [] (rpc/call-fn {:params {:fn "users.api/find-all"}}))))
+    (is (= [] (rpc/call-fn {:params {:fn "schema.api/cubes"}}))))
 
   (testing "only apis namespaces are allowed"
-    (is (thrown? AssertionError (rpc/call-fn {:params {:fn "users.repository/find-users"}})))))
+    (is (thrown? AssertionError (rpc/call-fn {:params {:fn "schema.repository/find-cubes"}})))))

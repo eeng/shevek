@@ -16,8 +16,11 @@
 (defn should-be-authenticated [request]
   (some? (:identity request)))
 
-(defn not-authenticated [request value]
+(defn not-authenticated [request _]
   {:status 401 :body {:error "Not authenticated"}})
+
+(defn not-authorized [request _]
+  {:status 403 :body {:error "Not authorized"}})
 
 (defroutes app-routes
   (GET "/" [] (-> "public/index.html" io/resource slurp))
@@ -28,10 +31,12 @@
 
 ; This needs to be a defn a not a def because of the config which will only be available after mount/start
 (defn app []
-  (-> app-routes
-      (wrap-request-logging)
-      (wrap-current-user)
-      (wrap-authentication (backends/jws {:secret (config :jwt-secret)}))
-      (wrap-restful-format :params-options {:transit-json {:handlers th/read-handlers}}
-                           :response-options {:transit-json {:handlers th/write-handlers}})
-      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))
+  (let [backend (backends/jws {:secret (config :jwt-secret) :unauthorized-handler not-authorized})]
+    (-> app-routes
+        (wrap-request-logging)
+        (wrap-current-user)
+        (wrap-authentication backend)
+        (wrap-authorization backend)
+        (wrap-restful-format :params-options {:transit-json {:handlers th/read-handlers}}
+                             :response-options {:transit-json {:handlers th/write-handlers}})
+        (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false)))))

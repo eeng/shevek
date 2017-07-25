@@ -1,5 +1,6 @@
 (ns shevek.lib.auth
   (:require [buddy.sign.jwt :as jwt]
+            [buddy.auth :refer [throw-unauthorized]]
             [shevek.db :refer [db]]
             [shevek.users.repository :as users]
             [shevek.config :refer [config]]
@@ -32,7 +33,13 @@
   "Store the user-id from the identity inserted by buddy, for easy access in the api functions"
   [handler]
   (fn [{:keys [identity] :as request}]
-    (handler (assoc request :user-id (when identity (oid (:id identity)))))))
+    (handler (assoc request
+                    :user-id (when identity (oid (:id identity)))
+                    :user identity))))
+
+(defn authorize [authorized?]
+  (when-not authorized?
+    (throw-unauthorized)))
 
 #_(def token (:token (authenticate db {:username "emma" :password "asdf654"})))
 #_(jwt/unsign token (config :jwt-secret))

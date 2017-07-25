@@ -4,6 +4,7 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
+            [shevek.navegation :refer [navigate]]
             [shevek.components.modal :refer [show-modal]]
             [shevek.lib.session-storage :as session-storage]))
 
@@ -18,9 +19,6 @@
   ([db] (assoc db :loading {}))
   ([db key] (update db :loading dissoc key)))
 
-(defn handle-not-authenticated []
-  (dispatch :session-expired))
-
 (defn handle-app-error [{:keys [status status-text response]}]
   (show-modal {:class "small basic"
                :header [:div.ui.icon.red.header
@@ -29,9 +27,17 @@
                :content response
                :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]}))
 
+(defn handle-not-authenticated []
+  (dispatch :session-expired))
+
+(defn handle-not-authorized [error]
+  (handle-app-error error)
+  (navigate "/"))
+
 (defevh :server-error [db {:keys [status] :as error}]
   (case status
     401 (handle-not-authenticated)
+    403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
     (handle-app-error error))
   (loaded db))
 

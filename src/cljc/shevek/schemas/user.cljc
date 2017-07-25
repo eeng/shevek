@@ -8,3 +8,6 @@
    :admin s/Bool
    (s/optional-key :email) s/Str
    (s/optional-key :_id) s/Any})
+
+(defn admin? [user]
+  (:admin user))

@@ -6,7 +6,7 @@
             [shevek.rpc :refer [loading?]]
             [shevek.components.popup :refer [popup]]
             [shevek.components.modal :refer [modal]]
-            [shevek.login :as login :refer [logged-in?]]
+            [shevek.login :as login :refer [logged-in? admin?]]
             [shevek.dashboard :as dashboard]
             [shevek.admin.page :as admin]
             [shevek.notification :refer [notification]]
@@ -36,8 +36,9 @@
    [:div.right.menu
     (when (current-page? :viewer) [share-menu])
     [settings-menu]
-    [:a.icon.item {:href "#/admin" :class (current-page-class :admin) :title (t :admin/menu)}
-     [:i.users.icon]]
+    (when (admin?)
+      [:a.icon.item {:href "#/admin" :class (current-page-class :admin) :title (t :admin/menu)}
+       [:i.users.icon]])
     [account-menu]
     [:a.item {:on-click #(dispatch :logout)}
      [:i.sign.out.icon] (t :menu/logout)]]])
