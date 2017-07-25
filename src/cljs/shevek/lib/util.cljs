@@ -14,15 +14,5 @@
   [f wait]
   (partial (variable-debounce f) wait))
 
-(def regex-char-esc-smap
-  (let [esc-chars "()&^%$#!?*."]
-    (zipmap esc-chars
-            (map #(str "\\" %) esc-chars))))
-
-(defn regex-escape [string]
-  (->> string
-       (replace regex-char-esc-smap)
-       (apply str)))
-
 (defn new-record? [{:keys [_id id]}]
   (and (nil? _id) (nil? id)))

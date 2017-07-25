@@ -10,6 +10,7 @@
             [shevek.lib.dw.dims :refer [time-dimension? add-dimension]]
             [cuerdas.core :as str]
             [shevek.lib.react :refer [rmap]]
+            [shevek.lib.string :refer [format-bool]]
             [shevek.lib.dates :refer [parse-time format-time]]))
 
 (def limit 100)
@@ -17,7 +18,7 @@
 (defn- format-dimension [{:keys [type] :as dim} result]
   (let [value (dimension-value dim result)]
     (cond
-      (= "BOOL" type) (t (keyword (str "boolean/" value)))
+      (= "BOOL" type) (format-bool value)
       (sequential? value) (str/join ", " value)
       (time-dimension? dim) (-> value parse-time format-time)
       :else value)))

@@ -2,7 +2,8 @@
   (:require-macros [shevek.reflow.macros :refer [defevh defevhi]])
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch]]
-            [shevek.lib.util :refer [debounce regex-escape]]
+            [shevek.lib.util :refer [debounce]]
+            [shevek.lib.string :refer [regex-escape]]
             [shevek.lib.collections :refer [includes?]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.i18n :refer [t]]

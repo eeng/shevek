@@ -6,7 +6,7 @@
             [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
             [shevek.lib.dw.time :refer [format-interval]]
             [shevek.lib.number :as num]
-            [shevek.lib.util :refer [debounce regex-escape]]
+            [shevek.lib.util :refer [debounce]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.lib.dw.dims :refer [dim= add-dimension remove-dimension time-dimension?]]
@@ -16,7 +16,8 @@
             [schema.core :as s]
             [goog.string :as gstr]
             [cuerdas.core :as str]
-            [shevek.lib.logger :as log]))
+            [shevek.lib.logger :as log]
+            [shevek.lib.string :refer [format-bool regex-escape]]))
 
 (defn- viewer [& keys]
   (db/get-in (into [:viewer] keys)))
@@ -82,7 +83,7 @@
   (cond
     (nil? value) "Ø"
     (time-dimension? dim) (format-time-according-to-period value granularity)
-    (= "BOOL" type) (t (keyword (str "boolean/" value)))
+    (= "BOOL" type) (format-bool value)
     :else value))
 
 (defn format-dimension [dim result]

@@ -9,7 +9,8 @@
             [reagent.core :as r]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch]]
-            [shevek.lib.util :refer [new-record?]]))
+            [shevek.lib.util :refer [new-record?]]
+            [shevek.lib.string :refer [format-bool]]))
 
 (defevh :users-arrived [db users]
   (-> (assoc db :users users)
@@ -26,7 +27,7 @@
 (def user-validations
   {:username (v/required)
    :fullname (v/required)
-   :password (v/regex #"\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z"
+   :password (v/regex #"^(?=.*[a-zA-Z])(?=.*[\d!@#\$%\^&\*]).{7,30}$"
                       {:when #(or (new-record? %) (seq (:password %))) :msg :validation/password})
    :password-confirmation (v/confirmation :password {:when (comp seq :password)})
    :email (v/email {:optional? true})})
@@ -59,14 +60,16 @@
                                                              :placeholder (when-not new-user? (t :users/password-hint))
                                                              :class (when new-user? "required") :type "password"}]
             [input-field edited-user :email {:label (t :users/email)}]
+            [input-field edited-user :admin {:label (t :users/admin) :as :checkbox :input-class "toggle"}]
             [:button.ui.primary.button {:on-click save} (t :actions/save)]
             [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]]))))
 
-(defn- user-row [{:keys [username fullname email] :as original-user} edited-user]
+(defn- user-row [{:keys [username fullname email admin] :as original-user} edited-user]
   [:tr
    [:td username]
    [:td fullname]
    [:td (mail-to email)]
+   [:td.center.aligned (format-bool admin)]
    [:td.collapsing
     [:button.ui.compact.basic.button
      {:on-click #(reset! edited-user original-user)}
@@ -81,8 +84,9 @@
     [:th.three.wide (t :users/username)]
     [:th.five.wide (t :users/fullname)]
     [:th (t :users/email)]
+    [:th.center.aligned (t :users/admin)]
     [:th.right.aligned
-     [:button.ui.button {:on-click #(reset! edited-user {})} (t :actions/new)]]]
+     [:button.ui.button {:on-click #(reset! edited-user {:admin false})} (t :actions/new)]]]
    [:tbody
     (for [user (db/get :users)]
       ^{:key (:username user)} [user-row user edited-user])]])

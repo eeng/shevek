@@ -78,6 +78,7 @@
     :users {:username "Username"
             :fullname "Full Name"
             :email "Email"
+            :admin "Admin"
             :password "Password"
             :password-confirmation "Password Confirmation"
             :invalid-credentials "Invalid username or password"
