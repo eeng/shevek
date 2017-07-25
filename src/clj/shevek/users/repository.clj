@@ -2,14 +2,8 @@
   (:require [schema.core :as s]
             [monger.collection :as mc]
             [monger.query :as mq]
-            [bcrypt-clj.auth :refer [crypt-password]]))
-
-(s/defschema User
-  {:username s/Str
-   :fullname s/Str
-   :password (s/constrained s/Str (comp pos? count))
-   (s/optional-key :email) s/Str
-   (s/optional-key :_id) s/Any})
+            [bcrypt-clj.auth :refer [crypt-password]]
+            [shevek.schemas.user :refer [User]]))
 
 (defn find-users [db]
   (mq/with-collection db "users"

@@ -5,7 +5,7 @@
             [monger.db :refer [drop-db]]
             [shevek.db :refer [db init-db]]
             [shevek.config :refer [config]]
-            [shevek.users.repository :refer [User]]
+            [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
             [clojure.string :as str]))
 

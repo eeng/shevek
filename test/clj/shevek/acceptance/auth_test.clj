@@ -3,7 +3,7 @@
             [shevek.acceptance.test-helper :refer :all]
             [etaoin.api :as e :refer [refresh]]
             [etaoin.keys :as k]
-            [shevek.users.repository :refer [User]]
+            [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
             [shevek.lib.auth :refer [token-expiration]]
             [clj-time.core :as t]))

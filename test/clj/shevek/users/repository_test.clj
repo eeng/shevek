@@ -3,7 +3,8 @@
             [shevek.test-helper :refer [it]]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [without?]]
-            [shevek.users.repository :refer [User find-users save-user reload]]
+            [shevek.users.repository :refer [find-users save-user reload]]
+            [shevek.schemas.user :refer [User]]
             [shevek.db :refer [db]]
             [bcrypt-clj.auth :refer [check-password]]))
 

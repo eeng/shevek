@@ -5,7 +5,7 @@
             [shevek.config :refer [config]]
             [shevek.asserts :refer [submap? without?]]
             [shevek.makers :refer [make!]]
-            [shevek.users.repository :refer [User]]
+            [shevek.schemas.user :refer [User]]
             [shevek.db :refer [db]]
             [buddy.sign.jwt :as jwt]
             [clj-time.core :as t]))

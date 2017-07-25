@@ -2,7 +2,8 @@
   (:require [schema-generators.complete :as c]
             [shevek.schema.repository :refer [save-cube]]
             [shevek.schemas.cube :refer [Cube]]
-            [shevek.users.repository :refer [User save-user]]
+            [shevek.schemas.user :refer [User]]
+            [shevek.users.repository :refer [save-user]]
             [shevek.db :refer [db]]))
 
 (def makers {Cube save-cube
