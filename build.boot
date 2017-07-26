@@ -32,9 +32,10 @@
                     [cljs-ajax "0.5.8"]
                     [secretary "1.2.3"]
                     [funcool/cuerdas "2.0.3"]
-                    [com.andrewmcveigh/cljs-time "0.5.0-alpha2"]
+                    [clj-time "0.14.0"]
+                    [com.andrewmcveigh/cljs-time "0.5.0"]
                     [com.taoensso/timbre "4.8.0"]
-                    [com.rpl/specter "1.0.0"]
+                    [com.rpl/specter "1.0.2"]
                     [prismatic/schema "1.1.6"]
                     [metosin/schema-tools "0.9.0"]
                     [prismatic/schema-generators "0.1.0"]
@@ -73,25 +74,23 @@
         (throw (ex-info "Function not found" {:namespace namespace :function function}))))
     fileset))
 
-(deftask build
-  "Build ClojureScript a Less files."
+(deftask build-dev-frontend
+  "Build ClojureScript and Less files."
   []
-  (comp (cljs)
-        (less)
+  (comp (cljs :optimizations :none :source-map true)
+        (less :source-map true)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (target)))
 
 (deftask build-and-start-app-for-dev []
-  (comp (build)
+  (comp (build-dev-frontend)
         (with-pass-thru _
           (shevek.app/start-without-nrepl))))
 
 (deftask dev-config []
   (merge-env! :source-paths #{"dev/clj"} :resource-paths #{"dev/resources"})
   (System/setProperty "conf" "dev/resources/config.edn")
-  (task-options! cljs {:optimizations :none :source-map true}
-                 less {:source-map  true}
-                 target {:dir #{"target/dev"}})
+  (task-options! target {:dir #{"target/dev"}})
   identity)
 
 (deftask dev
@@ -116,9 +115,7 @@
 (deftask test-config []
   (merge-env! :source-paths #{"test/clj" "test/cljc" "test/cljs"} :resource-paths #{"test/resources"})
   (System/setProperty "conf" "test/resources/config.edn")
-  (task-options! cljs {:optimizations :none :source-map true}
-                 less {:source-map  true}
-                 target {:dir #{"target/test"}})
+  (task-options! target {:dir #{"target/test"}})
   identity)
 
 (deftask test-clj
@@ -138,7 +135,7 @@
   "Run the acceptance tests."
   []
   (comp (test-config)
-        (build)
+        (build-dev-frontend)
         ; Hay que levantar la app (con nrepl) desde el on-start y no desde boot porque sino el test al correr en un pod no ve los mount states.
         (alt-test :test-matcher #".*acceptance\.(?!test\-helper).*"
                   :on-start 'shevek.test-helper/init-acceptance-tests)))
@@ -154,3 +151,15 @@
   "Seeds the application data."
   []
   (run :namespace "shevek.app" :function "seed"))
+
+(deftask package
+  "Package the project for deploy. Then start with: java -Dconf=dist/config.edn -jar dist/shevek.jar"
+  []
+  (comp (cljs :optimizations :advanced)
+        (less)
+        (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
+        (aot :all true)
+        (uber)
+        (jar :file "shevek.jar" :main 'shevek.app)
+        (sift :include #{#"shevek.jar" #"config.edn"})
+        (target :dir #{"dist"})))

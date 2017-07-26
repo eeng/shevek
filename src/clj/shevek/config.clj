@@ -5,7 +5,8 @@
 (defstate cfg :start (load-config))
 
 (defn config [& keys]
-  (get-in cfg keys))
+  (or (get-in cfg keys)
+      (throw (Exception. (str "Configuration error, property missing: " keys)))))
 
 (defn env []
   (config :env))

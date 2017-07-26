@@ -11,7 +11,7 @@
 
 (defn cubes [db]
   (debug "Seeding schema.")
-  (let [{:keys [cubes]} (load-config :file "resources/config.edn")]
+  (let [{:keys [cubes]} (load-config)]
     (update-cubes db cubes)))
 
 (defn seed! [db]

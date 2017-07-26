@@ -1,8 +1,9 @@
 /target
+/dist
+/out
 *.jar
 *.class
 /.lein-*
 /.nrepl-*
-/out
 .DS_Store
 log

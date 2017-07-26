@@ -43,4 +43,5 @@
   (seed! db))
 
 (defn -main [& args]
-  (start))
+  (start)
+  (.addShutdownHook (Runtime/getRuntime) (Thread. mount/stop)))
