@@ -1,5 +1,18 @@
+@background-color: #F7F7F7;
+
 body {
   background-color: #F7F7F7;
+}
+
+.preloader {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: url(../images/preloader.svg) center no-repeat @background-color;
+  pointer-events: none; // So acceptance test can click through
 }
 
 .ui.fixed.menu {
