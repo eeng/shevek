@@ -5,9 +5,9 @@
             [cprop.core :refer [load-config]]))
 
 (defn users [db]
-  (when-not (users/find-by-username db "admin")
+  (when-not (users/find-by db {:admin true})
     (debug "Seeding admin user.")
-    (users/save-user db {:username "admin" :fullname "Administrator" :password "asdf654" :admin true})))
+    (users/create-or-update-by db :username {:username "admin" :fullname "Administrator" :password "asdf654" :admin true})))
 
 (defn cubes [db]
   (debug "Seeding schema.")
