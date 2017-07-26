@@ -77,7 +77,8 @@
 (deftask build-dev-frontend
   "Build ClojureScript and Less files."
   []
-  (comp (cljs :optimizations :none :source-map true)
+  (comp (cljs :optimizations :none :source-map true
+              :compiler-options {:external-config {:devtools/config {:features-to-install [:formatters :hints :async]}}})
         (less :source-map true)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (target)))
@@ -155,7 +156,7 @@
 (deftask package
   "Package the project for deploy. Then start with: java -Dconf=dist/config.edn -jar dist/shevek.jar"
   []
-  (comp (cljs :optimizations :advanced)
+  (comp (cljs :optimizations :advanced :compiler-options {:externs ["src/externs/jquery.js" "src/externs/semantic-ui.js"]})
         (less)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (aot :all true)

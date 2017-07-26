@@ -6,7 +6,7 @@
  :mongodb-uri "mongodb://localhost/shevek"
  :druid-uri "http://localhost:8082"
 
- ; You should change this
+ ; You should change this, preferably with an environment variable
  :jwt-secret "bca6cbe12667824fe817a2fef73e1c2d3f2387859a08c549"
 
  ; Set to 0 to disable auto discovery (in seconds)

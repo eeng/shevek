@@ -2,5 +2,4 @@
  :init-fns [shevek.app/init]
  :boot-reload {:on-jsload shevek.app/init}
  :compiler-options {:asset-path "js/app.out"
-                    :parallel-build true
-                    :external-config {:devtools/config {:features-to-install [:formatters :hints :async]}}}}
+                    :parallel-build true}}
