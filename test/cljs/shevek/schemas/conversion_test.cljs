@@ -29,7 +29,7 @@
                   (-> {:split [{:name "page" :type "t" :limit 10
                                 :sort-by {:name "page" :type "t" :descending true}}
                                {:name "time" :type "t" :granularity "P1D"
-                                :sort-by {:name "count" :type "t" :expression "e" :format "f" :descending false}}]}
+                                :sort-by {:name "count" :type "t" :expression "e" :format "f" :descending false :favorite true}}]}
                       viewer->report :split))))
 
   (testing "should convert the pinboard"

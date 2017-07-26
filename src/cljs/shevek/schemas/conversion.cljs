@@ -40,7 +40,7 @@
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
 (defn- viewer-dim->report [{:keys [period interval value sort-by] :as dim}]
-  (cond-> (dissoc dim :type :title :description :format :expression)
+  (cond-> (dissoc dim :type :title :description :format :expression :favorite)
           period (update :period name)
           interval (update :interval (partial map to-iso8601))
           value (update :value vec)
