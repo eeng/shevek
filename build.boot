@@ -156,7 +156,9 @@
 (deftask package
   "Package the project for deploy. Then start with: java -Dconf=dist/config.edn -jar dist/shevek.jar"
   []
-  (comp (cljs :optimizations :advanced :compiler-options {:externs ["src/externs/jquery.js" "src/externs/semantic-ui.js"]})
+  (comp (cljs :optimizations :advanced
+              :compiler-options {:externs ["src/externs/jquery.js" "src/externs/semantic-ui.js"]
+                                 :closure-defines {"goog.DEBUG" false}})
         (less)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (aot :all true)
