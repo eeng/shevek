@@ -20,7 +20,7 @@
   ([db key] (update db :loading dissoc key)))
 
 (defn handle-app-error [{:keys [status status-text response]}]
-  (show-modal {:class "small basic"
+  (show-modal {:class "small basic app-error"
                :header [:div.ui.icon.red.header
                         [:i.warning.circle.icon]
                         (str "Error " status ": " status-text)]

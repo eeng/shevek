@@ -40,7 +40,10 @@
   (reset! error nil)
   (POST "/login" {:params @user
                   :handler #(dispatch :login-successful %)
-                  :error-handler #(dispatch :login-failed)})
+                  :error-handler (fn [{:keys [status] :as response}]
+                                   (if (= status 401)
+                                     (dispatch :login-failed)
+                                     (dispatch :server-error response)))})
   (rpc/loading db :logging-in))
 
 (defevh :logout [db]
