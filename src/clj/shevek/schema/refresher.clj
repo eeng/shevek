@@ -4,14 +4,15 @@
             [taoensso.timbre :refer [info error]]
             [shevek.config :refer [config]]
             [shevek.schema.manager :refer [discover!]]
-            [shevek.schema.seed :refer [seed!]]
+            [shevek.schema.seed :as seed :refer [seed!]]
             [shevek.dw :refer [dw]]
             [shevek.db :refer [db]]))
 
 (defn- refresh []
   (try
+    (seed/users db)
     (discover! dw db)
-    (seed! db)
+    (seed/cubes db)
     (catch Exception e
       (error e))))
 
