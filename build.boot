@@ -6,7 +6,7 @@
                     [adzerk/boot-reload "0.5.1" :scope "test"]
                     [com.cemerick/piggieback "0.2.1" :scope "test"] ; Needed by boot-cljs-repl
                     [weasel "0.7.0" :scope "test"] ; Needed by boot-cljs-repl
-                    [org.clojure/tools.nrepl "0.2.12" :scope "test"] ; Needed by boot-cljs-repl
+                    [org.clojure/tools.nrepl "0.2.12"]
                     [adzerk/boot-cljs-repl "0.3.3"]
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [samestep/boot-refresh "0.1.0" :scope "test"]
