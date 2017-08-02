@@ -1,2 +1,2 @@
 server "druid"
-set :branch, "production"
+set :branch, "master"
