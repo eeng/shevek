@@ -1,0 +1,6 @@
+{
+    "error": "Query timeout",
+    "errorMessage": "Timeout waiting for task.",
+    "errorClass": "java.util.concurrent.TimeoutException",
+    "host": "druid:8083"
+}

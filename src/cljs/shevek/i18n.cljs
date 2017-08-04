@@ -113,7 +113,8 @@
                  :password "must have a combination of at least 7 letters and numbers (or symbols)"
                  :confirmation "doesn't match the previous value"}
     :boolean {:true "Yes"
-              :false "No"}}
+              :false "No"}
+    :errors {"Query timeout" "The query is taking longer than expected. Please try with a shorter period."}}
 
    :es
    {:menu {:logout "Salir"}
@@ -218,7 +219,8 @@
                  :password "debería tener al menos 7 letras y números (o símbolos)"
                  :confirmation "no coincide con el valor anterior"}
     :boolean {:true "Si"
-              :false "No"}}
+              :false "No"}
+    :errors {"Query timeout" "La consulta está demorando demasiado. Por favor, intente con un período más corto."}}
 
    :tongue/fallback :en})
 

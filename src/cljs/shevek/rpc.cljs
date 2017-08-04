@@ -3,7 +3,7 @@
   (:require [ajax.core :refer [POST]]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
-            [shevek.i18n :refer [t]]
+            [shevek.i18n :refer [t translation]]
             [shevek.navegation :refer [navigate]]
             [shevek.components.modal :refer [show-modal]]
             [shevek.lib.session-storage :as session-storage]))
@@ -20,12 +20,15 @@
   ([db key] (update db :loading dissoc key)))
 
 (defn handle-app-error [{:keys [status status-text response]}]
-  (show-modal {:class "small basic app-error"
-               :header [:div.ui.icon.red.header
-                        [:i.warning.circle.icon]
-                        (str "Error " status ": " status-text)]
-               :content response
-               :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]}))
+  (let [error (:error response)
+        status-text (or error status-text)
+        message (or (and error (translation :errors error)) response)]
+    (show-modal {:class "small basic app-error"
+                 :header [:div.ui.icon.red.header
+                          [:i.warning.circle.icon]
+                          (str "Error " status ": " status-text)]
+                 :content message
+                 :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]})))
 
 (defn handle-not-authenticated []
   (dispatch :session-expired))

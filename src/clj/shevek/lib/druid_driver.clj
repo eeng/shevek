@@ -1,7 +1,8 @@
 (ns shevek.lib.druid-driver
   (:require [clj-http.client :as http]
             [taoensso.timbre :as log]
-            [shevek.logging :refer [pp-str]]))
+            [shevek.logging :refer [pp-str]]
+            [cheshire.core :refer [parse-string]]))
 
 (defprotocol DruidDriver
   (datasources [this])
@@ -14,10 +15,12 @@
   (datasources [_]
     (:body (http/get (str uri "/druid/v2/datasources") {:as :json :conn-timeout 10000})))
 
-  ; TODO en el :context de la q se le puede pasar un timeout
   (send-query [_ dq]
     (log/debug "Sending query to druid:\n" (pp-str dq))
-    (:body (http/post (str uri "/druid/v2") {:content-type :json :form-params dq :as :json}))))
+    (try
+      (:body (http/post (str uri "/druid/v2") {:content-type :json :form-params dq :as :json}))
+      (catch clojure.lang.ExceptionInfo e
+        (throw (ex-info "Druid error" (-> e ex-data :body (parse-string true))))))))
 
 (defn connect [uri]
   (Druid. uri))

@@ -81,12 +81,16 @@
     (-> (assoc dq :intervals (str/join "/" (-> time-filters first :interval)))
         (assoc-if-seq :filter (->> normal-filters (filter with-value?) to-druid-filter)))))
 
+(defn add-timeout [dq]
+  (assoc-in dq [:context :timeout] 30000))
+
 (defn to-druid-query [{:keys [cube filter measures dimension] :as q}]
   (-> {:queryType (calculate-query-type q)
        :dataSource {:type "table" :name cube}}
       (add-druid-filters filter)
       (add-druid-measures (concat measures (sort-by-derived-measures dimension measures)))
-      (add-query-type-dependant-fields q)))
+      (add-query-type-dependant-fields q)
+      (add-timeout)))
 
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]
   (condp = queryType

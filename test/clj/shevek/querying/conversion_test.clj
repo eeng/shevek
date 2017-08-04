@@ -125,7 +125,10 @@
                                         :fields [{:type "fieldAccess" :fieldName "_t1"}
                                                  {:type "constant" :value 20}]}]}
                    (to-druid-query {:measures [{:name "a1" :expression "(/ (sum $amount) 10)"}
-                                               {:name "a2" :expression "(* (sum $amount) 20)"}]}))))))
+                                               {:name "a2" :expression "(* (sum $amount) 20)"}]})))))
+
+  (testing "timeout"
+    (is (= 30000 (get-in (to-druid-query {}) [:context :timeout])))))
 
 (deftest from-druid-results-test
   (testing "topN results"
