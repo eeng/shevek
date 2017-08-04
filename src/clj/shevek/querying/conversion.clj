@@ -56,7 +56,8 @@
            :granularity (if dimension
                           {:type "period" :period (:granularity dimension)}
                           {:type "all"})
-           :descending (get-in dimension [:sort-by :descending] false))))
+           :descending (get-in dimension [:sort-by :descending] false)
+           :context {:skipEmptyBuckets true})))
 
 (defn- with-value? [{:keys [operator value]}]
   (or (= "is" operator) (seq value)))
