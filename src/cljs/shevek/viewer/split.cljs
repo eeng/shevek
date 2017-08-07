@@ -74,7 +74,7 @@
          [:div.ui.form
           (when (time-dimension? dim)
             [:div.field.periods
-             [:label (t :cubes/granularity)]
+             [:label (t :viewer/granularity)]
              [:div.ui.five.small.basic.buttons
               (for [[period title] granularities]
                 [:button.ui.button {:key period
@@ -82,7 +82,7 @@
                                     :on-click #(swap! opts assoc :granularity period)}
                  title])]])
           [:div.field
-           [:label (t :cubes/sort-by)]
+           [:label (t :viewer/sort-by)]
            [:div.flex.field
             [select (map (juxt :title :name) posible-sort-bys)
              {:class "fluid selection" :selected (get-in @opts [:sort-by :name])
@@ -92,7 +92,7 @@
              {:on-click #(swap! opts update-in [:sort-by :descending] not)}
              [:i.long.arrow.icon {:class (if desc "down" "up")}]]]]
           [:div.field
-           [:label (t :cubes/limit)]
+           [:label (t :viewer/limit)]
            [select (map (juxt identity identity) [5 10 25 50 100])
             {:selected (:limit @opts) :on-change #(swap! opts assoc :limit (str/parse-int %))}]]
           [:button.ui.primary.compact.button
@@ -114,6 +114,6 @@
 
 (defn split-panel []
   [:div.split.panel (droppable #(dispatch :split-dimension-added %))
-   [panel-header (t :cubes/split)]
+   [panel-header (t :viewer/split)]
    (for [dim (viewer :split)]
      ^{:key (:name dim)} [split-item dim])])

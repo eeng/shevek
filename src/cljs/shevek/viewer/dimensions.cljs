@@ -46,7 +46,7 @@
                                (sort-by :title))
             search-text @search]
         [:div.dimensions.panel.ui.basic.segment (loading-class :cube-metadata)
-         [panel-header (t :cubes/dimensions) [search-button searching]]
+         [panel-header (t :viewer/dimensions) [search-button searching]]
          (when @searching
            [search-input search {:on-stop #(reset! searching false)}])
          [:div.items

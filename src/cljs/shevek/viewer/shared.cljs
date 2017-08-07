@@ -7,7 +7,7 @@
             [shevek.lib.dw.time :refer [format-interval]]
             [shevek.lib.number :as num]
             [shevek.lib.util :refer [debounce]]
-            [shevek.i18n :refer [t]]
+            [shevek.i18n :refer [t translation]]
             [shevek.rpc :as rpc]
             [shevek.lib.dw.dims :refer [dim= add-dimension remove-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
@@ -129,7 +129,7 @@
                   (-> (first value) (format-dim-value dim) (str/prune 15))
                   (count value))]
     (cond
-      period [:span (->> (name period) (str "cubes.period/") keyword t)]
+      period [:span (translation :viewer.period period)]
       interval [:span (format-interval interval)]
       :else [:span title " "
              (when (seq value)

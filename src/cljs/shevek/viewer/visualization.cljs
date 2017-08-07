@@ -35,11 +35,11 @@
    [:div.dimension-value (format-dimension dim result)]
    [:div.buttons
     [:button.ui.primary.compact.button
-     {:on-click #(dispatch :table-row-filtered filter-path "include")}
+     {:on-click #(dispatch :pivot-table-row-filtered filter-path "include")}
      (t :actions/select)]
     [:button.ui.compact.button
-     {:on-click #(dispatch :table-row-filtered filter-path "exclude")}
-     (t :cubes.operator/exclude)]
+     {:on-click #(dispatch :pivot-table-row-filtered filter-path "exclude")}
+     (t :viewer.operator/exclude)]
     [:button.ui.compact.button
      {:on-click #(do (close-popup)
                    (dispatch :viewer/raw-data-requested (build-filter dim {:operator "include" :value #{(dimension-value dim result)}})))}

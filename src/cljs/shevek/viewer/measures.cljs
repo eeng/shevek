@@ -23,7 +23,7 @@
 (defn- measures-panel []
   (let [selected-measures (viewer :measures)]
     [:div.measures.panel.ui.basic.segment (rpc/loading-class :cube-metadata)
-     [panel-header (t :cubes/measures)]
+     [panel-header (t :viewer/measures)]
      [:div.items
       (for [m (sort-by :title (current-cube :measures))]
         ^{:key (:name m)} [measure-item m selected-measures])]]))

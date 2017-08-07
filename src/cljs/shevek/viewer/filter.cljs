@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch]]
             [cuerdas.core :as str]
-            [shevek.i18n :refer [t]]
+            [shevek.i18n :refer [t translation]]
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension merge-dimensions]]
             [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
@@ -91,11 +91,11 @@
   (let [showed-period (r/atom period)]
     (fn [dim]
       [:div.relative.period-type
-       [period-buttons dim showed-period (t :cubes.period/latest)
+       [period-buttons dim showed-period (t :viewer.period/latest)
         [:latest-hour :latest-day :latest-7days :latest-30days :latest-90days]]
-       [period-buttons dim showed-period (t :cubes.period/current)
+       [period-buttons dim showed-period (t :viewer.period/current)
         [:current-day :current-week :current-month :current-quarter :current-year]]
-       [period-buttons dim showed-period (t :cubes.period/previous)
+       [period-buttons dim showed-period (t :viewer.period/previous)
         [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]
        [:div.ui.label (if @showed-period
                         (format-period @showed-period (current-cube :max-time))
@@ -121,7 +121,7 @@
 (defn- menu-item-for-period-type [period-type period-type-value]
   [:a.item {:class (when (= @period-type period-type-value) "active")
             :on-click #(reset! period-type period-type-value)}
-   (->> (name period-type-value) (str "cubes.period/") keyword t)])
+   (translation :viewer.period period-type-value)])
 
 (defn- time-filter-popup [{:keys [period] :as dim}]
   (let [period-type (r/atom (if period :relative :specific))]
@@ -144,8 +144,8 @@
        :on-change #(swap! filter-opts update :value (toggle-filter-value %) value)}]]))
 
 (defn filter-operators []
-  [[(t :cubes.operator/include) "include"]
-   [(t :cubes.operator/exclude) "exclude"]])
+  [[(t :viewer.operator/include) "include"]
+   [(t :viewer.operator/exclude) "exclude"]])
 
 (defn- operator-selector [opts]
   [dropdown (filter-operators)
@@ -208,6 +208,6 @@
 
 (defn filter-panel []
   [:div.filter.panel (droppable #(dispatch :dimension-added-to-filter %))
-   [panel-header (t :cubes/filter)]
+   [panel-header (t :viewer/filter)]
    (for [dim (viewer :filter)]
      ^{:key (:name dim)} [filter-item dim])])
