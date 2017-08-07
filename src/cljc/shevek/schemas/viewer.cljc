@@ -47,6 +47,7 @@
 
 (s/defschema Viewer
   {:cube Cube
+   (s/optional-key :viztype) s/Str
    (s/optional-key :filter) Filters
    (s/optional-key :raw-data-filter) Filters
    (s/optional-key :split) [Split]

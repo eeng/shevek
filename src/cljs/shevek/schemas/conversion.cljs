@@ -15,6 +15,7 @@
                   (filter :favorite measures)
                   (take 3 measures))]
     {:cube cube
+     :viztype "totals"
      :filter [(build-time-filter cube)]
      :split []
      :measures (vec measures)

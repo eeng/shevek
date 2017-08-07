@@ -11,7 +11,7 @@
             [shevek.viewer.measures :refer [measures-panel]]
             [shevek.viewer.filter :refer [filter-panel]]
             [shevek.viewer.split :refer [split-panel]]
-            [shevek.viewer.visualization :refer [visualization-panel]]
+            [shevek.viewer.visualization :refer [visualization-panel viztype-selector]]
             [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
             [shevek.viewer.url :refer [store-viewer-in-url restore-report-from-url]]
@@ -72,9 +72,11 @@
     [dimensions-panel]
     [measures-panel]]
    [:div.center-column
-    [:div
-     [filter-panel]
-     [split-panel]]
+    [:div.top-row
+     [:div.filter-split
+       [filter-panel]
+       [split-panel]]
+     [viztype-selector]]
     [visualization-panel]]
    [:div.right-column
     [pinboard-panels]]])

@@ -19,14 +19,23 @@
                  :sort-by (or sort-by (assoc (-> viewer :measures first) :descending (not (time-dimension? dim)))))
           (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer)))))
 
+(defn- adjust-viztype [{:keys [viewer] :as db}]
+  (let [{old-viztype :viztype split :split} viewer
+        new-viztype (cond
+                      (and (= old-viztype "totals") (seq split)) "table"
+                      (empty? split) "totals"
+                      :else old-viztype)]
+    (println old-viztype (count split) new-viztype)
+    (assoc-in db [:viewer :viztype] new-viztype)))
+
 (defevhi :split-dimension-added [{:keys [viewer] :as db} dim]
-  {:after [store-viewer-in-url]}
+  {:after [adjust-viztype store-viewer-in-url]}
   (let [limit (when (seq (:split viewer)) 5)]
     (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
         (send-main-query))))
 
 (defevhi :split-replaced [db dim]
-  {:after [close-popup store-viewer-in-url]}
+  {:after [close-popup adjust-viztype store-viewer-in-url]}
   (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
       (send-main-query)))
 
@@ -36,7 +45,7 @@
       (send-main-query)))
 
 (defevhi :split-dimension-removed [db dim]
-  {:after [close-popup store-viewer-in-url]}
+  {:after [close-popup adjust-viztype store-viewer-in-url]}
   (-> (update-in db [:viewer :split] remove-dimension dim)
       (send-main-query)))
 

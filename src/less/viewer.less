@@ -77,6 +77,21 @@
   .measures { flex: 29 1 0%; }
   .dimensions, .measures { padding-bottom: 8px; }
 
+  .top-row {
+    display: flex;
+    flex-direction: row;
+    .filter-split { flex-grow: 1 }
+    .viztype-selector {
+      width: 90px;
+      padding: 0 @panel-horizontal-padding;
+      text-align: center;
+      .viztype-button {
+        .vertical-align;
+        margin-top: -1px;
+      }
+    }
+  }
+
   .filter, .split {
     flex-direction: row;
     align-items: center;
@@ -248,4 +263,33 @@
       }
     }
   }
+}
+
+.viztype-button {
+  i {
+    display: block;
+    margin: 0.3em auto 0;
+    font-size: 2em;
+  }
+}
+
+.viztype-popup {
+  width: 19.5em;
+  text-align: center;
+  a {
+    .border-radius(5px);
+    border: 1px solid #eee;
+    display: inline-block;
+    width: 6em;
+    padding: 0.5em 0;
+    margin: 0.25em;
+    &:hover { border-color: #bbb; }
+  }
+}
+
+.viztype-popup a, .viztype-selector {
+  cursor: pointer;
+  color: #777;
+  transition: color 0.3s ease, border-color 0.5s ease;
+  &:hover, &.active { color: black }
 }

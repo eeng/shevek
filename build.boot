@@ -47,7 +47,8 @@
                     [buddy/buddy-sign "1.5.0"]
                     [buddy/buddy-auth "1.4.1"]
                     [cljsjs/jwt-decode "2.1.0-0"]
-                    [cljsjs/clipboard "1.6.1-1"]])
+                    [cljsjs/clipboard "1.6.1-1"]
+                    [cljsjs/chartjs "2.6.0-0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
