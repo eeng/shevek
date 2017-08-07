@@ -45,12 +45,11 @@
                    :previous-year "Previous Year"}
     :cubes.operator {:include "Include"
                      :exclude "Exclude"}
-    :cubes.schema {:name "Name"
-                   :title "Title"
-                   :description "Description"
-                   :type "Type"
-                   :format "Format"
-                   :expression "Expression"}
+    :viewer.viztype {"totals" "totals"
+                     "table" "table"
+                     "bar-chart" "bar chart"
+                     "line-chart" "line chart"
+                     "pie-chart" "pie chart"}
     :reports {:menu "Reports"
               :title "Saved Reports"
               :pinned "Favorite Reports"
@@ -154,12 +153,11 @@
                    :previous-year "Año Pasado"}
     :cubes.operator {:include "Incluir"
                      :exclude "Excluir"}
-    :cubes.schema {:name "Nombre"
-                   :title "Título"
-                   :description "Descripción"
-                   :type "Tipo"
-                   :format "Formato"
-                   :expression "Expresión"}
+    :viewer.viztype {"totals" "totales"
+                     "table" "tabla"
+                     "bar-chart" "barras"
+                     "line-chart" "línea"
+                     "pie-chart" "torta"}
     :reports {:menu "Reportes"
               :title "Reportes"
               :pinned "Reportes Favoritos"
