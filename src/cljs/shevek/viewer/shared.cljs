@@ -29,10 +29,11 @@
   (-> (viewer :cube)
       (get-in keys)))
 
-; Copio el split a arrived-split asi sólo se rerenderiza la table cuando llegan los resultados. Sino se re-renderizaría dos veces, primero inmediatamente luego de splitear y despues cuando llegan los resultados, provocando un pantallazo molesto.
+; TODO agregar ns viewer asi queda analoga a dashboard/query-executed
 (defevh :query-executed [db results results-keys]
   (-> (assoc-in db (into [:viewer] results-keys) results)
-      (assoc-in [:viewer :arrived-split] (-> db :viewer :split))
+      (assoc-in [:viewer :results :split] (-> db :viewer :split))
+      (assoc-in [:viewer :results :viztype] (-> db :viewer :viztype))
       (rpc/loaded results-keys)))
 
 (defn send-query [db viewer results-keys]

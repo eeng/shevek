@@ -47,14 +47,15 @@
 
 (s/defschema Viewer
   {:cube Cube
-   (s/optional-key :viztype) s/Str
+   (s/optional-key :viztype) s/Keyword
    (s/optional-key :filter) Filters
    (s/optional-key :raw-data-filter) Filters
    (s/optional-key :split) [Split]
-   (s/optional-key :arrived-split) [Split]
    (s/optional-key :measures) [Measure]
    (s/optional-key :pinboard) Pinboard
    (s/optional-key :results) {(s/optional-key :main) [Result]
                               (s/optional-key :filter) {s/Str [Result]}
                               (s/optional-key :pinboard) {s/Str [Result]}
-                              (s/optional-key :raw) RawQueryResults}})
+                              (s/optional-key :raw) RawQueryResults
+                              (s/optional-key :split) [Split]
+                              (s/optional-key :viztype) s/Keyword}})

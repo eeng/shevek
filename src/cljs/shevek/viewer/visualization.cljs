@@ -3,7 +3,7 @@
             [clojure.string :as str]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
-            [shevek.i18n :refer [t]]
+            [shevek.i18n :refer [t translation]]
             [shevek.navegation :refer [current-page?]]
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
@@ -35,10 +35,10 @@
    [:div.dimension-value (format-dimension dim result)]
    [:div.buttons
     [:button.ui.primary.compact.button
-     {:on-click #(dispatch :pivot-table-row-filtered filter-path "include")}
+     {:on-click #(dispatch :table-row-filtered filter-path "include")}
      (t :actions/select)]
     [:button.ui.compact.button
-     {:on-click #(dispatch :pivot-table-row-filtered filter-path "exclude")}
+     {:on-click #(dispatch :table-row-filtered filter-path "exclude")}
      (t :cubes.operator/exclude)]
     [:button.ui.compact.button
      {:on-click #(do (close-popup)
@@ -47,7 +47,7 @@
     [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
 
 ; TODO PERF cada vez q se clickea una row se renderizan todas las otras, ver de mejorar
-(defn- pivot-table-row [result dim depth measures max-values value-result-path]
+(defn- table-row [result dim depth measures max-values value-result-path]
   (let [filter-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
         row-key (hash filter-path)
         totals-row (totals-result? result dim)]
@@ -67,15 +67,15 @@
                     :style {:width (calculate-rate measure-value (max-values measure-name))}})]
         (format-measure measure result)])]))
 
-(defn- pivot-table-rows
+(defn- table-rows
   ([results dims depth measures max-values]
-   (pivot-table-rows results dims depth measures max-values []))
+   (table-rows results dims depth measures max-values []))
   ([results [dim & dims] depth measures max-values value-result-path]
    (when dim
      (mapcat (fn [result]
                (let [new-path (conj value-result-path [dim result])]
-                 (into [(pivot-table-row result dim depth measures max-values new-path)]
-                       (pivot-table-rows (:_results result) dims (inc depth) measures max-values new-path))))
+                 (into [(table-row result dim depth measures max-values new-path)]
+                       (table-rows (:_results result) dims (inc depth) measures max-values new-path))))
              results))))
 
 (defn- calculate-max-values [measures results]
@@ -100,17 +100,20 @@
        (when icon-after? [:span title])])
     [:th opts title]))
 
-(defn- pivot-table-visualization [viewer]
-  (let [split (viewer :arrived-split)
-        measures (viewer :measures)
+(defn- table-visualization [{:keys [measures viztype] :as viewer}]
+  (let [split (get-in viewer [:results :split])
         results (get-in viewer [:results :main])
         max-values (calculate-max-values measures results)]
-    [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
-     [:thead>tr
-      [sortable-th (->> split (map :title) (str/join ", ")) split split]
-      (for [{:keys [name title] :as measure} measures]
-        ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
-     (into [:tbody] (pivot-table-rows results split 0 measures max-values))]))
+    (if (empty? split)
+      [:div.icon-hint
+       [:i.warning.circle.icon]
+       [:div.text (t :viewer/split-required (translation :viewer.viztype viztype))]]
+      [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
+       [:thead>tr
+        [sortable-th (->> split (map :title) (str/join ", ")) split split]
+        (for [{:keys [name title] :as measure} measures]
+          ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
+       (into [:tbody] (table-rows results split 0 measures max-values))])))
 
 (defn visualization [viewer]
   (when (get-in viewer [:results :main])
@@ -119,9 +122,9 @@
        [:div.icon-hint
         [:i.warning.circle.icon]
         [:div.text (t :cubes/no-measures)]]
-       (if (empty? (viewer :arrived-split))
-         [totals-visualization viewer]
-         [pivot-table-visualization viewer]))]))
+       (case (get-in viewer [:results :viztype])
+         :totals [totals-visualization viewer]
+         :table [table-visualization viewer]))]))
 
 (defn visualization-panel []
   [:div.visualization-container.zone.panel.ui.basic.segment

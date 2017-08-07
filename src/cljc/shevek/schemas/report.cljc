@@ -27,6 +27,7 @@
    (s/optional-key :description) s/Str
    (s/optional-key :pin-in-dashboard) s/Bool ; Optional when restored from URL
    :cube s/Any
+   :viztype s/Str
    :measures [s/Str]
    :filter [Filter]
    :split [Split]

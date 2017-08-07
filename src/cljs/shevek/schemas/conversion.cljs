@@ -15,7 +15,7 @@
                   (filter :favorite measures)
                   (take 3 measures))]
     {:cube cube
-     :viztype "totals"
+     :viztype :totals
      :filter [(build-time-filter cube)]
      :split []
      :measures (vec measures)
@@ -32,8 +32,9 @@
 (defn- report-dims->viewer [coll cube]
   (mapv #(report-dim->viewer % cube) coll))
 
-(defn report->viewer [{:keys [pinboard] :as report} cube]
+(defn report->viewer [{:keys [pinboard viztype] :as report} cube]
   {:cube cube
+   :viztype (keyword viztype)
    :filter (report-dims->viewer (report :filter) cube)
    :split (report-dims->viewer (report :split) cube)
    :measures (mapv #(find-dimension % (cube :measures)) (report :measures))
@@ -47,8 +48,9 @@
           value (update :value vec)
           sort-by (update :sort-by viewer-dim->report)))
 
-(defn viewer->report [{:keys [cube measures filter split pinboard]}]
+(defn viewer->report [{:keys [cube measures filter split pinboard viztype]}]
   {:cube (:name cube)
+   :viztype (when viztype (name viztype))
    :measures (map :name measures)
    :filter (map viewer-dim->report filter)
    :split (map viewer-dim->report split)

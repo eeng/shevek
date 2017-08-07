@@ -22,10 +22,9 @@
 (defn- adjust-viztype [{:keys [viewer] :as db}]
   (let [{old-viztype :viztype split :split} viewer
         new-viztype (cond
-                      (and (= old-viztype "totals") (seq split)) "table"
-                      (empty? split) "totals"
+                      (and (= old-viztype :totals) (seq split)) :table
+                      (empty? split) :totals
                       :else old-viztype)]
-    (println old-viztype (count split) new-viztype)
     (assoc-in db [:viewer :viztype] new-viztype)))
 
 (defevhi :split-dimension-added [{:keys [viewer] :as db} dim]

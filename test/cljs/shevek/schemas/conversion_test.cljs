@@ -6,7 +6,7 @@
             [shevek.lib.dates :refer [date-time]]))
 
 (deftest viewer->report-tests
-  (testing "should store only the cube id"
+  (testing "should store only the cube name"
     (is (= "wikiticker" (-> {:cube {:name "wikiticker"}} viewer->report :cube))))
 
   (testing "should store only the selected measures names"
@@ -41,7 +41,10 @@
                viewer->report :pinboard))))
 
   (testing "should not store user-id as the URL"
-    (is (without? :user-id (viewer->report {})))))
+    (is (without? :user-id (viewer->report {}))))
+
+  (testing "should convert the viztype"
+    (is (= "pie-chart" (:viztype (viewer->report {:viztype :pie-chart}))))))
 
 (deftest report->viewer-tests
   (testing "should convert back to keywords, dates and sets and add title and other fields"
@@ -62,4 +65,7 @@
                            :dimensions [{:name "time"}]}}
                (report->viewer {:dimensions [{:name "otherD" :title "..."} {:name "time" :title "Time"}]
                                 :measures [{:name "otherM" :type "..."} {:name "count" :type "longSum"}]})
-               :pinboard)))))
+               :pinboard))))
+
+  (testing "should convert back the viztype"
+    (is (= :pie-chart (:viztype (report->viewer {:viztype "pie-chart"} {}))))))

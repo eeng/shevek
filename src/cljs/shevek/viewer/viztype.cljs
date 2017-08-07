@@ -3,17 +3,22 @@
   (:require [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
-            [shevek.i18n :refer [translation]]))
+            [shevek.i18n :refer [translation]]
+            [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defevhi :viztype-changed [db viztype]
-  {:after [close-popup]}
-  (assoc-in db [:viewer :viztype] viztype))
+  {:after [close-popup store-viewer-in-url]}
+  (-> db
+      (assoc-in [:viewer :viztype] viztype)
+      (assoc-in [:viewer :results :viztype] viztype)
+      (cond->
+       (= viztype :totals) (assoc-in [:viewer :split] []))))
 
-(def viztype-icons {"totals" "slack"
-                    "table" "table"
-                    "bar-chart" "bar chart"
-                    "line-chart" "line chart"
-                    "pie-chart" "pie chart"})
+(def viztype-icons {:totals "slack"
+                    :table "table"
+                    :bar-chart "bar chart"
+                    :line-chart "line chart"
+                    :pie-chart "pie chart"})
 
 (defn- viztype-button [viztype]
   [:div.viztype-button

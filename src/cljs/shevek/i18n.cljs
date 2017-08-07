@@ -45,11 +45,12 @@
                    :previous-year "Previous Year"}
     :cubes.operator {:include "Include"
                      :exclude "Exclude"}
-    :viewer.viztype {"totals" "totals"
-                     "table" "table"
-                     "bar-chart" "bar chart"
-                     "line-chart" "line chart"
-                     "pie-chart" "pie chart"}
+    :viewer {:split-required "At least one split is required for the {1} visualization"}
+    :viewer.viztype {:totals "totals"
+                     :table "table"
+                     :bar-chart "bar chart"
+                     :line-chart "line chart"
+                     :pie-chart "pie chart"}
     :reports {:menu "Reports"
               :title "Saved Reports"
               :pinned "Favorite Reports"
@@ -153,11 +154,12 @@
                    :previous-year "Año Pasado"}
     :cubes.operator {:include "Incluir"
                      :exclude "Excluir"}
-    :viewer.viztype {"totals" "totales"
-                     "table" "tabla"
-                     "bar-chart" "barras"
-                     "line-chart" "línea"
-                     "pie-chart" "torta"}
+    :viewer {:split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"}
+    :viewer.viztype {:totals "totales"
+                     :table "tabla"
+                     :bar-chart "barras"
+                     :line-chart "línea"
+                     :pie-chart "torta"}
     :reports {:menu "Reportes"
               :title "Reportes"
               :pinned "Reportes Favoritos"
