@@ -20,3 +20,7 @@
 
 (defn includes? [coll x]
   (some #(= % x) coll))
+
+(defn index-of [coll value]
+  (some (fn [[idx item]] (if (= value item) idx))
+        (map-indexed vector coll)))

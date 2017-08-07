@@ -9,7 +9,8 @@
             [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
-            [shevek.viewer.filter :refer [build-filter]]))
+            [shevek.viewer.filter :refer [build-filter]]
+            [shevek.viewer.chart :refer [chart-visualization]]))
 
 (defn- sort-results-according-to-selected-measures [viewer]
   (let [result (first (get-in viewer [:results :main]))]
@@ -104,16 +105,12 @@
   (let [split (get-in viewer [:results :split])
         results (get-in viewer [:results :main])
         max-values (calculate-max-values measures results)]
-    (if (empty? split)
-      [:div.icon-hint
-       [:i.warning.circle.icon]
-       [:div.text (t :viewer/split-required (translation :viewer.viztype viztype))]]
-      [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
-       [:thead>tr
-        [sortable-th (->> split (map :title) (str/join ", ")) split split]
-        (for [{:keys [name title] :as measure} measures]
-          ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
-       (into [:tbody] (table-rows results split 0 measures max-values))])))
+    [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
+     [:thead>tr
+      [sortable-th (->> split (map :title) (str/join ", ")) split split]
+      (for [{:keys [name title] :as measure} measures]
+        ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
+     (into [:tbody] (table-rows results split 0 measures max-values))]))
 
 (defn visualization [viewer]
   (when (get-in viewer [:results :main])
@@ -121,10 +118,17 @@
      (if (empty? (viewer :measures))
        [:div.icon-hint
         [:i.warning.circle.icon]
-        [:div.text (t :cubes/no-measures)]]
-       (case (get-in viewer [:results :viztype])
-         :totals [totals-visualization viewer]
-         :table [table-visualization viewer]))]))
+        [:div.text (t :viewer/no-measures)]]
+       (let [viztype (get-in viewer [:results :viztype])
+             split (get-in viewer [:results :split])]
+         (if (and (not= viztype :totals) (empty? split))
+           [:div.icon-hint
+            [:i.warning.circle.icon]
+            [:div.text (t :viewer/split-required (translation :viewer.viztype viztype))]]
+           (case viztype
+             :totals [totals-visualization viewer]
+             :table [table-visualization viewer]
+             ^{:key viztype} [chart-visualization viewer]))))])) ; Chart.js doesn't allow to update the type so we need to remount on viztype change
 
 (defn visualization-panel []
   [:div.visualization-container.zone.panel.ui.basic.segment
