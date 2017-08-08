@@ -28,8 +28,8 @@
 
 (defevh :dashboard/query-executed [db results name]
   (-> (assoc-in db [:dashboard name :results :main] results)
-      (assoc-in [:dashboard name :results :split] (get-in db [:dashboard name :split])) ; TODO mmm no queda muy prolijo esto, lo tengo q hacer aca xq el component visualization lo necesita
-      ; TODO update falta copiar el viztype como se hace en el query-executed del viewer. Ver como refactorizar esa duplicacion
+      (assoc-in [:dashboard name :results :split] (get-in db [:dashboard name :split]))
+      (assoc-in [:dashboard name :results :viztype] (get-in db [:dashboard name :viztype]))
       (rpc/loaded [:dashboard name])))
 
 (defevh :dashboard/cube-arrived [db cube {:keys [name] :as report}]

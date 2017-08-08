@@ -29,8 +29,7 @@
   (-> (viewer :cube)
       (get-in keys)))
 
-; TODO agregar ns viewer asi queda analoga a dashboard/query-executed
-(defevh :query-executed [db results results-keys]
+(defevh :viewer/query-executed [db results results-keys]
   (-> (assoc-in db (into [:viewer] results-keys) results)
       (assoc-in [:viewer :results :split] (-> db :viewer :split))
       (assoc-in [:viewer :results :viztype] (-> db :viewer :viztype))
@@ -39,7 +38,7 @@
 (defn send-query [db viewer results-keys]
   (let [q (viewer->query viewer)]
     (log/info "Sending query" q)
-    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :query-executed % results-keys))
+    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :viewer/query-executed % results-keys))
     (rpc/loading db results-keys)))
 
 (defn send-main-query [{:keys [viewer] :as db}]
