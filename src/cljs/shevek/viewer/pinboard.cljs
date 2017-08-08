@@ -136,4 +136,4 @@
      [:div.panel.ui.basic.segment.no-pinned
       [:div.icon-hint
        [:i.pin.icon]
-       [:div.text (t :cubes/no-pinned)]]])])
+       [:div.text (t :viewer/no-pinned)]]])])

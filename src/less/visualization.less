@@ -21,7 +21,6 @@
         opacity: .999;
         td {
           position: relative;
-
           .bg {
             position: absolute;
             right: 0;
@@ -31,7 +30,6 @@
             z-index: -1;
             &.neg { background-color: rgba(187, 69, 0, 0.12) }
           }
-
           .generate-depths(@i) when (@i > 0) {
             .generate-depths(@i - 1);
             .depth-@{i} { margin-left: (@i * 1.5em); }
@@ -41,10 +39,14 @@
       }
     }
 
-    canvas {
-      -moz-user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
+    .chart {
+      &:not(:last-child) { margin-bottom: 1.5em }
+      .title { margin-bottom: 0.5em; }
+      canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+      }
     }
   }
 }
