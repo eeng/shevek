@@ -7,15 +7,21 @@
 (defn make-color-palette []
   (-> ["#ef5350" "#ec407a" "#ab47bc" "#7e57c2" "#5c6bc0" "#42a5f5" "#81d4fa" "#26c6da" "#26a69a"
        "#66bb6a" "#9ccc65" "#d4e157" "#ffee58" "#ffca28" "#ffa726" "#ff7043" "#8d6e63" "#78909c"]
-      shuffle
-      cycle))
+      shuffle cycle))
+
+(defn- viztype-dependant-dataset-opts [viztype results measure measures colors]
+  (case viztype
+    :line-chart {:fill false
+                 :borderColor (nth colors (index-of measures measure))}
+    :pie-chart {:backgroundColor (take (count results) colors)}
+    {:backgroundColor (if (= (count measures) 1)
+                        (take (count results) colors)
+                        (nth colors (index-of measures measure)))}))
 
 (defn- build-dataset [{:keys [title] :as measure} results measures viztype colors]
-  {:label title
-   :data (map #(dimension-value measure %) results)
-   :backgroundColor (if (or (= (count measures) 1) (= viztype :pie-chart))
-                      (take (count results) colors)
-                      (nth colors (index-of measures measure)))})
+  (merge {:label title
+          :data (map #(dimension-value measure %) results)}
+         (viztype-dependant-dataset-opts viztype results measure measures colors)))
 
 (defn- viewer->chart-data [{:keys [measures results viztype] :as viewer} colors]
   (let [split (:split results)
@@ -40,9 +46,8 @@
 (defn- build-chart [canvas {:keys [viztype] :as viewer}]
   (let [colors (make-color-palette)
         options (case viztype
-                  :bar-chart {:scales {:yAxes [{:ticks {:beginAtZero true}}]}}
                   :pie-chart {:tooltips {:callbacks {:title pie-tooltip-title :label pie-tooltip-label}}}
-                  {})]
+                  {:scales {:yAxes [{:ticks {:beginAtZero true}}]}})]
     {:colors colors
      :object (js/Chart. canvas
                         (clj->js {:type (chart-types viztype)
