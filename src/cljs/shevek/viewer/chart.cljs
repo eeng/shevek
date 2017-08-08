@@ -49,7 +49,7 @@
     (js/Chart. canvas
                (clj->js {:type (chart-types viztype)
                          :data (viewer->chart-data viewer)
-                         :options options}))))
+                         :options (assoc options :legend {:display false})}))))
 
 
 (defn- update-chart [chart viewer]
