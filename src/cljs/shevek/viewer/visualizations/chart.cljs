@@ -51,8 +51,10 @@
       (str (get (.-nestedLabels ds) idx) " ‧ " (get (.-labels data) idx))
       (get (.-labels data) idx))))
 
-(defn- build-chart [canvas measure {:keys [viztype] :as viewer}]
-  (let [options (cond-> {:legend {:display false}
+(defn- build-chart [canvas {:keys [title] :as measure} {:keys [viztype results] :as viewer}]
+  (let [chart-title (str title ": " (format-measure measure (-> results :main first)))
+        options (cond-> {:legend {:display false}
+                         :title {:display true :text chart-title}
                          :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
                         (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
     (js/Chart. canvas
@@ -74,9 +76,8 @@
 ; Chart.js doesn't allow to update the type so we need to remount on viztype change, hence that :key.
 ; Also when split count change because the tooltips title callbacks are installed only on mount
 (defn chart-visualization [{:keys [measures results] :as viewer}]
-  (let [{:keys [viztype split main]} results]
+  (let [{:keys [viztype split]} results]
     [:div
      (for [{:keys [name title] :as measure} measures]
-       [:div.chart {:key name}
-        [:div.title title ": " (format-measure measure (first main))]
+       [:div.chart-container {:key name}
         ^{:key (str viztype (count split))} [chart measure viewer]])]))
