@@ -53,8 +53,9 @@
 
 (defn- build-chart [canvas {:keys [title] :as measure} {:keys [viztype results] :as viewer}]
   (let [chart-title (str title ": " (format-measure measure (-> results :main first)))
-        options (cond-> {:legend {:display false}
-                         :title {:display true :text chart-title}
+        options (cond-> {:title {:display true :text chart-title}
+                         :legend {:display false}
+                         :maintainAspectRatio false
                          :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
                         (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
     (js/Chart. canvas
@@ -73,11 +74,17 @@
                      :component-did-update #(apply update-chart @chart (r/props %) (r/children %))
                      :component-will-unmount #(do (.destroy @chart) (reset! chart nil))})))
 
+(defn- set-chart-height [component measures-count]
+  (let [chart (-> component r/dom-node js/$)
+        viz-height (-> chart (.closest ".visualization-container") .height)
+        margin-bottom 10]
+    (.css chart "height" (str "calc(" (/ 100 measures-count) "% - " margin-bottom "px)"))))
+
 ; Chart.js doesn't allow to update the type so we need to remount on viztype change, hence that :key.
 ; Also when split count change because the tooltips title callbacks are installed only on mount
 (defn chart-visualization [{:keys [measures results] :as viewer}]
   (let [{:keys [viztype split]} results]
-    [:div
+    [:div.charts
      (for [{:keys [name title] :as measure} measures]
-       [:div.chart-container {:key name}
+       [:div.chart-container {:key name :ref #(when % (set-chart-height % (count measures)))}
         ^{:key (str viztype (count split))} [chart measure viewer]])]))

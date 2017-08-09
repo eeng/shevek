@@ -94,7 +94,7 @@
   (let [panel (-> rc r/dom-node js/$)
         items (-> panel (.find ".header, .items .item, .search.input") .toArray js->clj)
         height (reduce + (map #(-> % js/$ (.outerHeight true)) items))]
-    (.css panel "max-height", (max (+ height 10) 100))))
+    (.css panel "max-height" (max (+ height 10) 100))))
 
 (defn pinned-dimension-panel [_]
   (let [searching (r/atom false)

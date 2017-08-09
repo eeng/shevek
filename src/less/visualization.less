@@ -39,8 +39,10 @@
       }
     }
 
+    height: 100%;
+    .charts { height: 100% }
     .chart-container {
-      &:not(:last-child) { margin-bottom: 1.5em }
+      &:not(:last-child) { margin-bottom: 10px } // If you change this remember to adjust the set-chart-height chart function
       position: relative;
       width: 98%;
       canvas {
