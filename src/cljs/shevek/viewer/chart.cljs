@@ -29,9 +29,9 @@
     2 (let [transposed-subresults (apply map (fn [& args] args) (map :_results results))]
         (map-indexed #(build-dataset-for-two-splits measure %2 viztype split %1) transposed-subresults))))
 
-(defn- build-chart-data [measure {:keys [results viztype] :as viewer}]
-  (let [split (:split results)
-        results (rest (:main results))] ; We don't need the totals row
+(defn- build-chart-data [measure {:keys [results] :as viewer}]
+  (let [{:keys [viztype split main]} results
+        results (rest main)] ; We don't need the totals row
     {:labels (map #(format-dimension (first split) %) results)
      :datasets (build-datasets measure split viztype results)}))
 
@@ -41,17 +41,17 @@
 (defn- tooltip-label [{:keys [name] :as measure} tooltip-item data]
   (let [ds (get (.-datasets data) (.-datasetIndex tooltip-item))
         value (get (.-data ds) (.-index tooltip-item))]
-    (str (.-label ds) ": " (format-measure measure {(keyword name) value}))))
+    (str " " (.-label ds) ": " (format-measure measure {(keyword name) value}))))
 
 (defn- tooltip-title [viztype tooltip-items data]
   (let [tooltip-item (first tooltip-items)
         ds (get (.-datasets data) (.-datasetIndex tooltip-item))
-        labels (if (= viztype :pie-chart)
-                 (.-labels data)
-                 (or (.-nestedLabels ds) (.-labels data)))]
-    (get labels (.-index tooltip-item))))
+        idx (.-index tooltip-item)]
+    (if (.-nestedLabels ds)
+      (str (get (.-nestedLabels ds) idx) " ‧ " (get (.-labels data) idx))
+      (get (.-labels data) idx))))
 
-(defn- build-chart [canvas measure {:keys [viztype split] :as viewer}]
+(defn- build-chart [canvas measure {:keys [viztype] :as viewer}]
   (let [options (cond-> {:legend {:display false}
                          :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
                         (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
