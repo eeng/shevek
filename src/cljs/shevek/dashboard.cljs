@@ -26,6 +26,7 @@
 (defn dashboard-reports []
   (filter :pin-in-dashboard (db/get :reports)))
 
+; TODO esto esta muy parecido al viewer/query-executed, refactorizar
 (defevh :dashboard/query-executed [db results name]
   (-> (assoc-in db [:dashboard name :results :main] results)
       (assoc-in [:dashboard name :results :split] (get-in db [:dashboard name :split]))

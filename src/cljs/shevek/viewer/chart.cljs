@@ -8,45 +8,57 @@
   (cycle ["#ef5350" "#ec407a" "#ab47bc" "#7e57c2" "#5c6bc0" "#42a5f5" "#81d4fa" "#26c6da" "#26a69a"
           "#66bb6a" "#9ccc65" "#d4e157" "#ffee58" "#ffca28" "#ffa726" "#ff7043" "#8d6e63" "#78909c"]))
 
-(defn- viztype-dependant-dataset-opts [viztype results measure measures]
-  (case viztype
-    :line-chart {:fill false
-                 :borderColor (nth colors (index-of measures measure))}
-    {:backgroundColor (take (count results) colors)}))
-
-(defn- build-dataset [{:keys [title] :as measure} results measures viztype]
+(defn- build-dataset-for-one-split [{:keys [title] :as measure} results viztype]
   (merge {:label title
           :data (map #(dimension-value measure %) results)}
-         (viztype-dependant-dataset-opts viztype results measure measures)))
+         (case viztype
+           :line-chart {:borderColor (first colors) :fill false}
+           {:backgroundColor (take (count results) colors)})))
 
-(defn- build-chart-data [measure {:keys [measures results viztype] :as viewer}]
+(defn- build-dataset-for-two-splits [{:keys [title] :as measure} results viztype split ds-idx]
+  (merge {:label title
+          :nestedLabels (map #(format-dimension (second split) %) results) ; Stored here for later use in tooltip-title
+          :data (map #(dimension-value measure %) results)}
+         (case viztype
+           :line-chart {:borderColor (nth colors ds-idx) :fill false}
+           {:backgroundColor (nth colors ds-idx)})))
+
+(defn- build-datasets [measure split viztype results]
+  (case (count split)
+    1 [(build-dataset-for-one-split measure results viztype)]
+    2 (let [transposed-subresults (apply map (fn [& args] args) (map :_results results))]
+        (map-indexed #(build-dataset-for-two-splits measure %2 viztype split %1) transposed-subresults))))
+
+(defn- build-chart-data [measure {:keys [results viztype] :as viewer}]
   (let [split (:split results)
-        results (rest (:main results)) ; We don't need the totals row
-        labels (map #(format-dimension (first split) %) results) ; TODO funca para un solo split x ahora
-        dataset (build-dataset measure results measures viztype)]
-    {:labels labels :datasets [dataset]}))
+        results (rest (:main results))] ; We don't need the totals row
+    {:labels (map #(format-dimension (first split) %) results)
+     :datasets (build-datasets measure split viztype results)}))
 
-(def chart-types {:bar-chart "bar"
-                  :line-chart "line"
-                  :pie-chart "pie"})
+(def chart-types {:bar-chart "bar" :line-chart "line" :pie-chart "pie"})
 
-; This two guys will make pie tooltips look like bar tooltips, as the default ones lack the dataset labels (our measures)
-(defn- pie-tooltip-title [tooltip-items data]
-  (get (.-labels data) (.-index (first tooltip-items))))
-
-(defn- pie-tooltip-label [tooltip-item data]
+; Necessary to make pie tooltips look like bar tooltips, as the default ones lack the dataset labels (our measures)
+(defn- tooltip-label [tooltip-item data]
   (let [ds (get (.-datasets data) (.-datasetIndex tooltip-item))
         value (get (.-data ds) (.-index tooltip-item))]
     (str (.-label ds) ": " value)))
 
-(defn- build-chart [canvas measure {:keys [viztype] :as viewer}]
-  (let [options (case viztype
-                  :pie-chart {:tooltips {:callbacks {:title pie-tooltip-title :label pie-tooltip-label}}}
-                  {:scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}})]
+(defn- tooltip-title [viztype tooltip-items data]
+  (let [tooltip-item (first tooltip-items)
+        ds (get (.-datasets data) (.-datasetIndex tooltip-item))
+        labels (if (= viztype :pie-chart)
+                 (.-labels data)
+                 (or (.-nestedLabels ds) (.-labels data)))]
+    (get labels (.-index tooltip-item))))
+
+(defn- build-chart [canvas measure {:keys [viztype split] :as viewer}]
+  (let [options (cond-> {:legend {:display false}
+                         :tooltips {:callbacks {:label tooltip-label :title (partial tooltip-title viztype)}}}
+                        (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
     (js/Chart. canvas
                (clj->js {:type (chart-types viztype)
                          :data (build-chart-data measure viewer)
-                         :options (assoc options :legend {:display false})}))))
+                         :options options}))))
 
 (defn- update-chart [chart measure viewer]
   (aset chart "data" (clj->js (build-chart-data measure viewer)))

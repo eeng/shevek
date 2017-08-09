@@ -128,7 +128,7 @@
            (case viztype
              :totals [totals-visualization viewer]
              :table [table-visualization viewer]
-             ^{:key viztype} [chart-visualization viewer]))))])) ; Chart.js doesn't allow to update the type so we need to remount on viztype change
+             ^{:key (str viztype (count split))} [chart-visualization viewer]))))])) ; Chart.js doesn't allow to update the type so we need to remount on viztype change. Also when split count change because the tooltips title callbacks are installed only on mount
 
 (defn visualization-panel []
   [:div.visualization-container.zone.panel.ui.basic.segment
