@@ -37,11 +37,11 @@
 
 (def chart-types {:bar-chart "bar" :line-chart "line" :pie-chart "pie"})
 
-; Necessary to make pie tooltips look like bar tooltips, as the default ones lack the dataset labels (our measures)
-(defn- tooltip-label [tooltip-item data]
+; Necessary to make pie tooltips look like bar tooltips, as the default ones lack the dataset labels (our measures). Also it formats the measure values.
+(defn- tooltip-label [{:keys [name] :as measure} tooltip-item data]
   (let [ds (get (.-datasets data) (.-datasetIndex tooltip-item))
         value (get (.-data ds) (.-index tooltip-item))]
-    (str (.-label ds) ": " value)))
+    (str (.-label ds) ": " (format-measure measure {(keyword name) value}))))
 
 (defn- tooltip-title [viztype tooltip-items data]
   (let [tooltip-item (first tooltip-items)
@@ -53,7 +53,7 @@
 
 (defn- build-chart [canvas measure {:keys [viztype split] :as viewer}]
   (let [options (cond-> {:legend {:display false}
-                         :tooltips {:callbacks {:label tooltip-label :title (partial tooltip-title viztype)}}}
+                         :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
                         (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
     (js/Chart. canvas
                (clj->js {:type (chart-types viztype)
