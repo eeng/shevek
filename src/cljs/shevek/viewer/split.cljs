@@ -15,7 +15,7 @@
 
 (defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
   (cond-> (assoc (clean-dim dim)
-                 :limit (or limit 50)
+                 :limit (or limit (and (time-dimension? dim) 1000) 50)
                  :sort-by (or sort-by (assoc (-> viewer :measures first) :descending (not (time-dimension? dim)))))
           (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer)))))
 
@@ -93,7 +93,7 @@
              [:i.long.arrow.icon {:class (if desc "down" "up")}]]]]
           [:div.field
            [:label (t :viewer/limit)]
-           [select (map (juxt identity identity) [5 10 25 50 100])
+           [select (map (juxt identity identity) [5 10 25 50 100 1000])
             {:selected (:limit @opts) :on-change #(swap! opts assoc :limit (str/parse-int %))}]]
           [:button.ui.primary.compact.button
            {:on-click #(dispatch :split-options-changed dim @opts)}
