@@ -22,7 +22,8 @@
              :granularity "Granularity"
              :no-pinned "Drag dimensions here to pin them for quick access"
              :no-measures "Please select at least one measure"
-             :split-required "At least one split is required for the {1} visualization"}
+             :split-required "At least one split is required for the {1} visualization"
+             :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"}
     :viewer.period {:relative "Relative"
                     :specific "Specific"
                     :latest "Latest"
@@ -131,7 +132,8 @@
     :viewer {:dimensions "Dimensiones"
              :measures "Métricas"
              :filter "Filtros"
-             :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"}
+             :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
+             :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"}
     :viewer.period {:relative "Relativo"
                     :specific "Específico"
                     :latest "Ultimo"
