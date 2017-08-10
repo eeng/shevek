@@ -25,7 +25,7 @@
                                            :viztype :bar-chart}})))))
 
     (testing "one split and viztype line-chart"
-      (is (= [{:data [100 200] :label "Added" :borderColor "#42a5f5", :fill false}]
+      (is (= [{:data [100 200] :label "Added" :borderColor "#42a5f5" :backgroundColor "rgba(66, 165, 245, 0.3)"}]
              (:datasets
               (build-chart-data {:name "added" :title "Added"}
                                 {:results {:split [{:name "country"}]

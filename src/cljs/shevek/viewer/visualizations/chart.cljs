@@ -14,7 +14,7 @@
   (merge {:label title
           :data (map #(dimension-value measure %) results)}
          (case viztype
-           :line-chart {:borderColor (first colors) :fill false}
+           :line-chart {:borderColor (first colors) :backgroundColor "rgba(66, 165, 245, 0.3)"}
            {:backgroundColor (take (count results) colors)})))
 
 (defn- build-dataset-for-two-splits [{:keys [title] :as measure} results viztype split ds-idx]
