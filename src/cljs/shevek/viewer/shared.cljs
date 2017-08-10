@@ -87,9 +87,10 @@
     :else value))
 
 (defn format-dimension [dim result]
-  (if (totals-result? result dim)
-    "Total"
-    (format-dim-value (dimension-value dim result) dim)))
+  (when result
+    (if (totals-result? result dim)
+      "Total"
+      (format-dim-value (dimension-value dim result) dim))))
 
 (defn- panel-header [text & actions]
   [:h2.ui.sub.header text

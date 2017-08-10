@@ -25,13 +25,20 @@
            :line-chart {:borderColor (nth colors ds-idx) :fill false}
            {:backgroundColor (nth colors ds-idx)})))
 
+(defn- fill-vector [size coll]
+  (for [i (range size)]
+    (get (vec coll) i)))
+
 (defn- build-datasets [measure split viztype results]
   (case (count split)
     1 [(build-dataset-for-one-split measure results viztype)]
-    2 (let [transposed-subresults (apply map (fn [& args] args) (map :_results results))]
+    2 (let [subresults (map :_results results)
+            biggest-size (->> subresults (map count) (apply max))
+            filled-subresults (map #(fill-vector biggest-size %) subresults)
+            transposed-subresults (apply map (fn [& args] args) filled-subresults)]
         (map-indexed #(build-dataset-for-two-splits measure %2 viztype split %1) transposed-subresults))))
 
-(defn- build-chart-data [measure {:keys [results] :as viewer}]
+(defn build-chart-data [measure {:keys [results] :as viewer}]
   (let [{:keys [viztype split main]} results
         results (rest main)] ; We don't need the totals row
     {:labels (map #(format-dimension (first split) %) results)
