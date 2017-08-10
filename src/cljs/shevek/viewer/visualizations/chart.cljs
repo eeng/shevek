@@ -18,12 +18,13 @@
            {:backgroundColor (take (count results) colors)})))
 
 (defn- build-dataset-for-two-splits [{:keys [title] :as measure} results viztype split ds-idx]
-  (merge {:label title
-          :nestedLabels (map #(format-dimension (second split) %) results) ; Stored here for later use in tooltip-title
-          :data (map #(dimension-value measure %) results)}
-         (case viztype
-           :line-chart {:borderColor (nth colors ds-idx) :fill false}
-           {:backgroundColor (nth colors ds-idx)})))
+  (let [labels (map #(format-dimension (second split) %) results)]
+    (merge {:label (first labels)
+            :nestedLabels labels ; Stored here for later use in tooltip-title
+            :data (map #(dimension-value measure %) results)}
+           (case viztype
+             :line-chart {:borderColor (nth colors ds-idx) :fill false}
+             {:backgroundColor (nth colors ds-idx)}))))
 
 (defn- fill-vector [size coll]
   (for [i (range size)]
@@ -60,8 +61,10 @@
 
 (defn- build-chart [canvas {:keys [title] :as measure} {:keys [viztype results] :as viewer}]
   (let [chart-title (str title ": " (format-measure measure (-> results :main first)))
+        show-legend? (or (> (-> results :split count) 1)
+                         (= viztype :pie-chart))
         options (cond-> {:title {:display true :text chart-title}
-                         :legend {:display false}
+                         :legend {:display show-legend? :position "bottom"}
                          :maintainAspectRatio false
                          :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
                         (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
