@@ -108,7 +108,7 @@
                            (assoc (clean-dim dim) :operator @unfiltered-operator))]
         [:div.dimension.panel.ui.basic.segment
          (merge {:ref #(when % (adjust-max-height %))}
-                (when-not @searching (loading-class [:results :pinboard name])))
+                (when-not @searching (loading-class [:viewer :results :pinboard name])))
          [panel-header (str title " " (title-according-to-dim-type dim))
           (when-not (time-dimension? dim) [filter-operators-button filter-dim unfiltered-operator])
           (when-not (time-dimension? dim) [search-button searching])

@@ -50,13 +50,13 @@
 (defn modal-content []
   [:div.subcontent
    [:p (t :raw-data/showing limit) [filters->str (viewer :raw-data-filter)]]
-   (if (rpc/loading? [:results :raw])
+   (if (rpc/loading? [:viewer :results :raw])
     [:div.ui.basic.segment.loading]
     [:div.table-container [raw-data-table]])])
 
 (defevh :viewer/raw-data-arrived [db results]
   (-> (assoc-in db [:viewer :results :raw] results)
-      (rpc/loaded [:results :raw])))
+      (rpc/loaded [:viewer :results :raw])))
 
 (defevh :viewer/raw-data-requested [{:keys [viewer] :as db} additional-filter]
   (show-modal {:header (t :raw-data/title)
@@ -70,4 +70,4 @@
               (assoc-in [:paging :threshold] limit))]
     (rpc/call "querying.api/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
     (-> (assoc-in db [:viewer :raw-data-filter] (:filter viewer))
-        (rpc/loading [:results :raw]))))
+        (rpc/loading [:viewer :results :raw]))))

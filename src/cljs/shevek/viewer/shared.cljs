@@ -29,20 +29,23 @@
   (-> (viewer :cube)
       (get-in keys)))
 
+(defn store-results-in [db results keys results-keys]
+  (-> (assoc-in db (concat keys [:results] results-keys) results)
+      (assoc-in (into keys [:results :split]) (get-in db (into keys [:split])))
+      (assoc-in (into keys [:results :viztype]) (get-in db (into keys [:viztype])))))
+
 (defevh :viewer/query-executed [db results results-keys]
-  (-> (assoc-in db (into [:viewer] results-keys) results)
-      (assoc-in [:viewer :results :split] (-> db :viewer :split))
-      (assoc-in [:viewer :results :viztype] (-> db :viewer :viztype))
-      (rpc/loaded results-keys)))
+  (-> (store-results-in db results [:viewer] results-keys)
+      (rpc/loaded (into [:viewer :results] results-keys))))
 
 (defn send-query [db viewer results-keys]
   (let [q (viewer->query viewer)]
     (log/info "Sending query" q)
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :viewer/query-executed % results-keys))
-    (rpc/loading db results-keys)))
+    (rpc/loading db (into [:viewer :results] results-keys))))
 
 (defn send-main-query [{:keys [viewer] :as db}]
-  (send-query db (assoc viewer :totals true) [:results :main]))
+  (send-query db (assoc viewer :totals true) [:main]))
 
 (defn- remove-dim-unless-time [dim coll]
   (if (time-dimension? dim)
@@ -55,7 +58,7 @@
                    :split [dim]
                    :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filter add-dimension search-filter))]
-    (send-query db q [:results :pinboard name])))
+    (send-query db q [:pinboard name])))
 
 (defn send-pinboard-queries
   ([db] (send-pinboard-queries db nil))

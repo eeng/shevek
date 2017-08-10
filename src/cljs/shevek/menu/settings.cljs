@@ -55,7 +55,7 @@
                      (set-auto-refresh-interval! auto-refresh)
                      (dispatch :settings-saved {:auto-refresh auto-refresh}))}]
     [:button.ui.fluid.button
-     (assoc (rpc/loading-class [:results :main])
+     (assoc (rpc/loading-class [:viewer :results :main])
             :on-click #(refresh-page))
      (t :settings/update-now)]]
    [:div#lang-dropdown.field

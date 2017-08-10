@@ -67,7 +67,7 @@
                                   (seq search) (conj (assoc dim :operator "search" :value search)))
                   :split [(assoc dim :limit 50)]
                   :measures [{:expression "(count)" :name "rowCount"}]}
-              [:results :filter name]))
+              [:filter name]))
 
 (def available-relative-periods
   {:latest-hour "1H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D" :latest-90days "90D"

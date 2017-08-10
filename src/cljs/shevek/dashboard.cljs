@@ -9,7 +9,8 @@
             [shevek.menu.reports :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]
-            [shevek.viewer.visualization :refer [visualization]]))
+            [shevek.viewer.visualization :refer [visualization]]
+            [shevek.viewer.shared :refer [store-results-in]]))
 
 (defn- cube-card [{:keys [name title description] :or {description (t :cubes/no-desc)}}]
   [:a.cube.card {:on-click #(dispatch :cube-selected name)}
@@ -26,11 +27,8 @@
 (defn dashboard-reports []
   (filter :pin-in-dashboard (db/get :reports)))
 
-; TODO esto esta muy parecido al viewer/query-executed, refactorizar
 (defevh :dashboard/query-executed [db results name]
-  (-> (assoc-in db [:dashboard name :results :main] results)
-      (assoc-in [:dashboard name :results :split] (get-in db [:dashboard name :split]))
-      (assoc-in [:dashboard name :results :viztype] (get-in db [:dashboard name :viztype]))
+  (-> (store-results-in db results [:dashboard name] [:main])
       (rpc/loaded [:dashboard name])))
 
 (defevh :dashboard/cube-arrived [db cube {:keys [name] :as report}]
