@@ -55,6 +55,7 @@
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload :refer [reload]]
  '[deraen.boot-less :refer [less]]
+ '[afrey.boot-asset-fingerprint :refer [asset-fingerprint]]
  '[samestep.boot-refresh :refer [refresh]]
  '[metosin.boot-alt-test :refer [alt-test]]
  '[crisptrutski.boot-cljs-test :refer [test-cljs] :rename {test-cljs alt-test-cljs}]
@@ -82,6 +83,7 @@
               :compiler-options {:external-config {:devtools/config {:features-to-install [:formatters :hints :async]}}})
         (less :source-map true)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
+        (asset-fingerprint :skip true)
         (target)))
 
 (deftask build-and-start-app-for-dev []
@@ -162,7 +164,8 @@
                                  :closure-defines {"goog.DEBUG" false}})
         (less)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
-        (aot :all true)
+        (asset-fingerprint :asset-root "public")
+        (aot :namespace #{'shevek.app})
         (uber)
         (jar :file "shevek.jar" :main 'shevek.app)
         (sift :include #{#"shevek.jar" #"config.edn"})
