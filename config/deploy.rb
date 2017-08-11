@@ -11,6 +11,6 @@ namespace :deploy do
       execute "cd #{release_path}; boot package"
     end
   end
-  after :published, :package
-  after :package, 'service:shevek:restart'
+  after :updated, :package
+  after :published, 'service:shevek:restart'
 end
