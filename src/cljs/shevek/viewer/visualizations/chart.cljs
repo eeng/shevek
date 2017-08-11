@@ -46,18 +46,20 @@
      :datasets (build-datasets measure split viztype results)}))
 
 ; Necessary to make pie tooltips look like bar tooltips, as the default ones lack the dataset labels (our measures). Also it formats the measure values.
-(defn- tooltip-label [{:keys [name] :as measure} tooltip-item data]
-  (let [ds (get (.-datasets data) (.-datasetIndex tooltip-item))
-        value (get (.-data ds) (.-index tooltip-item))]
-    (str " " (.-label ds) ": " (format-measure measure {(keyword name) value}))))
+(defn- tooltip-label [{:keys [name title] :as measure} tooltip-item data]
+  (let [ds (get (aget data "datasets") (aget tooltip-item "datasetIndex"))
+        value (get (aget ds "data") (aget tooltip-item "index"))]
+    (str " " title ": " (format-measure measure {(keyword name) value}))))
 
 (defn- tooltip-title [viztype tooltip-items data]
   (let [tooltip-item (first tooltip-items)
-        ds (get (.-datasets data) (.-datasetIndex tooltip-item))
-        idx (.-index tooltip-item)]
-    (if (.-nestedLabels ds)
-      (str (get (.-nestedLabels ds) idx) " ‧ " (get (.-labels data) idx))
-      (get (.-labels data) idx))))
+        ds (get (aget data "datasets") (aget tooltip-item "datasetIndex"))
+        idx (aget tooltip-item "index")
+        labels (aget data "labels")
+        nested-labels (aget ds "nestedLabels")]
+    (if nested-labels
+      (str (get nested-labels idx) " ‧ " (get labels idx))
+      (get labels idx))))
 
 (defn- build-chart [canvas {:keys [title] :as measure} {:keys [viztype results] :as viewer}]
   (let [chart-title (str title ": " (format-measure measure (-> results :main first)))
