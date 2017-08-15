@@ -58,6 +58,7 @@
               :description "Description"
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
+              :deleted "Report '{1}' deleted!"
               :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
     :share {:title "Share"
             :copy-url "Copy URL"
@@ -168,6 +169,7 @@
               :description "Descripción"
               :pin-in-dashboard "Mostrar en dashboard"
               :saved "Reporte '{1}' guardado correctamente"
+              :deleted "Reporte '{1}' eliminado correctamente"
               :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
     :share {:title "Compartir"
             :copy-url "Copiar URL"

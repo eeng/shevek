@@ -48,8 +48,9 @@
     (rpc/call "reports.api/save-report" :args [report] :handler #(dispatch :report-saved % editing-current?))
     (rpc/loading db :save-report)))
 
-(defevh :delete-report [db report]
-  (rpc/call "reports.api/delete-report" :args [report] :handler fetch-reports)
+(defevh :delete-report [db {:keys [name] :as report}]
+  (rpc/call "reports.api/delete-report" :args [report]
+            :handler #(do (notify (t :reports/deleted name)) (fetch-reports)))
   (cond-> (rpc/loading db :save-report)
           (current-report? db report) (dissoc :current-report)))
 
