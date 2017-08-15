@@ -59,10 +59,13 @@
         (query dw {:cube "wikiticker"
                    :split [{:name "__time" :granularity "PT12H"} {:name "country"}]
                    :measures [{:name "count" :expression "(sum $count)"}]
-                   :filter [{:interval ["2015-09-01" "2015-09-01"]}]})
+                   :filter [{:interval ["2015-09-01" "2015-09-01"]}
+                            {:name "country" :operator "is" :value "Argentina"}]})
         (is (submaps? [{:queryType "timeseries"}
                        {:queryType "topN" :dimension "country"
-                        :intervals "2015-09-01T00:00:00.000Z/2015-09-01T12:00:00.000Z"}
+                        :intervals "2015-09-01T00:00:00.000Z/2015-09-01T12:00:00.000Z"
+                        :filter {:dimension "country" :type "selector" :value "Argentina"}}
                        {:queryType "topN" :dimension "country"
-                        :intervals "2015-09-01T12:00:00.000Z/2015-09-02T00:00:00.000Z"}]
+                        :intervals "2015-09-01T12:00:00.000Z/2015-09-02T00:00:00.000Z"
+                        :filter {:dimension "country" :type "selector" :value "Argentina"}}]
                       (sort-by :intervals @queries-sent)))))))
