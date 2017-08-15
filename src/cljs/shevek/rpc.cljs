@@ -41,6 +41,7 @@
   (case status
     401 (handle-not-authenticated)
     403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
+    502 (handle-app-error (assoc error :response {:error "Bad Gateway"}))
     (handle-app-error error))
   (loaded db))
 

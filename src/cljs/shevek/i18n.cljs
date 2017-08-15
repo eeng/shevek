@@ -115,7 +115,8 @@
                  :confirmation "doesn't match the previous value"}
     :boolean {:true "Yes"
               :false "No"}
-    :errors {"Query timeout" "The query is taking longer than expected. Please try with a shorter period."}}
+    :errors {"Query timeout" "The query is taking longer than expected. Please try with a shorter period."
+             "Bad Gateway" "The system is not available right now. Please try again later."}}
 
    :es
    {:menu {:logout "Salir"}
@@ -223,7 +224,8 @@
                  :confirmation "no coincide con el valor anterior"}
     :boolean {:true "Si"
               :false "No"}
-    :errors {"Query timeout" "La consulta está demorando demasiado. Por favor, intente con un período más corto."}}
+    :errors {"Query timeout" "La consulta está demorando demasiado. Por favor, intente con un período más corto."
+             "Bad Gateway" "El sistema no está disponible en este momento. Por favor, intente nuevamente más tarde."}}
 
    :tongue/fallback :en})
 
