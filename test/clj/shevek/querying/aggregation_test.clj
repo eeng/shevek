@@ -19,7 +19,7 @@
                        {:queryType "topN" :dimension "page"}]
                       @queries-sent)))))
 
-  (testing "query with two dimensions should issue one query for the first dim and one for each result as filter for the second dim"
+  (testing "query with two normal dimensions should issue one query for the first dim and one for each result as filter for the second dim"
     (let [queries-sent (atom [])]
       (with-redefs
         [druid/send-query
@@ -43,4 +43,26 @@
                         :filter {:dimension "country" :type "selector" :value "Argentina"}}
                        {:queryType "topN" :dimension "city"
                         :filter {:dimension "country" :type "selector" :value "Brasil"}}]
-                      (sort-by (juxt (comp not nil? :filter) (comp :value :filter)) @queries-sent)))))))
+                      (sort-by (juxt (comp not nil? :filter) (comp :value :filter)) @queries-sent))))))
+
+  (testing "query with one time and one normal dimension should issue one query for the time dim and for each result should issue another query with the interval set accordingly"
+    (let [queries-sent (atom [])]
+      (with-redefs
+        [druid/send-query
+         (fn [_ dq]
+           (swap! queries-sent conj dq)
+           (cond
+             (= "timeseries" (dq :queryType))
+             [{:result {:count 1} :timestamp "2015-09-01T00:00:00.000Z"}
+              {:result {:count 2} :timestamp "2015-09-01T12:00:00.000Z"}]
+             :else []))]
+        (query dw {:cube "wikiticker"
+                   :split [{:name "__time" :granularity "PT12H"} {:name "country"}]
+                   :measures [{:name "count" :expression "(sum $count)"}]
+                   :filter [{:interval ["2015-09-01" "2015-09-01"]}]})
+        (is (submaps? [{:queryType "timeseries"}
+                       {:queryType "topN" :dimension "country"
+                        :intervals "2015-09-01T00:00:00.000Z/2015-09-01T12:00Z"}
+                       {:queryType "topN" :dimension "country"
+                        :intervals "2015-09-01T12:00:00.000Z/2015-09-02T00:00Z"}]
+                      (sort-by :intervals @queries-sent)))))))
