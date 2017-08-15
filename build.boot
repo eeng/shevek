@@ -48,7 +48,8 @@
                     [buddy/buddy-auth "1.4.1"]
                     [cljsjs/jwt-decode "2.1.0-0"]
                     [cljsjs/clipboard "1.6.1-1"]
-                    [cljsjs/chartjs "2.6.0-0"]])
+                    [cljsjs/chartjs "2.6.0-0"]
+                    [lukesnape/boot-asset-fingerprint "1.5.1" :scope "test"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
