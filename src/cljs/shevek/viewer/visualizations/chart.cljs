@@ -60,22 +60,24 @@
       (str (get nested-labels idx) " ‧ " (get labels idx))
       (get labels idx))))
 
-(defn- build-chart [canvas {:keys [title] :as measure} {:keys [viztype results] :as viz}]
+(defn- build-chart-opts [{:keys [title] :as measure} {:keys [viztype results] :as viz}]
   (let [chart-title (str title ": " (format-measure measure (first results)))
         show-legend? (or (> (-> results :split count) 1)
-                         (= viztype :pie-chart))
-        options (cond-> {:title {:display true :text chart-title}
-                         :legend {:display show-legend? :position "bottom"}
-                         :maintainAspectRatio false
-                         :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
-                        (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
-    (js/Chart. canvas
-               (clj->js {:type (chart-types viztype)
-                         :data (build-chart-data measure viz)
-                         :options options}))))
+                         (= viztype :pie-chart))]
+    (cond-> {:title {:display true :text chart-title}
+             :legend {:display show-legend? :position "bottom"}
+             :maintainAspectRatio false
+             :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
+            (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))))
+
+(defn- build-chart [canvas measure {:keys [viztype] :as viz}]
+  (js/Chart. canvas (clj->js {:type (chart-types viztype)
+                              :data (build-chart-data measure viz)
+                              :options (build-chart-opts measure viz)})))
 
 (defn- update-chart [chart measure viz]
   (aset chart "data" (clj->js (build-chart-data measure viz)))
+  (aset chart "options" "title" (clj->js (:title (build-chart-opts measure viz))))
   (.update chart 0))
 
 (defn- chart [measure viz]

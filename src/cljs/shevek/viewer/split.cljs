@@ -43,7 +43,7 @@
 (defevhi :split-dimension-replaced [db old-dim new-dim]
   {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] replace-dimension old-dim (init-splitted-dim new-dim db))
-      (send-main-query)))
+      send-main-query))
 
 (defevhi :split-dimension-removed [db dim]
   {:after [close-popup store-viewer-in-url]}
