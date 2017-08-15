@@ -10,7 +10,7 @@
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]
             [shevek.viewer.visualization :refer [visualization]]
-            [shevek.viewer.shared :refer [store-results-in]]))
+            [shevek.viewer.shared :refer [send-visualization-query]]))
 
 (defn- cube-card [{:keys [name title description] :or {description (t :cubes/no-desc)}}]
   [:a.cube.card {:on-click #(dispatch :cube-selected name)}
@@ -27,15 +27,9 @@
 (defn dashboard-reports []
   (filter :pin-in-dashboard (db/get :reports)))
 
-(defevh :dashboard/query-executed [db results name]
-  (-> (store-results-in db results [:dashboard name] [:main])
-      (rpc/loaded [:dashboard name])))
-
 (defevh :dashboard/cube-arrived [db cube {:keys [name] :as report}]
-  (let [viewer (report->viewer report (set-cube-defaults cube))
-        q (viewer->query (assoc viewer :totals true))]
-    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :dashboard/query-executed % name))
-    (update-in db [:dashboard name] merge viewer)))
+  (let [viewer (report->viewer report (set-cube-defaults cube))]
+    (send-visualization-query db viewer [:dashboard name])))
 
 (defevh :dashboard/cube-requested [db {:keys [name cube] :as report}]
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :dashboard/cube-arrived % report))

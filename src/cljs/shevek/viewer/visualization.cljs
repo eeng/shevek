@@ -8,26 +8,24 @@
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]
             [shevek.viewer.visualizations.chart :refer [chart-visualization]]))
 
-(defn visualization [viewer]
-  (when (get-in viewer [:results :main])
+(defn visualization [{:keys [results measures viztype split] :as viz}]
+  (when results
     [:div.visualization
-     (if (empty? (viewer :measures))
+     (if (empty? measures)
        [:div.icon-hint
         [:i.warning.circle.icon]
         [:div.text (t :viewer/no-measures)]]
-       (let [viztype (get-in viewer [:results :viztype])
-             split (get-in viewer [:results :split])]
-         (if (and (not= viztype :totals) (empty? split))
-           [:div.icon-hint
-            [:i.warning.circle.icon]
-            [:div.text (t :viewer/split-required (translation :viewer.viztype viztype))]]
-           (case viztype
-             :totals [totals-visualization viewer]
-             :table [table-visualization viewer]
-             [chart-visualization viewer]))))]))
+       (if (and (not= viztype :totals) (empty? split))
+         [:div.icon-hint
+          [:i.warning.circle.icon]
+          [:div.text (t :viewer/split-required (translation :viewer.viztype viztype))]]
+         (case viztype
+           :totals [totals-visualization viz]
+           :table [table-visualization viz]
+           [chart-visualization viz])))]))
 
 (defn visualization-panel []
   [:div.visualization-container.zone.panel.ui.basic.segment
    (merge (droppable #(dispatch :split-replaced %))
-          (rpc/loading-class [:viewer :results :main]))
-   [visualization (db/get :viewer)]])
+          (rpc/loading-class [:viewer :visualization]))
+   [visualization (db/get-in [:viewer :visualization])]])

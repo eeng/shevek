@@ -12,8 +12,10 @@
 
 (defevhi :measure-toggled [db dim selected]
   {:after [store-viewer-in-url]}
-  (cond-> (update-in db [:viewer :measures] (if selected add-dimension remove-dimension) dim)
-          selected (send-main-query)))
+  (let [set-viz-measures #(assoc-in % [:viewer :visualization :measures] (get-in % [:viewer :measures]))]
+    (cond-> (update-in db [:viewer :measures] (if selected add-dimension remove-dimension) dim)
+            selected send-main-query
+            (not selected) set-viz-measures)))
 
 (defn- measure-item [{:keys [name title description] :as dim} selected-measures]
   [:div.item {:on-click toggle-checkbox-inside :title description}

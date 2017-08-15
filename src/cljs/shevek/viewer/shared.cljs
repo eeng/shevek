@@ -29,23 +29,31 @@
   (-> (viewer :cube)
       (get-in keys)))
 
-(defn store-results-in [db results keys results-keys]
-  (-> (assoc-in db (concat keys [:results] results-keys) results)
-      (assoc-in (into keys [:results :split]) (get-in db (into keys [:split])))
-      (assoc-in (into keys [:results :viztype]) (get-in db (into keys [:viztype])))))
-
 (defevh :viewer/query-executed [db results results-keys]
-  (-> (store-results-in db results [:viewer] results-keys)
-      (rpc/loaded (into [:viewer :results] results-keys))))
+  (-> (assoc-in db results-keys results)
+      (rpc/loaded results-keys)))
 
 (defn send-query [db viewer results-keys]
-  (let [q (viewer->query viewer)]
+  (let [q (viewer->query viewer)
+        results-keys (into [:viewer :results] results-keys)]
     (log/info "Sending query" q)
     (rpc/call "querying.api/query" :args [q] :handler #(dispatch :viewer/query-executed % results-keys))
-    (rpc/loading db (into [:viewer :results] results-keys))))
+    (rpc/loading db results-keys)))
+
+(defevh :visualization/query-executed [db results results-keys viewer]
+  (let [viz (-> (select-keys viewer [:viztype :split :measures])
+                (assoc :results results))]
+    (-> (assoc-in db results-keys viz)
+        (rpc/loaded results-keys))))
+
+(defn send-visualization-query [db viewer results-keys]
+  (let [q (viewer->query (assoc viewer :totals true))]
+    (log/info "Sending visualization query" q)
+    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :visualization/query-executed % results-keys viewer))
+    (rpc/loading db results-keys)))
 
 (defn send-main-query [{:keys [viewer] :as db}]
-  (send-query db (assoc viewer :totals true) [:main]))
+  (send-visualization-query db viewer [:viewer :visualization]))
 
 (defn- remove-dim-unless-time [dim coll]
   (if (time-dimension? dim)

@@ -30,7 +30,7 @@
   (for [i (range size)]
     (get (vec coll) i)))
 
-(defn- build-datasets [measure split viztype results]
+(defn- build-datasets [measure {:keys [split viztype results]}]
   (case (count split)
     1 [(build-dataset-for-one-split measure results viztype)]
     2 (let [subresults (map :_results results)
@@ -39,11 +39,10 @@
             transposed-subresults (apply map (fn [& args] args) filled-subresults)]
         (map-indexed #(build-dataset-for-two-splits measure %2 viztype split %1) transposed-subresults))))
 
-(defn build-chart-data [measure {:keys [results] :as viewer}]
-  (let [{:keys [viztype split main]} results
-        results (rest main)] ; We don't need the totals row
-    {:labels (map #(format-dimension (first split) %) results)
-     :datasets (build-datasets measure split viztype results)}))
+(defn build-chart-data [measure {:keys [split] :as viz}]
+  (let [viz (update viz :results rest)] ; We don't need the totals row
+    {:labels (map #(format-dimension (first split) %) (:results viz))
+     :datasets (build-datasets measure viz)}))
 
 ; Necessary to make pie tooltips look like bar tooltips, as the default ones lack the dataset labels (our measures). Also it formats the measure values.
 (defn- tooltip-label [{:keys [name title] :as measure} tooltip-item data]
@@ -61,8 +60,8 @@
       (str (get nested-labels idx) " ‧ " (get labels idx))
       (get labels idx))))
 
-(defn- build-chart [canvas {:keys [title] :as measure} {:keys [viztype results] :as viewer}]
-  (let [chart-title (str title ": " (format-measure measure (-> results :main first)))
+(defn- build-chart [canvas {:keys [title] :as measure} {:keys [viztype results] :as viz}]
+  (let [chart-title (str title ": " (format-measure measure (first results)))
         show-legend? (or (> (-> results :split count) 1)
                          (= viztype :pie-chart))
         options (cond-> {:title {:display true :text chart-title}
@@ -72,17 +71,17 @@
                         (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))]
     (js/Chart. canvas
                (clj->js {:type (chart-types viztype)
-                         :data (build-chart-data measure viewer)
+                         :data (build-chart-data measure viz)
                          :options options}))))
 
-(defn- update-chart [chart measure viewer]
-  (aset chart "data" (clj->js (build-chart-data measure viewer)))
+(defn- update-chart [chart measure viz]
+  (aset chart "data" (clj->js (build-chart-data measure viz)))
   (.update chart 0))
 
-(defn- chart [measure viewer]
+(defn- chart [measure viz]
   (let [chart (atom nil)]
     (r/create-class {:reagent-render (fn [_] [:canvas])
-                     :component-did-mount #(reset! chart (build-chart (r/dom-node %) measure viewer))
+                     :component-did-mount #(reset! chart (build-chart (r/dom-node %) measure viz))
                      :component-did-update #(apply update-chart @chart (r/props %) (r/children %))
                      :component-will-unmount #(do (.destroy @chart) (reset! chart nil))})))
 
@@ -94,13 +93,12 @@
 
 ; Chart.js doesn't allow to update the type so we need to remount on viztype change, hence that :key.
 ; Also when split count change because the tooltips title callbacks are installed only on mount
-(defn chart-visualization [{:keys [measures results] :as viewer}]
-  (let [{:keys [viztype split]} results]
-    (if (> (count split) 2)
-      [:div.icon-hint
-       [:i.warning.circle.icon]
-       [:div.text (t :viewer/too-many-splits-for-chart)]]
-      [:div.charts
-       (for [{:keys [name title] :as measure} measures]
-         [:div.chart-container {:key name :ref #(when % (set-chart-height % (count measures)))}
-          ^{:key (str viztype (count split))} [chart measure viewer]])])))
+(defn chart-visualization [{:keys [measures viztype split] :as viz}]
+  (if (> (count split) 2)
+    [:div.icon-hint
+     [:i.warning.circle.icon]
+     [:div.text (t :viewer/too-many-splits-for-chart)]]
+    [:div.charts
+     (for [{:keys [name] :as measure} measures]
+       [:div.chart-container {:key name :ref #(when % (set-chart-height % (count measures)))}
+        ^{:key (str viztype (count split))} [chart measure viz]])]))

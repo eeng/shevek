@@ -28,15 +28,17 @@
     (assoc-in db [:viewer :viztype] new-viztype)))
 
 (defevhi :split-dimension-added [{:keys [viewer] :as db} dim]
-  {:after [adjust-viztype store-viewer-in-url]}
+  {:after [store-viewer-in-url]}
   (let [limit (when (seq (:split viewer)) 5)]
     (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
-        (send-main-query))))
+        adjust-viztype
+        send-main-query)))
 
 (defevhi :split-replaced [db dim]
-  {:after [close-popup adjust-viztype store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
-      (send-main-query)))
+      adjust-viztype
+      send-main-query))
 
 (defevhi :split-dimension-replaced [db old-dim new-dim]
   {:after [close-popup store-viewer-in-url]}
@@ -44,14 +46,15 @@
       (send-main-query)))
 
 (defevhi :split-dimension-removed [db dim]
-  {:after [close-popup adjust-viztype store-viewer-in-url]}
+  {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] remove-dimension dim)
-      (send-main-query)))
+      adjust-viztype
+      send-main-query))
 
 (defevhi :split-options-changed [db dim opts]
   {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :split] replace-dimension (merge dim opts))
-      (send-main-query)))
+      send-main-query))
 
 (defevhi :splits-sorted-by [db sort-bys descending]
   {:after [store-viewer-in-url]}

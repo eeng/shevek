@@ -10,7 +10,7 @@
   {:after [close-popup store-viewer-in-url]}
   (-> db
       (assoc-in [:viewer :viztype] viztype)
-      (assoc-in [:viewer :results :viztype] viztype)
+      (assoc-in [:viewer :visualization :viztype] viztype)
       (cond->
        (= viztype :totals) (assoc-in [:viewer :split] []))))
 

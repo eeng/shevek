@@ -2,7 +2,7 @@
   (:require [schema.core :as s]
             [schema-tools.core :as st]
             [shevek.schemas.cube :refer [Dimension Measure]]
-            [shevek.schemas.viewer :refer [Viewer Cube]]
+            [shevek.schemas.viewer :refer [Viewer Visualization Cube]]
             [shevek.schemas.report :refer [Report]]))
 
 (s/defschema Settings
@@ -10,7 +10,7 @@
    (s/optional-key :auto-refresh) s/Int})
 
 (s/defschema Dashboard
-  {s/Str Viewer})
+  {s/Str Visualization})
 
 (s/defschema CurrentReport
   (st/assoc Report (s/optional-key :user-id) s/Any))

@@ -84,10 +84,8 @@
        (when icon-after? [:span title])])
     [:th opts title]))
 
-(defn table-visualization [{:keys [measures viztype] :as viewer}]
-  (let [split (get-in viewer [:results :split])
-        results (get-in viewer [:results :main])
-        max-values (calculate-max-values measures results)]
+(defn table-visualization [{:keys [measures split results]}]
+  (let [max-values (calculate-max-values measures results)]
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
      [:thead>tr
       [sortable-th (->> split (map :title) (str/join ", ")) split split]
