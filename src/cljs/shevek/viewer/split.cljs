@@ -14,10 +14,11 @@
             [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
-  (cond-> (assoc (clean-dim dim)
-                 :limit (or limit (and (time-dimension? dim) 1000) 50)
-                 :sort-by (or sort-by (assoc (-> viewer :measures first) :descending (not (time-dimension? dim)))))
-          (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer)))))
+  (let [first-measure (or (-> viewer :measures first) (-> viewer :cube :measures first))]
+    (cond-> (assoc (clean-dim dim)
+                   :limit (or limit (and (time-dimension? dim) 1000) 50)
+                   :sort-by (or sort-by (assoc first-measure :descending (not (time-dimension? dim)))))
+            (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer))))))
 
 (defn- adjust-viztype [{:keys [viewer] :as db}]
   (let [{old-viztype :viztype split :split} viewer
