@@ -62,7 +62,7 @@
                    :filter [{:interval ["2015-09-01" "2015-09-01"]}]})
         (is (submaps? [{:queryType "timeseries"}
                        {:queryType "topN" :dimension "country"
-                        :intervals "2015-09-01T00:00:00.000Z/2015-09-01T12:00Z"}
+                        :intervals "2015-09-01T00:00:00.000Z/2015-09-01T12:00:00.000Z"}
                        {:queryType "topN" :dimension "country"
-                        :intervals "2015-09-01T12:00:00.000Z/2015-09-02T00:00Z"}]
+                        :intervals "2015-09-01T12:00:00.000Z/2015-09-02T00:00:00.000Z"}]
                       (sort-by :intervals @queries-sent)))))))

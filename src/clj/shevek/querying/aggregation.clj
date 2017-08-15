@@ -1,7 +1,7 @@
 (ns shevek.querying.aggregation
   (:require [shevek.lib.collections :refer [assoc-if-seq]]
             [shevek.lib.druid-driver :refer [send-query]]
-            [shevek.lib.dates :refer [plus-duration]]
+            [shevek.lib.dates :refer [plus-period]]
             [shevek.lib.dw.dims :refer [time-dimension?]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
             [shevek.schemas.query :refer [Query]]
@@ -16,7 +16,7 @@
 (defn- add-filter-for-dim [filter {:keys [name granularity] :as dim} result]
   (let [dim-value (result (keyword name))]
     (if (time-dimension? dim)
-      (setval [ALL :interval] [dim-value (plus-duration dim-value granularity)] filter)
+      (setval [ALL :interval] [dim-value (plus-period dim-value granularity)] filter)
       (conj filter {:name name :operator "is" :value dim-value}))))
 
 (defn- send-queries-for-split [dw {:keys [split filter] :as q}]

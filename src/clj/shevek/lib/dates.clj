@@ -1,7 +1,7 @@
 (ns shevek.lib.dates
-  (:import java.time.ZonedDateTime java.time.Duration))
+  (:import org.joda.time.DateTime org.joda.time.Period))
 
-(defn plus-duration [str-date str-duration]
-  (let [duration (Duration/parse str-duration)
-        date (ZonedDateTime/parse str-date)]
-    (-> date (.plus duration) .toString)))
+(defn plus-period [str-date str-period]
+  (let [period (Period/parse str-period)
+        date (DateTime/parse str-date)]
+    (-> date (.plus period) .toString)))
