@@ -7,7 +7,7 @@
   (testing "totals query"
     (is (submap? {:queryType "timeseries"
                   :dataSource {:type "table" :name "wikiticker"}
-                  :granularity {:type "all"}
+                  :granularity "all"
                   :intervals "2015/2016"
                   :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}]}
                  (to-druid-query {:cube "wikiticker"
@@ -17,7 +17,7 @@
   (testing "query with one atemporal dimension should generate a topN query"
     (is (submap? {:queryType "topN"
                   :dataSource {:type "table" :name "wikiticker"}
-                  :granularity {:type "all"}
+                  :granularity "all"
                   :dimension "page"
                   :metric {:type "numeric" :metric "count"}
                   :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}]

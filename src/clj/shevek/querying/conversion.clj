@@ -47,7 +47,7 @@
   (condp = queryType
     "topN"
     (assoc dq
-           :granularity {:type "all"}
+           :granularity "all"
            :dimension (dimension :name)
            :metric (generate-metric-field dimension measures)
            :threshold (dimension :limit (or 100)))
@@ -55,7 +55,7 @@
     (assoc dq
            :granularity (if dimension
                           {:type "period" :period (:granularity dimension)}
-                          {:type "all"})
+                          "all")
            :descending (get-in dimension [:sort-by :descending] false)
            :context {:skipEmptyBuckets true})))
 

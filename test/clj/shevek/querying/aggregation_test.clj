@@ -15,7 +15,7 @@
                    :measures [{:name "count" :expression "(sum $count)"}]
                    :filter [{:interval ["2015-09-12" "2015-09-13"]}]
                    :totals true})
-        (is (submaps? [{:queryType "timeseries" :granularity {:type "all"}}
+        (is (submaps? [{:queryType "timeseries" :granularity "all"}
                        {:queryType "topN" :dimension "page"}]
                       @queries-sent)))))
 
