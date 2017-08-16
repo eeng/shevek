@@ -18,9 +18,20 @@
    :description "Ventas calculadas a partir de los comprobantes de facturación de VTOL"
    :dimensions [{:name "__time" :title "Fecha de Emisión"}
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
-                {:name "dia_semana" :title "Día de Semana"}
-                {:name "año" :title "Año" :column "__time"
+                {:name "año" :column "__time"
                  :extraction [{:type "timeFormat" :format "Y" :timeZone "America/Buenos_Aires" :locale "es"}]}
+                {:name "mes" :column "__time"
+                 :extraction [{:type "timeFormat" :format "MMMM" :timeZone "America/Buenos_Aires" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "semestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
+                {:name "cuatrimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'C' + (Math.floor(new Date(d).getMonth() / 4) + 1) }"}]}
+                {:name "trimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
+                {:name "dia_semana" :title "Día de Semana" :column "__time"
+                 :extraction [{:type "timeFormat" :format "EEEE" :timeZone "America/Buenos_Aires" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "tipo_comprobante" :title "Tipo de Comprobante"}
                 {:name "grupo_item" :title "Grupo de Item"}
                 {:name "tipo_item" :title "Tipo de Item"}
