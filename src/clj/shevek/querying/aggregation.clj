@@ -18,7 +18,7 @@
     (if (time-dimension? dim)
       (setval [ALL #(:interval %) :interval]
               [dim-value (plus-period dim-value granularity)] filter)
-      (conj filter {:name name :operator "is" :value dim-value}))))
+      (conj filter (assoc dim :operator "is" :value dim-value)))))
 
 (defn- send-queries-for-split [dw {:keys [split filter] :as q}]
   (let [[dim & dims] split]

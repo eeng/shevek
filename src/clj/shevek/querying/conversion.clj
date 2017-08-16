@@ -17,15 +17,22 @@
 (defn- sort-by-same? [{:keys [name sort-by]}]
   (= name (:name sort-by)))
 
-(defn- to-druid-filter [[{:keys [name operator value]} :as filters]]
-  (condp = (count filters)
-    0 nil
-    1 (condp = (keyword operator)
-        :is {:type "selector" :dimension name :value value}
-        :include {:type "in" :dimension name :values value}
-        :exclude {:type "not" :field {:type "in" :dimension name :values value}}
-        :search {:type "search" :dimension name :query {:type "insensitive_contains" :value value}})
-    {:type "and" :fields (map #(to-druid-filter [%]) filters)}))
+(defn- dimension-and-extraction [{:keys [name column extraction]}]
+  (cond-> {:dimension (or column name)}
+          extraction (assoc :extractionFn (if (> (count extraction) 1)
+                                            {:type "cascade" :extractionFns extraction}
+                                            (first extraction)))))
+
+(defn- to-druid-filter [[{:keys [operator value] :as dim} :as filters]]
+  (let [base-filter (dimension-and-extraction dim)]
+    (condp = (count filters)
+      0 nil
+      1 (condp = (keyword operator)
+          :is (assoc base-filter :type "selector" :value value)
+          :include (assoc base-filter :type "in" :values value)
+          :exclude {:type "not" :field (assoc base-filter :type "in" :values value)}
+          :search (assoc base-filter :type "search" :query {:type "insensitive_contains" :value value}))
+      {:type "and" :fields (map #(to-druid-filter [%]) filters)})))
 
 (defn- calculate-query-type [{:keys [dimension]}]
   (if (and dimension (not (time-dimension? dimension)))
@@ -42,14 +49,9 @@
       field
       {:type "inverted" :metric field})))
 
-(defn- dimension-spec [{:keys [name column extraction]}]
+(defn- dimension-spec [{:keys [name extraction] :as dim}]
   (if extraction
-    {:type "extraction"
-     :outputName name
-     :dimension (or column name)
-     :extractionFn (if (> (count extraction) 1)
-                     {:type "cascade" :extractionFns extraction}
-                     (first extraction))}
+    (assoc (dimension-and-extraction dim) :type "extraction" :outputName name)
     name))
 
 (defn- add-query-type-dependant-fields [{:keys [queryType] :as dq}

@@ -142,7 +142,14 @@
              (:dimension
                (to-druid-query {:dimension {:name "year" :column "__time"
                                             :extraction [{:type "timeFormat" :format "Y"}
-                                                         {:type "strlen"}]}}))))))
+                                                         {:type "strlen"}]}})))))
+
+    (testing "should use the dimension extraction function in filters also"
+      (is (= {:type "selector" :dimension "__time" :value "2017"
+              :extractionFn {:type "timeFormat" :format "Y"}}
+             (:filter
+              (to-druid-query {:filter [{:name "year" :operator "is" :value "2017" :column "__time"
+                                         :extraction [{:type "timeFormat" :format "Y"}]}]}))))))
 
   (testing "timeout"
     (is (= 30000 (get-in (to-druid-query {}) [:context :timeout])))))
