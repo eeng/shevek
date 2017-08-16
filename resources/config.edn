@@ -18,6 +18,7 @@
    :description "Ventas calculadas a partir de los comprobantes de facturación de VTOL"
    :dimensions [{:name "__time" :title "Fecha de Emisión"}
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
+                {:name "year" :hidden true}
                 {:name "año" :column "__time"
                  :extraction [{:type "timeFormat" :format "Y" :timeZone "America/Buenos_Aires" :locale "es"}]}
                 {:name "mes" :column "__time"

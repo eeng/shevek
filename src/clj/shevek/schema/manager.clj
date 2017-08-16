@@ -19,7 +19,8 @@
 (defn- merge-dimensions [old-coll new-coll]
   (let [old-updated-fields (map #(merge % (corresponding % new-coll)) old-coll)
         new-fields (remove #(corresponding % old-coll) new-coll)]
-    (concat old-updated-fields new-fields)))
+    (->> (concat old-updated-fields new-fields)
+         (remove :hidden))))
 
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))

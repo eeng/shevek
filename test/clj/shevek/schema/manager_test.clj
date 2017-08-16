@@ -81,7 +81,12 @@
       (make! Cube {:name "sales" :dimensions []})
       (update-cubes db [{:name "sales" :dimensions [{:name "year" :extraction [{:type "timeFormat" :format "Y"}]}]}])
       (is (submaps? [{:name "year" :extraction [{:type "timeFormat" :format "Y"}] :type "STRING"}]
-                    (-> (find-cubes db) first :dimensions))))))
+                    (-> (find-cubes db) first :dimensions))))
+
+    (it "a hidden dimension should be deleted"
+      (make! Cube {:name "sales" :dimensions [{:name "year"}]})
+      (update-cubes db [{:name "sales" :dimensions [{:name "year" :hidden true}]}])
+      (is (= [] (-> (find-cubes db) first :dimensions))))))
 
 (deftest calculate-expression-tests
   (are [x y] (= x (calculate-expression y))
