@@ -26,7 +26,9 @@
   {:name s/Str
    (s/optional-key :limit) s/Int
    (s/optional-key :sort-by) SortBy
-   (s/optional-key :granularity) s/Str})
+   (s/optional-key :granularity) s/Str
+   (s/optional-key :column) s/Str
+   (s/optional-key :extraction) [{s/Keyword s/Str}]})
 
 (s/defschema Query
   {:cube s/Str

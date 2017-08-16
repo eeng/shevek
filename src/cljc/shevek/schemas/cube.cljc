@@ -6,8 +6,14 @@
    :title s/Str
    (s/optional-key :description) (s/maybe s/Str)})
 
+(s/defschema ExtractionFn
+  {s/Keyword s/Str})
+
 (s/defschema Dimension
-  (assoc NTD :type s/Str))
+  (assoc NTD
+         :type s/Str
+         (s/optional-key :column) s/Str
+         (s/optional-key :extraction) [ExtractionFn]))
 
 (s/defschema Measure
   (assoc NTD

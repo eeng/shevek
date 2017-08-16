@@ -127,6 +127,23 @@
                    (to-druid-query {:measures [{:name "a1" :expression "(/ (sum $amount) 10)"}
                                                {:name "a2" :expression "(* (sum $amount) 20)"}]})))))
 
+  (testing "extraction functions"
+    (testing "derived dimension with one extraction fn"
+      (is (= {:type "extraction" :outputName "year" :dimension "__time"
+              :extractionFn {:type "timeFormat" :format "Y"}}
+             (:dimension
+               (to-druid-query {:dimension {:name "year" :column "__time"
+                                            :extraction [{:type "timeFormat" :format "Y"}]}})))))
+
+    (testing "derived dimension with two extraction fns"
+      (is (= {:type "extraction" :outputName "year" :dimension "__time"
+              :extractionFn {:type "cascade" :extractionFns [{:type "timeFormat" :format "Y"}
+                                                             {:type "strlen"}]}}
+             (:dimension
+               (to-druid-query {:dimension {:name "year" :column "__time"
+                                            :extraction [{:type "timeFormat" :format "Y"}
+                                                         {:type "strlen"}]}}))))))
+
   (testing "timeout"
     (is (= 30000 (get-in (to-druid-query {}) [:context :timeout])))))
 

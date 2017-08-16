@@ -42,13 +42,23 @@
       field
       {:type "inverted" :metric field})))
 
+(defn- dimension-spec [{:keys [name column extraction]}]
+  (if extraction
+    {:type "extraction"
+     :outputName name
+     :dimension (or column name)
+     :extractionFn (if (> (count extraction) 1)
+                     {:type "cascade" :extractionFns extraction}
+                     (first extraction))}
+    name))
+
 (defn- add-query-type-dependant-fields [{:keys [queryType] :as dq}
                                         {:keys [dimension measures] :as q}]
   (condp = queryType
     "topN"
     (assoc dq
            :granularity "all"
-           :dimension (dimension :name)
+           :dimension (dimension-spec dimension)
            :metric (generate-metric-field dimension measures)
            :threshold (dimension :limit (or 100)))
     "timeseries"
