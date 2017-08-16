@@ -75,7 +75,13 @@
     (it "adding new derived measure"
       (make! Cube {:name "sales" :measures []})
       (update-cubes db [{:name "sales" :measures [{:name "amount" :expression "(/ (sum $amount) 100)"}]}])
-      (is (submaps? [{:name "amount" :expression "(/ (sum $amount) 100)"}] (-> (find-cubes db) first :measures))))))
+      (is (submaps? [{:name "amount" :expression "(/ (sum $amount) 100)"}] (-> (find-cubes db) first :measures))))
+
+    (it "adding new derived dimension"
+      (make! Cube {:name "sales" :dimensions []})
+      (update-cubes db [{:name "sales" :dimensions [{:name "year" :extraction [{:type "timeFormat" :format "Y"}]}]}])
+      (is (submaps? [{:name "year" :extraction [{:type "timeFormat" :format "Y"}] :type "STRING"}]
+                    (-> (find-cubes db) first :dimensions))))))
 
 (deftest calculate-expression-tests
   (are [x y] (= x (calculate-expression y))

@@ -34,9 +34,12 @@
 (defn- set-default-expression [measure]
   (merge {:expression (calculate-expression measure)} measure))
 
+(defn- set-default-type [dimension]
+  (merge {:type "STRING"} dimension))
+
 (defn set-default-titles [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
-      (assoc :dimensions (mapv set-default-title dimensions))
+      (assoc :dimensions (mapv (comp set-default-type set-default-title) dimensions))
       (assoc :measures (mapv (comp set-default-expression set-default-title) measures))))
 
 (defn- update-cube [old new]
