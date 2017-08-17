@@ -8,21 +8,29 @@
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]
             [shevek.viewer.visualizations.chart :refer [chart-visualization]]))
 
+(defn- warning [text]
+  [:div.icon-hint
+   [:i.warning.circle.icon]
+   [:div.text text]])
+
 (defn visualization [{:keys [results measures viztype split] :as viz}]
-  (when results
+  (when results ; Results are nil until first query finish
     [:div.visualization
-     (if (empty? measures)
-       [:div.icon-hint
-        [:i.warning.circle.icon]
-        [:div.text (t :viewer/no-measures)]]
-       (if (and (not= viztype :totals) (empty? split))
-         [:div.icon-hint
-          [:i.warning.circle.icon]
-          [:div.text (t :viewer/split-required (translation :viewer.viztype viztype))]]
-         (case viztype
-           :totals [totals-visualization viz]
-           :table [table-visualization viz]
-           [chart-visualization viz])))]))
+     (cond
+       (empty? measures)
+       [warning (t :viewer/no-measures)]
+
+       (and (empty? results) (seq split))
+       [warning (t :viewer/no-results)]
+
+       (and (not= viztype :totals) (empty? split))
+       [warning (t :viewer/split-required (translation :viewer.viztype viztype))]
+
+       :else
+       (case viztype
+         :totals [totals-visualization viz]
+         :table [table-visualization viz]
+         [chart-visualization viz]))]))
 
 (defn visualization-panel []
   [:div.visualization-container.zone.panel.ui.basic.segment

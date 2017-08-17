@@ -22,6 +22,7 @@
              :granularity "Granularity"
              :no-pinned "Drag dimensions here to pin them for quick access"
              :no-measures "Please select at least one measure"
+             :no-results "No results were found that match the specified search criteria"
              :split-required "At least one split is required for the {1} visualization"
              :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"}
     :viewer.period {:relative "Relative"
@@ -125,15 +126,16 @@
             :menu "Cubos"
             :missing "No hay cubos definidos."
             :no-desc "Sin descripción"
-            :no-pinned "Arrastre dimensiones aquí para acceso rápido"
-            :no-measures "Por favor seleccione al menos una métrica"
-            :no-results "No se encontraron resultados"
-            :limit "Límite"
-            :sort-by "Ordenar Por"
-            :granularity "Granularidad"}
+            :no-results "No se encontraron resultados"}
     :viewer {:dimensions "Dimensiones"
              :measures "Métricas"
              :filter "Filtros"
+             :limit "Límite"
+             :sort-by "Ordenar Por"
+             :granularity "Granularidad"
+             :no-pinned "Arrastre dimensiones aquí para acceso rápido"
+             :no-measures "Por favor seleccione al menos una métrica"
+             :no-results "No se encontraron resultados que coincidan con los criterios especificados"
              :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
              :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"}
     :viewer.period {:relative "Relativo"
