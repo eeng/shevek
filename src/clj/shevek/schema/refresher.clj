@@ -40,3 +40,5 @@
 (defstate refresher
   :start (start (* (config :datasources-refresh-interval) 1000))
   :stop (stop refresher))
+
+#_(refresh)
