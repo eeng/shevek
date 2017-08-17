@@ -100,6 +100,13 @@
                    :hour "MMM d, yyyy ha"
                    :day "MMM d, yyyy"
                    :month "MMM yyyy"}
+    :calendar {:days ["S" "M" "T" "W" "T" "F" "S"]
+               :months ["January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"]
+               :monthsShort ["Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
+               :today "Today"
+               :now "Now"
+               :am "AM"
+               :pm "PM"}
     :actions {:ok "Accept"
               :cancel "Cancel"
               :edit "Modify"
@@ -213,6 +220,11 @@
                    :hour "dd/MM/yy H 'hs'"
                    :day "dd/MM/yy"
                    :month "MM/yy"}
+    :calendar {:days ["D" "L" "M" "M" "J" "V" "S"]
+               :months ["Enero" "Febrero" "Marzo" "Abril" "Mayo" "Junio" "Julio" "Agosto" "Septiembre" "Octubre" "Noviembre" "Diciembre"]
+               :monthsShort ["Ene" "Feb" "Mar" "Abr" "May" "Jun" "Jul" "Ago" "Sep" "Oct" "Nov" "Dic"]
+               :today "Hoy"
+               :now "Ahora"}
     :actions {:ok "Aceptar"
               :cancel "Cancelar"
               :edit "Editar"

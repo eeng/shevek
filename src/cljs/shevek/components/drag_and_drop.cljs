@@ -1,5 +1,4 @@
-(ns shevek.components.drag-and-drop
-  (:require [cljs.reader :refer [read-string]]))
+(ns shevek.components.drag-and-drop)
 
 (def drag-data (atom nil))
 

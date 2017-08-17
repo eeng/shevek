@@ -12,6 +12,7 @@
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
+            [shevek.components.calendar :refer [build-range-calendar]]
             [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defn send-queries [db dont-query-pinboard-dim]
@@ -101,16 +102,6 @@
                         (format-period @showed-period (current-cube :max-time))
                         (format-interval interval))]])))
 
-(defn- build-calendar [dom-node]
-  (let [from (-> dom-node js/$ (.find ".calendar.from"))
-        to (-> dom-node js/$ (.find ".calendar.to"))
-        trigger-change #(-> % (.get 0) (.dispatchEvent (js/Event. "input" #js {:bubbles true})))]
-    (.calendar from #js {:type "date" :endCalendar to})
-    (.calendar to #js {:type "date" :startCalendar from
-                       :onHidden #(do
-                                    (-> from (.find "input") trigger-change)
-                                    (-> to (.find "input") trigger-change))})))
-
 (defn- specific-period-time-filter [{:keys [period interval] :as dim}]
   (let [interval (or interval (to-interval period (current-cube :max-time)))
         form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
@@ -119,7 +110,7 @@
     (fn []
       (let [[from to] (parse @form-interval)
             valid? (and from to (<= from to))]
-        [:div.specific.period-type.ui.form {:ref #(when % (build-calendar %))}
+        [:div.specific.period-type.ui.form {:ref build-range-calendar}
          [input-field form-interval :from {:label (t :viewer.period/from) :icon "calendar" :read-only true
                                            :input-wrapper {:class "left icon calendar from"}}]
          [input-field form-interval :to {:label (t :viewer.period/to) :icon "calendar" :read-only true
