@@ -44,7 +44,9 @@
                     :previous-week "Previous Week"
                     :previous-month "Previous Month"
                     :previous-quarter "Previous Quarter"
-                    :previous-year "Previous Year"}
+                    :previous-year "Previous Year"
+                    :from "From"
+                    :to "To"}
     :viewer.operator {:include "Include"
                       :exclude "Exclude"}
     :viewer.viztype {:totals "totals"
@@ -157,7 +159,9 @@
                     :previous-week "Semana Pasada"
                     :previous-month "Mes Pasado"
                     :previous-quarter "Trimestre Pasado"
-                    :previous-year "Año Pasado"}
+                    :previous-year "Año Pasado"
+                    :from "Desde"
+                    :to "Hasta"}
     :viewer.operator {:include "Incluir"
                       :exclude "Excluir"}
     :viewer.viztype {:totals "totales"

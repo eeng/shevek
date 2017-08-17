@@ -111,9 +111,8 @@
       (let [[from to] (parse @form-interval)
             valid? (and from to (<= from to))]
         [:div.specific.period-type.ui.form {:ref shortcuts}
-         [:div.fields
-          [input-field form-interval :from]
-          [input-field form-interval :to]]
+         [input-field form-interval :from {:label (t :viewer.period/from) :icon "calendar"}]
+         [input-field form-interval :to {:label (t :viewer.period/to) :icon "calendar"}]
          [:div
           [:button.ui.primary.compact.button {:on-click accept :class (when-not valid? "disabled")} (t :actions/ok)]
           [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))

@@ -44,17 +44,19 @@
 
 (def input-types {:text text-input :textarea textarea :checkbox checkbox-input})
 
-(defn input-field [atom field {:keys [label class input-class as] :or {as :text} :as opts}]
+(defn input-field [atom field {:keys [label class input-class as icon] :or {as :text} :as opts}]
   (let [path (wrap-coll field)
         errors (get-in @atom (into [:errors] path))
         input-opts (cond-> (assoc opts :class input-class)
-                           true (dissoc :input-class :as)
+                           true (dissoc :input-class :as :icon)
                            (not= as :checkbox) (dissoc :label))
         input (input-types as)]
     (assert input (str "Input type '" as "' not supported"))
     [:div.field {:class (classes class (when errors "error"))}
      (when (and label (not= as :checkbox)) [:label label])
-     [input atom field input-opts]
+     [:div.ui.input {:class (when icon "left icon")}
+      (when icon [:i.icon {:class icon}])
+      [input atom field input-opts]]
      (when errors [:div.ui.pointing.red.basic.label (str/join ", " errors)])]))
 
 ; El selected-title es necesario xq semantic muestra la opción seleccionada en el on-change nomás, y en el mount inicial sólo si selected no es nil. En el pinboard measure por ej. el selected arranca en nil y luego cuando llega la metadata se updatea con el selected, pero no se reflejaba en el dropdown xq ya se había ejecutado el $(..).dropdown() antes.
