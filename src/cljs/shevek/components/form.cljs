@@ -44,17 +44,17 @@
 
 (def input-types {:text text-input :textarea textarea :checkbox checkbox-input})
 
-(defn input-field [atom field {:keys [label class input-class as icon] :or {as :text} :as opts}]
+(defn input-field [atom field {:keys [label class input-class input-wrapper as icon] :or {as :text} :as opts}]
   (let [path (wrap-coll field)
         errors (get-in @atom (into [:errors] path))
         input-opts (cond-> (assoc opts :class input-class)
-                           true (dissoc :input-class :as :icon)
+                           true (dissoc :input-class :as :icon :input-wrapper)
                            (not= as :checkbox) (dissoc :label))
         input (input-types as)]
     (assert input (str "Input type '" as "' not supported"))
     [:div.field {:class (classes class (when errors "error"))}
      (when (and label (not= as :checkbox)) [:label label])
-     [:div.ui.input {:class (when icon "left icon")}
+     [:div.ui.input (merge {:class (when icon "left icon")} input-wrapper)
       (when icon [:i.icon {:class icon}])
       [input atom field input-opts]]
      (when errors [:div.ui.pointing.red.basic.label (str/join ", " errors)])]))

@@ -161,7 +161,7 @@
   "Package the project for deploy. Then start with: java -Dconf=dist/config.edn -jar dist/shevek.jar"
   []
   (comp (cljs :optimizations :advanced
-              :compiler-options {:externs ["src/externs/jquery.js" "src/externs/semantic-ui.js"]
+              :compiler-options {:externs ["src/externs/jquery.js" "src/externs/semantic-ui.js" "src/externs/calendar.js"]
                                  :closure-defines {"goog.DEBUG" false}})
         (less)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})

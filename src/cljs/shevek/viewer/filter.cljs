@@ -9,7 +9,7 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-date]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube dimension-value send-pinboard-queries filter-title]]
-            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field kb-shortcuts]]
+            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.viewer.url :refer [store-viewer-in-url]]))
@@ -101,18 +101,29 @@
                         (format-period @showed-period (current-cube :max-time))
                         (format-interval interval))]])))
 
+(defn- build-calendar [dom-node]
+  (let [from (-> dom-node js/$ (.find ".calendar.from"))
+        to (-> dom-node js/$ (.find ".calendar.to"))
+        trigger-change #(-> % (.get 0) (.dispatchEvent (js/Event. "input" #js {:bubbles true})))]
+    (.calendar from #js {:type "date" :endCalendar to})
+    (.calendar to #js {:type "date" :startCalendar from
+                       :onHidden #(do
+                                    (-> from (.find "input") trigger-change)
+                                    (-> to (.find "input") trigger-change))})))
+
 (defn- specific-period-time-filter [{:keys [period interval] :as dim}]
   (let [interval (or interval (to-interval period (current-cube :max-time)))
         form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
         parse #(map parse-date ((juxt :from :to) %))
-        accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})
-        shortcuts (kb-shortcuts :enter accept :escape close-popup)]
+        accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})]
     (fn []
       (let [[from to] (parse @form-interval)
             valid? (and from to (<= from to))]
-        [:div.specific.period-type.ui.form {:ref shortcuts}
-         [input-field form-interval :from {:label (t :viewer.period/from) :icon "calendar"}]
-         [input-field form-interval :to {:label (t :viewer.period/to) :icon "calendar"}]
+        [:div.specific.period-type.ui.form {:ref #(when % (build-calendar %))}
+         [input-field form-interval :from {:label (t :viewer.period/from) :icon "calendar" :read-only true
+                                           :input-wrapper {:class "left icon calendar from"}}]
+         [input-field form-interval :to {:label (t :viewer.period/to) :icon "calendar" :read-only true
+                                         :input-wrapper {:class "left icon calendar to"}}]
          [:div
           [:button.ui.primary.compact.button {:on-click accept :class (when-not valid? "disabled")} (t :actions/ok)]
           [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
