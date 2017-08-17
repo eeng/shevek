@@ -1,8 +1,10 @@
 (ns shevek.components.drag-and-drop
   (:require [cljs.reader :refer [read-string]]))
 
+(def drag-data (atom nil))
+
 (defn drag-start [event transfer-data]
-  (.. event -dataTransfer (setData "application/x-clojure-data" transfer-data))
+  (reset! drag-data transfer-data)
   (let [drag-image (-> (js/$ "<div class='drag-image'/>")
                        (.text (.. event -target -innerText))
                        (.appendTo "body")
@@ -14,10 +16,9 @@
 
 (defn handle-drop [handler]
   (fn [event]
-    (let [transfer-data (read-string (.. event -dataTransfer (getData "application/x-clojure-data")))]
-      (handler transfer-data)
-      (.preventDefault event)
-      (.stopPropagation event))))
+    (handler @drag-data)
+    (.preventDefault event)
+    (.stopPropagation event)))
 
 (defn drag-over [event]
   (.preventDefault event))
