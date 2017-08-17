@@ -73,8 +73,21 @@
    :title "Eventos de Pedidos"
    :description "Métricas de eventos producidos sobre pedidos cargados en VTOL"
    :dimensions [{:name "__time" :title "Fecha"}
-                {:name "dia_semana" :title "Día de Semana"}
-                {:name "year" :title "Año"}
+                {:name "year" :hidden true}
+                {:name "año" :column "__time"
+                 :extraction [{:type "timeFormat" :format "Y" :timeZone "America/Buenos_Aires" :locale "es"}]}
+                {:name "mes" :column "__time"
+                 :extraction [{:type "timeFormat" :format "MMMM" :timeZone "America/Buenos_Aires" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "semestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
+                {:name "cuatrimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'C' + (Math.floor(new Date(d).getMonth() / 4) + 1) }"}]}
+                {:name "trimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
+                {:name "dia_semana" :title "Día de Semana" :column "__time"
+                 :extraction [{:type "timeFormat" :format "EEEE" :timeZone "America/Buenos_Aires" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "tipo_pedido" :title "Tipo de Pedido"}
                 {:name "condicion_ruteo" :title "Condición de Ruteo"}]
    :measures [{:name "facturado" :format "$0,0.00a" :expression "(/ (sum $facturado) 100)"}
