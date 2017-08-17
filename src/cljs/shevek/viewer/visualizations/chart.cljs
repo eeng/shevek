@@ -10,9 +10,15 @@
 
 (def chart-types {:bar-chart "bar" :line-chart "line" :pie-chart "pie"})
 
+(defn- build-data [measure results viztype]
+  (for [result results :let [value (dimension-value measure result)]]
+    (if (and (= :pie-chart viztype) (neg? value))
+      0
+      value)))
+
 (defn- build-dataset-for-one-split [{:keys [title] :as measure} results viztype]
   (merge {:label title
-          :data (map #(dimension-value measure %) results)}
+          :data (build-data measure results viztype)}
          (case viztype
            :line-chart {:borderColor (first colors) :backgroundColor "rgba(66, 165, 245, 0.3)"}
            {:backgroundColor (take (count results) colors)})))
@@ -21,7 +27,7 @@
   (let [labels (map #(format-dimension (second split) %) results)]
     (merge {:label (first labels)
             :nestedLabels labels ; Stored here for later use in tooltip-title
-            :data (map #(dimension-value measure %) results)}
+            :data (build-data measure results viztype)}
            (case viztype
              :line-chart {:borderColor (nth colors ds-idx) :fill false}
              {:backgroundColor (nth colors ds-idx)}))))
