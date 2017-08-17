@@ -22,19 +22,12 @@
     [dimension-popup-button "orange" "plus" :split-dimension-added dim]
     [dimension-popup-button "yellow" "pin" :dimension-pinned dim]]])
 
-(defn- type-icon [type name]
-  (let [effective-type (if (= name "__time") "TIME" type)]
-    (condp = effective-type
-      "TIME" "wait"
-      "LONG" "hashtag"
-      "font")))
-
-(defn- dimension-item [search {:keys [name title type description] :as dim}]
+(defn- dimension-item [search {:keys [name title description] :as dim}]
   [:div.item (assoc (draggable dim)
                     :title description
                     :class (when (popup-opened? name) "active")
                     :on-click #(show-popup % [dimension-popup dim] {:position "right center" :distanceAway -30 :id name}))
-   [:i.icon {:class (type-icon type name)}]
+   [:i.icon {:class "radio"}]
    (highlight title search)])
 
 (defn dimensions-panel []
