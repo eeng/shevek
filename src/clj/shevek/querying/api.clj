@@ -8,4 +8,4 @@
   (agg/query dw db q))
 
 (defn raw-query [_ q]
-  (raw/query dw q))
+  (raw/query dw db q))

@@ -140,26 +140,34 @@
   (testing "extraction functions"
     (testing "derived dimension with one extraction fn"
       (is (= {:type "extraction" :outputName "year" :dimension "__time"
-              :extractionFn {:type "timeFormat" :format "Y"}}
+              :extractionFn {:type "substring" :index 3}}
              (:dimension
                (to-druid-query {:dimension {:name "year" :column "__time"
-                                            :extraction [{:type "timeFormat" :format "Y"}]}} schema)))))
+                                            :extraction [{:type "substring" :index 3}]}} schema)))))
 
     (testing "derived dimension with two extraction fns"
       (is (= {:type "extraction" :outputName "year" :dimension "__time"
-              :extractionFn {:type "cascade" :extractionFns [{:type "timeFormat" :format "Y"}
+              :extractionFn {:type "cascade" :extractionFns [{:type "subsring"}
                                                              {:type "strlen"}]}}
              (:dimension
               (to-druid-query {:dimension {:name "year" :column "__time"
-                                           :extraction [{:type "timeFormat" :format "Y"}
+                                           :extraction [{:type "subsring"}
                                                         {:type "strlen"}]}} schema)))))
 
     (testing "should use the dimension extraction function in filters also"
       (is (= {:type "selector" :dimension "__time" :value "2017"
-              :extractionFn {:type "timeFormat" :format "Y"}}
+              :extractionFn {:type "strlen"}}
              (:filter
               (to-druid-query {:filter [{:name "year" :operator "is" :value "2017" :column "__time"
-                                         :extraction [{:type "timeFormat" :format "Y"}]}]} schema))))))
+                                         :extraction [{:type "strlen"}]}]} schema)))))
+
+    (testing "the timeFormat extraction should include the schema or default timezone"
+      (is (= {:type "timeFormat" :locale "es" :timeZone "Europe/Berlin"}
+             (-> (to-druid-query {:dimension {:name "year" :column "__time"
+                                              :extraction [{:type "timeFormat" :locale "es"}]}}
+                                 {:default-time-zone "Europe/Berlin"})
+                 (get-in [:dimension :extractionFn]))))))
+
 
   (testing "timeout"
     (is (= 30000 (get-in (to-druid-query {} schema) [:context :timeout])))))

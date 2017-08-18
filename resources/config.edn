@@ -20,9 +20,9 @@
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
                 {:name "year" :hidden true}
                 {:name "año" :column "__time"
-                 :extraction [{:type "timeFormat" :format "Y" :timeZone "America/Buenos_Aires" :locale "es"}]}
+                 :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
                 {:name "mes" :column "__time"
-                 :extraction [{:type "timeFormat" :format "MMMM" :timeZone "America/Buenos_Aires" :locale "es"}
+                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "semestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
@@ -31,7 +31,7 @@
                 {:name "trimestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
                 {:name "dia_semana" :title "Día de Semana" :column "__time"
-                 :extraction [{:type "timeFormat" :format "EEEE" :timeZone "America/Buenos_Aires" :locale "es"}
+                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "tipo_comprobante" :title "Tipo de Comprobante"}
                 {:name "grupo_item" :title "Grupo de Item"}
@@ -82,9 +82,9 @@
    :dimensions [{:name "__time" :title "Fecha"}
                 {:name "year" :hidden true}
                 {:name "año" :column "__time"
-                 :extraction [{:type "timeFormat" :format "Y" :timeZone "America/Buenos_Aires" :locale "es"}]}
+                 :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
                 {:name "mes" :column "__time"
-                 :extraction [{:type "timeFormat" :format "MMMM" :timeZone "America/Buenos_Aires" :locale "es"}
+                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "semestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
@@ -93,7 +93,7 @@
                 {:name "trimestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
                 {:name "dia_semana" :title "Día de Semana" :column "__time"
-                 :extraction [{:type "timeFormat" :format "EEEE" :timeZone "America/Buenos_Aires" :locale "es"}
+                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "tipo_pedido" :title "Tipo de Pedido"}
                 {:name "condicion_ruteo" :title "Condición de Ruteo"}]
