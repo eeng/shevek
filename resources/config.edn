@@ -73,7 +73,9 @@
                :format "0,0"}
               {:name "unidades"
                :title "Unidades"
-               :favorite true}]}
+               :favorite true}
+              {:name "impuestos"
+               :hidden true}]}
   {:name "eventos_pedidos"
    :title "Eventos de Pedidos"
    :description "Métricas de eventos producidos sobre pedidos cargados en VTOL"
