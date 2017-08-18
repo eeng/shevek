@@ -6,6 +6,9 @@
 (defn detect [pred coll]
   (first (filter pred coll)))
 
+(defn find-by [key value coll]
+  (detect #(= (get % key) value) coll))
+
 (defn assoc-if-seq [map key val]
   (cond-> map
           (seq val) (assoc key val)))

@@ -1,5 +1,6 @@
 (ns shevek.querying.conversion
   (:require [clojure.string :as str]
+            [clj-time.core :as t]
             [shevek.lib.collections :refer [assoc-if-seq]]
             [shevek.querying.expression :refer [measure->druid]]
             [shevek.lib.dw.dims :refer [time-dimension? includes-dim?]]))
@@ -55,7 +56,8 @@
     name))
 
 (defn- add-query-type-dependant-fields [{:keys [queryType] :as dq}
-                                        {:keys [dimension measures] :as q}]
+                                        {:keys [dimension measures] :as q}
+                                        {:keys [default-time-zone] :or {default-time-zone (str (t/default-time-zone))}}]
   (condp = queryType
     "topN"
     (assoc dq
@@ -66,7 +68,7 @@
     "timeseries"
     (assoc dq
            :granularity (if dimension
-                          {:type "period" :period (:granularity dimension)}
+                          {:type "period" :period (:granularity dimension) :timeZone default-time-zone}
                           "all")
            :descending (get-in dimension [:sort-by :descending] false)
            :context {:skipEmptyBuckets true})))
@@ -96,12 +98,12 @@
 (defn add-timeout [dq]
   (assoc-in dq [:context :timeout] 30000))
 
-(defn to-druid-query [{:keys [cube filter measures dimension] :as q}]
+(defn to-druid-query [{:keys [cube filter measures dimension] :as q} schema]
   (-> {:queryType (calculate-query-type q)
        :dataSource {:type "table" :name cube}}
       (add-druid-filters filter)
       (add-druid-measures (concat measures (sort-by-derived-measures dimension measures)))
-      (add-query-type-dependant-fields q)
+      (add-query-type-dependant-fields q schema)
       (add-timeout)))
 
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]

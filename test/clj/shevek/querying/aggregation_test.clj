@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [shevek.asserts :refer [submaps?]]
             [shevek.querying.aggregation :refer [query]]
-            [shevek.lib.druid-driver :as druid]))
+            [shevek.lib.druid-driver :as druid]
+            [shevek.db :refer [db]]))
 
 (def dw :dw)
 
@@ -10,11 +11,12 @@
   (testing "query with one dimension with totals should issue two druid queries"
     (let [queries-sent (atom [])]
       (with-redefs [druid/send-query (fn [_ dq] (swap! queries-sent conj dq) [])]
-        (query dw {:cube "wikiticker"
-                   :split [{:name "page"}]
-                   :measures [{:name "count" :expression "(sum $count)"}]
-                   :filter [{:interval ["2015-09-12" "2015-09-13"]}]
-                   :totals true})
+        (query dw db
+               {:cube "wikiticker"
+                :split [{:name "page"}]
+                :measures [{:name "count" :expression "(sum $count)"}]
+                :filter [{:interval ["2015-09-12" "2015-09-13"]}]
+                :totals true})
         (is (submaps? [{:queryType "timeseries" :granularity "all"}
                        {:queryType "topN" :dimension "page"}]
                       @queries-sent)))))
@@ -34,10 +36,11 @@
              [{:result [{:city "Rio de Janerio" :count 5}]}]))]
         (is (submaps? [{:country "Argentina" :count 1 :_results [{:city "Cordoba" :count 3} {:city "Rafaela" :count 4}]}
                        {:country "Brasil" :count 2 :_results [{:city "Rio de Janerio" :count 5}]}]
-                      (query dw {:cube "wikiticker"
-                                 :split [{:name "country"} {:name "city"}]
-                                 :measures [{:name "count" :expression "(sum $count)"}]
-                                 :filter [{:interval ["2015-09-12" "2015-09-13"]}]})))
+                      (query dw db
+                             {:cube "wikiticker"
+                              :split [{:name "country"} {:name "city"}]
+                              :measures [{:name "count" :expression "(sum $count)"}]
+                              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})))
         (is (submaps? [{:queryType "topN" :dimension "country"}
                        {:queryType "topN" :dimension "city"
                         :filter {:dimension "country" :type "selector" :value "Argentina"}}
@@ -56,11 +59,12 @@
              [{:result {:count 1} :timestamp "2015-09-01T00:00:00.000Z"}
               {:result {:count 2} :timestamp "2015-09-01T12:00:00.000Z"}]
              :else []))]
-        (query dw {:cube "wikiticker"
-                   :split [{:name "__time" :granularity "PT12H"} {:name "country"}]
-                   :measures [{:name "count" :expression "(sum $count)"}]
-                   :filter [{:interval ["2015-09-01" "2015-09-01"]}
-                            {:name "country" :operator "is" :value "Argentina"}]})
+        (query dw db
+               {:cube "wikiticker"
+                :split [{:name "__time" :granularity "PT12H"} {:name "country"}]
+                :measures [{:name "count" :expression "(sum $count)"}]
+                :filter [{:interval ["2015-09-01" "2015-09-01"]}
+                         {:name "country" :operator "is" :value "Argentina"}]})
         (is (submaps? [{:queryType "timeseries"}
                        {:queryType "topN" :dimension "country"
                         :intervals "2015-09-01T00:00:00.000Z/2015-09-01T12:00:00.000Z"
