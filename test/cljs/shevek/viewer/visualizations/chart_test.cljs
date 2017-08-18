@@ -8,31 +8,31 @@
   (testing "labels"
     (is (submap? {:labels ["Argentina" "Brasil"]}
                  (build-chart-data {:name "added"}
-                                   {:results {:split [{:name "country"}]
-                                              :main [{}
-                                                     {:country "Argentina"}
-                                                     {:country "Brasil"}]}}))))
+                                   {:split [{:name "country"}]
+                                    :results [{}
+                                              {:country "Argentina"}
+                                              {:country "Brasil"}]}))))
 
   (testing "datasets"
     (testing "one split and viztype bar-chart"
       (is (= [{:data [100 200] :label "Added" :backgroundColor ["#42a5f5" "#ff7043"]}]
              (:datasets
               (build-chart-data {:name "added" :title "Added"}
-                                {:results {:split [{:name "country"}]
-                                           :main [{:added 300}
-                                                  {:added 100 :country "Argentina"}
-                                                  {:added 200 :country "Brasil"}]
-                                           :viztype :bar-chart}})))))
+                                {:split [{:name "country"}]
+                                 :results [{:added 300}
+                                           {:added 100 :country "Argentina"}
+                                           {:added 200 :country "Brasil"}]
+                                 :viztype :bar-chart})))))
 
     (testing "one split and viztype line-chart"
       (is (= [{:data [100 200] :label "Added" :borderColor "#42a5f5" :backgroundColor "rgba(66, 165, 245, 0.3)"}]
              (:datasets
               (build-chart-data {:name "added" :title "Added"}
-                                {:results {:split [{:name "country"}]
-                                           :main [{:added 300}
-                                                  {:added 100 :country "Argentina"}
-                                                  {:added 200 :country "Brasil"}]
-                                           :viztype :line-chart}})))))
+                                {:split [{:name "country"}]
+                                 :results [{:added 300}
+                                           {:added 100 :country "Argentina"}
+                                           {:added 200 :country "Brasil"}]
+                                 :viztype :line-chart})))))
 
     (testing "two splits with equal size of nested results"
       (is (submaps? [{:data [20 160] :nestedLabels ["Santa Fe" "Sao Paulo"] :backgroundColor "#42a5f5"}
@@ -40,13 +40,13 @@
                     (:datasets
                      (build-chart-data
                       {:name "added" :title "Added"}
-                      {:results {:split [{:name "country"} {:name "city"}]
-                                 :main [{}
-                                        {:country "Argentina" :_results [{:added 20 :city "Santa Fe"}
-                                                                         {:added 80 :city "Rafaela"}]}
-                                        {:country "Brasil" :_results [{:added 160 :city "Sao Paulo"}
-                                                                      {:added 40 :city "Brasilia"}]}]
-                                 :viztype :bar-chart}})))))
+                      {:split [{:name "country"} {:name "city"}]
+                       :results [{}
+                                 {:country "Argentina" :_results [{:added 20 :city "Santa Fe"}
+                                                                  {:added 80 :city "Rafaela"}]}
+                                 {:country "Brasil" :_results [{:added 160 :city "Sao Paulo"}
+                                                               {:added 40 :city "Brasilia"}]}]
+                       :viztype :bar-chart})))))
 
     (testing "two splits with different size of nested results"
       (is (submaps? [{:data [30 70] :nestedLabels ["Santa Fe" "Sao Paulo"]}
@@ -55,10 +55,10 @@
                     (:datasets
                      (build-chart-data
                       {:name "added" :title "Added"}
-                      {:results {:split [{:name "country"} {:name "city"}]
-                                 :main [{}
-                                        {:country "Argentina" :_results [{:added 30 :city "Santa Fe"}
-                                                                         {:added 80 :city "Rafaela"}
-                                                                         {:added 25 :city "Ceres"}]}
-                                        {:country "Brasil" :_results '({:added 70 :city "Sao Paulo"}
-                                                                       {:added 40 :city "Brasilia"})}]}})))))))
+                      {:split [{:name "country"} {:name "city"}]
+                       :results [{}
+                                 {:country "Argentina" :_results [{:added 30 :city "Santa Fe"}
+                                                                  {:added 80 :city "Rafaela"}
+                                                                  {:added 25 :city "Ceres"}]}
+                                 {:country "Brasil" :_results '({:added 70 :city "Sao Paulo"}
+                                                                {:added 40 :city "Brasilia"})}]})))))))
