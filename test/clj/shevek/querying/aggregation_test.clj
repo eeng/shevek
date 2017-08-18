@@ -2,16 +2,16 @@
   (:require [clojure.test :refer :all]
             [shevek.asserts :refer [submaps?]]
             [shevek.querying.aggregation :refer [query]]
-            [shevek.lib.druid-driver :as druid]
-            [shevek.db :refer [db]]))
+            [shevek.lib.druid-driver :as druid]))
 
 (def dw :dw)
+(def schema {})
 
 (deftest query-test
   (testing "query with one dimension with totals should issue two druid queries"
     (let [queries-sent (atom [])]
       (with-redefs [druid/send-query (fn [_ dq] (swap! queries-sent conj dq) [])]
-        (query dw db
+        (query dw schema
                {:cube "wikiticker"
                 :split [{:name "page"}]
                 :measures [{:name "count" :expression "(sum $count)"}]
@@ -36,7 +36,7 @@
              [{:result [{:city "Rio de Janerio" :count 5}]}]))]
         (is (submaps? [{:country "Argentina" :count 1 :_results [{:city "Cordoba" :count 3} {:city "Rafaela" :count 4}]}
                        {:country "Brasil" :count 2 :_results [{:city "Rio de Janerio" :count 5}]}]
-                      (query dw db
+                      (query dw schema
                              {:cube "wikiticker"
                               :split [{:name "country"} {:name "city"}]
                               :measures [{:name "count" :expression "(sum $count)"}]
@@ -59,7 +59,7 @@
              [{:result {:count 1} :timestamp "2015-09-01T00:00:00.000Z"}
               {:result {:count 2} :timestamp "2015-09-01T12:00:00.000Z"}]
              :else []))]
-        (query dw db
+        (query dw schema
                {:cube "wikiticker"
                 :split [{:name "__time" :granularity "PT12H"} {:name "country"}]
                 :measures [{:name "count" :expression "(sum $count)"}]

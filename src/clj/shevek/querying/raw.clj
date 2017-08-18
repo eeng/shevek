@@ -3,7 +3,6 @@
             [schema.core :as s]
             [shevek.querying.conversion :refer [add-druid-filters]]
             [shevek.lib.druid-driver :refer [send-query]]
-            [shevek.schema.repository :refer [find-cube]]
             [clojure.set :refer [rename-keys]]))
 
 ; fromNext should not be necessary on the next version of Druid
@@ -19,25 +18,24 @@
     {:results (map (comp #(rename-keys % {:timestamp :__time}) :event) events)
      :paging (assoc paging :pagingIdentifiers pagingIdentifiers)}))
 
-(s/defn query :- RawQueryResults [dw db {:keys [cube] :as q} :- RawQuery]
-  (let [schema (find-cube db cube)
-        dq (to-druid-query q schema)
+(s/defn query :- RawQueryResults [dw schema {:keys [cube] :as q} :- RawQuery]
+  (let [dq (to-druid-query q schema)
         dr (send-query dw dq)]
     (from-druid-results q dr)))
 
 ;; Examples
 
-#_(query shevek.dw/dw shevek.db/db
+#_(query shevek.dw/dw {}
          {:cube "wikiticker"
           :filter [{:interval ["2015" "2016"]}]
           :paging {:threshold 3}})
 
 ; Getting the second page
-#_(let [result (query shevek.dw/dw shevek.db/db
+#_(let [result (query shevek.dw/dw {}
                       {:cube "wikiticker"
                        :filter [{:interval ["2015" "2016"]}]
                        :paging {:threshold 3}})]
-    (query shevek.dw/dw shevek.db/db
+    (query shevek.dw/dw {}
            {:cube "wikiticker"
             :filter [{:interval ["2015" "2016"]}]
             :paging (:paging result)}))
