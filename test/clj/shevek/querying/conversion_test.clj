@@ -105,14 +105,22 @@
 
     (testing "ascending ordered by the same dimension should use lexicographic sorting"
       (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}}
-                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}
-                                    :measures [{:name "count" :expression "(sum $count)"}]}
-                                   schema))))
+                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}} schema)))
+      (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}}
+                   (to-druid-query {:dimension {:name "isNew" :type "BOOL" :sort-by {:name "isNew" :descending false}}} schema))))
 
     (testing "descending ordered by the same dimension should use lexicographic sorting"
       (is (submap? {:metric {:type "inverted"
                              :metric {:type "dimension" :ordering "lexicographic"}}}
-                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending true}}} schema)))))
+                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending true}}} schema))))
+
+    (testing "ordering by numeric dimensions should use numeric sorting"
+      (is (submap? {:metric {:type "dimension" :ordering "numeric"}}
+                   (to-druid-query {:dimension {:name "aLong" :type "LONG"
+                                                :sort-by {:name "aLong" :descending false}}} schema)))
+      (is (submap? {:metric {:type "dimension" :ordering "numeric"}}
+                   (to-druid-query {:dimension {:name "aFloat" :type "FLOAT"
+                                                :sort-by {:name "aFloat" :descending false}}} schema)))))
 
   (testing "measures"
     (testing "arithmetic expression"

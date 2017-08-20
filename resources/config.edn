@@ -51,10 +51,10 @@
                 {:name "tasa_iva" :title "Tasa de IVA"}
                 {:name "condicion_iva" :title "Condición IVA"}
                 {:name "despacho_preferencial" :title "Despacho Preferencial" :type "BOOL"}
-                {:name "esferico" :title "Esférico"}
-                {:name "cilindrico" :title "Cilíndrico"}
-                {:name "eje_cilindrico" :title "Eje Cilíndrico"}
-                {:name "adicion" :title "Adición"}]
+                {:name "esferico" :title "Esférico" :type "FLOAT"}
+                {:name "cilindrico" :title "Cilíndrico" :type "FLOAT"}
+                {:name "eje_cilindrico" :title "Eje Cilíndrico" :type "FLOAT"}
+                {:name "adicion" :title "Adición" :type "FLOAT"}]
    :measures [{:name "importe"
                :title "Importe Total"
                :expression "(/ (sum $importe) 100)"

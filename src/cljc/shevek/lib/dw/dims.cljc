@@ -2,6 +2,7 @@
   (:require [shevek.lib.collections :refer [detect]]
             [shevek.schemas.cube :refer [Dimension]]
             [schema-tools.core :as st]
+            [clojure.string :refer [lower-case]]
             [com.rpl.specter :refer [transform ALL]]))
 
 (defn dim= [dim1 dim2]
@@ -47,3 +48,6 @@
 
 (defn merge-dimensions [current-dims other-dims]
   (reduce add-or-replace current-dims other-dims))
+
+(defn numeric-dim? [{:keys [type]}]
+  (some #{"LONG" "FLOAT"} [type]))
