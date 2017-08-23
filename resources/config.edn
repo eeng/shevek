@@ -38,7 +38,8 @@
                 {:name "tipo_item" :title "Tipo de Item"}
                 {:name "concepto" :hidden true}
                 {:name "tipo_concepto" :hidden true}
-                {:name "descripcion" :title "Descripción Renglón"}
+                {:name "descripcion" :title "Descripción Amplia"}
+                {:name "descripcion_reducida" :title "Descripción Reducida"}
                 {:name "oficina_emision" :title "Oficina de Emisión"}
                 {:name "cuit_cliente" :title "CUIT Cliente"}
                 {:name "provincia_cliente" :title "Provincia del Cliente"}
@@ -74,8 +75,14 @@
                :title "Último Cbte"
                :format "0,0"}
               {:name "unidades"
+               :hidden true}
+              {:name "unidades_precios"
                :title "Unidades"
+               :expression "(where {$tipo_item \"Precio\"} (sum $unidades))"
                :favorite true}
+              {:name "unidades_descargos"
+               :title "Unidades Descargos"
+               :expression "(where (not= $tipo_item \"Precio\") (sum $unidades))"}
               {:name "impuestos"
                :hidden true}]}
   {:name "eventos_pedidos"

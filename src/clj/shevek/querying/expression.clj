@@ -22,8 +22,11 @@
       ([(op :guard #{'and 'or}) & args] :seq)
       {:type (str op) :fields (map condition->filter args)}
 
-      ([op field-ref val] :seq)
-      {:type "selector" :dimension (field-ref->field field-ref) :value val})))
+      (['= field-ref val] :seq)
+      {:type "selector" :dimension (field-ref->field field-ref) :value val}
+
+      (['not= field-ref val] :seq)
+      {:type "not" :field {:type "selector" :dimension (field-ref->field field-ref) :value val}})))
 
 (defn- build-filtered-aggregator [field condition aggregator]
   {:type "filtered"

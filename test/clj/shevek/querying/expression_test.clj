@@ -36,6 +36,13 @@
               :postAggregations []}
              (measure->druid {:name "amount" :expression "(where (= $country \"ar\") (sum $amount))"})))
       (is (= {:aggregations [{:type "filtered"
+                              :filter {:type "not"
+                                       :field {:type "selector" :dimension "country" :value "ar"}}
+                              :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
+                              :name "amount"}]
+              :postAggregations []}
+             (measure->druid {:name "amount" :expression "(where (not= $country \"ar\") (sum $amount))"})))
+      (is (= {:aggregations [{:type "filtered"
                               :filter {:type "and"
                                        :fields [{:type "selector" :dimension "country" :value 1}
                                                 {:type "selector" :dimension "city" :value 2}]}
