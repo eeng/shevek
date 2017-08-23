@@ -36,6 +36,8 @@
                 {:name "tipo_comprobante" :title "Tipo de Comprobante"}
                 {:name "grupo_item" :title "Grupo de Item"}
                 {:name "tipo_item" :title "Tipo de Item"}
+                {:name "concepto" :hidden true}
+                {:name "tipo_concepto" :hidden true}
                 {:name "descripcion" :title "Descripción Renglón"}
                 {:name "oficina_emision" :title "Oficina de Emisión"}
                 {:name "cuit_cliente" :title "CUIT Cliente"}
