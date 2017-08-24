@@ -104,17 +104,20 @@
            (t :actions/ok)]
           [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
 
-; The timestamp is so if a split is removed a then re-added, the popup is regenerated
+; The popup-key needs two things:
+; 1. The splitted dim so if we sort from the visualization the popup gets remounted with the updated opts.
+; 2. A timestamp for if a split is removed and then re-added, the popup gets regenerated with default opts.
 ; The button has to be a link otherwise Firefox wouldn't fire the click event on the icon
-(defn- split-item [{:keys [title] :as dim}]
-  (let [popup-key (-> dim (assoc :timestamp (js/Date.)) hash)]
-    (fn []
-      [:a.ui.orange.compact.right.labeled.icon.button
-       (merge {:on-click #(show-popup % ^{:key popup-key} [split-popup dim] {:position "bottom center"})}
-              (draggable dim)
-              (droppable #(dispatch :split-dimension-replaced dim %)))
-       [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
-       title])))
+(defn- split-item [_]
+  (let [timestamp (js/Date.)]
+    (fn [{:keys [title] :as dim}]
+      (let [popup-key (-> dim (assoc :timestamp timestamp) hash)]
+        [:a.ui.orange.compact.right.labeled.icon.button
+         (merge {:on-click #(show-popup % ^{:key popup-key} [split-popup dim] {:position "bottom center"})}
+                (draggable dim)
+                (droppable #(dispatch :split-dimension-replaced dim %)))
+         [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
+         title]))))
 
 (defn split-panel []
   [:div.split.panel (droppable #(dispatch :split-dimension-added %))
