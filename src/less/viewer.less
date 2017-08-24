@@ -80,6 +80,7 @@
   .top-row {
     display: flex;
     flex-direction: row;
+    flex-shrink: 0; // Without this on certain browsers this row would shrink when visualization content overflows
     .filter-split { flex-grow: 1 }
     .viztype-selector {
       width: 90px;
@@ -118,10 +119,11 @@
     display: flex;
     flex-direction: column;
     .panel {
+      &.header-container { flex-shrink: 0 }
       &.no-pinned {
         align-items: center;
         justify-content: center;
-        height: 250px;
+        min-height: 250px;
         padding: @panel-horizontal-padding;
         .icon-hint { margin-top: -1em }
       }

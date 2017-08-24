@@ -125,7 +125,7 @@
 
 (defn pinboard-panels []
   [:div.pinboard (droppable #(dispatch :dimension-pinned %))
-   [:div.panel
+   [:div.panel.header-container
     [panel-header (t :viewer/pinboard)
      [dropdown (map (juxt :title :name) (current-cube :measures))
       {:selected (viewer :pinboard :measure :name) :class "top right pointing"
