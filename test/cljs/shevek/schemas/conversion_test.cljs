@@ -24,13 +24,13 @@
                viewer->report :filter))))
 
   (testing "in each split should store only the dimension name besides its own fields"
-    (is (submaps? [{:name "page" :limit 10 :sort-by {:name "page" :descending true}}
-                   {:name "time" :granularity "P1D" :sort-by {:name "count" :descending false}}]
-                  (-> {:split [{:name "page" :type "t" :limit 10
-                                :sort-by {:name "page" :type "t" :descending true}}
-                               {:name "time" :type "t" :granularity "P1D"
-                                :sort-by {:name "count" :type "t" :expression "e" :format "f" :descending false :favorite true}}]}
-                      viewer->report :split))))
+    (is (= [{:name "page" :limit 10 :sort-by {:name "page" :descending true}}
+            {:name "time" :granularity "P1D" :sort-by {:name "count" :descending false}}]
+           (-> {:split [{:name "page" :type "t" :limit 10
+                         :sort-by {:name "page" :type "t" :descending true}}
+                        {:name "time" :type "t" :granularity "P1D" :column "..." :extraction "..."
+                         :sort-by {:name "count" :type "t" :expression "e" :format "f" :descending false :favorite true}}]}
+               viewer->report :split))))
 
   (testing "should convert the pinboard"
     (is (= {:measure "count"
