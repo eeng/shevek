@@ -7,7 +7,7 @@
 
 (defn find-users [db]
   (mq/with-collection db "users"
-    (mq/fields [:username :fullname :email :admin])
+    (mq/fields [:username :fullname :email :admin :permissions])
     (mq/sort {:username 1})))
 
 (defn find-by-username [db username]

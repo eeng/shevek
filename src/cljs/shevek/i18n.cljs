@@ -88,7 +88,13 @@
             :invalid-credentials "Invalid username or password"
             :session-expired "Session expired, please login again"
             :password-hint "Leave blank if you don't want to change it"
-            :unauthorized "Sorry, you are not allow to access this page. Please contact the administrator for more information."}
+            :unauthorized "Sorry, you are not allow to access this page. Please contact the administrator for more information."
+            :basic-info "Basic Information"
+            :permissions "Permissions"}
+    :permissions {:title "Permissions"
+                  :allowed-cubes "Allowed Cubes"
+                  :all-cubes "All cubes will be visible"
+                  :only-cubes-selected "Only the following selected cubes will be visible"}
     :account {:title "Your Account"
               :subtitle "Edit your profile details here"
               :current-password "Current Password"
@@ -208,7 +214,9 @@
             :invalid-credentials "Usuario y/o password incorrecto"
             :session-expired "Sesión expirada, por favor ingrese nuevamente"
             :password-hint "Dejar en blanco para no cambiarlo"
-            :unauthorized "Ud. no tiene acceso a esta página. Por favor, contacte al administrador para más información."}
+            :unauthorized "Ud. no tiene acceso a esta página. Por favor, contacte al administrador para más información."
+            :basic-info "Información Básica"
+            :permissions "Permisos"}
     :account {:title "Tu Cuenta"
               :subtitle "Aquí podés cambiar los detalles de tu perfil"
               :current-password "Password Actual"

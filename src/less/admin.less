@@ -1,10 +1,28 @@
 #admin {
-  section {
+  section.users {
     margin-top: 2em;
     margin-bottom: 3em;
-  }
-  .red.button:active {
-    background-color: #d01919 !important;
-    color: white !important;
+    .red.button:active {
+      background-color: #d01919 !important;
+      color: white !important;
+    }
+    h3.header {
+      color: #ccc;
+      text-transform: uppercase;
+      font-weight: normal;
+      font-size: 1.1em;
+    }
+    h4.header {
+      margin-top: 1em;
+    }
+    .item {
+      cursor: pointer;
+      .icon {
+        margin-top: -.1em;
+        margin-right: 0.3em;
+      }
+      .description { margin-top: 0.3em }
+      &.hidden * { .more.muted; }
+    }
   }
 }

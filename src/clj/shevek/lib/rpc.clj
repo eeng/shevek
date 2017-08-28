@@ -18,10 +18,12 @@
     (assert f (str "There is no remote function with fid " fid))
     (apply f request args)))
 
+; The query runs within a pmap so if a timeout occours in Druid we will get an ExecutionException with the ExceptionInfo wrapped, hence the root-cause.
 (defn controller [request]
   (try
     {:status 200 :body (call-fn request)}
     (catch Exception e
-      (if-let [data (-> e root-cause ex-data)] ; The query runs within a pmap so if a timeout occours in Druid we will get an ExecutionException with the ExceptionInfo wrapped, hence the root-cause.
-        {:status 500 :body data}
-        (throw e)))))
+      (let [{:keys [error] :as data} (-> e root-cause ex-data)]
+        (if (= error "Query timeout")
+          {:status 500 :body data}
+          (throw e))))))

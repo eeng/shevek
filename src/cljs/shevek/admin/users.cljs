@@ -10,7 +10,9 @@
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [new-record?]]
-            [shevek.lib.string :refer [format-bool]]))
+            [shevek.lib.string :refer [format-bool]]
+            [shevek.lib.collections :refer [includes?]]
+            [shevek.lib.dw.cubes :refer [cubes-list]]))
 
 (defevh :users-arrived [db users]
   (-> (assoc db :users users)
@@ -24,6 +26,22 @@
   (dispatch :users-requested)
   (rpc/loaded db :saving-user))
 
+(def default-user {:admin false})
+
+(defn permissions->ui [{:keys [allowed-cubes] :or {allowed-cubes "all"}}]
+  (let [all-allowed? (= allowed-cubes "all")
+        selected-cubes (if all-allowed? [] (map :name allowed-cubes))
+        cube-permission (fn [{:keys [name] :as cube}]
+                         (assoc cube :selected (includes? selected-cubes name)))]
+    {:cubes (mapv cube-permission (cubes-list))
+     :only-cubes-selected (not all-allowed?)}))
+
+(defn ui->permissions [{:keys [only-cubes-selected cubes]}]
+  (let [allowed-cubes (if only-cubes-selected
+                        (->> cubes (filter :selected) (map #(select-keys % [:name])))
+                        "all")]
+    {:allowed-cubes allowed-cubes}))
+
 (def user-validations
   {:username (v/required)
    :fullname (v/required)
@@ -33,6 +51,7 @@
    :email (v/email {:optional? true})})
 
 (defevh :user-changed [db edited-user cancel]
+  (swap! edited-user update :permissions ui->permissions)
   (when (v/valid?! edited-user user-validations)
     (rpc/call "users.api/save"
               :args [(dissoc @edited-user :password-confirmation)]
@@ -42,27 +61,56 @@
 (defevh :user-deleted [db user]
   (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %)))
 
-(defn- user-form [edited-user]
-  (let [cancel #(reset! edited-user nil)
-        save #(dispatch :user-changed edited-user cancel)
+(defn- user-fields [user shortcuts]
+  (let [new-user? (new-record? @user)]
+    [:div
+     [:h3.ui.header (t :users/basic-info)]
+     [:div.ui.form {:ref shortcuts}
+      [input-field user :username {:label (t :users/username) :class "required" :auto-focus true}]
+      [input-field user :fullname {:label (t :users/fullname) :class "required"}]
+      [input-field user :password {:label (t :users/password) :class (when new-user? "required")
+                                          :type "password" :placeholder (when-not new-user? (t :users/password-hint))}]
+      [input-field user :password-confirmation {:label (t :users/password-confirmation)
+                                                       :placeholder (when-not new-user? (t :users/password-hint))
+                                                       :class (when new-user? "required") :type "password"}]
+      [input-field user :email {:label (t :users/email)}]
+      [input-field user :admin {:label (t :users/admin) :as :checkbox :input-class "toggle"}]]]))
+
+(defn- cube-permissions [user {:keys [title description selected]} i]
+  [:div.item {:on-click #(swap! user update-in [:permissions :cubes i :selected] not)
+              :class (when-not selected "hidden")}
+   [:i.icon.large {:class (if selected "checkmark" "minus")}]
+   [:div.content
+    [:div.header title]
+    [:div.description description]]])
+
+(defn- user-permissions [user]
+  (let [{:keys [only-cubes-selected cubes]} (get-in @user [:permissions])]
+    [:div
+     [:h3.ui.header (t :users/permissions)]
+     [:h4.ui.header (t :permissions/allowed-cubes)]
+     [input-field user [:permissions :only-cubes-selected]
+      {:label (t (if only-cubes-selected :permissions/only-cubes-selected :permissions/all-cubes))
+       :as :checkbox :input-class "toggle"}]
+     (when only-cubes-selected
+       [:div.ui.divided.items
+        (for [[i {:keys [name] :as cube}] (map-indexed vector cubes)]
+          ^{:key name} [cube-permissions user cube i])])]))
+
+(defn- user-form [user]
+  (let [cancel #(reset! user nil)
+        save #(dispatch :user-changed user cancel)
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
-      (let [new-user? (new-record? @edited-user)]
-        [:div.ui.grid
-         [:div.five.wide.column
-          [:div.ui.segment (rpc/loading-class :saving-user)
-           [:div.ui.form {:ref shortcuts}
-            [input-field edited-user :username {:label (t :users/username) :class "required" :auto-focus true}]
-            [input-field edited-user :fullname {:label (t :users/fullname) :class "required"}]
-            [input-field edited-user :password {:label (t :users/password) :class (when new-user? "required")
-                                                :type "password" :placeholder (when-not new-user? (t :users/password-hint))}]
-            [input-field edited-user :password-confirmation {:label (t :users/password-confirmation)
-                                                             :placeholder (when-not new-user? (t :users/password-hint))
-                                                             :class (when new-user? "required") :type "password"}]
-            [input-field edited-user :email {:label (t :users/email)}]
-            [input-field edited-user :admin {:label (t :users/admin) :as :checkbox :input-class "toggle"}]
-            [:button.ui.primary.button {:on-click save} (t :actions/save)]
-            [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]]))))
+      [:div.ui.padded.segment (rpc/loading-class :saving-user)
+       [:div.ui.grid
+        [:div.five.wide.column
+         [user-fields user shortcuts]]
+        [:div.eleven.wide.column
+         [user-permissions user]]
+        [:div.sixteen.wide.column
+         [:button.ui.primary.button {:on-click save} (t :actions/save)]
+         [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]])))
 
 (defn- user-row [{:keys [username fullname email admin] :as original-user} edited-user]
   [:tr
@@ -72,7 +120,7 @@
    [:td.center.aligned (format-bool admin)]
    [:td.collapsing
     [:button.ui.compact.basic.button
-     {:on-click #(reset! edited-user original-user)}
+     {:on-click #(reset! edited-user (update original-user :permissions permissions->ui))}
      (t :actions/edit)]
     [:button.ui.compact.basic.red.button
      (hold-to-confirm #(dispatch :user-deleted original-user))
@@ -86,7 +134,9 @@
     [:th (t :users/email)]
     [:th.center.aligned (t :users/admin)]
     [:th.right.aligned
-     [:button.ui.button {:on-click #(reset! edited-user {:admin false})} (t :actions/new)]]]
+     [:button.ui.button
+      {:on-click #(reset! edited-user (update default-user :permissions permissions->ui))}
+      (t :actions/new)]]]
    [:tbody
     (for [user (db/get :users)]
       ^{:key (:username user)} [user-row user edited-user])]])
@@ -95,7 +145,8 @@
   (dispatch :users-requested)
   (let [edited-user (r/atom nil)]
     (fn []
-      [:section
+      [:section.users
        [:h2.ui.app.header (t :admin/users)]
-       (when @edited-user [user-form edited-user])
-       [users-table edited-user]])))
+       (if @edited-user
+         [user-form edited-user]
+         [users-table edited-user])])))
