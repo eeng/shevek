@@ -1,12 +1,13 @@
 (ns shevek.admin.users
   (:require-macros [shevek.reflow.macros :refer [defevh]])
-  (:require [shevek.i18n :refer [t]]
+  (:require [reagent.core :as r]
+            [cuerdas.core :as str]
+            [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title mail-to]]
             [shevek.components.form :refer [input-field kb-shortcuts hold-to-confirm]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
-            [reagent.core :as r]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [new-record?]]
@@ -86,7 +87,7 @@
 
 (defn- user-permissions [user]
   (let [{:keys [only-cubes-selected cubes]} (get-in @user [:permissions])]
-    [:div
+    [:div.permissions-fields
      [:h3.ui.header (t :users/permissions)]
      [:h4.ui.header (t :permissions/allowed-cubes)]
      [input-field user [:permissions :only-cubes-selected]
@@ -112,41 +113,49 @@
          [:button.ui.primary.button {:on-click save} (t :actions/save)]
          [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]])))
 
-(defn- user-row [{:keys [username fullname email admin] :as original-user} edited-user]
-  [:tr
-   [:td username]
-   [:td fullname]
-   [:td (mail-to email)]
-   [:td.center.aligned (format-bool admin)]
-   [:td.collapsing
-    [:button.ui.compact.basic.button
-     {:on-click #(reset! edited-user (update original-user :permissions permissions->ui))}
-     (t :actions/edit)]
-    [:button.ui.compact.basic.red.button
-     (hold-to-confirm #(dispatch :user-deleted original-user))
-     (t :actions/delete)]]])
+(defn- user-item [{:keys [username fullname email admin permissions] :as original-user} edited-user]
+  (let [allowed-cubes (:allowed-cubes permissions)
+        allowed-cubes-text
+        (cond
+          (= allowed-cubes "all") (t :permissions/all-cubes)
+          (empty? allowed-cubes) (t :permissions/no-cubes)
+          :else (str (t :permissions/only-cubes-selected) ": "
+                     (str/join ", " (map #(db/get-in [:cubes (:name %) :title]) allowed-cubes))))]
+    [:div.item
+     [:i.user.huge.icon]
+     [:div.content
+      [:div.right.floated
+       [:button.ui.compact.basic.button
+        {:on-click #(reset! edited-user (update original-user :permissions permissions->ui))}
+        (t :actions/edit)]
+       [:button.ui.compact.basic.red.button
+        (hold-to-confirm #(dispatch :user-deleted original-user))
+        (t :actions/delete)]]
+      [:div.header fullname]
+      [:div.description
+       [:p (t :users/username) ": " username]
+       (when (seq email) [:p (t :users/email) ": " (mail-to email)])
+       [:p allowed-cubes-text]]
+      (when admin
+        [:div.extra
+         [:div.ui.blue.label "Admin"]])]]))
 
-(defn- users-table [edited-user]
-  [:table.ui.table
-   [:thead>tr
-    [:th.three.wide (t :users/username)]
-    [:th.five.wide (t :users/fullname)]
-    [:th (t :users/email)]
-    [:th.center.aligned (t :users/admin)]
-    [:th.right.aligned
-     [:button.ui.button
-      {:on-click #(reset! edited-user (update default-user :permissions permissions->ui))}
-      (t :actions/new)]]]
-   [:tbody
-    (for [user (db/get :users)]
-      ^{:key (:username user)} [user-row user edited-user])]])
+(defn- users-list [edited-user]
+  [:div.users-list
+   [:div.ui.padded.segment
+    [:div.ui.divided.items
+     (for [user (db/get :users)]
+       ^{:key (:username user)} [user-item user edited-user])]]])
 
 (defn users-section []
   (dispatch :users-requested)
   (let [edited-user (r/atom nil)]
     (fn []
       [:section.users
+       [:button.ui.button.right.floated
+        {:on-click #(reset! edited-user (update default-user :permissions permissions->ui))}
+        (t :actions/new)]
        [:h2.ui.app.header (t :admin/users)]
        (if @edited-user
          [user-form edited-user]
-         [users-table edited-user])])))
+         [users-list edited-user])])))

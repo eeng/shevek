@@ -93,8 +93,9 @@
             :permissions "Permissions"}
     :permissions {:title "Permissions"
                   :allowed-cubes "Allowed Cubes"
-                  :all-cubes "All cubes will be visible"
-                  :only-cubes-selected "Only the following selected cubes will be visible"}
+                  :all-cubes "Can view all cubes"
+                  :no-cubes "Can view no cubes"
+                  :only-cubes-selected "Can view only the following cubes"}
     :account {:title "Your Account"
               :subtitle "Edit your profile details here"
               :current-password "Current Password"
@@ -217,6 +218,11 @@
             :unauthorized "Ud. no tiene acceso a esta página. Por favor, contacte al administrador para más información."
             :basic-info "Información Básica"
             :permissions "Permisos"}
+    :permissions {:title "Permisos"
+                  :allowed-cubes "Cubes Visibles"
+                  :all-cubes "Puede visualizar todos los cubos"
+                  :no-cubes "No puede visualizar ningún cubo"
+                  :only-cubes-selected "Puede ver sólo los siguientes cubos"}
     :account {:title "Tu Cuenta"
               :subtitle "Aquí podés cambiar los detalles de tu perfil"
               :current-password "Password Actual"
