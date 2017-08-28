@@ -11,7 +11,7 @@
 (def token-expiration (t/days 1))
 
 (defn generate-token [{:keys [_id] :as user}]
-  (let [token (-> (dissoc user :_id :password)
+  (let [token (-> (select-keys user [:username :fullname :admin])
                   (assoc :id (str _id) :exp (t/plus (t/now) token-expiration)))]
     (jwt/sign token (config :jwt-secret))))
 
@@ -35,7 +35,7 @@
   (fn [{:keys [identity] :as request}]
     (handler (assoc request
                     :user-id (when identity (oid (:id identity)))
-                    :user identity))))
+                    :user (users/find-by-username db (:username identity))))))
 
 (defn authorize [authorized?]
   (when-not authorized?
