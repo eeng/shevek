@@ -2,10 +2,11 @@
   (:require [shevek.schema.repository :as r]
             [shevek.schema.metadata :as m]
             [shevek.db :refer [db]]
-            [shevek.dw :refer [dw]]))
+            [shevek.dw :refer [dw]]
+            [shevek.schema.auth :refer [filter-visible-cubes]]))
 
-(defn cubes [_]
-  (r/find-cubes db))
+(defn cubes [{:keys [user]}]
+  (filter-visible-cubes (:permissions user) (r/find-cubes db)))
 
 (defn max-time [_ cube-name]
   (:max-time (m/time-boundary dw cube-name)))
@@ -19,5 +20,5 @@
 
 ;; Examples
 
-#_(cubes)
+#_(cubes {:user {:permissions {:allowed-cubes "all"}}})
 #_(cube "wikiticker")
