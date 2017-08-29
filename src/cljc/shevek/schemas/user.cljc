@@ -2,7 +2,8 @@
   (:require [schema.core :as s]))
 
 (s/defschema CubePermissions
-  {:name s/Str})
+  {:name s/Str
+   (s/optional-key :measures) (s/cond-pre (s/eq "all") [s/Str])})
 
 (s/defschema User
   {(s/optional-key :_id) s/Any

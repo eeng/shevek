@@ -4,15 +4,15 @@
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title mail-to]]
-            [shevek.components.form :refer [input-field kb-shortcuts hold-to-confirm search-input filter-matching]]
+            [shevek.components.form :refer [input-field kb-shortcuts hold-to-confirm search-input filter-matching select]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.lib.util :refer [new-record?]]
-            [shevek.lib.string :refer [format-bool]]
-            [shevek.lib.collections :refer [includes?]]
+            [shevek.lib.string :refer [format-bool split]]
+            [shevek.lib.collections :refer [find-by]]
             [shevek.lib.dw.cubes :refer [cubes-list]]))
 
 (defevh :users-arrived [db users]
@@ -30,17 +30,22 @@
 (def default-user {:admin false})
 
 (defn adapt-for-client [{:keys [allowed-cubes] :or {allowed-cubes "all"} :as user}]
-  (let [all-allowed? (= allowed-cubes "all")
-        selected-cubes (if all-allowed? [] (map :name allowed-cubes))
-        cube-permission (fn [{:keys [name] :as cube}]
-                         (assoc cube :selected (includes? selected-cubes name)))]
+  (let [cube-permission (fn [{:keys [name] :as cube}]
+                          (let [allowed-cube (find-by :name name allowed-cubes)
+                                allowed-measures (get allowed-cube :measures "all")]
+                            (assoc cube
+                                   :selected (some? allowed-cube)
+                                   :only-measures-selected (not= "all" allowed-measures)
+                                   :allowed-measures (when (not= "all" allowed-measures) allowed-measures))))]
     (assoc user
            :cubes (mapv cube-permission (cubes-list))
-           :only-cubes-selected (not all-allowed?))))
+           :only-cubes-selected (not= allowed-cubes "all"))))
 
 (defn adapt-for-server [{:keys [only-cubes-selected cubes] :as user}]
-  (let [allowed-cubes (if only-cubes-selected
-                        (->> cubes (filter :selected) (map #(select-keys % [:name])))
+  (let [adapt-cube (fn [{:keys [name allowed-measures only-measures-selected]}]
+                     {:name name :measures (if only-measures-selected allowed-measures "all")})
+        allowed-cubes (if only-cubes-selected
+                        (->> cubes (filter :selected) (map adapt-cube))
                         "all")]
     (-> (dissoc user :password-confirmation :cubes :only-cubes-selected)
         (assoc :allowed-cubes allowed-cubes))))
@@ -76,13 +81,23 @@
       [input-field user :email {:label (t :users/email)}]
       [input-field user :admin {:label (t :users/admin) :as :checkbox :input-class "toggle"}]]]))
 
-(defn- cube-permissions [user {:keys [title description selected]} i]
+(defn- cube-permissions [user {:keys [title description selected measures only-measures-selected allowed-measures] :as cube} i]
   [:div.item {:on-click #(swap! user update-in [:cubes i :selected] not)
               :class (when-not selected "hidden")}
-   [:i.icon.large {:class (if selected "checkmark" "minus")}]
+   [:i.icon.large.selected {:class (if selected "checkmark" "minus")}]
    [:div.content
     [:div.header title]
-    [:div.description description]]])
+    [:div.description [:p description]
+     (when selected
+       [:div.measures {:on-click #(.stopPropagation %)}
+        [:a {:on-click #(swap! user update-in [:cubes i :only-measures-selected] not)}
+         (t (if only-measures-selected :permissions/only-measures-selected :permissions/all-measures))]
+        (when only-measures-selected
+          [select (map (juxt :title :name) measures)
+           {:class "multiple fluid search selection"
+            :selected allowed-measures
+            :on-change #(swap! user assoc-in [:cubes i :allowed-measures] (split % #","))
+            :placeholder (t :permissions/select-measures)}])])]]])
 
 (defn- user-permissions [user]
   (let [{:keys [only-cubes-selected cubes]} @user]
@@ -92,9 +107,8 @@
      (if (:admin @user)
        [:div (t :permissions/admin-all-cubes)]
        [:div
-        [input-field user :only-cubes-selected
-         {:label (t (if only-cubes-selected :permissions/only-cubes-selected :permissions/all-cubes))
-          :as :checkbox :input-class "toggle"}]
+        [:a {:on-click #(swap! user update :only-cubes-selected not)}
+         (t (if only-cubes-selected :permissions/only-cubes-selected :permissions/all-cubes))]
         (when only-cubes-selected
           [:div.ui.divided.items
            (for [[i {:keys [name] :as cube}] (map-indexed vector cubes)]
@@ -116,14 +130,25 @@
          [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]])))
 
 (defn- user-item [{:keys [username fullname email admin allowed-cubes] :or {allowed-cubes "all"} :as original-user} edited-user]
-  (let [allowed-cubes-text
+  (let [cube-permissions (fn [{:keys [name measures]}]
+                           (let [cube-title (db/get-in [:cubes name :title])
+                                 all-measures (db/get-in [:cubes name :measures])
+                                 measures-titles (if (seq measures)
+                                                   (->> measures
+                                                        (map #(:title (find-by :name % all-measures)))
+                                                        (str/join ", "))
+                                                   (t :permissions/no-measures))
+                                 measures-details (when (not= measures "all")
+                                                    (str " (" (t :viewer/measures) ": " measures-titles ")"))]
+                             (str cube-title measures-details)))
+        allowed-cubes-text
         (cond
           (= allowed-cubes "all") (t :permissions/all-cubes)
           (empty? allowed-cubes) (t :permissions/no-cubes)
           :else (str (t :permissions/only-cubes-selected) ": "
-                     (str/join ", " (map #(db/get-in [:cubes (:name %) :title]) allowed-cubes))))]
+                     (->> allowed-cubes (map cube-permissions) (str/join ", "))))]
     [:div.item
-     [:i.user.huge.icon]
+     [:div [:i.user.huge.icon]]
      [:div.content
       [:div.right.floated
        [:button.ui.compact.basic.button

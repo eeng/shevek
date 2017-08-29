@@ -68,4 +68,10 @@
                :pinboard))))
 
   (testing "should convert back the viztype"
-    (is (= :pie-chart (:viztype (report->viewer {:viztype "pie-chart"} {}))))))
+    (is (= :pie-chart (:viztype (report->viewer {:viztype "pie-chart"} {})))))
+
+  (testing "if a report measure is not present on the cube (because modified permissions) should remove it"
+    (is (= [{:name "m2" :title "M2"}]
+           (-> {:measures ["m1" "m2"]}
+               (report->viewer {:measures [{:name "m2" :title "M2"}]})
+               :measures)))))

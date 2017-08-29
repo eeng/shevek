@@ -22,10 +22,12 @@
       padding-left: 2em;
     }
     .permissions-fields {
+      a { cursor: pointer; }
+      .items { margin-top: 2em }
       .item {
         cursor: pointer;
         user-select: none;
-        .icon {
+        .icon.selected {
           margin-top: -.1em;
           margin-right: 0.4em;
         }
@@ -33,6 +35,13 @@
         * { transition: color 0.3s ease, color 0.3s ease; }
         &.hidden * { .more.muted; }
         &.hidden:hover * { .muted; }
+
+        .measures {
+          .ui.dropdown {
+            display: block;
+            margin-top: 0.5em;
+          }
+        }
       }
     }
     .users-list {

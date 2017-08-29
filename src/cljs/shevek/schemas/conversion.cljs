@@ -37,7 +37,7 @@
    :viztype (keyword viztype)
    :filter (report-dims->viewer (report :filter) cube)
    :split (report-dims->viewer (report :split) cube)
-   :measures (mapv #(find-dimension % (cube :measures)) (report :measures))
+   :measures (filterv some? (map #(find-dimension % (cube :measures)) (report :measures)))
    :pinboard {:measure (find-dimension (:measure pinboard) (cube :measures))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 

@@ -96,7 +96,11 @@
                   :admin-all-cubes "Admin users view everything"
                   :all-cubes "Can view all cubes"
                   :no-cubes "Can view no cubes"
-                  :only-cubes-selected "Can view only the following cubes"}
+                  :only-cubes-selected "Can view only the following cubes"
+                  :all-measures "All measures will be visible"
+                  :only-measures-selected "Only the following measures will be visible"
+                  :select-measures "Please select the allowed measures"
+                  :no-measures "None"}
     :account {:title "Your Account"
               :subtitle "Edit your profile details here"
               :current-password "Current Password"
@@ -224,7 +228,11 @@
                   :admin-all-cubes "Administradores pueden ver todo"
                   :all-cubes "Puede visualizar todos los cubos"
                   :no-cubes "No puede visualizar ningún cubo"
-                  :only-cubes-selected "Puede ver sólo los siguientes cubos"}
+                  :only-cubes-selected "Puede ver sólo los siguientes cubos"
+                  :all-measures "Todas las métricas serán visibles"
+                  :only-measures-selected "Sólo las siguientes métricas serán visibles"
+                  :select-measures "Por favor seleccion las métricas permitidas"
+                  :no-measures "Ninguna"}
     :account {:title "Tu Cuenta"
               :subtitle "Aquí podés cambiar los detalles de tu perfil"
               :current-password "Password Actual"

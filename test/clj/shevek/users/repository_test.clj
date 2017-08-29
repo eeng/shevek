@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [deftest is]]
             [shevek.test-helper :refer [it]]
             [shevek.makers :refer [make!]]
-            [shevek.asserts :refer [without?]]
+            [shevek.asserts :refer [without? submaps?]]
             [shevek.users.repository :refer [find-users save-user reload]]
             [shevek.schemas.user :refer [User]]
             [shevek.db :refer [db]]
@@ -30,7 +30,7 @@
 
   (it "admin should always view all cubes"
     (is (= "all" (:allowed-cubes (make! User {:admin true :allowed-cubes [{:name "x"}]}))))
-    (is (= [{:name "x"}] (:allowed-cubes (make! User {:admin false :allowed-cubes [{:name "x"}]}))))))
+    (is (submaps? [{:name "x"}] (:allowed-cubes (make! User {:admin false :allowed-cubes [{:name "x"}]}))))))
 
 (deftest find-users-tests
   (it "should return users sorted by username"
