@@ -90,13 +90,16 @@
     [:div.permissions-fields
      [:h3.ui.header (t :users/permissions)]
      [:h4.ui.header (t :permissions/allowed-cubes)]
-     [input-field user [:permissions :only-cubes-selected]
-      {:label (t (if only-cubes-selected :permissions/only-cubes-selected :permissions/all-cubes))
-       :as :checkbox :input-class "toggle"}]
-     (when only-cubes-selected
-       [:div.ui.divided.items
-        (for [[i {:keys [name] :as cube}] (map-indexed vector cubes)]
-          ^{:key name} [cube-permissions user cube i])])]))
+     (if (:admin @user)
+       [:div (t :permissions/admin-all-cubes)]
+       [:div
+        [input-field user [:permissions :only-cubes-selected]
+         {:label (t (if only-cubes-selected :permissions/only-cubes-selected :permissions/all-cubes))
+          :as :checkbox :input-class "toggle"}]
+        (when only-cubes-selected
+          [:div.ui.divided.items
+           (for [[i {:keys [name] :as cube}] (map-indexed vector cubes)]
+             ^{:key name} [cube-permissions user cube i])])])]))
 
 (defn- user-form [user]
   (let [cancel #(reset! user nil)

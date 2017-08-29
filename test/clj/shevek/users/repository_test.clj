@@ -26,7 +26,13 @@
     (let [new-user (make! User {:password "pass1234" :fullname "N1"})
           changed-user (->> (dissoc new-user :password)
                             (save-user db) (reload db))]
-      (is (check-password "pass1234" (:password changed-user))))))
+      (is (check-password "pass1234" (:password changed-user)))))
+
+  (it "admin should always view all cubes"
+    (is (= "all" (-> (make! User {:admin true :permissions {:allowed-cubes [{:name "x"}]}})
+                     (get-in [:permissions :allowed-cubes]))))
+    (is (= [{:name "x"}] (-> (make! User {:admin false :permissions {:allowed-cubes [{:name "x"}]}})
+                             (get-in [:permissions :allowed-cubes]))))))
 
 (deftest find-users-tests
   (it "should return users sorted by username"

@@ -27,10 +27,16 @@
 (defn find-by [db fields-and-values]
   (mc/find-one-as-map db "users" fields-and-values))
 
+(defn ensure-admin-permissions [{:keys [admin] :as user}]
+  (cond-> user
+          admin (assoc-in [:permissions :allowed-cubes] "all")))
+
 (defn create-or-update-by [db field user]
   (let [value (field user)
         existing (or (and value (find-by db {field value})) {})
-        merged (merge existing (encrypt-password user))]
+        merged (->> (encrypt-password user)
+                    (ensure-admin-permissions)
+                    (merge existing))]
     (s/validate User merged)
     (mc/save-and-return db "users" merged)))
 

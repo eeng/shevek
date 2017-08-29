@@ -93,6 +93,7 @@
             :permissions "Permissions"}
     :permissions {:title "Permissions"
                   :allowed-cubes "Allowed Cubes"
+                  :admin-all-cubes "Admin users view everything"
                   :all-cubes "Can view all cubes"
                   :no-cubes "Can view no cubes"
                   :only-cubes-selected "Can view only the following cubes"}
@@ -220,6 +221,7 @@
             :permissions "Permisos"}
     :permissions {:title "Permisos"
                   :allowed-cubes "Cubes Visibles"
+                  :admin-all-cubes "Administradores pueden ver todo"
                   :all-cubes "Puede visualizar todos los cubos"
                   :no-cubes "No puede visualizar ningún cubo"
                   :only-cubes-selected "Puede ver sólo los siguientes cubos"}
