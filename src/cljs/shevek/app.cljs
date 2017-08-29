@@ -4,6 +4,7 @@
             [shevek.schemas.interceptor :as schema]
             [shevek.reflow.core :as reflow]
             [shevek.reflow.interceptors :as i]
+            [shevek.lib.error]
             [secretary.core :as secretary]
             [goog.events :as events]
             [goog.history.EventType :as EventType])

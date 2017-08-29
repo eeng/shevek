@@ -3,9 +3,7 @@
   (:require [ajax.core :refer [POST]]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
-            [shevek.i18n :refer [t translation]]
-            [shevek.navegation :refer [navigate]]
-            [shevek.components.modal :refer [show-modal]]
+            [shevek.i18n :refer [t]]
             [shevek.lib.session-storage :as session-storage]))
 
 (defn loading?
@@ -18,32 +16,6 @@
 (defn loaded
   ([db] (assoc db :loading {}))
   ([db key] (update db :loading dissoc key)))
-
-(defn handle-app-error [{:keys [status status-text response]}]
-  (let [error (:error response)
-        status-text (or error status-text)
-        message (or (and error (translation :errors error)) response)]
-    (show-modal {:class "small basic app-error"
-                 :header [:div.ui.icon.red.header
-                          [:i.warning.circle.icon]
-                          (str "Error " status ": " status-text)]
-                 :content message
-                 :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]})))
-
-(defn handle-not-authenticated []
-  (dispatch :session-expired))
-
-(defn handle-not-authorized [error]
-  (handle-app-error error)
-  (navigate "/"))
-
-(defevh :server-error [db {:keys [status] :as error}]
-  (case status
-    401 (handle-not-authenticated)
-    403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
-    502 (handle-app-error (assoc error :response {:error "Bad Gateway"}))
-    (handle-app-error error))
-  (loaded db))
 
 (defn call [fid & {:keys [args handler] :or {args []}}]
   {:pre [(vector? args)]}

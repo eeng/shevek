@@ -16,7 +16,9 @@
             [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
             [shevek.viewer.url :refer [store-viewer-in-url restore-report-from-url]]
-            [shevek.viewer.raw]))
+            [shevek.viewer.raw]
+            [shevek.notification :refer [notify]]
+            [shevek.i18n :refer [t]]))
 
 (defn- already-build? [viewer]
   (some? (:measures viewer)))
@@ -27,14 +29,18 @@
     current-report (report->viewer current-report cube)
     :else (build-new-viewer cube)))
 
-(defevhi :cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
-  {:after [store-viewer-in-url]}
+(defevh :cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
   (let [cube (set-cube-defaults cube)
-        {:keys [pinboard] :as viewer} (init-viewer cube viewer current-report)]
-    (-> (assoc db :viewer viewer)
-        (rpc/loaded :cube-metadata)
-        (send-main-query)
-        (send-pinboard-queries))))
+        db (rpc/loaded db :cube-metadata)
+        {:keys [measures] :as viewer} (init-viewer cube viewer current-report)]
+    (if (seq measures)
+      (-> (assoc db :viewer viewer)
+          (send-main-query)
+          (send-pinboard-queries)
+          (store-viewer-in-url))
+      (do
+        (notify (t :viewer/unauthorized (:title cube)) :type :error :timeout 5000)
+        (navigate "/")))))
 
 (defevh :viewer-initialized [db]
   (if-let [cube (get-in db [:viewer :cube :name])]

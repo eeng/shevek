@@ -9,8 +9,9 @@
     (when (not= next-path current-path)
       (.pushState js/history {}, nil, next-path))))
 
-(defn- store-viewer-in-url [{:keys [viewer]}]
-  (-> viewer viewer->report pr-str b64/encode store))
+(defn store-viewer-in-url [{:keys [viewer] :as db}]
+  (-> viewer viewer->report pr-str b64/encode store)
+  db)
 
 (defn restore-report-from-url [encoded-report]
   (try
