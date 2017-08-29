@@ -11,7 +11,7 @@
 (def token-expiration (t/days 1))
 
 (defn generate-token [{:keys [_id] :as user}]
-  (let [token (-> (select-keys user [:username :fullname :admin])
+  (let [token (-> (select-keys user [:username :fullname :admin :email])
                   (assoc :id (str _id) :exp (t/plus (t/now) token-expiration)))]
     (jwt/sign token (config :jwt-secret))))
 

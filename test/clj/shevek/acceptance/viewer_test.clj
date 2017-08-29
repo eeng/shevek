@@ -25,7 +25,6 @@
         (is (has-css? page ".statistic" :count 3))
         (click page {:id "cb-measure-delta"})
         (is (has-css? page ".statistic" :count 4))
-        (Thread/sleep 300) ; For the debounce
         (refresh page)
         (is (has-css? page ".statistic" :count 4))))
 
