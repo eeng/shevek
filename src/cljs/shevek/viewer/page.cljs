@@ -17,7 +17,6 @@
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
             [shevek.viewer.url :refer [store-viewer-in-url restore-report-from-url]]
             [shevek.viewer.raw]
-            [shevek.notification :refer [notify]]
             [shevek.i18n :refer [t]]))
 
 (defn- already-build? [viewer]
@@ -38,9 +37,7 @@
           (send-main-query)
           (send-pinboard-queries)
           (store-viewer-in-url))
-      (do
-        (notify (t :viewer/unauthorized (:title cube)) :type :error :timeout 5000)
-        (navigate "/")))))
+      (dispatch :client-error (t :viewer/unauthorized (:title cube))))))
 
 (defevh :viewer-initialized [db]
   (if-let [cube (get-in db [:viewer :cube :name])]

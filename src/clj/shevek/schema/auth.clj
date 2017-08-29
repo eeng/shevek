@@ -15,8 +15,8 @@
       (includes? measures (:name measure))))
 
 (defn filter-cube [{:keys [name measures] :as cube} {:keys [allowed-cubes] :as user}]
-  (authorize (cube-visible? cube user))
-  (let [allowed-cube (and (not= allowed-cubes "all") (find-by :name name allowed-cubes))
-        filtered-measures (filterv #(measure-visible? % allowed-cube) measures)]
-    (authorize (seq filtered-measures))
-    (assoc cube :measures filtered-measures)))
+  (if (cube-visible? cube user)
+    (let [allowed-cube (and (not= allowed-cubes "all") (find-by :name name allowed-cubes))
+          filtered-measures (filterv #(measure-visible? % allowed-cube) measures)]
+      (assoc cube :measures filtered-measures))
+    (select-keys cube [:name :title])))

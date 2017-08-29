@@ -4,7 +4,8 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t translation]]
             [shevek.navegation :refer [navigate]]
-            [shevek.rpc :as rpc]))
+            [shevek.rpc :as rpc]
+            [shevek.notification :refer [notify]]))
 
 (defn handle-app-error [{:keys [status status-text response]}]
   (let [error (:error response)
@@ -30,4 +31,9 @@
     403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
     502 (handle-app-error (assoc error :response {:error "Bad Gateway"}))
     (handle-app-error error))
+  (rpc/loaded db))
+
+(defevh :client-error [db error]
+  (notify error :type :error :timeout 5000)
+  (navigate "/")
   (rpc/loaded db))

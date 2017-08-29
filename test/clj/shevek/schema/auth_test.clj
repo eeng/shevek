@@ -2,17 +2,20 @@
   (:require [clojure.test :refer :all]
             [shevek.schema.auth :refer [filter-cubes filter-cube]]))
 
+(defn filtered-cubes [user cubes]
+  (map :name (filter-cubes user cubes)))
+
 (deftest filter-cubes-test
   (let [all-cubes [{:name "c1"} {:name "c2"}]]
     (testing "by default all cubes are visible"
-      (is (= ["c1" "c2"] (map :name (filter-cubes nil all-cubes)))))
+      (is (= ["c1" "c2"] (filtered-cubes nil all-cubes))))
 
     (testing "when all cubes are allowed"
-      (is (= ["c1" "c2"] (map :name (filter-cubes {:allowed-cubes "all"} all-cubes)))))
+      (is (= ["c1" "c2"] (filtered-cubes {:allowed-cubes "all"} all-cubes))))
 
     (testing "if a list of allowed-cubes is specified, only those cubes are visible"
-      (is (= ["c2"] (map :name (filter-cubes {:allowed-cubes [{:name "c2"}]} all-cubes))))
-      (is (= [] (map :name (filter-cubes {:allowed-cubes []} all-cubes)))))))
+      (is (= ["c2"] (filtered-cubes {:allowed-cubes [{:name "c2"}]} all-cubes)))
+      (is (= [] (filtered-cubes {:allowed-cubes []} all-cubes))))))
 
 (defn filtered-measures [cube user]
   (->> (filter-cube cube user) :measures (map :name)))
@@ -28,10 +31,8 @@
       (is (= ["m1"] (filtered-measures cube {:allowed-cubes [{:name "c1" :measures ["m1"]}]})))
       (is (= ["m2"] (filtered-measures cube {:allowed-cubes [{:name "c1" :measures ["m2"]}]}))))
 
-    (testing "if the cube is not allowed it should throw unauthorized error"
-      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Unauthorized"
-                            (filter-cube cube {:allowed-cubes [{:name "c2"}]}))))
+    (testing "if the cube is not allowed it should return the cube without measures"
+      (is (= [] (filtered-measures cube {:allowed-cubes [{:name "c2"}]}))))
 
     (testing "if no measures are allowed an unauthorized error is thrown"
-      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Unauthorized"
-                            (filtered-measures cube {:allowed-cubes [{:name "c1" :measures []}]}))))))
+      (is (= [] (filtered-measures cube {:allowed-cubes [{:name "c1" :measures []}]}))))))

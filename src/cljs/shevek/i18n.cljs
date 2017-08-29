@@ -25,7 +25,7 @@
              :no-results "No results were found that match the specified search criteria"
              :split-required "At least one split is required for the {1} visualization"
              :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"
-             :unauthorized "Oops! It seems you are not allow to view this cube anymore. Please contact the administrator to resolve this issue."}
+             :unauthorized "Oops! It seems you are not allow to view the {1} cube anymore. Please contact the administrator to resolve this issue."}
     :viewer.period {:relative "Relative"
                     :specific "Specific"
                     :latest "Latest"
@@ -160,7 +160,7 @@
              :no-results "No se encontraron resultados que coincidan con los criterios especificados"
              :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
              :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"
-             :unauthorized "Oops! Parece que Ud. ya no tiene acceso a este cubo. Por favor, contacte al administrador para resolver este inconviente."}
+             :unauthorized "Oops! Parece que Ud. ya no tiene acceso al cubo {1}. Por favor, contacte al administrador para resolver este inconviente."}
     :viewer.period {:relative "Relativo"
                     :specific "Específico"
                     :latest "Ultimo"
