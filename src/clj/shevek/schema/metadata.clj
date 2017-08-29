@@ -36,8 +36,7 @@
 
 ;; Examples
 
-(require '[shevek.dw :refer [dw]])
-#_(cubes dw)
-#_(dimensions-and-measures dw "wikiticker")
-#_(segment-metadata-query dw "wikiticker")
-#_(time-boundary dw "wikiticker")
+#_(cubes shevek.dw/dw)
+#_(dimensions-and-measures shevek.dw/dw "wikiticker")
+#_(segment-metadata-query shevek.dw/dw "wikiticker")
+#_(time-boundary shevek.dw/dw "wikiticker")

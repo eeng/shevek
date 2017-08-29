@@ -34,7 +34,7 @@
   (let [path (wrap-coll field)
         id (str "cb-" (str/join "-" (map str path)))
         opts (merge {:type "checkbox"
-                     :checked (get-in @atom path)
+                     :checked (= (get-in @atom path) true) ; without the = true reagent throws a warning when the value is nil
                      :on-change #(swap! atom update-in path not)
                      :id id}
                     opts)]

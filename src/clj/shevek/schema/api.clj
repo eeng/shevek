@@ -6,7 +6,10 @@
             [shevek.schema.auth :refer [filter-visible-cubes]]))
 
 (defn cubes [{:keys [user]}]
-  (filter-visible-cubes (:permissions user) (r/find-cubes db)))
+  (->> (r/find-cubes db)
+       (filter-visible-cubes (:permissions user))
+       (map #(select-keys % [:_id :name :title :description]))
+       (sort-by :title)))
 
 (defn max-time [_ cube-name]
   (:max-time (m/time-boundary dw cube-name)))
@@ -21,4 +24,4 @@
 ;; Examples
 
 #_(cubes {:user {:permissions {:allowed-cubes "all"}}})
-#_(cube "wikiticker")
+#_(cube nil "vtol_stats")
