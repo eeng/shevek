@@ -7,7 +7,7 @@
 
 (defn cubes [{:keys [user]}]
   (->> (r/find-cubes db)
-       (filter-visible-cubes (:permissions user))
+       (filter-visible-cubes user)
        (map #(select-keys % [:_id :name :title :description]))
        (sort-by :title)))
 

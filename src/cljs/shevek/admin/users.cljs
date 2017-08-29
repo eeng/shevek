@@ -29,19 +29,21 @@
 
 (def default-user {:admin false})
 
-(defn permissions->ui [{:keys [allowed-cubes] :or {allowed-cubes "all"}}]
+(defn adapt-for-client [{:keys [allowed-cubes] :or {allowed-cubes "all"} :as user}]
   (let [all-allowed? (= allowed-cubes "all")
         selected-cubes (if all-allowed? [] (map :name allowed-cubes))
         cube-permission (fn [{:keys [name] :as cube}]
                          (assoc cube :selected (includes? selected-cubes name)))]
-    {:cubes (mapv cube-permission (cubes-list))
-     :only-cubes-selected (not all-allowed?)}))
+    (assoc user
+           :cubes (mapv cube-permission (cubes-list))
+           :only-cubes-selected (not all-allowed?))))
 
-(defn ui->permissions [{:keys [only-cubes-selected cubes]}]
+(defn adapt-for-server [{:keys [only-cubes-selected cubes] :as user}]
   (let [allowed-cubes (if only-cubes-selected
                         (->> cubes (filter :selected) (map #(select-keys % [:name])))
                         "all")]
-    {:allowed-cubes allowed-cubes}))
+    (-> (dissoc user :password-confirmation :cubes :only-cubes-selected)
+        (assoc :allowed-cubes allowed-cubes))))
 
 (def user-validations
   {:username (v/required)
@@ -53,9 +55,8 @@
 
 (defevh :user-changed [db edited-user cancel]
   (when (v/valid?! edited-user user-validations)
-    (let [user (-> @edited-user (dissoc :password-confirmation) (update :permissions ui->permissions))]
-      (rpc/call "users.api/save" :args [user] :handler #(do (dispatch :user-saved) (cancel)))
-      (rpc/loading db :saving-user))))
+    (rpc/call "users.api/save" :args [(adapt-for-server @edited-user)] :handler #(do (dispatch :user-saved) (cancel)))
+    (rpc/loading db :saving-user)))
 
 (defevh :user-deleted [db user]
   (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %)))
@@ -76,7 +77,7 @@
       [input-field user :admin {:label (t :users/admin) :as :checkbox :input-class "toggle"}]]]))
 
 (defn- cube-permissions [user {:keys [title description selected]} i]
-  [:div.item {:on-click #(swap! user update-in [:permissions :cubes i :selected] not)
+  [:div.item {:on-click #(swap! user update-in [:cubes i :selected] not)
               :class (when-not selected "hidden")}
    [:i.icon.large {:class (if selected "checkmark" "minus")}]
    [:div.content
@@ -84,14 +85,14 @@
     [:div.description description]]])
 
 (defn- user-permissions [user]
-  (let [{:keys [only-cubes-selected cubes]} (get-in @user [:permissions])]
+  (let [{:keys [only-cubes-selected cubes]} @user]
     [:div.permissions-fields
      [:h3.ui.header (t :users/permissions)]
      [:h4.ui.header (t :permissions/allowed-cubes)]
      (if (:admin @user)
        [:div (t :permissions/admin-all-cubes)]
        [:div
-        [input-field user [:permissions :only-cubes-selected]
+        [input-field user :only-cubes-selected
          {:label (t (if only-cubes-selected :permissions/only-cubes-selected :permissions/all-cubes))
           :as :checkbox :input-class "toggle"}]
         (when only-cubes-selected
@@ -114,9 +115,8 @@
          [:button.ui.primary.button {:on-click save} (t :actions/save)]
          [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]])))
 
-(defn- user-item [{:keys [username fullname email admin permissions] :as original-user} edited-user]
-  (let [allowed-cubes (:allowed-cubes permissions)
-        allowed-cubes-text
+(defn- user-item [{:keys [username fullname email admin allowed-cubes] :or {allowed-cubes "all"} :as original-user} edited-user]
+  (let [allowed-cubes-text
         (cond
           (= allowed-cubes "all") (t :permissions/all-cubes)
           (empty? allowed-cubes) (t :permissions/no-cubes)
@@ -127,7 +127,7 @@
      [:div.content
       [:div.right.floated
        [:button.ui.compact.basic.button
-        {:on-click #(reset! edited-user (update original-user :permissions permissions->ui))}
+        {:on-click #(reset! edited-user (adapt-for-client original-user))}
         (t :actions/edit)]
        [:button.ui.compact.basic.red.button
         (hold-to-confirm #(dispatch :user-deleted original-user))
@@ -161,7 +161,7 @@
     (fn []
       [:section.users
        [:button.ui.button.right.floated
-        {:on-click #(reset! edited-user (update default-user :permissions permissions->ui))}
+        {:on-click #(reset! edited-user (adapt-for-client default-user))}
         (t :actions/new)]
        [:h2.ui.app.header (t :admin/users)]
        (if @edited-user

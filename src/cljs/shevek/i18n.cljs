@@ -92,8 +92,7 @@
             :basic-info "Basic Information"
             :permissions "Permissions"
             :no-results "No users where found"}
-    :permissions {:title "Permissions"
-                  :allowed-cubes "Allowed Cubes"
+    :permissions {:allowed-cubes "Allowed Cubes"
                   :admin-all-cubes "Admin users view everything"
                   :all-cubes "Can view all cubes"
                   :no-cubes "Can view no cubes"
@@ -221,8 +220,7 @@
             :basic-info "Información Básica"
             :permissions "Permisos"
             :no-results "No se encontraron usuarios"}
-    :permissions {:title "Permisos"
-                  :allowed-cubes "Cubes Visibles"
+    :permissions {:allowed-cubes "Cubes Visibles"
                   :admin-all-cubes "Administradores pueden ver todo"
                   :all-cubes "Puede visualizar todos los cubos"
                   :no-cubes "No puede visualizar ningún cubo"

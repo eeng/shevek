@@ -29,10 +29,8 @@
       (is (check-password "pass1234" (:password changed-user)))))
 
   (it "admin should always view all cubes"
-    (is (= "all" (-> (make! User {:admin true :permissions {:allowed-cubes [{:name "x"}]}})
-                     (get-in [:permissions :allowed-cubes]))))
-    (is (= [{:name "x"}] (-> (make! User {:admin false :permissions {:allowed-cubes [{:name "x"}]}})
-                             (get-in [:permissions :allowed-cubes]))))))
+    (is (= "all" (:allowed-cubes (make! User {:admin true :allowed-cubes [{:name "x"}]}))))
+    (is (= [{:name "x"}] (:allowed-cubes (make! User {:admin false :allowed-cubes [{:name "x"}]}))))))
 
 (deftest find-users-tests
   (it "should return users sorted by username"

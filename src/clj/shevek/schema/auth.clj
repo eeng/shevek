@@ -1,9 +1,8 @@
 (ns shevek.schema.auth
   (:require [schema.core :as s]
-            [shevek.lib.collections :refer [includes?]]
-            [shevek.schemas.user :refer [Permissions]]))
+            [shevek.lib.collections :refer [includes?]]))
 
-(s/defn filter-visible-cubes [{:keys [allowed-cubes] :or {allowed-cubes "all"}} :- Permissions cubes]
+(defn filter-visible-cubes [{:keys [allowed-cubes] :or {allowed-cubes "all"}} cubes]
   (if (= allowed-cubes "all")
     cubes
     (let [allowed-cubes (map :name allowed-cubes)]

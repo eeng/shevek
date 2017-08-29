@@ -7,7 +7,7 @@
 
 (defn find-users [db]
   (mq/with-collection db "users"
-    (mq/fields [:username :fullname :email :admin :permissions])
+    (mq/fields [:username :fullname :email :admin :allowed-cubes])
     (mq/sort {:username 1})))
 
 (defn find-by-username [db username]
@@ -29,7 +29,7 @@
 
 (defn ensure-admin-permissions [{:keys [admin] :as user}]
   (cond-> user
-          admin (assoc-in [:permissions :allowed-cubes] "all")))
+          admin (assoc :allowed-cubes "all")))
 
 (defn create-or-update-by [db field user]
   (let [value (field user)
