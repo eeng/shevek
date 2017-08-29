@@ -2,6 +2,7 @@
   (:require [reagent.core :as r]
             [shevek.lib.collections :refer [detect wrap-coll]]
             [shevek.lib.react :refer [with-react-keys]]
+            [shevek.lib.string :refer [regex-escape]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
             [shevek.notification :refer [notify]]))
@@ -97,6 +98,24 @@
   (fn [dom-node]
     (when dom-node
       (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
+
+(defn- filter-matching [search get-value results]
+  (if (seq search)
+    (let [pattern (re-pattern (str "(?i)" (regex-escape search)))]
+      (filter #(re-find pattern (get-value %)) results))
+    results))
+
+(defn search-input [search {:keys [on-change on-stop wrapper] :or {on-change identity on-stop identity wrapper {}}}]
+  (let [change #(on-change (reset! search %))
+        clear #(do (when (seq @search) (change ""))
+                 (on-stop))
+        wrapper-opts (merge {:ref (kb-shortcuts :enter on-stop :escape clear)} wrapper)]
+     [:div.ui.icon.fluid.input.search wrapper-opts
+      [:input {:type "text" :placeholder (t :input/search) :value @search
+               :on-change #(change (.-target.value %)) :auto-focus true}]
+      (if (seq @search)
+        [:i.link.remove.circle.icon {:on-click clear}]
+        [:i.search.icon])]))
 
 (defonce holding (r/atom nil))
 (def holding-time 2)

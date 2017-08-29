@@ -4,7 +4,7 @@
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
             [shevek.components.text :refer [page-title mail-to]]
-            [shevek.components.form :refer [input-field kb-shortcuts hold-to-confirm]]
+            [shevek.components.form :refer [input-field kb-shortcuts hold-to-confirm search-input filter-matching]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
@@ -142,11 +142,18 @@
          [:div.ui.blue.label "Admin"]])]]))
 
 (defn- users-list [edited-user]
-  [:div.users-list
-   [:div.ui.padded.segment
-    [:div.ui.divided.items
-     (for [user (db/get :users)]
-       ^{:key (:username user)} [user-item user edited-user])]]])
+  (let [search (r/atom "")
+        username-or-fullname #(str/join "|" ((juxt :username :fullname) %))]
+    (fn []
+      [:div.users-list
+       [search-input search {:wrapper {:class "big"}}]
+       [:div.ui.padded.segment
+        [:div.ui.divided.items
+         (let [users (filter-matching @search username-or-fullname (db/get :users))]
+           (if (seq users)
+             (for [user users]
+               ^{:key (:username user)} [user-item user edited-user])
+             [:div.large.tip (t :users/no-results)]))]]])))
 
 (defn users-section []
   (dispatch :users-requested)

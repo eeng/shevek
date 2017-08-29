@@ -107,25 +107,8 @@
   [:h2.ui.sub.header text
    (when (seq actions) (into [:div.actions] actions))])
 
-(defn- filter-matching [search get-value results]
-  (if (seq search)
-    (let [pattern (re-pattern (str "(?i)" (regex-escape search)))]
-      (filter #(re-find pattern (get-value %)) results))
-    results))
-
 (defn- search-button [searching]
   [:i.search.link.icon {:on-click #(swap! searching not)}])
-
-(defn search-input [search {:keys [on-change on-stop] :or {on-change identity on-stop identity}}]
-  (let [change #(on-change (reset! search %))
-        clear #(do (when (seq @search) (change ""))
-                 (on-stop))]
-     [:div.ui.icon.small.fluid.input.search {:ref (kb-shortcuts :enter on-stop :escape clear)}
-      [:input {:type "text" :placeholder (t :input/search) :value @search
-               :on-change #(change (.-target.value %)) :auto-focus true}]
-      (if (seq @search)
-        [:i.link.remove.circle.icon {:on-click clear}]
-        [:i.search.icon])]))
 
 (defn- highlight [value search]
   (if (seq search)

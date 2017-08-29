@@ -10,10 +10,10 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.lib.dw.dims :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
             [shevek.lib.dw.time :refer [default-granularity]]
-            [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside]]
+            [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside search-input filter-matching]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.filter :refer [filter-operators]]
-            [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension filter-matching search-button search-input highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries]]
+            [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension search-button highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries]]
             [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defn init-pinned-dim [dim viewer]
@@ -116,7 +116,8 @@
           [:i.close.link.link.icon {:on-click #(dispatch :dimension-unpinned dim)}]]
          (when @searching
            [search-input search {:on-change #(debounce-dispatch :dimension-values-searched dim %)
-                                 :on-stop #(reset! searching false)}])
+                                 :on-stop #(reset! searching false)
+                                 :wrapper {:class "small"}}])
          (if results
            (if (seq filtered-results)
              (into [:div.items] (map #(pinned-dimension-item dim filter-dim % measure @search) filtered-results))

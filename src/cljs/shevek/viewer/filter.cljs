@@ -8,8 +8,8 @@
             [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.dates :refer [format-date parse-date]]
-            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value search-input filter-matching debounce-dispatch highlight current-cube dimension-value send-pinboard-queries filter-title]]
-            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field]]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value debounce-dispatch highlight current-cube dimension-value send-pinboard-queries filter-title]]
+            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.components.calendar :refer [build-range-calendar]]
@@ -165,7 +165,7 @@
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector opts]
-        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %)}]]
+        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %) :wrapper {:class "small"}}]]
        [:div.items-container
         (into [:div.items]
           (map #(dimension-value-item dim % opts @search)

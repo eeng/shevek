@@ -6,7 +6,8 @@
             [shevek.rpc :refer [loading-class]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.components.drag-and-drop :refer [draggable]]
-            [shevek.viewer.shared :refer [current-cube panel-header send-main-query filter-matching search-button search-input highlight]]))
+            [shevek.components.form :refer [search-input filter-matching]]
+            [shevek.viewer.shared :refer [current-cube panel-header send-main-query search-button highlight]]))
 
 (defn dimension-popup-button [color icon event name]
   [:button.ui.circular.icon.button
@@ -41,7 +42,7 @@
         [:div.dimensions.panel.ui.basic.segment (loading-class :cube-metadata)
          [panel-header (t :viewer/dimensions) [search-button searching]]
          (when @searching
-           [search-input search {:on-stop #(reset! searching false)}])
+           [search-input search {:on-stop #(reset! searching false) :wrapper {:class "small"}}])
          [:div.items
           (for [dim filtered-dims]
             ^{:key (:name dim)} [dimension-item search-text dim])]]))))

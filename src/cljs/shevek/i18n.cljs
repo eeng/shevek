@@ -90,7 +90,8 @@
             :password-hint "Leave blank if you don't want to change it"
             :unauthorized "Sorry, you are not allow to access this page. Please contact the administrator for more information."
             :basic-info "Basic Information"
-            :permissions "Permissions"}
+            :permissions "Permissions"
+            :no-results "No users where found"}
     :permissions {:title "Permissions"
                   :allowed-cubes "Allowed Cubes"
                   :admin-all-cubes "Admin users view everything"
@@ -218,7 +219,8 @@
             :password-hint "Dejar en blanco para no cambiarlo"
             :unauthorized "Ud. no tiene acceso a esta página. Por favor, contacte al administrador para más información."
             :basic-info "Información Básica"
-            :permissions "Permisos"}
+            :permissions "Permisos"
+            :no-results "No se encontraron usuarios"}
     :permissions {:title "Permisos"
                   :allowed-cubes "Cubes Visibles"
                   :admin-all-cubes "Administradores pueden ver todo"
