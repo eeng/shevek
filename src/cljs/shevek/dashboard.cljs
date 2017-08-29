@@ -55,6 +55,7 @@
         [:div.tip [:i.info.circle.icon] (t :reports/none)]))))
 
 (defn page []
+  (fetch-cubes)
   [:div#dashboard.ui.container
    [page-title (t :dashboard/title) (t :dashboard/subtitle) "block layout"]
    [:h2.ui.app.header (t :cubes/title)]

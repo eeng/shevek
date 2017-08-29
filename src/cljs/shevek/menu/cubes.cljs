@@ -25,7 +25,8 @@
        [:div (t :cubes/no-results)])]))
 
 (defn- cubes-menu []
-  (fetch-cubes)
+  (when-not (current-page? :dashboard) ; No need to fetch the cubes again when we are on the home page
+    (fetch-cubes))
   (fn []
     [:a#cubes-menu.item {:on-click #(show-popup % popup-content {:position "bottom left"})}
      [:i.cubes.icon]
