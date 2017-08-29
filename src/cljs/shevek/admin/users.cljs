@@ -52,12 +52,10 @@
    :email (v/email {:optional? true})})
 
 (defevh :user-changed [db edited-user cancel]
-  (swap! edited-user update :permissions ui->permissions)
   (when (v/valid?! edited-user user-validations)
-    (rpc/call "users.api/save"
-              :args [(dissoc @edited-user :password-confirmation)]
-              :handler #(do (dispatch :user-saved) (cancel)))
-    (rpc/loading db :saving-user)))
+    (let [user (-> @edited-user (dissoc :password-confirmation) (update :permissions ui->permissions))]
+      (rpc/call "users.api/save" :args [user] :handler #(do (dispatch :user-saved) (cancel)))
+      (rpc/loading db :saving-user))))
 
 (defevh :user-deleted [db user]
   (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %)))
@@ -110,7 +108,7 @@
        [:div.ui.grid
         [:div.five.wide.column
          [user-fields user shortcuts]]
-        [:div.eleven.wide.column
+        [:div.eleven.wide.column.permissions
          [user-permissions user]]
         [:div.sixteen.wide.column
          [:button.ui.primary.button {:on-click save} (t :actions/save)]
