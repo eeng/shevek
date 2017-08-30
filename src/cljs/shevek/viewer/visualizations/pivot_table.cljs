@@ -14,29 +14,28 @@
                (/ measure-value max-value))]
     (str (* (Math/abs rate) 100) "%")))
 
-(defn- row-popup [dim result filter-path]
+(defn- row-popup [dim result selected-path]
   [:div
    [:div.dimension-value (format-dimension dim result)]
    [:div.buttons
     [:button.ui.primary.compact.button
-     {:on-click #(dispatch :pivot-table-row-filtered filter-path "include")}
+     {:on-click #(dispatch :pivot-table-row-filtered selected-path "include")}
      (t :actions/select)]
     [:button.ui.compact.button
-     {:on-click #(dispatch :pivot-table-row-filtered filter-path "exclude")}
+     {:on-click #(dispatch :pivot-table-row-filtered selected-path "exclude")}
      (t :viewer.operator/exclude)]
     [:button.ui.compact.button
-     {:on-click #(do (close-popup)
-                   (dispatch :viewer/raw-data-requested (build-filter dim {:operator "include" :value #{(dimension-value dim result)}})))}
+     {:on-click #(do (close-popup) (dispatch :viewer/raw-data-requested selected-path))}
      (t :raw-data/button)]
     [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
 
 ; TODO PERF cada vez q se clickea una row se renderizan todas las otras, ver de mejorar
 (defn- table-row [result dim depth measures max-values value-result-path]
-  (let [filter-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
-        row-key (hash filter-path)
+  (let [selected-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
+        row-key (hash selected-path)
         totals-row (totals-result? result dim)]
     [:tr {:on-click #(when-not totals-row
-                       (show-popup % ^{:key (hash result)} [row-popup dim result filter-path]
+                       (show-popup % ^{:key (hash result)} [row-popup dim result selected-path]
                                    {:position "top center" :distanceAway 135 :setFluidWidth true
                                     :class "pivot-table-popup" :id row-key}))
           :class (when (and (not totals-row) (popup-opened? row-key)) "active")}

@@ -56,11 +56,13 @@
       (-> (update-in db [:viewer :filter] add-dimension (assoc dim :value #{toggled-value}))
           (send-queries dim)))))
 
-(defevhi :pivot-table-row-filtered [db filter-path operator]
+(defn selected-path->filters [selected-path operator]
+  (map #(build-filter (first %) {:operator operator :value #{(second %)}}) selected-path))
+
+(defevhi :pivot-table-row-filtered [db selected-path operator]
   {:after [close-popup store-viewer-in-url]}
-  (let [new-filters (map #(build-filter (first %) {:operator operator :value #{(second %)}}) filter-path)]
-    (-> (update-in db [:viewer :filter] merge-dimensions new-filters)
-        (send-queries nil))))
+  (-> (update-in db [:viewer :filter] merge-dimensions (selected-path->filters selected-path operator))
+      (send-queries nil)))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim} search]
   (send-query db {:cube (viewer :cube)

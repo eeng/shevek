@@ -7,7 +7,8 @@
             [shevek.i18n :refer [t]]
             [shevek.components.modal :refer [show-modal]]
             [shevek.viewer.shared :refer [current-cube dimension-value format-measure viewer filter-title]]
-            [shevek.lib.dw.dims :refer [time-dimension? add-dimension]]
+            [shevek.viewer.filter :refer [selected-path->filters]]
+            [shevek.lib.dw.dims :refer [time-dimension? add-dimension merge-dimensions]]
             [cuerdas.core :as str]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.string :refer [format-bool]]
@@ -58,14 +59,14 @@
   (-> (assoc-in db [:viewer :results :raw] results)
       (rpc/loaded [:viewer :results :raw])))
 
-(defevh :viewer/raw-data-requested [{:keys [viewer] :as db} additional-filter]
+(defevh :viewer/raw-data-requested [{:keys [viewer] :as db} selected-path]
   (show-modal {:header (t :raw-data/title)
                :content [modal-content]
                :actions [[:div.ui.cancel.button (t :actions/close)]]
                :class "large raw-data"
                :js-opts {:observeChanges false}})
   (let [viewer (cond-> viewer
-                       additional-filter (update :filter add-dimension additional-filter))
+                       selected-path (update :filter merge-dimensions (selected-path->filters selected-path "include")))
         q (-> (viewer->raw-query viewer)
               (assoc-in [:paging :threshold] limit))]
     (rpc/call "querying.api/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
