@@ -16,3 +16,6 @@
   (mq/with-collection db "reports"
     (mq/find {:user-id user-id})
     (mq/sort {:name 1})))
+
+(s/defn delete-reports [db user-id]
+  (mc/remove db "reports" {:user-id user-id}))

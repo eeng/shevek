@@ -4,10 +4,13 @@
             [shevek.schemas.cube :refer [Cube]]
             [shevek.users.repository :refer [save-user]]
             [shevek.schemas.user :refer [User]]
+            [shevek.reports.repository :refer [save-report]]
+            [shevek.schemas.report :refer [Report]]
             [shevek.db :refer [db]]))
 
 (def makers {Cube save-cube
-             User save-user})
+             User save-user
+             Report save-report})
 
 (defn make [schema args]
   (c/complete args schema))

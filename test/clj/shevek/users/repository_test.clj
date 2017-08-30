@@ -3,10 +3,12 @@
             [shevek.test-helper :refer [it]]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [without? submaps?]]
-            [shevek.users.repository :refer [find-users save-user reload]]
+            [shevek.users.repository :refer [find-users save-user delete-user reload]]
             [shevek.schemas.user :refer [User]]
+            [shevek.schemas.report :refer [Report]]
             [shevek.db :refer [db]]
-            [bcrypt-clj.auth :refer [check-password]]))
+            [bcrypt-clj.auth :refer [check-password]]
+            [monger.collection :as mc]))
 
 (deftest save-user-tests
   (it "should throw error if username already exists"
@@ -42,3 +44,10 @@
   (it "should no return passwords"
     (make! User {:username "a"})
     (is (without? :password (first (find-users db))))))
+
+(deftest delete-user-tests
+  (it "should delete the reports"
+    (let [u (make! User)]
+      (make! Report {:user-id (:_id u)})
+      (delete-user db u)
+      (is (= [] (mc/find-maps db "reports"))))))

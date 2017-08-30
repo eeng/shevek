@@ -7,7 +7,7 @@
 
 (s/defschema Split
   {:name s/Str
-   :limit (s/cond-pre s/Int s/Str)
+   :limit s/Num
    (s/optional-key :sort-by) SortBy
    (s/optional-key :granularity) s/Str})
 
@@ -26,7 +26,7 @@
    (s/optional-key :name) s/Str ; Optional when restored from URL
    (s/optional-key :description) s/Str
    (s/optional-key :pin-in-dashboard) s/Bool ; Optional when restored from URL
-   :cube s/Any
+   :cube s/Str
    :viztype s/Str
    :measures [s/Str]
    :filter [Filter]
