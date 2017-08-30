@@ -27,7 +27,7 @@
 
 (defn controller [{:keys [params]}]
   (let [{:keys [token] :as res} (authenticate-and-generate-token db params)]
-    {:status (if token 201 401) :body res})) ;
+    {:status (if token 201 401) :body res}))
 
 (defn wrap-current-user
   "Store the user-id from the identity inserted by buddy, for easy access in the api functions"

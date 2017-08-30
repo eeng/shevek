@@ -14,7 +14,7 @@
             [buddy.auth.accessrules :refer [restrict error]]))
 
 (defn should-be-authenticated [request]
-  (some? (:identity request)))
+  (boolean (:user request)))
 
 (defn not-authenticated [request _]
   {:status 401 :body {:error "Not authenticated"}})
