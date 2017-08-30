@@ -1,7 +1,9 @@
 (ns shevek.viewer.url
   (:require [shevek.schemas.conversion :refer [viewer->report]]
             [cljs.reader :refer [read-string]]
-            [shevek.lib.base64 :as b64]))
+            [shevek.lib.base64 :as b64]
+            [schema.core :as s]
+            [shevek.schemas.app-db :refer [CurrentReport]]))
 
 (defn store [encoded-report]
   (let [current-path (.-hash js/location)
@@ -15,5 +17,5 @@
 
 (defn restore-report-from-url [encoded-report]
   (try
-    (-> encoded-report js/decodeURI b64/decode read-string)
+    (->> encoded-report js/decodeURI b64/decode read-string (s/validate CurrentReport))
     (catch js/Error _ nil)))

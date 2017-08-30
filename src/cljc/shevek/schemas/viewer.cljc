@@ -38,7 +38,7 @@
 ; In the Viewer the Cube is slightly different from the schemas.cube.Cube: it starts only with the name and later receives a max-time
 (s/defschema Cube
   {(s/optional-key :_id) s/Any
-   :name s/Str
+   :name (s/maybe s/Str) ; Can be nil on invalid report's URLs
    (s/optional-key :title) s/Str
    (s/optional-key :description) s/Str
    (s/optional-key :dimensions) [Dimension]
