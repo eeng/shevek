@@ -22,8 +22,8 @@
 (defn controller [request]
   (try
     {:status 200 :body (call-fn request)}
-    (catch Exception e
-      (let [{:keys [error] :as data} (-> e root-cause ex-data)]
-        (if (= error "Query timeout")
-          {:status 500 :body data}
+    (catch clojure.lang.ExceptionInfo e
+      (let [{:keys [type] :as data} (-> e root-cause ex-data)]
+        (if (isa? type :shevek.app/error)
+          {:status 599 :body data}
           (throw e))))))
