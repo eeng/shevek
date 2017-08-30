@@ -9,16 +9,11 @@
   (cond-> cube
           max-time (update :max-time parse-time)))
 
-(defn- to-map-with-name-as-key [cubes]
-  (zipmap (map :name cubes) cubes))
-
-(defevh :cubes-arrived [db cubes]
-  (-> (assoc db :cubes (to-map-with-name-as-key cubes))
-      (rpc/loaded :cubes)))
+(defn- cube-names-as-keys [db cubes]
+  (assoc db :cubes (zipmap (map :name cubes) cubes)))
 
 (defevh :cubes-requested [db]
-  (rpc/call "schema.api/cubes" :handler #(dispatch :cubes-arrived %))
-  (rpc/loading db :cubes))
+  (rpc/fetch db :cubes "schema.api/cubes" :handler cube-names-as-keys))
 
 (defn fetch-cubes []
   (dispatch :cubes-requested))

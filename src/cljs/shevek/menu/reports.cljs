@@ -15,14 +15,8 @@
             [shevek.lib.util :refer [new-record?]]
             [cuerdas.core :as str]))
 
-; TODO Muy parecido a lo de users, de nuevo el patron de call, loading y loaded
-(defevh :reports-arrived [db reports]
-  (-> (assoc db :reports reports)
-      (rpc/loaded :reports)))
-
 (defevh :reports-requested [db]
-  (rpc/call "reports.api/find-all" :handler #(dispatch :reports-arrived %))
-  (rpc/loading db :reports))
+  (rpc/fetch db :reports "reports.api/find-all"))
 
 (defn fetch-reports []
   (dispatch :reports-requested))

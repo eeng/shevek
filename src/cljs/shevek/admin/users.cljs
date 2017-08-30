@@ -15,13 +15,8 @@
             [shevek.lib.collections :refer [find-by]]
             [shevek.lib.dw.cubes :refer [cubes-list]]))
 
-(defevh :users-arrived [db users]
-  (-> (assoc db :users users)
-      (rpc/loaded :users)))
-
 (defevh :users-requested [db]
-  (rpc/call "users.api/find-all" :handler #(dispatch :users-arrived %))
-  (rpc/loading db :users))
+  (rpc/fetch db :users "users.api/find-all"))
 
 (defevh :user-saved [db]
   (dispatch :users-requested)

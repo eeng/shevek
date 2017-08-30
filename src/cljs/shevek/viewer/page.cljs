@@ -28,9 +28,8 @@
     current-report (report->viewer current-report cube)
     :else (build-new-viewer cube)))
 
-(defevh :cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
+(defn cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
   (let [cube (set-cube-defaults cube)
-        db (rpc/loaded db :cube-metadata)
         viewer (init-viewer cube viewer current-report)]
     (if (cube-authorized? viewer)
       (-> (assoc db :viewer viewer)
@@ -41,9 +40,7 @@
 
 (defevh :viewer-initialized [db]
   (if-let [cube (get-in db [:viewer :cube :name])]
-    (do ; TODO las mimas tres lineas
-      (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :cube-arrived %))
-      (rpc/loading db :cube-metadata))
+    (rpc/fetch db :cube-metadata "schema.api/cube" :args [cube] :handler cube-arrived)
     (navigate "/")))
 
 (defn prepare-cube [db cube report]

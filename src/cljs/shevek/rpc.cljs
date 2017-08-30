@@ -24,15 +24,13 @@
                 :error-handler #(dispatch :server-error %)
                 :headers {"Authorization" (str "Token " (session-storage/get-item "shevek.access-token"))}}))
 
-;; Generic events to make remote queries (doesn't allow to process them before storing in the db)
+(defevh :data-arrived [db db-key data db-handler]
+  (let [db-handler (or db-handler #(assoc % db-key data))]
+    (-> db (loaded db-key) (db-handler data))))
 
-(defevh :data-requested [db db-key fid & args]
-  (call fid :handler #(dispatch :data-arrived db-key %) :args args)
+(defn fetch [db db-key fid & {:keys [args handler] :or {args []}}]
+  (call fid :args args :handler #(dispatch :data-arrived db-key % handler))
   (loading db db-key))
-
-(defevh :data-arrived [db db-key data]
-  (-> (assoc db db-key data)
-      (loaded db-key)))
 
 (defn- loading-class [loading-key]
   {:class (when (loading? loading-key) "loading")})
