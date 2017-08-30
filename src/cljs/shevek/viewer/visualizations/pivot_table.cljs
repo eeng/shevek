@@ -29,7 +29,6 @@
      (t :raw-data/button)]
     [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
 
-; TODO PERF cada vez q se clickea una row se renderizan todas las otras, ver de mejorar
 (defn- table-row [result dim depth measures max-values value-result-path]
   (let [selected-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
         row-key (hash selected-path)

@@ -32,11 +32,9 @@
   {:after [store-viewer-in-url]}
   (update-in db [:viewer :pinboard :dimensions] remove-dimension dim))
 
-; TODO al cambiar la measure se muestra temporalmente un cero en todas las filas. Ver si se puede evitar.
 (defevhi :pinboard-measure-selected [db measure-name]
   {:after [store-viewer-in-url]}
-  (-> (assoc-in db [:viewer :pinboard :measure]
-                (find-dimension measure-name (current-cube :measures)))
+  (-> (assoc-in db [:viewer :pinboard :measure] (find-dimension measure-name (current-cube :measures)))
       (send-pinboard-queries)))
 
 (defevhi :pinned-time-granularity-changed [db dim granularity]

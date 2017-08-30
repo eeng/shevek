@@ -137,7 +137,6 @@
          [relative-period-time-filter dim]
          [specific-period-time-filter dim])])))
 
-; TODO PERF cada vez que se tilda un valor se renderizan todos los resultados, ya que todos dependen del filter-opts :value que es donde estan todos los tildados. No se puede evitar?
 (defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
   (let [value (dimension-value dim result)
         label (format-dimension dim result)]
