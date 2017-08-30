@@ -75,7 +75,13 @@
     .segment-value { display: inline }
   }
   .measures { flex: 29 1 0%; }
-  .dimensions, .measures { padding-bottom: 8px; }
+  .dimensions, .measures {
+    padding-bottom: 8px;
+    .help.icon {
+      margin-left: 0.3em;
+      cursor: help;
+    }
+  }
 
   .top-row {
     display: flex;

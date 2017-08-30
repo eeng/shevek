@@ -134,3 +134,7 @@
 
 (defn cube-authorized? [{:keys [measures]}]
   (seq measures))
+
+(defn description-help-icon [{:keys [description]}]
+  (when (seq description)
+    [:i.help.circle.outline.icon {:title description}]))

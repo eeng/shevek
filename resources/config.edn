@@ -138,7 +138,8 @@
    :dimensions [{:name "isMinor" :type "BOOL"}
                 {:name "isUnpatrolled" :type "BOOL"}
                 {:name "isAnonymous" :type "BOOL"}
-                {:name "isRobot" :type "BOOL"}
+                {:name "isRobot" :type "BOOL" :description "Indicates whether a computer or a human being make this edit"}
                 {:name "isNew" :type "BOOL"}
                 {:name "regionIsoCode" :title "Region ISO Code"}
-                {:name "countryIsoCode" :title "Country ISO Code"}]}]}
+                {:name "countryIsoCode" :title "Country ISO Code"}]
+   :measures [{:name "count" :description "Some interesting count"}]}]}
