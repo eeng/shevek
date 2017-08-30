@@ -131,3 +131,6 @@
                 (case operator
                   ("include" "exclude") (str "(" details ")")
                   "")])])))
+
+(defn cube-authorized? [{:keys [measures]}]
+  (seq measures))

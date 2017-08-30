@@ -9,8 +9,8 @@
             [shevek.menu.reports :refer [fetch-reports]]
             [shevek.schemas.conversion :refer [report->viewer viewer->query]]
             [shevek.lib.react :refer [rmap]]
-            [shevek.viewer.visualization :refer [visualization]]
-            [shevek.viewer.shared :refer [send-visualization-query]]))
+            [shevek.viewer.visualization :refer [visualization warning]]
+            [shevek.viewer.shared :refer [send-visualization-query cube-authorized?]]))
 
 (defn- cube-card [{:keys [name title description] :or {description (t :cubes/no-desc)}}]
   [:a.cube.card {:on-click #(dispatch :cube-selected name)}
@@ -29,7 +29,9 @@
 
 (defevh :dashboard/cube-arrived [db cube {:keys [name] :as report}]
   (let [viewer (report->viewer report (set-cube-defaults cube))]
-    (send-visualization-query db viewer [:dashboard name])))
+    (if (cube-authorized? viewer)
+      (send-visualization-query db viewer [:dashboard name])
+      (rpc/loaded db [:dashboard name]))))
 
 (defevh :dashboard/cube-requested [db {:keys [name cube] :as report}]
   (rpc/call "schema.api/cube" :args [cube] :handler #(dispatch :dashboard/cube-arrived % report))
@@ -44,7 +46,10 @@
       [:div.meta description]]
      [:div.content.visualization-container
       [loader [:dashboard name]]
-      [visualization (db/get-in [:dashboard name])]]]))
+      (let [vis (db/get-in [:dashboard name])]
+        (if (cube-authorized? vis)
+          [visualization vis]
+          [warning (t :reports/unauthorized)]))]]))
 
 (defn- reports-cards []
   (fetch-reports)

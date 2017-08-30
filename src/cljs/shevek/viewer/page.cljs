@@ -6,7 +6,7 @@
             [shevek.navegation :refer [current-page? navigate]]
             [shevek.lib.dw.cubes :refer [set-cube-defaults]]
             [shevek.lib.dates :refer [parse-time]]
-            [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
+            [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name cube-authorized?]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
             [shevek.viewer.filter :refer [filter-panel]]
@@ -31,8 +31,8 @@
 (defevh :cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
   (let [cube (set-cube-defaults cube)
         db (rpc/loaded db :cube-metadata)
-        {:keys [measures] :as viewer} (init-viewer cube viewer current-report)]
-    (if (seq measures)
+        viewer (init-viewer cube viewer current-report)]
+    (if (cube-authorized? viewer)
       (-> (assoc db :viewer viewer)
           (send-main-query)
           (send-pinboard-queries)

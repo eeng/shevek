@@ -8,7 +8,7 @@
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]
             [shevek.viewer.visualizations.chart :refer [chart-visualization]]))
 
-(defn- warning [text]
+(defn warning [text]
   [:div.icon-hint
    [:i.warning.circle.icon]
    [:div.text text]])

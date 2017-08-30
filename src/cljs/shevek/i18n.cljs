@@ -25,7 +25,7 @@
              :no-results "No results were found that match the specified search criteria"
              :split-required "At least one split is required for the {1} visualization"
              :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"
-             :unauthorized "Oops! It seems you are not allow to view the {1} cube anymore. Please contact the administrator to resolve this issue."}
+             :unauthorized "Oops! It seems that the {1} cube is no longer available."}
     :viewer.period {:relative "Relative"
                     :specific "Specific"
                     :latest "Latest"
@@ -63,7 +63,8 @@
               :pin-in-dashboard "Pin in dashboard"
               :saved "Report '{1}' saved!"
               :deleted "Report '{1}' deleted!"
-              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."}
+              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
+              :unauthorized "Oops! This report is no longer available."}
     :share {:title "Share"
             :copy-url "Copy URL"
             :copied "URL Copied!"}
@@ -160,7 +161,7 @@
              :no-results "No se encontraron resultados que coincidan con los criterios especificados"
              :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
              :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"
-             :unauthorized "Oops! Parece que Ud. ya no tiene acceso al cubo {1}. Por favor, contacte al administrador para resolver este inconviente."}
+             :unauthorized "Oops! Parece que el cubo {1} ya no está disponible."}
     :viewer.period {:relative "Relativo"
                     :specific "Específico"
                     :latest "Ultimo"
@@ -198,7 +199,8 @@
               :pin-in-dashboard "Mostrar en dashboard"
               :saved "Reporte '{1}' guardado correctamente"
               :deleted "Reporte '{1}' eliminado correctamente"
-              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."}
+              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
+              :unauthorized "Oops! Este reporte ya no está disponible."}
     :share {:title "Compartir"
             :copy-url "Copiar URL"
             :copied "URL Copiado!"}
