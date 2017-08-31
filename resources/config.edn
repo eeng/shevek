@@ -58,33 +58,19 @@
                 {:name "cilindrico" :title "Cilíndrico" :type "FLOAT"}
                 {:name "eje_cilindrico" :title "Eje Cilíndrico" :type "FLOAT"}
                 {:name "adicion" :title "Adición" :type "FLOAT"}]
-   :measures [{:name "importe"
-               :title "Importe Total"
-               :expression "(/ (sum $importe) 100)"
-               :format "$0.00a"}
-              {:name "importe_productos"
-               :title "Importe Productos"
-               :expression "(/ (where {$grupo_item \"Productos\"} (sum $importe)) 100)"
-               :format "$0.00a"
-               :favorite true}
-              {:name "importe_impuestos"
-               :title "Importe Impuestos"
-               :expression "(/ (where {$grupo_item \"Impuestos\"} (sum $importe)) 100)"
-               :format "$0.00a"}
-              {:name "ultimo_nro_cbte"
-               :title "Último Cbte"
-               :format "0,0"}
-              {:name "unidades"
-               :hidden true}
-              {:name "unidades_precios"
-               :title "Unidades"
+   :measures [{:name "importe" :title "Importe Total" :format "$0.00a"
+               :expression "(/ (sum $importe) 100)"}
+              {:name "importe_productos" :format "$0.00a" :favorite true
+               :expression "(/ (where {$grupo_item \"Productos\"} (sum $importe)) 100)"}
+              {:name "importe_impuestos" :format "$0.00a"
+               :expression "(/ (where {$grupo_item \"Impuestos\"} (sum $importe)) 100)"}
+              {:name "ultimo_nro_cbte" :title "Último Cbte" :format "0,0"}
+              {:name "unidades_precios" :title "Unidades"
                :expression "(where {$tipo_item \"Precio\"} (sum $unidades))"
                :favorite true}
               {:name "unidades_descargos"
-               :title "Unidades Descargos"
                :expression "(where (not= $tipo_item \"Precio\") (sum $unidades))"}
-              {:name "impuestos"
-               :hidden true}]}
+              {:name "unidades" :hidden true}]}
   {:name "eventos_pedidos"
    :title "Eventos de Pedidos"
    :description "Métricas de eventos producidos sobre pedidos cargados en VTOL"
@@ -109,15 +95,39 @@
    :measures [{:name "facturado" :format "$0,0.00a" :expression "(/ (sum $facturado) 100)"}
               {:name "pedidos" :title "Pedidos" :description "Cantidad aproximada de pedidos distintos"}
               {:name "pedidos_finalizados_en_tiempo"
-               :title "Pedidos Finalizados En Tiempo"
                :expression "(where {$estado_generado \"Finalizado\" $condicion_ruteo \"En Tiempo\"} (sum $eventos))"}
               {:name "pedidos_finalizados"
-               :title "Pedidos Finalizados"
                :expression "(where {$estado_generado \"Finalizado\"} (sum $eventos))"}
-              {:name "ins"
-               :title "INS"
-               :format "0%"
+              {:name "ins" :title "INS" :format "0%"
                :expression "(/ (where {$estado_generado \"Finalizado\" $condicion_ruteo \"En Tiempo\"} (sum $eventos)) (where {$estado_generado \"Finalizado\"} (sum $eventos)))"}]}
+  {:name "repeticiones"
+   :title "Repeticiones"
+   :description "Seguimiento de lentes repetidas vs procesadas"
+   :dimensions [{:name "__time" :title "Fecha"}
+                {:name "año" :column "__time"
+                 :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
+                {:name "mes" :column "__time"
+                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "dia_semana" :title "Día de Semana" :column "__time"
+                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "material" :title "Material"}
+                {:name "clase" :title "Clase de Lente"}
+                {:name "seccion" :title "Sección"}
+                {:name "fabricacion" :title "Fabricación"}
+                {:name "tipo_tallado" :title "Tipo de Tallado"}]
+   :measures [{:name "lentes_procesadas" :favorite true}
+              {:name "lentes_repetidas" :title "Repeticiones" :favorite true
+               :description "Lentes Repetidas"}
+              {:name "lentes_facturadas"
+               :expression "(where {$seccion \"Vitolen\"} (sum $lentes_procesadas))"}
+              {:name "repetidas_vs_procesadas" :title "R/LP" :format "0.0%" :favorite true
+               :description "R/LP = Lentes Repetidas / Lentes Procesadas"
+               :expression "(/ (sum $lentes_repetidas) (sum $lentes_procesadas)))"}
+              {:name "repetidas_vs_facturadas" :title "R/LF" :format "0.0%" :favorite true
+               :description "R/LF = Lentes Repetidas / Lentes Facturadas"
+               :expression "(/ (sum $lentes_repetidas) (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))))"}]}
   {:name "vtol_stats"
    :title "VTOL Stats"
    :description "Estadísticas de utilización del sistema VTOL"
