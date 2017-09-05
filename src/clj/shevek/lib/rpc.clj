@@ -1,6 +1,7 @@
 (ns shevek.lib.rpc
   (:require [clojure.string :refer [split ends-with?]]
             [clojure.repl :refer [root-cause]]
+            [taoensso.timbre :as log]
             ; Hay que colocar las api aca para que las resuelva el call-fn en los tests de aceptación (y posiblemente luego tb en production)
             [shevek.reports.api]
             [shevek.querying.api]
@@ -25,5 +26,7 @@
     (catch clojure.lang.ExceptionInfo e
       (let [{:keys [type] :as data} (-> e root-cause ex-data)]
         (if (isa? type :shevek.app/error)
-          {:status 599 :body data}
+          (do
+            (log/error e)
+            {:status 599 :body data})
           (throw e))))))

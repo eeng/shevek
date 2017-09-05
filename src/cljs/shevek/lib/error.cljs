@@ -27,7 +27,8 @@
     401 (handle-not-authenticated)
     403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
     502 (handle-app-error (assoc error :response (t :errors/bad-gateway)))
-    599 (handle-app-error (assoc error :response (translation :errors (:error response)) :status-text (:error response)))
+    599 (let [new-response (or (translation :errors (:error response)) (pr-str response))]
+          (handle-app-error (assoc error :response new-response :status-text (:error response))))
     (handle-app-error error))
   (rpc/loaded db))
 
