@@ -78,6 +78,7 @@
 (defn dimension-value [{:keys [name]} result]
   (->> name keyword (get result)))
 
+; TODO this is wrong, shouldn't do the gstr/format if the measure already has a format.
 (defn format-measure [{:keys [type format] :as dim} result]
   (let [value (or (dimension-value dim result) 0)
         value (condp = type

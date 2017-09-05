@@ -15,6 +15,7 @@
    (s/optional-key :column) s/Str
    (s/optional-key :extraction) [{s/Keyword s/Str}]})
 
+; TODO in the client only the name should be needed. Check if we can use the schema on the server to complete the rest of the fields
 (s/defschema Measure
   {:name s/Str
    :expression s/Str})

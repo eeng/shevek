@@ -117,20 +117,18 @@
                 {:name "seccion" :title "Sección"}
                 {:name "fabricacion" :title "Fabricación"}
                 {:name "tipo_tallado" :title "Tipo de Tallado"}]
-   :measures [{:name "lentes_procesadas"}
+   :measures [{:name "lentes_procesadas"
+               :description "Tener presente que una misma lente puede ser procesada varias veces (en distintas secciones por ejemplo)"}
               {:name "lentes_repetidas" :title "Repeticiones" :favorite true
                :description "Lentes Repetidas"}
-              {:name "lentes_facturadas"
+              {:name "lentes_facturadas" :description "Lentes procesadas en la sección Vitolen (calculadas a partir de eventos de facturación)"
                :expression "(where {$seccion \"Vitolen\"} (sum $lentes_procesadas))"}
-              {:name "repetidas_vs_procesadas" :title "R/LP" :format "0.0%"
-               :description "R/LP = Lentes Repetidas / Lentes Procesadas (sólo representativo cuando se filtra por sección)"
-               :expression "(/ (sum $lentes_repetidas) (sum $lentes_procesadas)))"}
-              {:name "repetidas_vs_facturadas" :title "R/LF" :format "0.0%"
-               :description "R/LF = Lentes Repetidas / Lentes Facturadas (utilizar cuando no se filtra por sección)"
-               :expression "(/ (sum $lentes_repetidas) (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))))"}
-              {:name "repetidas_vs_procturadas" :title "R/LPF" :format "0.0%" :favorite true
-               :description "R/LPF = Lentes Repetidas / Lentes Procesadas (pero si no filtra por sección se utiliza Lentes Facturadas en lugar de Procesadas)"
-               :expression "(greatest (/ (sum $lentes_repetidas) (sum $lentes_procesadas)) (/ (sum $lentes_repetidas) (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))))"}]}
+              {:name "indicador" :description "Si LF = 0 ó LF = LP, entonces Indicador = R/LP; sino Indicador = R/(LF+R)"
+               :type "javascript" :format "0.0%" :favorite true
+               :expression "(js [(sum $lentes_repetidas)
+                                 (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))
+                                 (sum $lentes_procesadas)]
+                                \"function(r, lf, lp) { return r / (lf == 0 || lf == lp ? lp : lf + r) }\")"}]}
   {:name "vtol_stats"
    :title "VTOL Stats"
    :description "Estadísticas de utilización del sistema VTOL"

@@ -90,7 +90,7 @@
                               :name "_t0"}
                              {:type "doubleSum" :fieldName "units" :name "_t1"}]
               :postAggregations [{:type "arithmetic" :fn "/" :name "x"
-                                  :fields [{:type "arithmetic" :fn "*"
+                                  :fields [{:type "arithmetic" :fn "*" :name nil
                                             :fields [{:type "fieldAccess" :fieldName "_t0"}
                                                      {:type "fieldAccess" :fieldName "_t1"}]}
                                            {:type "constant" :value 100}]}]}
@@ -101,4 +101,12 @@
               :postAggregations [{:type "doubleGreatest" :name "amount"
                                   :fields [{:type "constant" :value 100}
                                            {:type "constant" :value 200}]}]}
-             (measure->druid {:name "amount" :expression "(greatest 100 200)"}))))))
+             (measure->druid {:name "amount" :expression "(greatest 100 200)"}))))
+
+    (testing "javascript post aggregator"
+      (is (= {:aggregations [{:type "doubleSum" :fieldName "delta" :name "_t0"}
+                             {:type "doubleSum" :fieldName "total" :name "_t1"}]
+              :postAggregations [{:type "javascript" :name "amount" :fieldNames ["_t0" "_t1"]
+                                  :function "function(f1, f2) { ... }"}]}
+             (measure->druid {:name "amount"
+                              :expression "(js [(sum $delta) (sum $total)] \"function(f1, f2) { ... }\")"}))))))

@@ -48,6 +48,18 @@
 
 (declare eval-post-aggregator)
 
+(defn- arithmetic-operator? [op]
+  (includes? ['/ '* '+ '- 'quotient] op))
+
+(defn- greatest-least-operators? [op]
+  (includes? ['greatest 'least] op))
+
+(defn- javascript-operator? [op]
+  (= op 'js))
+
+(defn- post-aggregator? [op]
+  (or (arithmetic-operator? op) (greatest-least-operators? op) (javascript-operator? op)))
+
 (defn- build-constant-postagg [value]
   [[] {:type "constant" :value value}])
 
@@ -57,33 +69,34 @@
         post-aggregator {:type "fieldAccess" :fieldName temp-name}]
     [aggregators post-aggregator]))
 
-(defn- build-binary-postagg [name operator args tig base-fields]
+(defn- build-fields-postagg [name args tig base-fields]
   (let [aggregators-and-post-aggs (map #(eval-post-aggregator nil % tig) args)
         aggregators (mapcat first aggregators-and-post-aggs)
         fields (map second aggregators-and-post-aggs)
-        post-aggregator (cond-> (assoc base-fields :fields fields)
-                                name (assoc :name name))]
+        post-aggregator (assoc base-fields :fields fields :name name)]
     [aggregators post-aggregator]))
 
-(defn- arithmetic-operator? [op]
-  (includes? ['/ '* '+ '- 'quotient] op))
+(defn- build-javascript-postagg [name fields function tig]
+  (let [aggregators-and-post-aggs (map #(eval-post-aggregator nil % tig) fields)
+        aggregators (mapcat first aggregators-and-post-aggs)]
+    [aggregators {:type "javascript" :name name :fieldNames (map :name aggregators) :function function}]))
 
-(defn- greatest-least-operators? [op]
-  (includes? ['greatest 'least] op))
-
-(defn- post-aggregator? [op]
-  (or (arithmetic-operator? op) (greatest-least-operators? op)))
-
-(defn eval-post-aggregator [name expression tig]
+(defn- eval-post-aggregator [name expression tig]
   (match expression
     ([(op :guard arithmetic-operator?) & args] :seq)
-    (build-binary-postagg name op args tig {:type "arithmetic" :fn (str op)})
+    (build-fields-postagg name args tig {:type "arithmetic" :fn (str op)})
 
     ([(op :guard greatest-least-operators?) & args] :seq)
-    (build-binary-postagg name op args tig {:type (str "double" (str/capital (str op)))})
+    (build-fields-postagg name args tig {:type (str "double" (str/capital (str op)))})
 
-    (value :guard number?) (build-constant-postagg value)
-    ([(_ :guard aggregator?) & _] :seq) (build-field-access-postagg expression tig)))
+    (value :guard number?)
+    (build-constant-postagg value)
+
+    ([(_ :guard aggregator?) & _] :seq)
+    (build-field-access-postagg expression tig)
+
+    ([(_ :guard javascript-operator?) fields function] :seq)
+    (build-javascript-postagg name fields function tig)))
 
 (defn eval-expression
   "First we need to discriminate between and expression that should return only an aggregator and one that should return a post-aggregator besides its generated aggregators"
