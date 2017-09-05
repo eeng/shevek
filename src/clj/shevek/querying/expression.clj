@@ -1,6 +1,7 @@
 (ns shevek.querying.expression
   (:require [clojure.core.match :refer [match]]
             [clojure.string :refer [starts-with?]]
+            [cuerdas.core :as str]
             [shevek.lib.collections :refer [includes?]]))
 
 (def aggregator-types {'count "count" 'sum "doubleSum" 'count-distinct "hyperUnique" 'max "doubleMax"})
@@ -34,18 +35,15 @@
    :aggregator aggregator
    :name field})
 
-(defn- simple-aggregation? [f]
+(defn- simple-aggregator? [f]
   (includes? (keys aggregator-types) f))
 
-(defn- aggregation? [f]
+(defn- aggregator? [f]
   (includes? (conj (keys aggregator-types) 'where) f))
-
-(defn- arithmetic-operator? [op]
-  (includes? ['/ '* '+ '- 'quotient] op))
 
 (defn- eval-aggregator [name expression]
   (match expression
-    ([(agg-fn :guard simple-aggregation?) & args] :seq) (apply build-aggregator name agg-fn args)
+    ([(agg-fn :guard simple-aggregator?) & args] :seq) (apply build-aggregator name agg-fn args)
     (['where condition subexp] :seq) (build-filtered-aggregator name condition (eval-aggregator name subexp))))
 
 (declare eval-post-aggregator)
@@ -59,26 +57,40 @@
         post-aggregator {:type "fieldAccess" :fieldName temp-name}]
     [aggregators post-aggregator]))
 
-(defn- build-arithmetic-postagg [name operator args tig]
+(defn- build-binary-postagg [name operator args tig base-fields]
   (let [aggregators-and-post-aggs (map #(eval-post-aggregator nil % tig) args)
         aggregators (mapcat first aggregators-and-post-aggs)
         fields (map second aggregators-and-post-aggs)
-        post-aggregator (cond-> {:type "arithmetic" :fn (str operator) :fields fields}
+        post-aggregator (cond-> (assoc base-fields :fields fields)
                                 name (assoc :name name))]
     [aggregators post-aggregator]))
 
+(defn- arithmetic-operator? [op]
+  (includes? ['/ '* '+ '- 'quotient] op))
+
+(defn- greatest-least-operators? [op]
+  (includes? ['greatest 'least] op))
+
+(defn- post-aggregator? [op]
+  (or (arithmetic-operator? op) (greatest-least-operators? op)))
+
 (defn eval-post-aggregator [name expression tig]
   (match expression
-    ([(op :guard arithmetic-operator?) & args] :seq) (build-arithmetic-postagg name op args tig)
+    ([(op :guard arithmetic-operator?) & args] :seq)
+    (build-binary-postagg name op args tig {:type "arithmetic" :fn (str op)})
+
+    ([(op :guard greatest-least-operators?) & args] :seq)
+    (build-binary-postagg name op args tig {:type (str "double" (str/capital (str op)))})
+
     (value :guard number?) (build-constant-postagg value)
-    ([(_ :guard aggregation?) & _] :seq) (build-field-access-postagg expression tig)))
+    ([(_ :guard aggregator?) & _] :seq) (build-field-access-postagg expression tig)))
 
 (defn eval-expression
   "First we need to discriminate between and expression that should return only an aggregator and one that should return a post-aggregator besides its generated aggregators"
   [name expression tig]
   (match expression
-    ([(_ :guard aggregation?) & _] :seq) [[(eval-aggregator name expression)] nil]
-    ([(_ :guard arithmetic-operator?) & _] :seq) (eval-post-aggregator name expression tig)))
+    ([(_ :guard aggregator?) & _] :seq) [[(eval-aggregator name expression)] nil]
+    ([(_ :guard post-aggregator?) & _] :seq) (eval-post-aggregator name expression tig)))
 
 (defn measure->druid [{:keys [name expression]} tig]
   {:pre [(string? expression)]}

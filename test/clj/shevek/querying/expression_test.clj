@@ -94,4 +94,11 @@
                                             :fields [{:type "fieldAccess" :fieldName "_t0"}
                                                      {:type "fieldAccess" :fieldName "_t1"}]}
                                            {:type "constant" :value 100}]}]}
-             (measure->druid {:name "x" :expression "(/ (* (where (= $country \"br\") (sum $amount)) (sum $units)) 100)"}))))))
+             (measure->druid {:name "x" :expression "(/ (* (where (= $country \"br\") (sum $amount)) (sum $units)) 100)"}))))
+
+    (testing "greatest post aggregator"
+      (is (= {:aggregations []
+              :postAggregations [{:type "doubleGreatest" :name "amount"
+                                  :fields [{:type "constant" :value 100}
+                                           {:type "constant" :value 200}]}]}
+             (measure->druid {:name "amount" :expression "(greatest 100 200)"}))))))

@@ -117,17 +117,20 @@
                 {:name "seccion" :title "Sección"}
                 {:name "fabricacion" :title "Fabricación"}
                 {:name "tipo_tallado" :title "Tipo de Tallado"}]
-   :measures [{:name "lentes_procesadas" :favorite true}
+   :measures [{:name "lentes_procesadas"}
               {:name "lentes_repetidas" :title "Repeticiones" :favorite true
                :description "Lentes Repetidas"}
               {:name "lentes_facturadas"
                :expression "(where {$seccion \"Vitolen\"} (sum $lentes_procesadas))"}
-              {:name "repetidas_vs_procesadas" :title "R/LP" :format "0.0%" :favorite true
-               :description "R/LP = Lentes Repetidas / Lentes Procesadas"
+              {:name "repetidas_vs_procesadas" :title "R/LP" :format "0.0%"
+               :description "R/LP = Lentes Repetidas / Lentes Procesadas (sólo representativo cuando se filtra por sección)"
                :expression "(/ (sum $lentes_repetidas) (sum $lentes_procesadas)))"}
-              {:name "repetidas_vs_facturadas" :title "R/LF" :format "0.0%" :favorite true
-               :description "R/LF = Lentes Repetidas / Lentes Facturadas"
-               :expression "(/ (sum $lentes_repetidas) (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))))"}]}
+              {:name "repetidas_vs_facturadas" :title "R/LF" :format "0.0%"
+               :description "R/LF = Lentes Repetidas / Lentes Facturadas (utilizar cuando no se filtra por sección)"
+               :expression "(/ (sum $lentes_repetidas) (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))))"}
+              {:name "repetidas_vs_procturadas" :title "R/LPF" :format "0.0%" :favorite true
+               :description "R/LPF = Lentes Repetidas / Lentes Procesadas (pero si no filtra por sección se utiliza Lentes Facturadas en lugar de Procesadas)"
+               :expression "(greatest (/ (sum $lentes_repetidas) (sum $lentes_procesadas)) (/ (sum $lentes_repetidas) (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))))"}]}
   {:name "vtol_stats"
    :title "VTOL Stats"
    :description "Estadísticas de utilización del sistema VTOL"
