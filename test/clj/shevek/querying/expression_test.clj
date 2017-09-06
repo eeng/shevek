@@ -109,4 +109,15 @@
               :postAggregations [{:type "javascript" :name "amount" :fieldNames ["_t0" "_t1"]
                                   :function "function(f1, f2) { ... }"}]}
              (measure->druid {:name "amount"
-                              :expression "(js [(sum $delta) (sum $total)] \"function(f1, f2) { ... }\")"}))))))
+                              :expression "(js [(sum $delta) (sum $total)] \"function(f1, f2) { ... }\")"}))))
+
+    (testing "hyperUniqueCardinality post aggregator should be used instead of fieldAccess when hyperUnique agggregator are used"
+      (is (= {:aggregations [{:type "hyperUnique" :fieldName "users" :name "_t0"}
+                             {:type "filtered"
+                              :filter {:type "selector" :dimension "x" :value "true"}
+                              :aggregator {:type "hyperUnique" :fieldName "users" :name "_t1"}
+                              :name "_t1"}]
+              :postAggregations [{:type "arithmetic" :name "amount" :fn "/"
+                                  :fields [{:type "hyperUniqueCardinality" :fieldName "_t0"}
+                                           {:type "hyperUniqueCardinality" :fieldName "_t1"}]}]}
+             (measure->druid {:name "amount" :expression "(/ (count-distinct $users) (where {$x \"true\"} (count-distinct $users)))"}))))))

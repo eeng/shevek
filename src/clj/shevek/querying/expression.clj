@@ -65,9 +65,12 @@
 
 (defn- build-field-access-postagg [expression tig]
   (let [temp-name (str "_t" (tig))
-        aggregators [(eval-aggregator temp-name expression)]
-        post-aggregator {:type "fieldAccess" :fieldName temp-name}]
-    [aggregators post-aggregator]))
+        aggregator (eval-aggregator temp-name expression)
+        post-aggregator-type (if (or (= (:type aggregator) "hyperUnique")
+                                     (= (get-in aggregator [:aggregator :type]) "hyperUnique")) ; Filtered aggregators
+                               "hyperUniqueCardinality" "fieldAccess")
+        post-aggregator {:type post-aggregator-type :fieldName temp-name}]
+    [[aggregator] post-aggregator]))
 
 (defn- build-fields-postagg [name args tig base-fields]
   (let [aggregators-and-post-aggs (map #(eval-post-aggregator nil % tig) args)
