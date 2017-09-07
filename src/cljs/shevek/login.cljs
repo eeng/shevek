@@ -8,6 +8,7 @@
             [shevek.components.form :refer [text-input input-field kb-shortcuts]]
             [shevek.lib.session-storage :as session-storage]
             [ajax.core :refer [POST]]
+            [shevek.navegation :refer [navigate]]
             [cljsjs.jwt-decode]))
 
 (defn current-user []
@@ -48,7 +49,8 @@
 
 (defevh :logout [db]
   (session-storage/remove-item! "shevek.access-token")
-  (select-keys db [:page :settings]))
+  (navigate "/")
+  (select-keys db [:settings]))
 
 (defevh :session-expired [db]
   (reset! error :users/session-expired)
