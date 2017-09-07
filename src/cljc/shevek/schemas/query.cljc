@@ -39,7 +39,8 @@
    :filter [(s/one TimeFilter "tf") NormalFilter]
    (s/optional-key :split) [Split]
    :measures [Measure]
-   (s/optional-key :totals) s/Bool})
+   (s/optional-key :totals) s/Bool
+   (s/optional-key :time-zone) s/Str})
 
 (s/defschema Paging
   {(s/optional-key :pagingIdentifiers) {s/Keyword s/Int}
@@ -48,7 +49,8 @@
 (s/defschema RawQuery
   {:cube s/Str
    :filter [(s/one TimeFilter "tf") NormalFilter]
-   (s/optional-key :paging) Paging})
+   (s/optional-key :paging) Paging
+   (s/optional-key :time-zone) s/Str})
 
 (s/defschema Result {s/Keyword s/Any})
 

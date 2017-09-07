@@ -157,4 +157,5 @@
                 {:name "isNew" :type "BOOL"}
                 {:name "regionIsoCode" :title "Region ISO Code"}
                 {:name "countryIsoCode" :title "Country ISO Code"}]
-   :measures [{:name "count" :description "Some interesting count"}]}]}
+   :measures [{:name "count" :description "Some interesting count"}]
+   :default-time-zone "America/New_York"}]}

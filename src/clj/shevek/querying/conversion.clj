@@ -18,23 +18,23 @@
 (defn- sort-by-same? [{:keys [name sort-by]}]
   (= name (:name sort-by)))
 
-(defn- time-zone [{:keys [default-time-zone]}]
-  (or default-time-zone (str (t/default-time-zone))))
+(defn- time-zone [q]
+  (or (:time-zone q) (str (t/default-time-zone))))
 
-(defn- add-time-zome-to-extraction-fn [{:keys [type] :as extraction-fn} schema]
+(defn- add-time-zome-to-extraction-fn [{:keys [type] :as extraction-fn} q]
   (cond-> extraction-fn
-          (= type "timeFormat") (assoc :timeZone (time-zone schema))))
+          (= type "timeFormat") (assoc :timeZone (time-zone q))))
 
-(defn- dimension-and-extraction [{:keys [name column extraction]} schema]
-  (let [extraction (map #(add-time-zome-to-extraction-fn % schema) extraction)]
+(defn- dimension-and-extraction [{:keys [name column extraction]} q]
+  (let [extraction (map #(add-time-zome-to-extraction-fn % q) extraction)]
     (cond-> {:dimension (or column name)}
             (seq extraction)
             (assoc :extractionFn (if (> (count extraction) 1)
                                    {:type "cascade" :extractionFns extraction}
                                    (first extraction))))))
 
-(defn- to-druid-filter [[{:keys [operator value] :as dim} :as filters] schema]
-  (let [base-filter (dimension-and-extraction dim schema)]
+(defn- to-druid-filter [[{:keys [operator value] :as dim} :as filters] q]
+  (let [base-filter (dimension-and-extraction dim q)]
     (condp = (count filters)
       0 nil
       1 (condp = (keyword operator)
@@ -42,7 +42,7 @@
           :include (assoc base-filter :type "in" :values value)
           :exclude {:type "not" :field (assoc base-filter :type "in" :values value)}
           :search (assoc base-filter :type "search" :query {:type "insensitive_contains" :value value}))
-      {:type "and" :fields (map #(to-druid-filter [%] schema) filters)})))
+      {:type "and" :fields (map #(to-druid-filter [%] q) filters)})))
 
 (defn- calculate-query-type [{:keys [dimension]}]
   (if (and dimension (not (time-dimension? dimension)))
@@ -59,25 +59,24 @@
       field
       {:type "inverted" :metric field})))
 
-(defn- dimension-spec [{:keys [name extraction] :as dim} schema]
+(defn- dimension-spec [{:keys [name extraction] :as dim} q]
   (if extraction
-    (assoc (dimension-and-extraction dim schema) :type "extraction" :outputName name)
+    (assoc (dimension-and-extraction dim q) :type "extraction" :outputName name)
     name))
 
 (defn- add-query-type-dependant-fields [{:keys [queryType] :as dq}
-                                        {:keys [dimension measures] :as q}
-                                        schema]
+                                        {:keys [dimension measures] :as q}]
   (condp = queryType
     "topN"
     (assoc dq
            :granularity "all"
-           :dimension (dimension-spec dimension schema)
+           :dimension (dimension-spec dimension q)
            :metric (generate-metric-field dimension measures)
            :threshold (dimension :limit (or 100)))
     "timeseries"
     (assoc dq
            :granularity (if dimension
-                          {:type "period" :period (:granularity dimension) :timeZone (time-zone schema)}
+                          {:type "period" :period (:granularity dimension) :timeZone (time-zone q)}
                           "all")
            :descending (get-in dimension [:sort-by :descending] false)
            :context {:skipEmptyBuckets true})))
@@ -99,20 +98,20 @@
          (reduce (partial merge-with concat))
          (merge dq))))
 
-(defn add-druid-filters [dq filters schema]
-  (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? filters)]
+(defn add-druid-filters [dq q]
+  (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? (:filter q))]
     (-> (assoc dq :intervals (str/join "/" (-> time-filters first :interval)))
-        (assoc-if-seq :filter (to-druid-filter (->> normal-filters (filter with-value?)) schema)))))
+        (assoc-if-seq :filter (to-druid-filter (->> normal-filters (filter with-value?)) q)))))
 
 (defn add-timeout [dq]
   (assoc-in dq [:context :timeout] 30000))
 
-(defn to-druid-query [{:keys [cube filter measures dimension] :as q} schema]
+(defn to-druid-query [{:keys [cube measures dimension] :as q}]
   (-> {:queryType (calculate-query-type q)
        :dataSource {:type "table" :name cube}}
-      (add-druid-filters filter schema)
+      (add-druid-filters q)
       (add-druid-measures (concat measures (sort-by-derived-measures dimension measures)))
-      (add-query-type-dependant-fields q schema)
+      (add-query-type-dependant-fields q)
       (add-timeout)))
 
 (defn from-druid-results [{:keys [dimension]} {:keys [queryType]} results]

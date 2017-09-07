@@ -16,7 +16,6 @@
 
 (defn filter-cube [{:keys [name measures] :as cube} {:keys [allowed-cubes] :as user}]
   (if (cube-visible? cube user)
-    (let [allowed-cube (and (not= allowed-cubes "all") (find-by :name name allowed-cubes))
-          filtered-measures (filterv #(measure-visible? % allowed-cube) measures)]
-      (assoc cube :measures filtered-measures))
+    (let [allowed-cube (and (not= allowed-cubes "all") (find-by :name name allowed-cubes))]
+      (update cube :measures (partial filterv #(measure-visible? % allowed-cube))))
     (select-keys cube [:name :title])))

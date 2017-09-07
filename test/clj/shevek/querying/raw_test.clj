@@ -3,8 +3,6 @@
             [shevek.asserts :refer [submap?]]
             [shevek.querying.raw :refer [to-druid-query from-druid-results]]))
 
-(def schema {})
-
 (deftest to-druid-query-test
   (testing "only time filter raw query"
     (is (submap? {:queryType "select"
@@ -12,19 +10,19 @@
                   :granularity {:type "all"}
                   :intervals "2015/2016"}
                  (to-druid-query {:cube "wikiticker"
-                                  :filter [{:interval ["2015" "2016"]}]} schema))))
+                                  :filter [{:interval ["2015" "2016"]}]}))))
 
   (testing "other filters should work exactly the same as the normal query"
     (is (submap? {:filter {:dimension "isRobot" :type "selector" :value "true"}}
-                 (to-druid-query {:filter [{:name "isRobot" :operator "is" :value "true"}]} schema))))
+                 (to-druid-query {:filter [{:name "isRobot" :operator "is" :value "true"}]}))))
 
   (testing "should pass through the paging spec or use a default with limit 100"
     (is (submap? {:pagingSpec {:threshold 100 :fromNext true}}
-                 (to-druid-query {} schema)))
+                 (to-druid-query {})))
     (is (submap? {:pagingSpec {:threshold 50 :fromNext true}}
-                 (to-druid-query {:paging {:threshold 50}} schema)))
+                 (to-druid-query {:paging {:threshold 50}})))
     (is (submap? {:pagingSpec {:threshold 50 :pagingIdentifiers {:a 4} :fromNext true}}
-                 (to-druid-query {:paging {:threshold 50 :pagingIdentifiers {:a 4}}} schema)))))
+                 (to-druid-query {:paging {:threshold 50 :pagingIdentifiers {:a 4}}})))))
 
 (deftest from-druid-results-test
   (testing "should return the new pagingIdentifiers along with the same threshold"
