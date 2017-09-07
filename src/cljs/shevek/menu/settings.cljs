@@ -9,6 +9,7 @@
             [shevek.components.popup :refer [show-popup]]
             [shevek.navegation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
+            [shevek.login :refer [logged-in?]]
             [schema-tools.core :as st]
             [cuerdas.core :as str]))
 
@@ -20,7 +21,7 @@
   (let [refresh-events {:dashboard :dashboard/refresh
                         :viewer :viewer-refresh}
         event (refresh-events (current-page))]
-    (when event (dispatch event))))
+    (when (and event (logged-in?)) (dispatch event))))
 
 (defonce auto-refresh-interval (atom nil))
 
