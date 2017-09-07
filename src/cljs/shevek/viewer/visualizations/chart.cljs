@@ -66,9 +66,9 @@
       (str (get nested-labels idx) " ‧ " (get labels idx))
       (get labels idx))))
 
-(defn- build-chart-opts [{:keys [title] :as measure} {:keys [viztype results] :as viz}]
+(defn- build-chart-opts [{:keys [title] :as measure} {:keys [viztype split results] :as viz}]
   (let [chart-title (str title ": " (format-measure measure (first results)))
-        show-legend? (or (> (-> results :split count) 1)
+        show-legend? (or (> (count split) 1)
                          (= viztype :pie-chart))]
     (cond-> {:title {:display true :text chart-title}
              :legend {:display show-legend? :position "bottom"}
