@@ -3,7 +3,8 @@
             [cljs.reader :refer [read-string]]
             [shevek.lib.base64 :as b64]
             [schema.core :as s]
-            [shevek.schemas.app-db :refer [CurrentReport]]))
+            [shevek.schemas.app-db :refer [CurrentReport]]
+            [shevek.lib.logger :as log]))
 
 (defn store [encoded-report]
   (let [current-path (.-hash js/location)
@@ -18,4 +19,6 @@
 (defn restore-report-from-url [encoded-report]
   (try
     (->> encoded-report js/decodeURI b64/decode read-string (s/validate CurrentReport))
-    (catch js/Error _ nil)))
+    (catch js/Error e
+      (log/error e)
+      nil)))
