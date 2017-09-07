@@ -123,7 +123,8 @@
                :description "Lentes Repetidas"}
               {:name "lentes_facturadas" :description "Lentes procesadas en la sección Vitolen (calculadas a partir de eventos de facturación)"
                :expression "(where {$seccion \"Vitolen\"} (sum $lentes_procesadas))"}
-              {:name "indicador" :description "Si LF = 0 ó LF = LP, entonces Indicador = R/LP; sino Indicador = R/(LF+R)"
+              {:name "indicador" :title "Indicador R/LP"
+               :description "Si LF = 0 ó LF = LP, entonces Indicador = R/LP; sino Indicador = R/(LF+R)"
                :type "javascript" :format "0.0%" :favorite true
                :expression "(js [(sum $lentes_repetidas)
                                  (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))
