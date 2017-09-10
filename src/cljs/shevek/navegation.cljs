@@ -17,7 +17,7 @@
   (assoc db :page page))
 
 (defroute "/" []
-  (dispatch :navigate :dashboard))
+  (dispatch :navigate :home))
 
 (defroute "/viewer/:encoded-report" [encoded-report]
   (dispatch :viewer-restored encoded-report))

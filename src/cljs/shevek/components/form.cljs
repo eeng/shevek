@@ -99,20 +99,25 @@
     (when dom-node
       (-> dom-node js/$ (.on "keyup" (partial handle-keypressed shortcuts))))))
 
+(defn by [& fields]
+  #(str/join "|" ((apply juxt fields) %)))
+
 (defn- filter-matching [search get-value results]
   (if (seq search)
     (let [pattern (re-pattern (str "(?i)" (regex-escape search)))]
       (filter #(re-find pattern (get-value %)) results))
     results))
 
-(defn search-input [search {:keys [on-change on-stop wrapper] :or {on-change identity on-stop identity wrapper {}}}]
+(defn search-input [search {:keys [on-change on-stop input wrapper] :or {on-change identity on-stop identity input {} wrapper {}}}]
   (let [change #(on-change (reset! search %))
         clear #(do (when (seq @search) (change ""))
                  (on-stop))
-        wrapper-opts (merge {:ref (kb-shortcuts :enter on-stop :escape clear)} wrapper)]
+        wrapper-opts (merge {:ref (kb-shortcuts :enter on-stop :escape clear)} wrapper)
+        input-opts (merge {:type "text" :placeholder (t :input/search) :value @search
+                           :on-change #(change (.-target.value %)) :auto-focus true}
+                          input)]
      [:div.ui.icon.fluid.input.search wrapper-opts
-      [:input {:type "text" :placeholder (t :input/search) :value @search
-               :on-change #(change (.-target.value %)) :auto-focus true}]
+      [:input input-opts]
       (if (seq @search)
         [:i.link.remove.circle.icon {:on-click clear}]
         [:i.search.icon])]))

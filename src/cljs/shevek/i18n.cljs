@@ -5,13 +5,23 @@
 (def translations
   {:en
    {:menu {:logout "Logout"}
-    :dashboard {:title "Dashboard"
-                :subtitle "Pin here your favorite reports for easy access"}
+    :home {:menu "Home"
+           :title "Welcome"
+           :subtitle "What would you like to see today?"}
     :cubes {:title "Data Cubes"
             :menu "Cubes"
-            :missing "There aren't any data cubes defined."
-            :no-desc "No description"
-            :no-results "No results where found"}
+            :missing "There aren't any data cubes defined"}
+    :dashboards {:title "Dashboards"
+                 :missing "There aren't any dashboards created"}
+    :reports {:title "Reports"
+              :missing "There aren't any reports created"
+              :name "Name"
+              :description "Description"
+              :pin-in-dashboard "Pin in dashboard"
+              :saved "Report '{1}' saved!"
+              :deleted "Report '{1}' deleted!"
+              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
+              :unauthorized "Oops! This report is no longer available."}
     :viewer {:dimensions "Dimensions"
              :measures "Measures"
              :filter "Filter"
@@ -55,16 +65,6 @@
                      :bar-chart "bar chart"
                      :line-chart "line chart"
                      :pie-chart "pie chart"}
-    :reports {:menu "Reports"
-              :title "Saved Reports"
-              :pinned "Favorite Reports"
-              :name "Name"
-              :description "Description"
-              :pin-in-dashboard "Pin in dashboard"
-              :saved "Report '{1}' saved!"
-              :deleted "Report '{1}' deleted!"
-              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
-              :unauthorized "Oops! This report is no longer available."}
     :share {:title "Share"
             :copy-url "Copy URL"
             :copied "URL Copied!"}
@@ -92,8 +92,7 @@
             :password-hint "Leave blank if you don't want to change it"
             :unauthorized "Sorry, you are not allow to access this page. Please contact the administrator for more information."
             :basic-info "Basic Information"
-            :permissions "Permissions"
-            :no-results "No users where found"}
+            :permissions "Permissions"}
     :permissions {:allowed-cubes "Allowed Cubes"
                   :admin-all-cubes "Admin users view everything"
                   :all-cubes "Can view all cubes"
@@ -139,17 +138,30 @@
                  :confirmation "doesn't match the previous value"}
     :boolean {:true "Yes"
               :false "No"}
-    :errors {:bad-gateway "The system is not available right now. Please try again later."
+    :errors {:no-results "No results where found"
+             :no-desc "No description"
+             :bad-gateway "The system is not available right now. Please try again later."
              "Query timeout" "The query is taking longer than expected. Please try with a shorter period."}}
 
    :es
    {:menu {:logout "Salir"}
-    :dashboard {:subtitle "Muestra las fuentes de datos disponibles y sus reportes favoritos"}
+    :home {:menu "Inicio"
+           :title "Bienvenido"
+           :subtitle "Qué le gustaría analizar hoy?"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
-            :missing "No hay cubos definidos."
-            :no-desc "Sin descripción"
-            :no-results "No se encontraron resultados"}
+            :missing "No hay cubos definidos"}
+    :dashboards {:title "Dashboards"
+                 :missing "No hay dashboards creados"}
+    :reports {:title "Reportes"
+              :missing "No hay reportes creados"
+              :name "Nombre"
+              :description "Descripción"
+              :pin-in-dashboard "Mostrar en dashboard"
+              :saved "Reporte '{1}' guardado correctamente"
+              :deleted "Reporte '{1}' eliminado correctamente"
+              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
+              :unauthorized "Oops! Este reporte ya no está disponible."}
     :viewer {:dimensions "Dimensiones"
              :measures "Métricas"
              :filter "Filtros"
@@ -191,16 +203,6 @@
                      :bar-chart "barras"
                      :line-chart "línea"
                      :pie-chart "torta"}
-    :reports {:menu "Reportes"
-              :title "Reportes"
-              :pinned "Reportes Favoritos"
-              :name "Nombre"
-              :description "Descripción"
-              :pin-in-dashboard "Mostrar en dashboard"
-              :saved "Reporte '{1}' guardado correctamente"
-              :deleted "Reporte '{1}' eliminado correctamente"
-              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
-              :unauthorized "Oops! Este reporte ya no está disponible."}
     :share {:title "Compartir"
             :copy-url "Copiar URL"
             :copied "URL Copiado!"}
@@ -226,8 +228,7 @@
             :password-hint "Dejar en blanco para no cambiarlo"
             :unauthorized "Ud. no tiene acceso a esta página. Por favor, contacte al administrador para más información."
             :basic-info "Información Básica"
-            :permissions "Permisos"
-            :no-results "No se encontraron usuarios"}
+            :permissions "Permisos"}
     :permissions {:allowed-cubes "Cubes Visibles"
                   :admin-all-cubes "Administradores pueden ver todo"
                   :all-cubes "Puede visualizar todos los cubos"
@@ -270,7 +271,9 @@
                  :confirmation "no coincide con el valor anterior"}
     :boolean {:true "Si"
               :false "No"}
-    :errors {:bad-gateway "El sistema no está disponible en este momento. Por favor, intente nuevamente más tarde."
+    :errors {:no-results "No se encontraron resultados"
+             :no-desc "Sin descripción"
+             :bad-gateway "El sistema no está disponible en este momento. Por favor, intente nuevamente más tarde."
              "Query timeout" "La consulta está demorando demasiado. Por favor, intente con un período más corto."}}
 
    :tongue/fallback :en})
@@ -285,3 +288,7 @@
 
 (defn translation [& args]
   (get-in translations (into [(lang)] args)))
+
+(defn translation! [& args]
+  (or (apply translation args)
+      (apply str "{Missing key " args "}")))

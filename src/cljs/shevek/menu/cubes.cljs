@@ -22,10 +22,10 @@
              [:div.content
               [:div.header title]
               [:div.description description]]]))]
-       [:div (t :cubes/no-results)])]))
+       [:div (t :errors/no-results)])]))
 
 (defn- cubes-menu []
-  (when-not (current-page? :dashboard) ; No need to fetch the cubes again when we are on the home page
+  (when-not (current-page? :home) ; No need to fetch the cubes again when we are on the home page
     (fetch-cubes))
   (fn []
     [:a#cubes-menu.item {:on-click #(show-popup % popup-content {:position "bottom left"})}

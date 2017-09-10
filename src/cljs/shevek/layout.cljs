@@ -7,6 +7,7 @@
             [shevek.components.popup :refer [popup]]
             [shevek.components.modal :refer [modal]]
             [shevek.login :as login :refer [logged-in? admin?]]
+            [shevek.home :as home]
             [shevek.dashboard :as dashboard]
             [shevek.admin.page :as admin]
             [shevek.notification :refer [notification]]
@@ -19,6 +20,7 @@
 
 (def pages
   {:login #'login/page
+   :home #'home/page
    :dashboard #'dashboard/page
    :admin #'admin/page
    :viewer #'viewer/page
@@ -29,8 +31,8 @@
 
 (defn- menu []
   [:div.ui.fixed.inverted.menu
-   [:a.item {:href "#/" :class (current-page-class :dashboard)}
-    [:i.block.layout.icon] (t :dashboard/title)]
+   [:a.item {:href "#/" :class (current-page-class :home)}
+    [:i.home.layout.icon] (t :home/menu)]
    [cubes-menu]
    [reports-menu]
    [:div.right.menu

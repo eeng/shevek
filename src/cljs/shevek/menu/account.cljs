@@ -74,7 +74,7 @@
 (defn page []
   (let [user (r/atom nil)]
     (fn []
-      [:div#account.ui.container
+      [:div.ui.container
        [page-title (t :account/title) (t :account/subtitle) "user"]
        [:div.ui.grid
         [:div.five.wide.column

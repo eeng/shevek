@@ -119,7 +119,7 @@
          (if results
            (if (seq filtered-results)
              (into [:div.items] (map #(pinned-dimension-item dim filter-dim % measure @search) filtered-results))
-             [:div.items [:div.item.no-results (t :cubes/no-results)]])
+             [:div.items [:div.item.no-results (t :errors/no-results)]])
            [:div.items.empty])]))))
 
 (defn pinboard-panels []

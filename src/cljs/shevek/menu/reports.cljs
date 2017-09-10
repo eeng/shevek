@@ -97,7 +97,7 @@
        [:div.ui.relaxed.middle.aligned.selection.list
         (for [report reports]
           ^{:key (:_id report)} [report-item report form-data])]
-       [:div (t :cubes/no-results)])]))
+       [:div (t :errors/no-results)])]))
 
 (defn- popup-content []
   (fetch-reports)
@@ -111,4 +111,4 @@
 (defn- reports-menu []
   (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
     [:a.item {:on-click #(show-popup % popup-content {:position "bottom left"})}
-     [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/menu))]))
+     [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/title))]))
