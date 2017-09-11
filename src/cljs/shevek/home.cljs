@@ -38,17 +38,20 @@
       [:div.column
        [:h2.ui.app.header (translation! key :title)]
        [search-input search {:input {:auto-focus false} :wrapper {:class "big"}}]
-       (let [records (filter-matching @search filter records)]
-         (if (seq records)
-           (rmap card-fn :name records)
-           [:div.large.tip (if (seq @search) (t :errors/no-results) (translation! key :missing))]))])))
+       (if records
+         (let [records (filter-matching @search filter records)]
+           (if (seq records)
+             (rmap card-fn :name records)
+             [:div.large.tip (if (seq @search) (t :errors/no-results) (translation! key :missing))]))
+         [:div.ui.active.inline.centered.loader])])))
 
 (defn page []
   (fetch-cubes)
   (fetch-reports)
-  [:div#home.ui.container
-   [page-title (t :home/title) (t :home/subtitle) "home layout"]
-   [:div.ui.equal.width.grid
-    [cards :cubes (c/cubes-list) (by :title :description) cube-card]
-    [cards :dashboards (db/get :dashboards) (by :name :description) dashboard-card]
-    [cards :reports (db/get :reports) (by :name :description) report-card]]])
+  (fn []
+    [:div#home.ui.container
+     [page-title (t :home/title) (t :home/subtitle) "home layout"]
+     [:div.ui.equal.width.grid
+      [cards :cubes (c/cubes-list) (by :title :description) cube-card]
+      [cards :dashboards (db/get :dashboards) (by :name :description) dashboard-card]
+      [cards :reports (db/get :reports) (by :name :description) report-card]]]))

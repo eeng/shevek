@@ -100,7 +100,6 @@
        [:div (t :errors/no-results)])]))
 
 (defn- popup-content []
-  (fetch-reports)
   (let [form-data (r/atom nil)]
     (fn []
       [:div#reports-popup
@@ -109,6 +108,9 @@
          [reports-list form-data])])))
 
 (defn- reports-menu []
-  (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
-    [:a.item {:on-click #(show-popup % popup-content {:position "bottom left"})}
-     [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/title))]))
+  (when-not (current-page? :home) ; No need to fetch the reports again when we are on the home page
+    (fetch-reports))
+  (fn []
+    (let [report-name (str/prune (db/get-in [:current-report :name]) 30)]
+      [:a.item {:on-click #(show-popup % popup-content {:position "bottom left"})}
+       [:i.line.chart.icon] (or (and (current-page? :viewer) report-name) (t :reports/title))])))
