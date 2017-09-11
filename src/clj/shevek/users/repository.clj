@@ -4,7 +4,8 @@
             [monger.query :as mq]
             [bcrypt-clj.auth :refer [crypt-password]]
             [shevek.schemas.user :refer [User]]
-            [shevek.reports.repository :refer [delete-reports]]))
+            [shevek.reports.repository :refer [delete-reports]]
+            [shevek.dashboards.repository :refer [delete-dashboards]]))
 
 (defn find-users [db]
   (mq/with-collection db "users"
@@ -47,6 +48,7 @@
 (defn delete-user [db {:keys [_id]}]
   (mc/remove-by-id db "users" _id)
   (delete-reports db _id)
+  (delete-dashboards db _id)
   true)
 
 ;; Examples

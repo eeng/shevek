@@ -6,7 +6,7 @@
   {:en
    {:menu {:logout "Logout"}
     :home {:menu "Home"
-           :title "Welcome"
+           :title "Welcome!"
            :subtitle "What would you like to see today?"}
     :cubes {:title "Data Cubes"
             :menu "Cubes"
@@ -147,15 +147,15 @@
    :es
    {:menu {:logout "Salir"}
     :home {:menu "Inicio"
-           :title "Bienvenido"
+           :title "Bienvenido!"
            :subtitle "Qué le gustaría analizar hoy?"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
             :missing "No hay cubos definidos"}
     :dashboards {:title "Dashboards"
-                 :missing "No hay dashboards creados"}
+                 :missing "No se ha creado ningún dashboard todavía"}
     :reports {:title "Reportes"
-              :missing "No hay reportes creados"
+              :missing "No se ha guardado ningún reporte todavía"
               :name "Nombre"
               :description "Descripción"
               :updated-at "Última actualización"

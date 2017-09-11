@@ -6,11 +6,14 @@
             [shevek.schemas.user :refer [User]]
             [shevek.reports.repository :refer [save-report]]
             [shevek.schemas.report :refer [Report]]
+            [shevek.dashboards.repository :refer [save-dashboard]]
+            [shevek.schemas.dashboard :refer [Dashboard]]
             [shevek.db :refer [db]]))
 
 (def makers {Cube save-cube
              User save-user
-             Report save-report})
+             Report save-report
+             Dashboard save-dashboard})
 
 (defn make [schema args]
   (c/complete args schema))

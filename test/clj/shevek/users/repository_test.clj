@@ -6,6 +6,7 @@
             [shevek.users.repository :refer [find-users save-user delete-user reload]]
             [shevek.schemas.user :refer [User]]
             [shevek.schemas.report :refer [Report]]
+            [shevek.schemas.dashboard :refer [Dashboard]]
             [shevek.db :refer [db]]
             [bcrypt-clj.auth :refer [check-password]]
             [monger.collection :as mc]))
@@ -50,4 +51,10 @@
     (let [u (make! User)]
       (make! Report {:user-id (:_id u)})
       (delete-user db u)
-      (is (= [] (mc/find-maps db "reports"))))))
+      (is (= [] (mc/find-maps db "reports")))))
+
+  (it "should delete the dashboards"
+    (let [u (make! User)]
+      (make! Dashboard {:user-id (:_id u)})
+      (delete-user db u)
+      (is (= [] (mc/find-maps db "dashboards"))))))

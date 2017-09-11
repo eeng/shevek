@@ -3,14 +3,12 @@
             [schema-tools.core :as st]
             [shevek.schemas.cube :refer [Dimension Measure]]
             [shevek.schemas.viewer :refer [Viewer Visualization Cube]]
-            [shevek.schemas.report :refer [Report]]))
+            [shevek.schemas.report :refer [Report]]
+            [shevek.schemas.dashboard :refer [Dashboard]]))
 
 (s/defschema Settings
   {(s/optional-key :lang) s/Str
    (s/optional-key :auto-refresh) s/Int})
-
-(s/defschema Dashboard
-  {s/Str Visualization})
 
 (s/defschema CurrentReport
   (st/assoc Report (s/optional-key :user-id) s/Any))
@@ -25,4 +23,4 @@
    (s/optional-key :current-report) (s/maybe CurrentReport)
    (s/optional-key :reports) [Report]
    (s/optional-key :users) [s/Any]
-   (s/optional-key :dashboard) Dashboard})
+   (s/optional-key :dashboards) [Dashboard]})

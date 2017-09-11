@@ -90,7 +90,9 @@
                     #"P(\d+)M" (formatter :month))]
     (->> time parse-time (f/unparse formatter))))
 
-(defn format-time [time]
-  (if (instance? goog.date.Date time)
-    (f/unparse (formatter :second) time)
-    (-> time parse-time format-time)))
+(defn format-time
+  ([time] (format-time time :second))
+  ([time formatter-i18n-key]
+   (if (instance? goog.date.Date time)
+     (f/unparse (formatter formatter-i18n-key) time)
+     (-> time parse-time (format-time formatter-i18n-key)))))

@@ -1,9 +1,17 @@
 #home {
   .column {
     .card {
-      .header { margin-bottom: .2em }
-      .icon { margin-right: .4rem }
-      .meta p:not(:last-child) { margin-bottom: .3em }
+      .header {
+        .icon { margin-right: .4rem }
+      }
+      .content {
+        .right.icon {
+          margin: 0 0 0 .25rem;
+          color: rgba(0,0,0,.3);
+          &:hover { color: black }
+        }
+      }
+      .description + .meta { margin-top: .5em }
     }
     .tip { margin-top: 1em }
     .loader { margin-top: 2em }

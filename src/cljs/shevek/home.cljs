@@ -1,4 +1,5 @@
 (ns shevek.home
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [cuerdas.core :as str]
             [shevek.reflow.core :refer [dispatch]]
@@ -10,34 +11,49 @@
             [shevek.lib.dw.cubes :as c :refer [fetch-cubes]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.dates :refer [format-time]]
+            [shevek.lib.string :refer [present?]]
             [shevek.menu.reports :refer [fetch-reports]]))
+
+(defevh :dashboards-requested [db]
+  (rpc/fetch db :dashboards "dashboards.api/find-all"))
+
+(defn fetch-dashboards []
+  (dispatch :dashboards-requested))
 
 (defn- cube-card [{:keys [name title description]}]
   [:a.ui.fluid.card {:on-click #(dispatch :cube-selected name)}
    [:div.content
     [:div.header [:i.cube.icon] title]
-    [:div.meta (if (str/blank? description) (t :errors/no-desc) description)]]])
+    [:div.description (if (present? description) description (t :errors/no-desc))]]])
 
-(defn- report-card [{:keys [name description updated-at] :as report}]
+(defn- report-card [{:keys [name description updated-at cube] :as report}]
   [:a.ui.fluid.card {:on-click #(dispatch :report-selected report)}
    [:div.content
+    [:i.right.floated.trash.icon]
+    [:i.right.floated.write.icon]
     [:div.header [:i.line.chart.icon] name]
-    [:div.meta
-     [:p description]
-     [:p (t :reports/updated-at) ": " (format-time updated-at)]]]])
+    (when (present? description)
+      [:div.description description])]
+   [:div.extra.content
+    [:i.cube.icon]
+    (db/get-in [:cubes cube :title])
+    [:span.right.floated (format-time updated-at :day)]]])
 
-(defn- dashboard-card [{:keys [name description]}]
+(defn- dashboard-card [{:keys [name description updated-at]}]
   [:a.ui.fluid.card {:on-click #(dispatch :dashboard-selected name)}
    [:div.content
     [:div.header [:i.block.icon] name]
-    [:div.meta (if (str/blank? description) (t :errors/no-desc) description)]]])
+    (when (present? description)
+      [:div.description description])
+    [:div.extra.content
+     [:span.right.floated (format-time updated-at :day)]]]])
 
 (defn- cards []
   (let [search (r/atom "")]
     (fn [key records filter card-fn]
       [:div.column
        [:h2.ui.app.header (translation! key :title)]
-       [search-input search {:input {:auto-focus false} :wrapper {:class "big"}}]
+       [search-input search {:input {:auto-focus (= key :cubes)}}]
        (if records
          (let [records (filter-matching @search filter records)]
            (if (seq records)
@@ -48,6 +64,7 @@
 (defn page []
   (fetch-cubes)
   (fetch-reports)
+  (fetch-dashboards)
   (fn []
     [:div#home.ui.container
      [page-title (t :home/title) (t :home/subtitle) "home layout"]

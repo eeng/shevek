@@ -19,3 +19,6 @@
   (if (seq s)
     (str/split s re)
     []))
+
+(defn present? [s]
+  (not (str/blank? s)))
