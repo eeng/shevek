@@ -50,7 +50,7 @@
 (defevh :logout [db]
   (session-storage/remove-item! "shevek.access-token")
   (navigate "/")
-  (select-keys db [:settings]))
+  (select-keys db [:settings :page]))
 
 (defevh :session-expired [db]
   (reset! error :users/session-expired)
