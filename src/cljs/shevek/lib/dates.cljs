@@ -91,4 +91,6 @@
     (->> time parse-time (f/unparse formatter))))
 
 (defn format-time [time]
-  (f/unparse (formatter :second) time))
+  (if (instance? goog.date.Date time)
+    (f/unparse (formatter :second) time)
+    (-> time parse-time format-time)))

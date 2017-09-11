@@ -12,7 +12,7 @@
             [cuerdas.core :as str]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.string :refer [format-bool]]
-            [shevek.lib.dates :refer [parse-time format-time]]))
+            [shevek.lib.dates :refer [format-time]]))
 
 (def limit 100)
 
@@ -21,7 +21,7 @@
     (cond
       (= "BOOL" type) (format-bool value)
       (sequential? value) (str/join ", " value)
-      (time-dimension? dim) (-> value parse-time format-time)
+      (time-dimension? dim) (format-time value)
       :else value)))
 
 (defn raw-data-table []

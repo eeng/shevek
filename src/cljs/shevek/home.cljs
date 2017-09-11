@@ -9,6 +9,7 @@
             [shevek.components.form :refer [search-input filter-matching by]]
             [shevek.lib.dw.cubes :as c :refer [fetch-cubes]]
             [shevek.lib.react :refer [rmap]]
+            [shevek.lib.dates :refer [format-time]]
             [shevek.menu.reports :refer [fetch-reports]]))
 
 (defn- cube-card [{:keys [name title description]}]
@@ -17,11 +18,13 @@
     [:div.header [:i.cube.icon] title]
     [:div.meta (if (str/blank? description) (t :errors/no-desc) description)]]])
 
-(defn- report-card [{:keys [name description] :as report}]
+(defn- report-card [{:keys [name description updated-at] :as report}]
   [:a.ui.fluid.card {:on-click #(dispatch :report-selected report)}
    [:div.content
     [:div.header [:i.line.chart.icon] name]
-    [:div.meta (if (str/blank? description) (t :errors/no-desc) description)]]])
+    [:div.meta
+     [:p description]
+     [:p (t :reports/updated-at) ": " (format-time updated-at)]]]])
 
 (defn- dashboard-card [{:keys [name description]}]
   [:a.ui.fluid.card {:on-click #(dispatch :dashboard-selected name)}
