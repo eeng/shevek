@@ -2,10 +2,10 @@
   (:require [shevek.dashboards.repository :as r]
             [shevek.db :refer [db]]))
 
-(defn save-dashboard [{:keys [user-id]} dashboard]
+(defn save [{:keys [user-id]} dashboard]
   (r/save-dashboard db (assoc dashboard :user-id user-id)))
 
-(defn delete-dashboard [_ dashboard]
+(defn delete [_ dashboard]
   (r/delete-dashboard db dashboard))
 
 (defn find-all [{:keys [user-id]}]

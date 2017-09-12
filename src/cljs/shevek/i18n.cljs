@@ -12,7 +12,9 @@
             :menu "Cubes"
             :missing "There aren't any data cubes defined"}
     :dashboards {:title "Dashboards"
-                 :missing "There aren't any dashboards created"}
+                 :missing "There aren't any dashboards created"
+                 :saved "Dashboard '{1}' saved!"
+                 :deleted "Dashboard '{1}' deleted!"}
     :reports {:title "Reports"
               :missing "There aren't any reports created"
               :name "Name"
@@ -126,7 +128,7 @@
               :edit "Modify"
               :save "Save"
               :save-as "Save As"
-              :new "New"
+              :new "Create"
               :delete "Delete"
               :close "Close"
               :select "Select"
@@ -153,7 +155,9 @@
             :menu "Cubos"
             :missing "No hay cubos definidos"}
     :dashboards {:title "Dashboards"
-                 :missing "No se ha creado ningún dashboard todavía"}
+                 :missing "No se ha creado ningún dashboard todavía"
+                 :saved "Dashboard '{1}' guardado correctamente"
+                 :deleted "Dashboard '{1}' eliminado correctamente"}
     :reports {:title "Reportes"
               :missing "No se ha guardado ningún reporte todavía"
               :name "Nombre"
@@ -261,7 +265,7 @@
               :edit "Editar"
               :save "Guardar"
               :save-as "Guardar Como"
-              :new "Nuevo"
+              :new "Crear"
               :delete "Eliminar"
               :close "Cerrar"
               :select "Seleccionar"

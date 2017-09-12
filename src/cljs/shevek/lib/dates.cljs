@@ -95,4 +95,4 @@
   ([time formatter-i18n-key]
    (if (instance? goog.date.Date time)
      (f/unparse (formatter formatter-i18n-key) time)
-     (-> time parse-time (format-time formatter-i18n-key)))))
+     (when time (-> time parse-time (format-time formatter-i18n-key))))))

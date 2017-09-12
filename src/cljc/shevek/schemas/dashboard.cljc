@@ -8,7 +8,7 @@
   {(s/optional-key :_id) s/Any
    :name s/Str
    (s/optional-key :description) s/Str
-   :user-id s/Any
+   (s/optional-key :user-id) s/Any ; When the new dashboard form is displayed we still don't have a user-id
    (s/optional-key :reports) [DashboardReport]
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})
