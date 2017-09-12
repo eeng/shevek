@@ -91,8 +91,10 @@
 
 (defn- handle-keypressed [shortcuts e]
   (let [key (-> e .-which Keys)
-        assigned-fn (shortcuts key)]
-    (when assigned-fn (assigned-fn))))
+        assigned-fn (shortcuts key)
+        tag (-> e .-target .-tagName)]
+    (when (and assigned-fn (not= "TEXTAREA" tag))
+      (assigned-fn))))
 
 (defn kb-shortcuts [& {:as shortcuts}]
   (fn [dom-node]
