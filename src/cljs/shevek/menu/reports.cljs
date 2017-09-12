@@ -55,7 +55,7 @@
         save #(when (valid?)
                 (dispatch :save-report @report)
                 (when-not (:editing? @form-data) (close-popup))
-                (js/setTimeout cancel 300))
+                (js/setTimeout cancel 100))
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
       [:div.ui.form {:ref shortcuts}
@@ -65,17 +65,20 @@
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
+(defn report-actions [report form-data]
+  [:div.item-actions
+   [:i.write.icon {:on-click (without-propagation #(reset! form-data {:report report :editing? true}))
+                   :title (t :actions/edit)}]
+   [:i.trash.icon (hold-to-confirm #(dispatch :delete-report report))]])
+
 (defn- report-item [_ form-data]
   (let [select-report #(do (dispatch :report-selected %) (close-popup))
-        cubes (db/get :cubes)
-        edit #(reset! form-data {:report % :editing? true})]
+        cubes (db/get :cubes)]
     (fn [{:keys [_id name description cube] :as report} _]
       [:div.item {:on-click #(select-report report)}
        [:div.right.floated.content
         [:div.cube (:title (cubes cube))]
-        [:div.item-actions
-         [:i.write.icon {:on-click (without-propagation edit report) :title (t :actions/edit)}]
-         [:i.trash.icon (hold-to-confirm #(dispatch :delete-report report))]]]
+        [report-actions report form-data]]
        [:div.header name]
        [:div.description description]])))
 

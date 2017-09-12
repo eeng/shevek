@@ -12,7 +12,7 @@
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.dates :refer [format-time]]
             [shevek.lib.string :refer [present?]]
-            [shevek.menu.reports :refer [fetch-reports]]))
+            [shevek.menu.reports :refer [fetch-reports save-report-form report-actions]]))
 
 (defevh :dashboards-requested [db]
   (rpc/fetch db :dashboards "dashboards.api/find-all"))
@@ -26,18 +26,23 @@
     [:div.header [:i.cube.icon] title]
     [:div.description (if (present? description) description (t :errors/no-desc))]]])
 
-(defn- report-card [{:keys [name description updated-at cube] :as report}]
-  [:a.ui.fluid.card {:on-click #(dispatch :report-selected report)}
-   [:div.content
-    [:i.right.floated.trash.icon]
-    [:i.right.floated.write.icon]
-    [:div.header [:i.line.chart.icon] name]
-    (when (present? description)
-      [:div.description description])]
-   [:div.extra.content
-    [:i.cube.icon]
-    (db/get-in [:cubes cube :title])
-    [:span.right.floated (format-time updated-at :day)]]])
+(defn- report-card []
+  (let [form-data (r/atom nil)]
+    (fn [{:keys [name description updated-at cube] :as report}]
+      (if @form-data
+        [:div.ui.fluid.card
+         [:div.content
+          [save-report-form form-data]]]
+        [:a.ui.fluid.card {:on-click #(dispatch :report-selected report)}
+         [:div.content
+          [:div.right.floated [report-actions report form-data]]
+          [:div.header [:i.line.chart.icon] name]
+          (when (present? description)
+            [:div.description description])]
+         [:div.extra.content
+          [:i.cube.icon]
+          (db/get-in [:cubes cube :title])
+          [:span.right.floated (format-time updated-at :day)]]]))))
 
 (defn- dashboard-card [{:keys [name description updated-at]}]
   [:a.ui.fluid.card {:on-click #(dispatch :dashboard-selected name)}
