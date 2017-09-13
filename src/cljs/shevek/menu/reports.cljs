@@ -7,7 +7,7 @@
             [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [kb-shortcuts input-field hold-to-confirm]]
-            [shevek.navegation :refer [current-page? navigate]]
+            [shevek.navigation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
             [shevek.viewer.page :as viewer]

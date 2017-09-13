@@ -3,7 +3,7 @@
   (:require [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
-            [shevek.navegation :refer [current-page? navigate]]
+            [shevek.navigation :refer [current-page? navigate]]
             [shevek.lib.dw.cubes :refer [set-cube-defaults]]
             [shevek.lib.dates :refer [parse-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name cube-authorized?]]

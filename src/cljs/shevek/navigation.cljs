@@ -1,4 +1,4 @@
-(ns shevek.navegation
+(ns shevek.navigation
   (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [secretary.core :refer-macros [defroute]]
             [shevek.reflow.core :refer [dispatch]]

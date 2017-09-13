@@ -7,7 +7,7 @@
             [shevek.lib.local-storage :as local-storage]
             [shevek.components.form :refer [select]]
             [shevek.components.popup :refer [show-popup]]
-            [shevek.navegation :refer [current-page]]
+            [shevek.navigation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
             [shevek.login :refer [logged-in?]]
             [schema-tools.core :as st]

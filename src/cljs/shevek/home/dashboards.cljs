@@ -10,7 +10,8 @@
             [shevek.lib.dates :refer [format-time now]]
             [shevek.lib.string :refer [present?]]
             [shevek.lib.util :refer [new-record?]]
-            [shevek.notification :refer [notify]]))
+            [shevek.notification :refer [notify]]
+            [shevek.navigation :refer [navigate]]))
 
 (defn fetch-dashboards []
   (dispatch :dashboards-requested))
@@ -39,8 +40,8 @@
   (rpc/call "dashboards.api/delete" :args [dashboard] :handler #(notify (t :dashboards/deleted name)))
   (update db :dashboards (partial remove #{dashboard})))
 
-(defn- show-card [{:keys [name description updated-at] :as dashboard} form-data]
-  [:a.ui.fluid.card {:on-click #(dispatch :dashboard-selected dashboard)}
+(defn- show-card [{:keys [_id name description updated-at] :as dashboard} form-data]
+  [:a.ui.fluid.card {:on-click #(navigate "/dashboard/" _id)}
    [:div.content
     [:div.right.floated
      [:div.item-actions {:on-click #(.stopPropagation %)}

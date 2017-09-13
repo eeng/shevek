@@ -8,7 +8,7 @@
             [shevek.components.form :refer [text-input input-field kb-shortcuts]]
             [shevek.lib.session-storage :as session-storage]
             [ajax.core :refer [POST]]
-            [shevek.navegation :refer [navigate]]
+            [shevek.navigation :refer [navigate]]
             [cljsjs.jwt-decode]))
 
 (defn current-user []

@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
-            [shevek.navegation :refer [current-page?]]
+            [shevek.navigation :refer [current-page?]]
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]

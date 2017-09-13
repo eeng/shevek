@@ -2,7 +2,7 @@
   (:require [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch]]
-            [shevek.navegation :refer [current-page? current-page]]
+            [shevek.navigation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
             [shevek.components.popup :refer [popup]]
             [shevek.components.modal :refer [modal]]

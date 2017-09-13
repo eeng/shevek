@@ -3,7 +3,7 @@
   (:require [shevek.components.modal :refer [show-modal]]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t translation]]
-            [shevek.navegation :refer [navigate]]
+            [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
             [shevek.notification :refer [notify]]))
 

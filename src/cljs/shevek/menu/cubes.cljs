@@ -2,7 +2,7 @@
   (:require [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch]]
-            [shevek.navegation :refer [current-page?]]
+            [shevek.navigation :refer [current-page?]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.viewer.shared :refer [current-cube-name]]
             [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]))
