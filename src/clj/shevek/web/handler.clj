@@ -37,6 +37,5 @@
         (wrap-current-user)
         (wrap-authentication backend)
         (wrap-authorization backend)
-        (wrap-restful-format :params-options {:transit-json {:handlers th/read-handlers}}
-                             :response-options {:transit-json {:handlers th/write-handlers}})
+        (wrap-restful-format :response-options {:transit-json {:handlers th/write-handlers}})
         (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false)))))
