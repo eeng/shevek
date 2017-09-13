@@ -30,3 +30,6 @@
 
 (defroute "/account" []
   (dispatch :navigate :account))
+
+(defroute "/dashboard/:id" [id]
+  (dispatch :dashboard-selected id))

@@ -14,3 +14,6 @@
 
 (s/defn delete-dashboards [db user-id]
   (m/delete-by db "dashboards" {:user-id user-id}))
+
+(defn find-by-id [db id]
+  (m/find-by-id db "dashboards" id))

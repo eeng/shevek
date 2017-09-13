@@ -10,3 +10,7 @@
 
 (defn find-all [{:keys [user-id]}]
   (r/find-dashboards db user-id))
+
+; TODO check that the user own this dash?
+(defn find-by-id [_ id]
+  (r/find-by-id db id))
