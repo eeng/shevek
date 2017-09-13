@@ -11,9 +11,9 @@
             [shevek.admin.users :refer [user-validations]]
             [shevek.notification :refer [notify]]))
 
-(defn account-menu []
+(defn account-menu [class]
   [:a.item
-   {:href "#/account"}
+   {:href "#/account" :class class}
    [:i.user.icon] (:fullname (current-user))])
 
 (defevh :account-saved [db {:keys [error] :as response} edited-user cancel]

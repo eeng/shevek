@@ -41,7 +41,7 @@
     (when (admin?)
       [:a.icon.item {:href "#/admin" :class (current-page-class :admin) :title (t :admin/menu)}
        [:i.users.icon]])
-    [account-menu]
+    [account-menu (current-page-class :account)]
     [:a.item {:on-click #(dispatch :logout)}
      [:i.sign.out.icon] (t :menu/logout)]]])
 
