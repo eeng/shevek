@@ -40,8 +40,8 @@
   (rpc/call "dashboards.api/delete" :args [dashboard] :handler #(notify (t :dashboards/deleted name)))
   (update db :dashboards (partial remove #{dashboard})))
 
-(defn- show-card [{:keys [_id name description updated-at] :as dashboard} form-data]
-  [:a.ui.fluid.card {:on-click #(navigate "/dashboard/" _id)}
+(defn- show-card [{:keys [id name description updated-at] :as dashboard} form-data]
+  [:a.ui.fluid.card {:on-click #(navigate "/dashboard/" id)}
    [:div.content
     [:div.right.floated
      [:div.item-actions {:on-click #(.stopPropagation %)}

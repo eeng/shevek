@@ -14,5 +14,5 @@
   [f wait]
   (partial (variable-debounce f) wait))
 
-(defn new-record? [{:keys [_id id]}]
-  (and (nil? _id) (nil? id)))
+(defn new-record? [{:keys [id]}]
+  (nil? id))

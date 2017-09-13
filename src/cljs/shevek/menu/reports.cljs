@@ -30,7 +30,7 @@
           editing-current? (assoc :current-report report)))
 
 (defn- current-report? [db report]
-  (= (:_id report) (get-in db [:current-report :_id])))
+  (= (:id report) (get-in db [:current-report :id])))
 
 (defevh :save-report [db report]
   (let [editing-current? (or (new-record? report)
@@ -88,7 +88,7 @@
         save #(if (new-record? current-report)
                 (reset! form-data {:report current-report :editing? false})
                 (do (dispatch :save-report current-report) (close-popup)))
-        save-as #(reset! form-data {:report (dissoc current-report :_id :name) :editing? false})]
+        save-as #(reset! form-data {:report (dissoc current-report :id :name) :editing? false})]
     [:div
      (when show-actions?
        [:div.actions
@@ -98,7 +98,7 @@
      (if (seq reports)
        [:div.ui.relaxed.middle.aligned.selection.list
         (for [report reports]
-          ^{:key (:_id report)} [report-item report form-data])]
+          ^{:key (:id report)} [report-item report form-data])]
        [:div (t :errors/no-results)])]))
 
 (defn- popup-content []

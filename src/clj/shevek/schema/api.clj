@@ -9,7 +9,7 @@
 (defn cubes [{:keys [user]}]
   (->> (r/find-cubes db)
        (auth/filter-cubes user)
-       (map #(select-keys % [:_id :name :title :description :measures]))
+       (map #(select-keys % [:id :name :title :description :measures]))
        (sort-by :title)))
 
 (defn max-time [_ cube-name]

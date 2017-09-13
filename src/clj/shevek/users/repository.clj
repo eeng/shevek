@@ -1,19 +1,19 @@
 (ns shevek.users.repository
   (:require [schema.core :as s]
-            [monger.collection :as mc]
-            [monger.query :as mq]
+            [shevek.lib.mongodb :as m]
             [bcrypt-clj.auth :refer [crypt-password]]
             [shevek.schemas.user :refer [User]]
             [shevek.reports.repository :refer [delete-reports]]
             [shevek.dashboards.repository :refer [delete-dashboards]]))
 
 (defn find-users [db]
-  (mq/with-collection db "users"
-    (mq/fields [:username :fullname :email :admin :allowed-cubes])
-    (mq/sort {:username 1})))
+  (m/find-all db "users" :fields [:username :fullname :email :admin :allowed-cubes] :sort {:username 1}))
+
+(defn find-by [db condition]
+  (m/find-by db "users" condition))
 
 (defn find-by-username [db username]
-  (mc/find-one-as-map db "users" {:username username}))
+  (find-by db {:username username}))
 
 (defn- encrypt-password [{:keys [password] :as user}]
   (if (seq password)
@@ -21,13 +21,10 @@
     (dissoc user :password)))
 
 (defn find-by-id [db id]
-  (mc/find-map-by-id db "users" id))
+  (m/find-by-id db "users" id))
 
-(defn reload [db {:keys [_id]}]
-  (find-by-id db _id))
-
-(defn find-by [db fields-and-values]
-  (mc/find-one-as-map db "users" fields-and-values))
+(defn reload [db {:keys [id]}]
+  (find-by-id db id))
 
 (defn ensure-admin-permissions [{:keys [admin] :as user}]
   (cond-> user
@@ -40,19 +37,17 @@
                     (ensure-admin-permissions)
                     (merge existing))]
     (s/validate User merged)
-    (mc/save-and-return db "users" merged)))
+    (m/save db "users" merged)))
 
 (defn save-user [db user]
-  (create-or-update-by db :_id user))
+  (create-or-update-by db :id user))
 
-(defn delete-user [db {:keys [_id]}]
-  (mc/remove-by-id db "users" _id)
-  (delete-reports db _id)
-  (delete-dashboards db _id)
-  true)
+(defn delete-user [db {:keys [id]}]
+  (m/delete-by-id db "users" id)
+  (delete-reports db id)
+  (delete-dashboards db id))
 
 ;; Examples
 
-#_(save-user shevek.db/db {:username "ddchp" :fullname "Daniel Chavarini" :password "prueba" :email "auditor@vitolen.com"})
-#_(save-user shevek.db/db {:username "dev" :fullname "Desarrollo" :password "prueba"})
+#_(save-user shevek.db/db {:username "dev" :fullname "Desarrollo" :password "prueba" :admin true})
 #_(find-users shevek.db/db)

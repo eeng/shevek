@@ -22,7 +22,7 @@
   {:measure s/Str :dimensions [Split]})
 
 (s/defschema Report
-  {(s/optional-key :_id) s/Any
+  {(s/optional-key :id) s/Str
    (s/optional-key :name) s/Str ; Optional when restored from URL
    (s/optional-key :description) s/Str
    (s/optional-key :pin-in-dashboard) s/Bool ; Optional when restored from URL
@@ -32,6 +32,6 @@
    :filter [Filter]
    :split [Split]
    :pinboard Pinboard
-   :user-id s/Any
+   :user-id s/Str
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})

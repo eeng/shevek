@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [shevek.test-helper :refer [it]]
             [shevek.asserts :refer [submap?]]
-            [shevek.lib.mongodb :refer [timestamp]]
+            [shevek.lib.mongodb :refer [timestamp oid wrap-oids unwrap-oids]]
             [clj-time.core :refer [date-time now]]))
 
 (deftest timestamp-tests
@@ -15,3 +15,29 @@
     (with-redefs [now (constantly (date-time 2017))]
       (is (submap? {:updated-at (date-time 2017)} (timestamp {})))
       (is (submap? {:updated-at (date-time 2017)} (timestamp {:updated-at (date-time 2016)}))))))
+
+(deftest wrap-oids-tests
+  (testing "should wrap foreign keys in ObjectId"
+    (is (= {:user-id (oid "597b7622f8d5026e49917be4")}
+           (wrap-oids {:user-id "597b7622f8d5026e49917be4"}))))
+
+  (testing "should wrap id in ObjectId and rename it to _id"
+    (is (= {:_id (oid "597b7622f8d5026e49917be4")}
+           (wrap-oids {:id "597b7622f8d5026e49917be4"}))))
+
+  (testing "should not touch other fields"
+    (is (= {:a 1 :b nil :c "d"}
+           (wrap-oids {:a 1 :b nil :c "d"})))))
+
+(deftest unwrap-oids-tests
+  (testing "should unwrap foreign keys ObjectId"
+    (is (= {:user-id "597b7622f8d5026e49917be4"}
+           (unwrap-oids {:user-id (oid "597b7622f8d5026e49917be4")}))))
+
+  (testing "should unwrap _id rename it to id"
+    (is (= {:id "597b7622f8d5026e49917be4"}
+           (unwrap-oids {:_id (oid "597b7622f8d5026e49917be4")}))))
+
+  (testing "should not touch other fields"
+    (is (= {:a 1 :b nil :c "d"}
+           (unwrap-oids {:a 1 :b nil :c "d"})))))

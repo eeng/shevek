@@ -28,7 +28,7 @@
         (is (submaps? [{:name "added" :expression "(sum $added)"}
                        {:name "requests" :expression "(count-distinct $requests)"}]
                       (mapcat :measures cubes)))
-        (is (= 2 (->> cubes (map :_id) (filter identity) count)))))))
+        (is (= 2 (->> cubes (map :id) (filter identity) count)))))))
 
 (deftest update-cubes-tests
   (testing "discovery use cases"
@@ -36,13 +36,13 @@
       (let [c1 (make! Cube {:name "c1"
                             :dimensions [{:name "d1" :type "STRING"}]
                             :measures [{:name "m1" :type "count"}]})]
-        (update-cubes db [(dissoc c1 :_id)
+        (update-cubes db [(dissoc c1 :id)
                           {:name "c2"
                            :dimensions [{:name "d2" :type "STRING"}]
                            :measures [{:name "m2" :type "count"}]}])
         (let [cubes (find-cubes db)]
           (is (= ["c1" "c2"] (map :name cubes)))
-          (is (= (:_id c1) (:_id (first cubes))))
+          (is (= (:id c1) (:id (first cubes))))
           (is (= ["d1" "d2"] (select [ALL :dimensions ALL :name] cubes)))
           (is (= ["m1" "m2"] (select [ALL :measures ALL :name] cubes))))))
 
@@ -55,7 +55,7 @@
                            :measures [{:name "m1" :type "longSum"}]}])
         (let [cubes (find-cubes db)]
           (is (= [["c1" "C1"]] (map (juxt :name :title) cubes)))
-          (is (= (:_id c1) (:_id (first cubes))))
+          (is (= (:id c1) (:id (first cubes))))
           (is (= [["d1" "D1"] ["d2" "D2"]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
           (is (= [["m1" "M1" "longSum"]] (map (juxt :name :title :type) (select [ALL :measures ALL] cubes))))))))
 

@@ -4,15 +4,14 @@
             [shevek.db :refer [db]]
             [shevek.users.repository :as users]
             [shevek.config :refer [config]]
-            [shevek.lib.mongodb :refer [oid]]
             [bcrypt-clj.auth :refer [check-password]]
             [clj-time.core :as t]))
 
 (def token-expiration (t/days 1))
 
-(defn generate-token [{:keys [_id] :as user}]
-  (let [token (-> (select-keys user [:username :fullname :admin :email])
-                  (assoc :id (str _id) :exp (t/plus (t/now) token-expiration)))]
+(defn generate-token [{:keys [id] :as user}]
+  (let [token (-> (select-keys user [:id :username :fullname :admin :email])
+                  (assoc :exp (t/plus (t/now) token-expiration)))]
     (jwt/sign token (config :jwt-secret))))
 
 (defn authenticate [db username password]
@@ -34,7 +33,7 @@
   [handler]
   (fn [{:keys [identity] :as request}]
     (handler (assoc request
-                    :user-id (when identity (oid (:id identity)))
+                    :user-id (when identity (:id identity))
                     :user (users/find-by-username db (:username identity))))))
 
 (defn authorize [authorized?]

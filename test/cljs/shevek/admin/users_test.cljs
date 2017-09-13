@@ -21,8 +21,8 @@
     (is (no-error-on? :password (validate-user {:password "asdf123"}))))
 
   (testing "password is required only on new users but if entered should be strong"
-    (is (no-error-on? :password (validate-user {:_id 1 :password ""})))
-    (is (error-on? :password (validate-user {:_id 1 :password "asd123"}))))
+    (is (no-error-on? :password (validate-user {:id 1 :password ""})))
+    (is (error-on? :password (validate-user {:id 1 :password "asd123"}))))
 
   (testing "password-confirmation should be equal to password, when present"
     (is (error-on? :password-confirmation (validate-user {:password "aaA" :password-confirmation "aaa"})))

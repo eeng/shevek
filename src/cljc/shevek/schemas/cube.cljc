@@ -26,5 +26,7 @@
   (assoc NTD
          :dimensions [Dimension]
          :measures [Measure]
-         (s/optional-key :_id) s/Any
-         (s/optional-key :default-time-zone) s/Str))
+         (s/optional-key :id) s/Str
+         (s/optional-key :default-time-zone) s/Str
+         (s/optional-key :created-at) s/Any
+         (s/optional-key :updated-at) s/Any))

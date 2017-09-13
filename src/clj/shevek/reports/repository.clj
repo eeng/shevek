@@ -1,21 +1,16 @@
 (ns shevek.reports.repository
   (:require [schema.core :as s]
             [shevek.schemas.report :refer [Report]]
-            [monger.collection :as mc]
-            [monger.query :as mq]
-            [shevek.lib.mongodb :refer [timestamp]]))
+            [shevek.lib.mongodb :as m]))
 
 (s/defn save-report [db report :- Report]
-  (mc/save-and-return db "reports" (timestamp report)))
+  (m/save db "reports" report))
 
-(s/defn delete-report [db {:keys [_id]}]
-  (mc/remove-by-id db "reports" _id)
-  true)
+(s/defn delete-report [db {:keys [id]}]
+  (m/delete-by-id db "reports" id))
 
 (defn find-reports [db user-id]
-  (mq/with-collection db "reports"
-    (mq/find {:user-id user-id})
-    (mq/sort {:name 1})))
+  (m/find-all db "reports" :where {:user-id user-id} :sort {:name 1}))
 
 (s/defn delete-reports [db user-id]
-  (mc/remove db "reports" {:user-id user-id}))
+  (m/delete-by db "reports" {:user-id user-id}))
