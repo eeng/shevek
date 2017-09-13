@@ -5,7 +5,6 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
-            [shevek.lib.react :refer [without-propagation]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [kb-shortcuts input-field hold-to-confirm]]
             [shevek.navegation :refer [current-page? navigate]]
@@ -66,8 +65,8 @@
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
 (defn report-actions [report form-data]
-  [:div.item-actions
-   [:i.write.icon {:on-click (without-propagation #(reset! form-data {:report report :editing? true}))
+  [:div.item-actions {:on-click #(.stopPropagation %)}
+   [:i.write.icon {:on-click #(reset! form-data {:report report :editing? true})
                    :title (t :actions/edit)}]
    [:i.trash.icon (hold-to-confirm #(dispatch :delete-report report))]])
 

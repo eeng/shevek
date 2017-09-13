@@ -7,7 +7,7 @@
 
 (defn page []
   [:div#home.ui.container
-   [page-title (t :home/title) (t :home/subtitle) "home layout"]
+   [page-title (t :home/title) (t :home/subtitle) "home"]
    [:div.ui.equal.width.grid
     [cubes-cards]
     [dashboards-cards]
