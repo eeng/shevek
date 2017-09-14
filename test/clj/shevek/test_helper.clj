@@ -1,5 +1,5 @@
 (ns shevek.test-helper
-  (:require [monger.db :refer [drop-db]]
+  (:require [monger.collection :refer [purge-many]]
             [shevek.app :refer [start start-db]]
             [mount.core :as mount]
             [shevek.schema.refresher :refer [refresher]]
@@ -16,7 +16,7 @@
 
 (defmacro it [description & body]
   `(testing ~description
-     (drop-db db)
+     (purge-many db ["users" "cubes" "reports" "dashboards"])
      (init-db db)
      ~@body))
 
