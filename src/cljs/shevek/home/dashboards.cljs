@@ -20,15 +20,16 @@
   (rpc/fetch db :dashboards "dashboards.api/find-all"))
 
 (defevh :new-dashboard-started [{:keys [dashboards] :as db}]
-  (update db :dashboards conj {:name (str "Dashboard #" (inc (count dashboards)))}))
+  (update db :dashboards conj {:name "" :created-at (now) :updated-at (now)}))
 
 (defevh :dashbard-edition-canceled [{:keys [dashboards] :as db} dashboard]
   (cond-> db
           (new-record? dashboard) (update :dashboards (partial remove #{dashboard}))))
 
 (defevh :dashboard-edit-saved [db form-data]
-  (rpc/call "dashboards.api/save" :args [@form-data] :handler #(dispatch :dashboard-saved % form-data))
-  (rpc/loading db :saving-dashboard))
+  (let [dashboard (dissoc @form-data :created-at :updated-at)]
+    (rpc/call "dashboards.api/save" :args [dashboard] :handler #(dispatch :dashboard-saved % form-data))
+    (rpc/loading db :saving-dashboard)))
 
 (defevh :dashboard-saved [db {:keys [name]} form-data]
   (fetch-dashboards)
@@ -57,18 +58,17 @@
   (let [cancel (fn [_]
                  (dispatch :dashbard-edition-canceled dashboard)
                  (reset! form-data nil))
-        save #(dispatch :dashboard-edit-saved form-data)
+        valid? #(present? (:name @form-data))
+        save #(when (valid?) (dispatch :dashboard-edit-saved form-data))
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
-      (let [valid? (present? (:name @form-data))
-            placeholder (when (new-record? dashboard) name)]
-        [:div.ui.fluid.card
-         [:div.content
-          [:div.ui.form (assoc (rpc/loading-class :saving-dashboard) :ref shortcuts)
-           [input-field form-data :name {:label (t :reports/name) :class "required" :auto-focus true :placeholder placeholder}]
-           [input-field form-data :description {:label (t :reports/description) :as :textarea :rows 2}]
-           [:button.ui.primary.button {:on-click save :class (when-not valid? "disabled")} (t :actions/save)]
-           [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]))))
+      [:div.ui.fluid.card
+       [:div.content
+        [:div.ui.form (assoc (rpc/loading-class :saving-dashboard) :ref shortcuts)
+         [input-field form-data :name {:label (t :reports/name) :class "required" :auto-focus true}]
+         [input-field form-data :description {:label (t :reports/description) :as :textarea :rows 2}]
+         [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
+         [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]])))
 
 (defn- dashboard-card [dashboard]
   (let [form-data (r/atom (when (new-record? dashboard)
