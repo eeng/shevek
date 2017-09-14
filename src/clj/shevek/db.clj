@@ -2,7 +2,8 @@
   (:require [mount.core :refer [defstate]]
             [monger.core :as mg]
             [monger.collection :as mc]
-            [shevek.config :refer [config]]))
+            [shevek.config :refer [config env?]]
+            [shevek.schema.migrator :refer [migrate!]]))
 
 (defstate mongo
   :start (mg/connect-via-uri (config :mongodb-uri))
@@ -14,6 +15,7 @@
   (mc/ensure-index db "users" (array-map :username 1) {:unique true})
   (mc/ensure-index db "reports" (array-map :user-id 1 :name 1))
   (mc/ensure-index db "dashboards" (array-map :user-id 1 :name 1))
+  (when-not (env? :test) (migrate! db))
   db)
 
 (defstate db :start (init-db (mongo :db)))
