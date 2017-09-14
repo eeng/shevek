@@ -1,6 +1,7 @@
 (ns shevek.components.calendar
   (:require [shevek.i18n :refer [translation]]
             [shevek.lib.dates :as dates]
+            [shevek.lib.util :refer [trigger-change]]
             [cljs-time.coerce :as c]))
 
 (defn- format-js-date [date]
@@ -12,7 +13,6 @@
   (when dom-node
     (let [from (-> dom-node js/$ (.find ".calendar.from"))
           to (-> dom-node js/$ (.find ".calendar.to"))
-          trigger-change #(-> % (.get 0) (.dispatchEvent (js/Event. "input" #js {:bubbles true})))
           shared-opts {:type "date"
                        :today true
                        :text (translation :calendar)

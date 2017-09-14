@@ -9,7 +9,7 @@
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.dates :refer [format-time now]]
             [shevek.lib.string :refer [present?]]
-            [shevek.lib.util :refer [new-record?]]
+            [shevek.lib.util :refer [new-record? trigger]]
             [shevek.notification :refer [notify]]
             [shevek.navigation :refer [navigate]]))
 
@@ -41,7 +41,7 @@
   (update db :dashboards (partial remove #{dashboard})))
 
 (defn- show-card [{:keys [id name description updated-at] :as dashboard} form-data]
-  [:a.ui.fluid.card {:on-click #(navigate "/dashboard/" id)}
+  [:a.ui.fluid.dashboard.card {:on-click #(navigate "/dashboard/" id)}
    [:div.content
     [:div.right.floated
      [:div.item-actions {:on-click #(.stopPropagation %)}
@@ -88,7 +88,7 @@
          [:div.actions
           [:button.ui.compact.button {:on-click #(dispatch :new-dashboard-started) :tab-index -1}
            (t :actions/new)]]
-         [search-input search {:input {:auto-focus false}}]
+         [search-input search {:on-enter #(trigger "click" ".dashboard.card") :input {:auto-focus false}}]
          (if dashboards
            (let [dashboards (filter-matching @search (by :name :description) dashboards)]
              (if (seq dashboards)

@@ -16,3 +16,10 @@
 
 (defn new-record? [{:keys [id]}]
   (nil? id))
+
+(defn trigger [event on]
+  (when-let [el (-> on js/$ (.get 0))]
+    (.dispatchEvent el (js/Event. event #js {:bubbles true}))))
+
+(defn trigger-change [on]
+  (trigger "input" on))

@@ -4,6 +4,7 @@
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap]]
+            [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
             [shevek.menu.reports :refer [fetch-reports save-report-form report-actions]]
             [shevek.components.form :refer [search-input filter-matching by]]
@@ -16,7 +17,7 @@
         [:div.ui.fluid.card
          [:div.content
           [save-report-form form-data]]]
-        [:a.ui.fluid.card {:on-click #(dispatch :report-selected report)}
+        [:a.ui.fluid.report.card {:on-click #(dispatch :report-selected report)}
          [:div.content
           [:div.right.floated [report-actions report form-data]]
           [:div.header [:i.line.chart.icon] name]
@@ -34,7 +35,7 @@
       (let [reports (db/get :reports)]
         [:div.column
          [:h2.ui.app.header (t :reports/title)]
-         [search-input search {:input {:auto-focus false}}]
+         [search-input search {:on-enter #(trigger "click" ".report.card") :input {:auto-focus false}}]
          (if reports
            (let [reports (filter-matching @search (by :name :description) reports)]
              (if (seq reports)

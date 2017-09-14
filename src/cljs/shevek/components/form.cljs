@@ -110,11 +110,12 @@
       (filter #(re-find pattern (get-value %)) results))
     results))
 
-(defn search-input [search {:keys [on-change on-stop input wrapper] :or {on-change identity on-stop identity input {} wrapper {}}}]
+(defn search-input [search {:keys [on-change on-stop on-enter input wrapper]
+                            :or {on-change identity on-stop identity on-enter identity input {} wrapper {}}}]
   (let [change #(on-change (reset! search %))
         clear #(do (when (seq @search) (change ""))
                  (on-stop))
-        wrapper-opts (merge {:ref (kb-shortcuts :enter on-stop :escape clear)} wrapper)
+        wrapper-opts (merge {:ref (kb-shortcuts :enter on-enter :escape clear)} wrapper)
         input-opts (merge {:type "text" :placeholder (t :input/search) :value @search
                            :on-change #(change (.-target.value %)) :auto-focus true}
                           input)]
