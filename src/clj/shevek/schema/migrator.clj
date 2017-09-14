@@ -15,11 +15,14 @@
 (defn- insert-migration-version [db migration-ns]
   (mc/insert db "schema-migrations" {:version (version migration-ns)}))
 
-(defn migrate! [db migrations-dir]
-  (let [migrations (->> migrations-dir
-                        io/resource io/file
-                        find-namespaces-in-dir
-                        (filter-already-done db))]
-    (doseq [migration migrations]
-      ((ns-resolve migration 'up) db)
-      (insert-migration-version db migration))))
+(defn migrate!
+  ([db] (migrate! db "shevek/migrations"))
+  ([db migrations-dir]
+   (let [migrations (->> migrations-dir
+                         io/resource io/file
+                         find-namespaces-in-dir
+                         (filter-already-done db))]
+     (doseq [migration migrations]
+       ((ns-resolve migration 'up) db)
+       (insert-migration-version db migration))
+     db)))

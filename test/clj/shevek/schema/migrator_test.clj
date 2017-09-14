@@ -7,10 +7,12 @@
 
 (deftest migrate-tests
   (it "should run the up function of all migration files"
+    (mc/remove db "schema-migrations")
     (migrate! db "shevek/schema/test_migrations")
     (is (= ["R1" "R2"] (map :name (mc/find-maps db "reports")))))
 
   (it "each migration should be run only once"
+    (mc/remove db "schema-migrations")
     (mc/insert db "schema-migrations" {:version "1"})
     (migrate! db "shevek/schema/test_migrations")
     (is (= ["R2"] (map :name (mc/find-maps db "reports"))))

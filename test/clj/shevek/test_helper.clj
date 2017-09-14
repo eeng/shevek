@@ -16,8 +16,7 @@
 
 (defmacro it [description & body]
   `(testing ~description
-     (purge-many db ["schema-migrations" "users" "cubes" "reports" "dashboards"])
-     (init-db db)
+     (purge-many db ["users" "cubes" "reports" "dashboards"])
      ~@body))
 
 (defmacro pending [name & body]
