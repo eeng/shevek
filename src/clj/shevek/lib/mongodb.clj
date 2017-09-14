@@ -16,15 +16,25 @@
             (not created-at) (assoc :created-at updated-at))))
 
 (defn- foreign-key? [[k _]]
-  (ends-with? (name k) "-id"))
+  (re-find #"\-ids?$" (name k)))
+
+(defn- wrap-oid [x]
+  (if (sequential? x)
+    (transform ALL oid x)
+    (oid x)))
 
 (defn wrap-oids [{:keys [id] :as m}]
-  (cond-> (transform [ALL foreign-key? LAST] oid m)
+  (cond-> (transform [ALL foreign-key? LAST] wrap-oid m)
           id (-> (assoc :_id (oid id))
                  (dissoc :id))))
 
+(defn- unwrap-oid [x]
+  (if (sequential? x)
+    (transform ALL str x)
+    (str x)))
+
 (defn unwrap-oids [{:keys [_id] :as m}]
-  (cond-> (transform [ALL foreign-key? LAST] str m)
+  (cond-> (transform [ALL foreign-key? LAST] unwrap-oid m)
           _id (-> (assoc :id (str _id))
                   (dissoc :_id))))
 
