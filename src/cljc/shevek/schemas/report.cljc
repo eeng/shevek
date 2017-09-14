@@ -25,7 +25,6 @@
   {(s/optional-key :id) s/Str
    (s/optional-key :name) s/Str ; Optional when restored from URL
    (s/optional-key :description) s/Str
-   (s/optional-key :pin-in-dashboard) s/Bool ; Optional when restored from URL
    :cube s/Str
    :viztype s/Str
    :measures [s/Str]
@@ -33,5 +32,6 @@
    :split [Split]
    :pinboard Pinboard
    :user-id s/Str
+   (s/optional-key :dashboards-ids) [s/Str]
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})

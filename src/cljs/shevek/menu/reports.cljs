@@ -60,7 +60,6 @@
       [:div.ui.form {:ref shortcuts}
        [input-field report :name {:label (t :reports/name) :class "required" :auto-focus true}]
        [input-field report :description {:label (t :reports/description) :as :textarea :rows 2}]
-       [input-field report :pin-in-dashboard {:label (t :reports/pin-in-dashboard) :as :checkbox :input-class "toggle"}]
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
@@ -82,7 +81,7 @@
        [:div.description description]])))
 
 (defn- reports-list [form-data]
-  (let [current-report (or (db/get :current-report) {:pin-in-dashboard false})
+  (let [current-report (or (db/get :current-report) {})
         reports (db/get :reports)
         show-actions? (current-page? :viewer)
         save #(if (new-record? current-report)
