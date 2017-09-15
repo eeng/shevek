@@ -18,7 +18,7 @@
                     [pjstadig/humane-test-output "0.8.1" :scope "test"]
                     [etaoin "0.1.6" :scope "test"]
                     [proto-repl "0.3.1"]
-                    [reagent "0.7.0"]
+                    [reagent "0.7.0" :exclusions [cljsjs/react]]
                     [clj-http "2.3.0"]
                     [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
                     [tongue "0.1.4"]
@@ -49,7 +49,10 @@
                     [cljsjs/jwt-decode "2.1.0-0"]
                     [cljsjs/clipboard "1.6.1-1"]
                     [cljsjs/chartjs "2.6.0-0"]
-                    [lukesnape/boot-asset-fingerprint "1.5.1" :scope "test"]])
+                    [lukesnape/boot-asset-fingerprint "1.5.1" :scope "test"]
+                    [cljsjs/react-with-addons "15.6.1-0"]
+                    [cljs-react-test "0.1.4-SNAPSHOT" :scope "test"]
+                    [prismatic/dommy "1.1.0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
