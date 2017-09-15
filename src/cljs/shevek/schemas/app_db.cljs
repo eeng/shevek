@@ -24,4 +24,4 @@
    (s/optional-key :reports) [Report]
    (s/optional-key :users) [s/Any]
    (s/optional-key :dashboards) [Dashboard]
-   (s/optional-key :dashboard) Dashboard})
+   (s/optional-key :dashboard) Dashboard}) ; The selected dashboard

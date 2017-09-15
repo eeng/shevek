@@ -105,8 +105,9 @@
 (defn- handle-keypressed [shortcuts e]
   (let [key (-> e .-which Keys)
         assigned-fn (shortcuts key)
-        tag (-> e .-target .-tagName)]
-    (when (and assigned-fn (not= "TEXTAREA" tag))
+        textarea? (-> e .-target .-tagName (= "TEXTAREA"))
+        dropdown? (-> e .-target js/$ (.closest ".dropdown") .-length (> 0))]
+    (when (and assigned-fn (not textarea?) (not dropdown?))
       (assigned-fn))))
 
 (defn kb-shortcuts [& {:as shortcuts}]
