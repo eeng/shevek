@@ -7,7 +7,7 @@
 
 (s/defschema User
   {(s/optional-key :id) s/Str
-   :username s/Str
+   :username (s/constrained s/Str #(> (count %) 1))
    :fullname s/Str
    :password (s/constrained s/Str (comp pos? count))
    :admin s/Bool

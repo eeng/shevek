@@ -37,13 +37,13 @@
 
 (deftest find-users-tests
   (it "should return users sorted by username"
-    (make! User {:username "a"})
-    (make! User {:username "c"})
-    (make! User {:username "b"})
-    (is (= ["a" "b" "c"] (map :username (find-users db)))))
+    (make! User {:username "aa"})
+    (make! User {:username "cc"})
+    (make! User {:username "bb"})
+    (is (= ["aa" "bb" "cc"] (map :username (find-users db)))))
 
   (it "should no return passwords"
-    (make! User {:username "a"})
+    (make! User)
     (is (without? :password (first (find-users db))))))
 
 (deftest delete-user-tests
