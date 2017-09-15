@@ -8,7 +8,7 @@
 (defn page []
   [:div#home.ui.container
    [page-title (t :home/title) (t :home/subtitle) "home"]
-   [:div.ui.equal.width.grid
+   [:div.ui.equal.width.relaxed.grid
     [cubes-cards]
     [dashboards-cards]
     [reports-cards]]])
