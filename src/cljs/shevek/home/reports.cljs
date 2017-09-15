@@ -1,14 +1,30 @@
 (ns shevek.home.reports
+  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
+            [shevek.rpc :as rpc]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
-            [shevek.menu.reports :refer [fetch-reports save-report-form report-actions]]
-            [shevek.components.form :refer [search-input filter-matching by]]
+            [shevek.notification :refer [notify]]
+            [shevek.home.dashboards :refer [fetch-dashboards]]
+            [shevek.menu.reports :refer [fetch-reports save-report-form]]
+            [shevek.components.form :refer [search-input filter-matching by hold-to-confirm]]
             [shevek.lib.dates :refer [format-time]]))
+
+(defevh :delete-report [db {:keys [name] :as report}]
+  (rpc/call "reports.api/delete-report" :args [report]
+            :handler (fn []
+                       (notify (t :reports/deleted name))
+                       (fetch-reports)
+                       (fetch-dashboards))))
+
+(defn- report-actions [report form-data]
+  [:div.item-actions {:on-click #(.stopPropagation %)}
+   [:i.write.icon {:on-click #(reset! form-data report) :title (t :actions/edit)}]
+   [:i.trash.icon (hold-to-confirm #(dispatch :delete-report report))]])
 
 (defn- report-card []
   (let [form-data (r/atom nil)]
@@ -16,7 +32,7 @@
       (if @form-data
         [:div.ui.fluid.card
          [:div.content
-          [save-report-form form-data]]]
+          [save-report-form form-data fetch-dashboards]]]
         [:a.ui.fluid.report.card {:on-click #(dispatch :report-selected report)}
          [:div.content
           [:div.right.floated [report-actions report form-data]]

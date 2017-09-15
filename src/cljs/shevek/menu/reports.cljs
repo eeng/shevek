@@ -6,13 +6,12 @@
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [show-popup close-popup]]
-            [shevek.components.form :refer [kb-shortcuts input-field hold-to-confirm]]
+            [shevek.components.form :refer [kb-shortcuts input-field]]
             [shevek.navigation :refer [current-page? navigate]]
             [shevek.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
             [shevek.viewer.page :as viewer]
             [shevek.lib.util :refer [new-record?]]
-            [shevek.home.dashboards :refer [fetch-dashboards]]
             [cuerdas.core :as str]))
 
 (defevh :reports-requested [db]
@@ -28,7 +27,6 @@
   (after-save)
   (notify (t :reports/saved name))
   (fetch-reports)
-  (when (current-page? :home) (fetch-dashboards))
   (cond-> (rpc/loaded db :saving-report)
           editing-current? (assoc :current-report report)))
 
@@ -44,18 +42,10 @@
     (rpc/call "reports.api/save-report" :args [report] :handler #(dispatch :report-saved % editing-current? after-save))
     (rpc/loading db :saving-report)))
 
-(defevh :delete-report [db {:keys [name] :as report}]
-  (rpc/call "reports.api/delete-report" :args [report]
-            :handler (fn []
-                       (notify (t :reports/deleted name))
-                       (fetch-reports)
-                       (fetch-dashboards)))
-  db)
-
-(defn- save-report-form [form-data]
+(defn- save-report-form [form-data after-save]
   (let [valid? #(seq (:name @form-data))
         cancel #(reset! form-data nil)
-        save #(when (valid?) (dispatch :save-report @form-data (fn [] (close-popup) (cancel))));
+        save #(when (valid?) (dispatch :save-report @form-data (fn [] (after-save) (cancel))));
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
       [:div.ui.form (assoc (rpc/loading-class :saving-report) :ref shortcuts)
@@ -65,12 +55,6 @@
                                                :collection (map (juxt :name :id) (db/get :dashboards))}]
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
-
-(defn report-actions [report form-data]
-  [:div.item-actions {:on-click #(.stopPropagation %)}
-   [:i.write.icon {:on-click #(reset! form-data report)
-                   :title (t :actions/edit)}]
-   [:i.trash.icon (hold-to-confirm #(dispatch :delete-report report))]])
 
 (defn- report-item [_ form-data]
   (let [select-report #(do (dispatch :report-selected %) (close-popup))]
@@ -107,7 +91,7 @@
     (fn []
       [:div#reports-popup
        (if @form-data
-         [save-report-form form-data]
+         [save-report-form form-data close-popup]
          [reports-list form-data])])))
 
 (defn- reports-menu []
