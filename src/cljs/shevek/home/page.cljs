@@ -10,5 +10,5 @@
    [page-title (t :home/title) (t :home/subtitle) "home"]
    [:div.ui.equal.width.relaxed.grid
     [cubes-cards]
-    [dashboards-cards]
-    [reports-cards]]])
+    [reports-cards]
+    [dashboards-cards]]])

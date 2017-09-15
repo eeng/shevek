@@ -14,7 +14,11 @@
     :dashboards {:title "Dashboards"
                  :missing "There aren't any dashboards created"
                  :saved "Dashboard '{1}' saved!"
-                 :deleted "Dashboard '{1}' deleted!"}
+                 :deleted "Dashboard '{1}' deleted!"
+                 :report-count #(cond
+                                  (zero? %) "No reports"
+                                  (= 1 %) "1 report"
+                                  :else "{1} reports")}
     :reports {:title "Reports"
               :missing "There aren't any reports created"
               :name "Name"
@@ -157,7 +161,11 @@
     :dashboards {:title "Dashboards"
                  :missing "No se ha creado ningún dashboard todavía"
                  :saved "Dashboard '{1}' guardado correctamente"
-                 :deleted "Dashboard '{1}' eliminado correctamente"}
+                 :deleted "Dashboard '{1}' eliminado correctamente"
+                 :report-count #(cond
+                                  (zero? %) "Sin reportes"
+                                  (= 1 %) "1 reporte"
+                                  :else "{1} reportes")}
     :reports {:title "Reportes"
               :missing "No se ha guardado ningún reporte todavía"
               :name "Nombre"

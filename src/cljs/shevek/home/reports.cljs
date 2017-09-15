@@ -7,6 +7,7 @@
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
             [shevek.menu.reports :refer [fetch-reports save-report-form report-actions]]
+            [shevek.home.dashboards :refer [fetch-dashboards]]
             [shevek.components.form :refer [search-input filter-matching by]]
             [shevek.lib.dates :refer [format-time]]))
 
@@ -16,7 +17,7 @@
       (if @form-data
         [:div.ui.fluid.card
          [:div.content
-          [save-report-form form-data]]]
+          [save-report-form form-data fetch-dashboards]]]
         [:a.ui.fluid.report.card {:on-click #(dispatch :report-selected report)}
          [:div.content
           [:div.right.floated [report-actions report form-data]]

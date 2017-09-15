@@ -47,13 +47,13 @@
   (cond-> (rpc/loading db :save-report)
           (current-report? db report) (dissoc :current-report)))
 
-(defn- save-report-form [form-data]
+(defn- save-report-form [form-data after-save]
   (let [report (r/cursor form-data [:report])
         valid? #(seq (:name @report))
         cancel #(reset! form-data nil)
         save #(when (valid?)
                 (dispatch :save-report @report)
-                (when-not (:editing? @form-data) (close-popup))
+                (after-save)
                 (js/setTimeout cancel 100))
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
@@ -106,7 +106,7 @@
     (fn []
       [:div#reports-popup
        (if @form-data
-         [save-report-form form-data]
+         [save-report-form form-data #(when-not (:editing? @form-data) (close-popup))]
          [reports-list form-data])])))
 
 (defn- reports-menu []
