@@ -8,7 +8,9 @@
   (:import [org.bson.types ObjectId]))
 
 (defn oid [str]
-  (ObjectId. str))
+  (try
+    (ObjectId. str)
+    (catch java.lang.IllegalArgumentException _)))
 
 (defn timestamp [{:keys [created-at] :as record}]
   (let [updated-at (now)]

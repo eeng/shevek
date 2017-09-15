@@ -29,7 +29,10 @@
 
   (testing "should not touch other fields"
     (is (= {:a 1 :b nil :c "d" :user-idea "x"}
-           (wrap-oids {:a 1 :b nil :c "d" :user-idea "x"})))))
+           (wrap-oids {:a 1 :b nil :c "d" :user-idea "x"}))))
+
+  (testing "should ignore foreign keys that aren't valid ObjectId"
+    (is (= {:user-id nil} (wrap-oids {:user-id "asdf"})))))
 
 (deftest unwrap-oids-tests
   (testing "should unwrap foreign keys ObjectId"
