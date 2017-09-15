@@ -23,11 +23,10 @@
               :missing "There aren't any reports created"
               :name "Name"
               :description "Description"
-              :dashboards "Pin in these dashboards"
+              :dashboards "Pin in Dashboards"
               :updated-at "Last updated"
               :saved "Report '{1}' saved!"
               :deleted "Report '{1}' deleted!"
-              :none "Save your favorite reports with the \"Pin in dashboard\" option so they appear here."
               :unauthorized "Oops! This report is no longer available."}
     :viewer {:dimensions "Dimensions"
              :measures "Measures"
@@ -136,7 +135,7 @@
               :delete "Delete"
               :close "Close"
               :select "Select"
-              :hold-delete "You must click the button and hold for {1} seconds to confirm"}
+              :hold-delete "You must click the button and hold for {1} second to confirm"}
     :input {:search "Search"}
     :validation {:required "can't be blank"
                  :regex "doesn't match pattern"
@@ -170,11 +169,10 @@
               :missing "No se ha guardado ningún reporte todavía"
               :name "Nombre"
               :description "Descripción"
-              :dashboards "Mostrar en estos dashboards"
+              :dashboards "Mostrar en Dashboards"
               :updated-at "Última actualización"
               :saved "Reporte '{1}' guardado correctamente"
               :deleted "Reporte '{1}' eliminado correctamente"
-              :none "Guardá tus reportes favoritos con la opción 'Mostrar en dashboard' para que aparezcan aquí."
               :unauthorized "Oops! Este reporte ya no está disponible."}
     :viewer {:dimensions "Dimensiones"
              :measures "Métricas"
@@ -277,7 +275,7 @@
               :delete "Eliminar"
               :close "Cerrar"
               :select "Seleccionar"
-              :hold-delete "Clickee en el botón y mantenga presionado por {1} segundos para confirmar"}
+              :hold-delete "Clickee el botón y mantenga presionado por un segundo para confirmar"}
     :input {:search "Buscar"}
     :validation {:required "este campo es obligatorio"
                  :email "no es una dirección válida"

@@ -140,7 +140,7 @@
         [:i.search.icon])]))
 
 (defonce holding (r/atom nil))
-(def holding-time 2)
+(def holding-time 1)
 
 (defn cancel-timeout []
   (when @holding
