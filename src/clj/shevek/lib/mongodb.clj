@@ -4,7 +4,7 @@
             [monger.collection :as mc]
             [clj-time.core :refer [now]]
             [clojure.string :refer [ends-with?]]
-            [com.rpl.specter :refer [transform ALL LAST]])
+            [com.rpl.specter :refer [transform ALL]])
   (:import [org.bson.types ObjectId]))
 
 (defn oid [str]
@@ -17,28 +17,37 @@
     (cond-> (assoc record :updated-at updated-at)
             (not created-at) (assoc :created-at updated-at))))
 
-(defn- foreign-key? [[k _]]
-  (re-find #"\-ids?$" (name k)))
+(defn- foreign-key-simple? [k]
+  (re-find #"\-id?$" (name k)))
 
-(defn- wrap-oid [x]
-  (if (sequential? x)
-    (transform ALL oid x)
-    (oid x)))
+(defn- foreign-key-multiple? [k]
+  (re-find #"\-ids$" (name k)))
 
-(defn wrap-oids [{:keys [id] :as m}]
-  (cond-> (transform [ALL foreign-key? LAST] wrap-oid m)
-          id (-> (assoc :_id (oid id))
-                 (dissoc :id))))
+(declare wrap-oids)
 
-(defn- unwrap-oid [x]
-  (if (sequential? x)
-    (transform ALL str x)
-    (str x)))
+(defn wrap-oid [[k v]]
+  (cond
+    (= k :id) [:_id (oid v)]
+    (foreign-key-simple? k) [k (oid v)]
+    (foreign-key-multiple? k) [k (transform ALL oid v)]
+    (and (sequential? v) (map? (first v))) [k (transform ALL wrap-oids v)]
+    :else [k v]))
 
-(defn unwrap-oids [{:keys [_id] :as m}]
-  (cond-> (transform [ALL foreign-key? LAST] unwrap-oid m)
-          _id (-> (assoc :id (str _id))
-                  (dissoc :_id))))
+(defn wrap-oids [m]
+  (transform ALL wrap-oid m))
+
+(declare unwrap-oids)
+
+(defn- unwrap-oid [[k v]]
+  (cond
+    (= k :_id) [:id (str v)]
+    (foreign-key-simple? k) [k (str v)]
+    (foreign-key-multiple? k) [k (transform ALL str v)]
+    (and (sequential? v) (map? (first v))) [k (transform ALL unwrap-oids v)]
+    :else [k v]))
+
+(defn unwrap-oids [m]
+  (transform ALL unwrap-oid m))
 
 (defn find-all [db collection & {:keys [where sort fields] :or {fields []}}]
   (map unwrap-oids
@@ -69,5 +78,3 @@
 (defn delete-by [db collection condition]
   (mc/remove db collection (wrap-oids condition))
   true)
-
-#_(save shevek.db/db "dashboards" {})

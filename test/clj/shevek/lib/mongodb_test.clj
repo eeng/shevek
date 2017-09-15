@@ -21,15 +21,17 @@
     (is (= {:user-id (oid "597b7622f8d5026e49917be4")}
            (wrap-oids {:user-id "597b7622f8d5026e49917be4"})))
     (is (= {:users-ids [(oid "597b7622f8d5026e49917be4") (oid "59ba962eac09a9074dbd922a")]}
-           (wrap-oids {:users-ids ["597b7622f8d5026e49917be4" "59ba962eac09a9074dbd922a"]}))))
+           (wrap-oids {:users-ids ["597b7622f8d5026e49917be4" "59ba962eac09a9074dbd922a"]})))
+    (is (= {:users [{:user-id (oid "597b7622f8d5026e49917be4")}]}
+           (wrap-oids {:users [{:user-id "597b7622f8d5026e49917be4"}]}))))
 
   (testing "should wrap id in ObjectId and rename it to _id"
     (is (= {:_id (oid "597b7622f8d5026e49917be4")}
            (wrap-oids {:id "597b7622f8d5026e49917be4"}))))
 
   (testing "should not touch other fields"
-    (is (= {:a 1 :b nil :c "d" :user-idea "x"}
-           (wrap-oids {:a 1 :b nil :c "d" :user-idea "x"}))))
+    (is (= {:a 1 :b nil :c "d" :user-idea "x" :tags ["a"]}
+           (wrap-oids {:a 1 :b nil :c "d" :user-idea "x" :tags ["a"]}))))
 
   (testing "should ignore foreign keys that aren't valid ObjectId"
     (is (= {:user-id nil} (wrap-oids {:user-id "asdf"})))))
@@ -46,5 +48,5 @@
            (unwrap-oids {:_id (oid "597b7622f8d5026e49917be4")}))))
 
   (testing "should not touch other fields"
-    (is (= {:a 1 :b nil :c "d"}
-           (unwrap-oids {:a 1 :b nil :c "d"})))))
+    (is (= {:a 1 :b nil :c "d" :tags ["a"]}
+           (unwrap-oids {:a 1 :b nil :c "d" :tags ["a"]})))))

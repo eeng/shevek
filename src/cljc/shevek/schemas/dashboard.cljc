@@ -2,7 +2,7 @@
   (:require [schema.core :as s]))
 
 (s/defschema DashboardReport
-  {:report-id s/Any})
+  {:report-id s/Str})
 
 (s/defschema Dashboard
   {(s/optional-key :id) s/Str
