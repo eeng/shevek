@@ -74,7 +74,7 @@
                                                        :placeholder (when-not new-user? (t :users/password-hint))
                                                        :class (when new-user? "required") :type "password"}]
       [input-field user :email {:label (t :users/email)}]
-      [input-field user :admin {:label (t :users/admin) :as :checkbox :input-class "toggle"}]]]))
+      [input-field user :admin {:label (t :users/admin) :as :checkbox :input {:class "toggle"}}]]]))
 
 (defn- cube-permissions [user {:keys [title description selected measures only-measures-selected allowed-measures] :as cube} i]
   [:div.item {:on-click #(swap! user update-in [:cubes i :selected] not)

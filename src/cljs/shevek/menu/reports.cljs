@@ -60,6 +60,8 @@
       [:div.ui.form {:ref shortcuts}
        [input-field report :name {:label (t :reports/name) :class "required" :auto-focus true}]
        [input-field report :description {:label (t :reports/description) :as :textarea :rows 2}]
+       [input-field report :dashboards-ids {:label (t :reports/dashboards) :as :select-multiple
+                                            :collection (map (juxt :name :id) (db/get :dashboards))}]
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
@@ -70,12 +72,11 @@
    [:i.trash.icon (hold-to-confirm #(dispatch :delete-report report))]])
 
 (defn- report-item [_ form-data]
-  (let [select-report #(do (dispatch :report-selected %) (close-popup))
-        cubes (db/get :cubes)]
+  (let [select-report #(do (dispatch :report-selected %) (close-popup))]
     (fn [{:keys [_id name description cube] :as report} _]
       [:div.item {:on-click #(select-report report)}
        [:div.right.floated.content
-        [:div.cube (:title (cubes cube))]
+        [:div.cube (db/get-in [:cubes cube :title])]
         [report-actions report form-data]]
        [:div.header name]
        [:div.description description]])))

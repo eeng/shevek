@@ -114,9 +114,9 @@
             valid? (and from to (<= from to))]
         [:div.specific.period-type.ui.form {:ref build-range-calendar}
          [input-field form-interval :from {:label (t :viewer.period/from) :icon "calendar" :read-only true
-                                           :input-wrapper {:class "left icon calendar from"}}]
+                                           :wrapper {:class "left icon calendar from"}}]
          [input-field form-interval :to {:label (t :viewer.period/to) :icon "calendar" :read-only true
-                                         :input-wrapper {:class "left icon calendar to"}}]
+                                         :wrapper {:class "left icon calendar to"}}]
          [:div
           [:button.ui.primary.compact.button {:on-click accept :class (when-not valid? "disabled")} (t :actions/ok)]
           [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
