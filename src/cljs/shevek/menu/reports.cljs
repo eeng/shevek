@@ -46,9 +46,11 @@
 
 (defevh :delete-report [db {:keys [name] :as report}]
   (rpc/call "reports.api/delete-report" :args [report]
-            :handler #(do (notify (t :reports/deleted name)) (fetch-reports)))
-  (cond-> db
-          (current-report? db report) (dissoc :current-report)))
+            :handler (fn []
+                       (notify (t :reports/deleted name))
+                       (fetch-reports)
+                       (fetch-dashboards)))
+  db)
 
 (defn- save-report-form [form-data]
   (let [valid? #(seq (:name @form-data))

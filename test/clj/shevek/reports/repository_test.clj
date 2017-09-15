@@ -6,7 +6,7 @@
             [shevek.schemas.report :refer [Report]]
             [shevek.schemas.dashboard :refer [Dashboard]]
             [shevek.dashboards.repository :as dr]
-            [shevek.reports.repository :refer [save-report]]
+            [shevek.reports.repository :refer [save-report delete-report]]
             [shevek.db :refer [db]]
             [shevek.lib.mongodb :refer [oid]]))
 
@@ -43,3 +43,10 @@
           d2 (make! Dashboard)
           r1 (make! Report {:dashboards-ids [(:id d1)]})]
       (is (without? :reports (dr/find-by-id db (:id d2)))))))
+
+(deftest delete-report-tests
+  (it "should remove the report from the dashboards that contain it"
+    (let [d (make! Dashboard)
+          r (make! Report {:dashboards-ids [(:id d)]})]
+      (delete-report db r)
+      (is (submap? {:reports []} (dr/find-by-id db (:id d)))))))
