@@ -1,7 +1,6 @@
 (ns shevek.navigation
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [secretary.core :refer-macros [defroute]]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]))
 
 (defn current-page []

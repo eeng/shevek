@@ -1,7 +1,6 @@
 (ns shevek.lib.error
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [shevek.components.modal :refer [show-modal]]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t translation]]
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]

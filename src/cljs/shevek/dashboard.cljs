@@ -1,6 +1,5 @@
 (ns shevek.dashboard
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
-  (:require [shevek.reflow.core :refer [dispatch]]
+  (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]

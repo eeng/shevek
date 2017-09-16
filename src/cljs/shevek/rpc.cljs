@@ -1,7 +1,6 @@
 (ns shevek.rpc
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [ajax.core :refer [POST]]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.session-storage :as session-storage]))

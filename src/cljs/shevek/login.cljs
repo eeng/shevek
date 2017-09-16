@@ -1,9 +1,8 @@
 (ns shevek.login
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
             [shevek.components.form :refer [text-input input-field kb-shortcuts]]
             [shevek.lib.session-storage :as session-storage]

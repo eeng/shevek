@@ -1,6 +1,5 @@
 (ns shevek.viewer.page
-  (:require-macros [shevek.reflow.macros :refer [defevh defevhi]])
-  (:require [shevek.reflow.core :refer [dispatch]]
+  (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.navigation :refer [current-page? navigate]]

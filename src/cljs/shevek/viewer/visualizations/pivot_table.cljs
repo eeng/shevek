@@ -1,6 +1,6 @@
 (ns shevek.viewer.visualizations.pivot-table
   (:require [clojure.string :as str]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.navigation :refer [current-page?]]
             [shevek.rpc :as rpc]

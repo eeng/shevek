@@ -1,7 +1,6 @@
 (ns shevek.viewer.viztype
-  (:require-macros [shevek.reflow.macros :refer [defevhi]])
   (:require [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [translation]]
             [shevek.viewer.url :refer [store-viewer-in-url]]))

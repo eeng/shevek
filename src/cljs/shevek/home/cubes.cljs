@@ -1,6 +1,6 @@
 (ns shevek.home.cubes
   (:require [reagent.core :as r]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap]]

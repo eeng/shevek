@@ -1,7 +1,7 @@
 (ns shevek.layout
   (:require [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.navigation :refer [current-page? current-page]]
             [shevek.rpc :refer [loading?]]
             [shevek.components.popup :refer [popup]]

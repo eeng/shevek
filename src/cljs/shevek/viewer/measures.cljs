@@ -1,7 +1,6 @@
 (ns shevek.viewer.measures
-  (:require-macros [shevek.reflow.macros :refer [defevhi]])
   (:require [reagent.core :as r]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading?]]
             [shevek.rpc :as rpc]

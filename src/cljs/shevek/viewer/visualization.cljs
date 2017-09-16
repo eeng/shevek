@@ -1,7 +1,7 @@
 (ns shevek.viewer.visualization
   (:require [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t translation]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.visualizations.totals :refer [totals-visualization]]

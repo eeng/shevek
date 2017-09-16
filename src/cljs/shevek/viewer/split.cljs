@@ -1,7 +1,6 @@
 (ns shevek.viewer.split
-  (:require-macros [shevek.reflow.macros :refer [defevhi]])
   (:require [reagent.core :as r]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.i18n :refer [t]]
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim]]
             [shevek.lib.dw.time :refer [default-granularity]]

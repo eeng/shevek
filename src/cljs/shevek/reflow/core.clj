@@ -1,4 +1,4 @@
-(ns shevek.reflow.macros)
+(ns shevek.reflow.core)
 
 (defmacro defevhi [event bindings interceptors & body]
   {:pre [(keyword? event) (vector? bindings) (map? interceptors)]}

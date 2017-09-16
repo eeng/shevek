@@ -1,6 +1,5 @@
 (ns shevek.viewer.raw
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
-  (:require [shevek.reflow.core :refer [dispatch]]
+  (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
             [shevek.schemas.conversion :refer [viewer->raw-query]]
             [shevek.rpc :as rpc]

@@ -1,6 +1,5 @@
 (ns shevek.lib.dw.cubes
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
-  (:require [shevek.reflow.core :refer [dispatch]]
+  (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]
             [shevek.lib.dates :refer [parse-time]]))

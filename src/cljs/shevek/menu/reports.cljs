@@ -1,8 +1,7 @@
 (ns shevek.menu.reports
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [show-popup close-popup]]

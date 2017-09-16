@@ -1,5 +1,4 @@
 (ns shevek.admin.users
-  (:require-macros [shevek.reflow.macros :refer [defevh]])
   (:require [reagent.core :as r]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
@@ -9,7 +8,7 @@
             [shevek.lib.validation :as v]
             [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.util :refer [new-record?]]
             [shevek.lib.string :refer [format-bool split]]
             [shevek.lib.collections :refer [find-by]]
