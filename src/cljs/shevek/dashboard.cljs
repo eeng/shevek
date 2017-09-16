@@ -10,6 +10,10 @@
   (dispatch :navigate :dashboard)
   (dissoc db :dashboard))
 
+(defevh :dashboard/refresh [db]
+  (console.log "TODO dashboard refresh")
+  db)
+
 (defn page []
   (if-let [{:keys [name description] :as dashboard} (db/get :dashboard)]
     [:div#dashboard.ui.container
