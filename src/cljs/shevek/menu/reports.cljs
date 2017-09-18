@@ -93,7 +93,7 @@
          [save-report-form form-data close-popup]
          [reports-list form-data])])))
 
-(defn- reports-menu []
+(defn reports-menu []
   (when-not (current-page? :home) ; No need to fetch the reports again when we are on the home page
     (fetch-reports))
   (fn []

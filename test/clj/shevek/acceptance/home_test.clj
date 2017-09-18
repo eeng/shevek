@@ -1,10 +1,10 @@
-(ns shevek.acceptance.dashboard-test
+(ns shevek.acceptance.home-test
   (:require [clojure.test :refer :all]
             [shevek.acceptance.test-helper :refer :all]
             [shevek.schemas.cube :refer [Cube]]
             [shevek.makers :refer [make!]]))
 
-(deftest dashboard
+(deftest home
   (it "shows the available cubes" page
     (make! Cube {:title "Sales"})
     (make! Cube {:title "Inventory"})
