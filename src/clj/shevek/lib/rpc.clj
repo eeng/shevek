@@ -6,7 +6,8 @@
             [shevek.reports.api]
             [shevek.querying.api]
             [shevek.users.api]
-            [shevek.schema.api]))
+            [shevek.schema.api]
+            [shevek.dashboards.api]))
 
 (defn call-fn
   "Given a params map like {:fn 'ns.api/func' :args [1 2]} calls (shevek.ns.api/func 1 2)"
