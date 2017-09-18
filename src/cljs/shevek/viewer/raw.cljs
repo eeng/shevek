@@ -68,6 +68,6 @@
                        selected-path (update :filter merge-dimensions (selected-path->filters selected-path "include")))
         q (-> (viewer->raw-query viewer)
               (assoc-in [:paging :threshold] limit))]
-    (rpc/call "querying.api/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
+    (rpc/call "querying/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
     (-> (assoc-in db [:viewer :raw-data-filter] (:filter viewer))
         (rpc/loading [:viewer :results :raw]))))

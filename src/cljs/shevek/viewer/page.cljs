@@ -39,7 +39,7 @@
 
 (defevh :viewer-initialized [db]
   (if-let [cube (get-in db [:viewer :cube :name])]
-    (rpc/fetch db :cube-metadata "schema.api/cube" :args [cube] :handler cube-arrived)
+    (rpc/fetch db :cube-metadata "schema/cube" :args [cube] :handler cube-arrived)
     (navigate "/")))
 
 (defn prepare-cube [db cube report]
@@ -63,7 +63,7 @@
 
 (defevh :viewer-refresh [db]
   (when-not (rpc/loading?)
-    (rpc/call "schema.api/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))))
+    (rpc/call "schema/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))))
 
 (defn page []
   (dispatch :viewer-initialized)

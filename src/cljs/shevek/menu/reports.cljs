@@ -14,7 +14,7 @@
             [cuerdas.core :as str]))
 
 (defevh :reports-requested [db]
-  (rpc/fetch db :reports "reports.api/find-all"))
+  (rpc/fetch db :reports "reports/find-all"))
 
 (defn fetch-reports []
   (dispatch :reports-requested))
@@ -38,7 +38,7 @@
         report (if editing-current?
                  (merge report (viewer->report (db :viewer)))
                  report)]
-    (rpc/call "reports.api/save-report" :args [report] :handler #(dispatch :report-saved % editing-current? after-save))
+    (rpc/call "reports/save-report" :args [report] :handler #(dispatch :report-saved % editing-current? after-save))
     (rpc/loading db :saving-report)))
 
 (defn- save-report-form [form-data after-save]

@@ -18,7 +18,7 @@
   (assoc db :dashboard (update dashboard :reports #(zipmap (map :id %) %))))
 
 (defevh :dashboard-selected [db id]
-  (rpc/fetch db :dashboard "dashboards.api/find-by-id" :args [id] :handler reports-ids-as-keys)
+  (rpc/fetch db :dashboard "dashboards/find-by-id" :args [id] :handler reports-ids-as-keys)
   (dispatch :navigate :dashboard)
   (dissoc db :dashboard))
 
@@ -32,7 +32,7 @@
       (rpc/loaded db (vis-key report)))))
 
 (defevh :dashboard/cube-requested [db {:keys [cube] :as report}]
-  (rpc/fetch db :cube-metadata "schema.api/cube" :args [cube] :handler #(cube-arrived %1 %2 report)))
+  (rpc/fetch db :cube-metadata "schema/cube" :args [cube] :handler #(cube-arrived %1 %2 report)))
 
 (defn- report-card [{:keys [name description] :as report}]
   (dispatch :dashboard/cube-requested report)

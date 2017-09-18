@@ -36,7 +36,7 @@
   (let [q (viewer->query viewer)
         results-keys (into [:viewer :results] results-keys)]
     (log/info "Sending query" q)
-    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :viewer/query-executed % results-keys))
+    (rpc/call "querying/query" :args [q] :handler #(dispatch :viewer/query-executed % results-keys))
     (rpc/loading db results-keys)))
 
 (defevh :visualization/query-executed [db results results-keys viewer]
@@ -48,7 +48,7 @@
 (defn send-visualization-query [db viewer results-keys]
   (let [q (viewer->query (assoc viewer :totals true))]
     (log/info "Sending visualization query" q)
-    (rpc/call "querying.api/query" :args [q] :handler #(dispatch :visualization/query-executed % results-keys viewer))
+    (rpc/call "querying/query" :args [q] :handler #(dispatch :visualization/query-executed % results-keys viewer))
     (rpc/loading db results-keys)))
 
 (defn send-main-query [{:keys [viewer] :as db}]

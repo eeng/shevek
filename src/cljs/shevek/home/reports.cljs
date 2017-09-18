@@ -14,7 +14,7 @@
             [shevek.lib.dates :refer [format-time]]))
 
 (defevh :delete-report [db {:keys [name] :as report}]
-  (rpc/call "reports.api/delete-report" :args [report]
+  (rpc/call "reports/delete-report" :args [report]
             :handler (fn []
                        (notify (t :reports/deleted name))
                        (fetch-reports)

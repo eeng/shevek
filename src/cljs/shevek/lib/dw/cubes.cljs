@@ -12,7 +12,7 @@
   (assoc db :cubes (zipmap (map :name cubes) cubes)))
 
 (defevh :cubes-requested [db]
-  (rpc/fetch db :cubes "schema.api/cubes" :handler cube-names-as-keys))
+  (rpc/fetch db :cubes "schema/cubes" :handler cube-names-as-keys))
 
 (defn fetch-cubes []
   (dispatch :cubes-requested))

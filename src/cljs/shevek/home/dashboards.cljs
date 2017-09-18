@@ -16,7 +16,7 @@
   (dispatch :dashboards-requested))
 
 (defevh :dashboards-requested [db]
-  (rpc/fetch db :dashboards "dashboards.api/find-all"))
+  (rpc/fetch db :dashboards "dashboards/find-all"))
 
 (defevh :new-dashboard-started [{:keys [dashboards] :as db}]
   (update db :dashboards conj {:name "" :created-at (now) :updated-at (now)}))
@@ -27,7 +27,7 @@
 
 (defevh :dashboard-edit-saved [db form-data]
   (let [dashboard (dissoc @form-data :created-at :updated-at)]
-    (rpc/call "dashboards.api/save" :args [dashboard] :handler #(dispatch :dashboard-saved % form-data))
+    (rpc/call "dashboards/save" :args [dashboard] :handler #(dispatch :dashboard-saved % form-data))
     (rpc/loading db :saving-dashboard)))
 
 (defevh :dashboard-saved [db {:keys [name]} form-data]
@@ -37,7 +37,7 @@
   (rpc/loaded db :saving-dashboard))
 
 (defevh :dashboard-deleted [db {:keys [name] :as dashboard}]
-  (rpc/call "dashboards.api/delete" :args [dashboard] :handler #(notify (t :dashboards/deleted name)))
+  (rpc/call "dashboards/delete" :args [dashboard] :handler #(notify (t :dashboards/deleted name)))
   (update db :dashboards (partial remove #{dashboard})))
 
 (defn select-dashboard [{:keys [id]}]

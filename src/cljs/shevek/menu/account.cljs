@@ -26,7 +26,7 @@
 
 (defevh :account-updated [db edited-user cancel]
   (when (v/valid?! edited-user (assoc user-validations :current-password (v/required)))
-    (rpc/call "users.api/save-account"
+    (rpc/call "users/save-account"
               :args [(dissoc @edited-user :password-confirmation)]
               :handler #(dispatch :account-saved % edited-user cancel))
     (rpc/loading db :saving-user)))

@@ -2,22 +2,22 @@
   (:require [clojure.string :refer [split ends-with?]]
             [clojure.repl :refer [root-cause]]
             [taoensso.timbre :as log]
-            ; Hay que colocar las api aca para que las resuelva el call-fn en los tests de aceptación (y posiblemente luego tb en production)
-            [shevek.reports.api]
-            [shevek.querying.api]
-            [shevek.users.api]
-            [shevek.schema.api]
-            [shevek.dashboards.api]))
+            [shevek.schema.api :as schema]
+            [shevek.users.api :as users]
+            [shevek.querying.api :as querying]
+            [shevek.reports.api :as reports]
+            [shevek.dashboards.api :as dashboards]))
+
+(defn- api-fn? [f]
+  (-> f meta :ns str (ends-with? ".api")))
 
 (defn call-fn
-  "Given a params map like {:fn 'ns.api/func' :args [1 2]} calls (shevek.ns.api/func 1 2)"
+  "Given a params map like {:fn 'ns-alias/func' :args [1 2]} calls (ns-alias/func 1 2). Make sure the alias is defined in the :require section."
   [{:keys [params] :as request}]
   (let [{fid :fn args :args :or {args []}} params
-        [namespace-suffix fn-name] (split fid #"/")
-        namespace (str "shevek." namespace-suffix)
-        f (ns-resolve (symbol namespace) (symbol fn-name))]
-    (assert (ends-with? namespace-suffix ".api") "Naughty boy")
+        f (ns-resolve 'shevek.lib.rpc (symbol fid))]
     (assert f (str "There is no remote function with fid " fid))
+    (assert (api-fn? f) "Only api functions are allowed")
     (apply f request args)))
 
 ; The query runs within a pmap so if a timeout occours in Druid we will get an ExecutionException with the ExceptionInfo wrapped, hence the root-cause.

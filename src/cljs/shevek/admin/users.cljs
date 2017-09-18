@@ -15,7 +15,7 @@
             [shevek.lib.dw.cubes :refer [cubes-list]]))
 
 (defevh :users-requested [db]
-  (rpc/fetch db :users "users.api/find-all"))
+  (rpc/fetch db :users "users/find-all"))
 
 (defevh :user-saved [db]
   (dispatch :users-requested)
@@ -54,11 +54,11 @@
 
 (defevh :user-changed [db edited-user cancel]
   (when (v/valid?! edited-user user-validations)
-    (rpc/call "users.api/save" :args [(adapt-for-server @edited-user)] :handler #(do (dispatch :user-saved) (cancel)))
+    (rpc/call "users/save" :args [(adapt-for-server @edited-user)] :handler #(do (dispatch :user-saved) (cancel)))
     (rpc/loading db :saving-user)))
 
 (defevh :user-deleted [db user]
-  (rpc/call "users.api/delete" :args [user] :handler #(dispatch :users-requested %)))
+  (rpc/call "users/delete" :args [user] :handler #(dispatch :users-requested %)))
 
 (defn- user-fields [user shortcuts]
   (let [new-user? (new-record? @user)]
