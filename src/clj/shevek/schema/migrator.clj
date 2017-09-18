@@ -1,33 +1,24 @@
 (ns shevek.schema.migrator
   (:require [shevek.lib.collections :refer [includes?]]
-            [clojure.java.io :as io]
-            [clojure.tools.namespace.find :refer [find-namespaces-in-dir]]
             [monger.collection :as mc]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [shevek.schema.migrations :refer [migrations]]))
 
 (def migrations-collection "schema-migrations")
 
-(defn- version [ns-sym]
-  (->> ns-sym name (re-find #"\.(\d+)\-.+") last))
-
 (defn- filter-already-done [db migrations]
-  (let [db-versions (map :version (mc/find-maps db migrations-collection))]
-    (->> migrations
-         (filter version)
-         (remove #(includes? db-versions (version %))))))
+  (let [migrations-done (->> (mc/find-maps db migrations-collection)
+                             (map (comp keyword :name)))]
+    (remove #(includes? migrations-done (first %)) migrations)))
 
-(defn- insert-migration-version [db migration-ns]
-  (mc/insert db migrations-collection {:version (version migration-ns)}))
+(defn- insert-migration-version [db migration-name]
+  (mc/insert db migrations-collection {:name (name migration-name)}))
 
 (defn migrate!
-  ([db] (migrate! db "shevek/migrations"))
-  ([db migrations-dir]
-   (let [migrations (->> migrations-dir
-                         io/resource io/file
-                         find-namespaces-in-dir
-                         (filter-already-done db))]
-     (doseq [migration migrations]
-       (log/debug "Executing migration" migration)
-       ((ns-resolve migration 'up) db)
-       (insert-migration-version db migration))
-    db)))
+  ([db] (migrate! db migrations))
+  ([db migrations]
+   (doseq [[migration-name migration-fn] (filter-already-done db migrations)]
+     (log/debug "Executing migration" migration-name)
+     (migration-fn db)
+     (insert-migration-version db migration-name))
+   db))
