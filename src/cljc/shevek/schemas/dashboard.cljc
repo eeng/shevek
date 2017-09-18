@@ -1,10 +1,8 @@
 (ns shevek.schemas.dashboard
-  (:require [schema.core :as s]
-            [shevek.schemas.report :refer [Report]]))
+  (:require [schema.core :as s]))
 
 (s/defschema DashboardReport
-  {:report-id s/Str
-   (s/optional-key :report) Report}) ; Eager fetched for the UI
+  {:report-id s/Str})
 
 (s/defschema Dashboard
   {(s/optional-key :id) s/Str

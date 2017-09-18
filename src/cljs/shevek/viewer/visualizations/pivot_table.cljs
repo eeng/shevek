@@ -33,7 +33,7 @@
   (let [selected-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
         row-key (hash selected-path)
         totals-row (totals-result? result dim)]
-    [:tr {:on-click #(when-not totals-row
+    [:tr {:on-click #(when (and (not totals-row) (current-page? :viewer))
                        (show-popup % ^{:key (hash result)} [row-popup dim result selected-path]
                                    {:position "top center" :distanceAway 135 :setFluidWidth true
                                     :class "pivot-table-popup" :id row-key}))

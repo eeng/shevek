@@ -14,4 +14,4 @@
           r2 (make! Report {:name "R2" :dashboards-ids [(:id d)]})]
       (is (= ["R1" "R2"]
              (->> (find-by-id db (:id d)) :reports
-                  (map (comp :name :report))))))))
+                  (map :name)))))))

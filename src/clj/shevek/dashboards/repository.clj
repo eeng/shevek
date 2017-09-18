@@ -11,7 +11,7 @@
   (m/delete-by-id db "dashboards" id))
 
 (defn- fetch-report [db {:keys [report-id] :as r}]
-  (assoc r :report (m/find-by-id db "reports" report-id)))
+  (merge (dissoc r :report-id) (m/find-by-id db "reports" report-id)))
 
 (defn find-dashboards [db user-id]
   (m/find-all db "dashboards" :where {:user-id user-id} :sort {:name 1}))

@@ -11,7 +11,13 @@
    (s/optional-key :auto-refresh) s/Int})
 
 (s/defschema CurrentReport
-  (st/assoc Report (s/optional-key :user-id) s/Any))
+  (st/assoc Report (s/optional-key :user-id) s/Str))
+
+(s/defschema DashboardReport
+  (st/assoc Report (s/optional-key :visualization) Visualization))
+
+(s/defschema CurrentDashboard
+  (st/assoc Dashboard :reports {s/Str DashboardReport}))
 
 (s/defschema AppDB
   {(s/optional-key :page) s/Keyword
@@ -24,4 +30,4 @@
    (s/optional-key :reports) [Report]
    (s/optional-key :users) [s/Any]
    (s/optional-key :dashboards) [Dashboard]
-   (s/optional-key :dashboard) Dashboard}) ; The selected dashboard
+   (s/optional-key :dashboard) CurrentDashboard}) ; The selected dashboard
