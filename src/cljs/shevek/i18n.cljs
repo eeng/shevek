@@ -18,7 +18,8 @@
                  :report-count #(cond
                                   (zero? %) "No reports"
                                   (= 1 %) "1 report"
-                                  :else "{1} reports")}
+                                  :else "{1} reports")
+                 :no-reports "This dashboard has no reports"}
     :reports {:title "Reports"
               :missing "There aren't any reports created"
               :name "Name"
@@ -135,7 +136,7 @@
               :delete "Delete"
               :close "Close"
               :select "Select"
-              :hold-delete "You must click the button and hold for {1} second to confirm"}
+              :hold-delete "You must click the button and hold for one second to confirm"}
     :input {:search "Search"}
     :validation {:required "can't be blank"
                  :regex "doesn't match pattern"
@@ -164,7 +165,8 @@
                  :report-count #(cond
                                   (zero? %) "Sin reportes"
                                   (= 1 %) "1 reporte"
-                                  :else "{1} reportes")}
+                                  :else "{1} reportes")
+                 :no-reports "Este dashboard no tiene reportes"}
     :reports {:title "Reportes"
               :missing "No se ha guardado ningún reporte todavía"
               :name "Nombre"

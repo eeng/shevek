@@ -145,7 +145,7 @@
 (defn cancel-timeout []
   (when @holding
     (swap! holding js/clearTimeout)
-    (notify (t :actions/hold-delete holding-time) :type :info)))
+    (notify (t :actions/hold-delete) :type :info)))
 
 (defonce mouseup-listener
   (do

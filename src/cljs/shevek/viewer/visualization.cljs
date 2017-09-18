@@ -3,15 +3,11 @@
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t translation]]
+            [shevek.components.text :refer [warning]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.visualizations.totals :refer [totals-visualization]]
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]
             [shevek.viewer.visualizations.chart :refer [chart-visualization]]))
-
-(defn warning [text]
-  [:div.icon-hint
-   [:i.warning.circle.icon]
-   [:div.text text]])
 
 (defn visualization [{:keys [results measures viztype split] :as viz}]
   (when results ; Results are nil until first query finish

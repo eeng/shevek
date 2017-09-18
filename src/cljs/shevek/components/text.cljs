@@ -14,3 +14,8 @@
 (defn loader [loading-key]
   (when (loading? loading-key)
     [:div.ui.active.inverted.dimmer [:div.ui.loader]]))
+
+(defn warning [text]
+  [:div.icon-hint
+   [:i.warning.circle.icon]
+   [:div.text text]])
