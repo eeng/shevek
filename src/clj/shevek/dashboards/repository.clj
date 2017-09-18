@@ -2,12 +2,15 @@
   (:require [schema.core :as s]
             [shevek.schemas.dashboard :refer [Dashboard]]
             [shevek.lib.mongodb :as m]
+            [monger.collection :as mc]
+            [monger.operators :refer [$pull]]
             [com.rpl.specter :refer [transform ALL]]))
 
 (s/defn save-dashboard [db dashboard :- Dashboard]
   (m/save db "dashboards" dashboard))
 
 (s/defn delete-dashboard [db {:keys [id]}]
+  (mc/update db "reports" {:dashboards-ids (m/oid id)} {$pull {:dashboards-ids (m/oid id)}} {:multi true})
   (m/delete-by-id db "dashboards" id))
 
 (defn- fetch-report [db {:keys [report-id] :as r}]

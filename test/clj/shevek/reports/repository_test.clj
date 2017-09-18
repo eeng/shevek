@@ -52,4 +52,4 @@
     (let [d (make! Dashboard)
           r (make! Report {:dashboards-ids [(:id d)]})]
       (delete-report db r)
-      (is (submap? {:reports []} (reload-dashboard d))))))
+      (is (= [] (:reports (reload-dashboard d)))))))
