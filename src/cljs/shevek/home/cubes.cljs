@@ -26,6 +26,6 @@
          (if cubes
            (let [cubes (filter-matching @search (by :title :description) cubes)]
              (if (seq cubes)
-               (rmap cube-card :name cubes)
+               [:div.cards (rmap cube-card :name cubes)]
                [:div.large.tip (if (seq @search) (t :errors/no-results) (t :cubes/missing))]))
            [:div.ui.active.inline.centered.loader])]))))

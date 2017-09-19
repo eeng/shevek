@@ -9,9 +9,9 @@
     (make! Cube {:title "Sales"})
     (make! Cube {:title "Inventory"})
     (login page)
-    (is (has-title? page "Dashboard"))
-    (is (has-css? page ".cube.card:nth-child(1)" :text "Sales"))
-    (is (has-css? page ".cube.card:nth-child(2)" :text "Inventory")))
+    (is (has-title? page "Welcome"))
+    (is (has-css? page ".cube.card:nth-child(1)" :text "Inventory"))
+    (is (has-css? page ".cube.card:nth-child(2)" :text "Sales")))
 
   (it "the cubes are displayed also on the menu" page
     (make! Cube {:title "Sales"})

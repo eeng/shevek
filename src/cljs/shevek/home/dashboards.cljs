@@ -96,6 +96,6 @@
          (if dashboards
            (let [dashboards (filter-matching @search (by :name :description) dashboards)]
              (if (seq dashboards)
-               (rmap dashboard-card (comp hash (juxt :name :created-at)) dashboards)
+               [:div.cards (rmap dashboard-card (comp hash (juxt :name :created-at)) dashboards)]
                [:div.large.tip (if (seq @search) (t :errors/no-results) (t :dashboards/missing))]))
            [:div.ui.active.inline.centered.loader])]))))
