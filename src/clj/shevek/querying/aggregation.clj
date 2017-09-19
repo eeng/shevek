@@ -58,7 +58,7 @@
           :measures [{:name "count" :expression "(sum $count)"}]
           :filter [{:interval ["2015-09-12" "2015-09-13"]}]})
 
-; One dimension with)
+; One dimension with totals
 #_(query shevek.dw/dw
          {:cube "wikiticker"
           :split [{:name "page" :limit 5}]

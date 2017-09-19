@@ -35,8 +35,8 @@
    [:a.item {:href "#/" :class (current-page-class :home)}
     [:i.home.layout.icon] (t :home/menu)]
    [cubes-menu]
-   [reports-menu]
    [dashboards-menu]
+   [reports-menu]
    [:div.right.menu
     (when (current-page? :viewer) [share-menu])
     [settings-menu]
