@@ -23,7 +23,7 @@
   {:status 403 :body {:error "Not authorized"}})
 
 (defroutes app-routes
-  (resources "/assets")
+  (resources "/public")
   (GET "/*" [] (-> "public/index.html" io/resource slurp))
   (POST "/login" [] auth/controller)
   (POST "/rpc" [] (restrict rpc/controller {:handler should-be-authenticated :on-error not-authenticated})))

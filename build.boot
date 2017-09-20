@@ -169,7 +169,7 @@
                                  :closure-defines {"goog.DEBUG" false}})
         (less)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
-        (asset-fingerprint :asset-root "public")
+        (asset-fingerprint)
         (aot :namespace #{'shevek.app})
         (uber)
         (jar :file "shevek.jar" :main 'shevek.app)
