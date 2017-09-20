@@ -1,5 +1,5 @@
 {:require  [shevek.app]
  :init-fns [shevek.app/init]
  :boot-reload {:on-jsload shevek.app/init}
- :compiler-options {:asset-path "js/app.out"
+ :compiler-options {:asset-path "/js/app.out"
                     :parallel-build true}}

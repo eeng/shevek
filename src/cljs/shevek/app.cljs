@@ -5,16 +5,8 @@
             [shevek.reflow.core :as reflow]
             [shevek.reflow.interceptors :as i]
             [shevek.lib.error]
-            [secretary.core :as secretary]
-            [goog.events :as events]
-            [goog.history.EventType :as EventType]
-            [cljsjs.jquery])
-  (:import goog.History))
-
-(defonce history
-  (doto (History.)
-    (events/listen EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
-    (.setEnabled true)))
+            [shevek.navigation :refer [init-navigation]]
+            [cljsjs.jquery]))
 
 (defn init-reflow []
   (reflow/init (-> (i/router) (i/logger) (schema/checker)))
@@ -23,5 +15,6 @@
 
 (defn init []
   (enable-console-print!)
+  (init-navigation)
   (init-reflow)
   (r/render-component [layout] (.getElementById js/document "app")))

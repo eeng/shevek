@@ -31,6 +31,7 @@
                     [se.haleby/stub-http "0.2.1"]
                     [cljs-ajax "0.5.8"]
                     [secretary "1.2.3"]
+                    [kibu/pushy "0.3.8"]
                     [funcool/cuerdas "2.0.3"]
                     [clj-time "0.14.0"]
                     [com.andrewmcveigh/cljs-time "0.5.1"]

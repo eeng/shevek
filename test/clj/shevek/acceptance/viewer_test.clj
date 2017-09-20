@@ -33,7 +33,7 @@
         {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
          (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
         (make-wikiticker-cube)
-        (visit page "/#/viewer/ezpjdWJlICJ3aWtpdGlja2VyIiwgOnZpenR5cGUgInRvdGFscyIsIDptZWFzdXJlcyAoImFkZGVkIiAiY291bnQiKSwgOmZpbHRlciAoezpuYW1lICJfX3RpbWUiLCA6cGVyaW9kICJsYXRlc3QtZGF5In0pLCA6c3BsaXQgKCksIDpwaW5ib2FyZCB7Om1lYXN1cmUgImRlbGV0ZWQiLCA6ZGltZW5zaW9ucyAoKX19")
+        (visit page "/viewer/ezpjdWJlICJ3aWtpdGlja2VyIiwgOnZpenR5cGUgInRvdGFscyIsIDptZWFzdXJlcyAoImFkZGVkIiAiY291bnQiKSwgOmZpbHRlciAoezpuYW1lICJfX3RpbWUiLCA6cGVyaW9kICJsYXRlc3QtZGF5In0pLCA6c3BsaXQgKCksIDpwaW5ib2FyZCB7Om1lYXN1cmUgImRlbGV0ZWQiLCA6ZGltZW5zaW9ucyAoKX19")
         (login page)
         (is (has-css? page ".statistic" :count 2))))
 
@@ -42,7 +42,7 @@
         {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
          (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
         (login page)
-        (visit page "/#/viewer/CHANGEDezpjdWJlICJ3aWtpdGlja2VyIiwgOm1lYXN1cmVzICgiZGVsZXRlZCIgImNvdW50IiksIDpmaWx0ZXIgKHs6bmFtZSAiX190aW1lIiwgOnBlcmlvZCAibGF0ZXN0LWRheSJ9KSwgOnNwbGl0ICgpLCA6cGluYm9hcmQgezptZWFzdXJlICJkZWxldGVkIiwgOmRpbWVuc2lvbnMgKCl9fQ==")
+        (visit page "/viewer/CHANGEDezpjdWJlICJ3aWtpdGlja2VyIiwgOm1lYXN1cmVzICgiZGVsZXRlZCIgImNvdW50IiksIDpmaWx0ZXIgKHs6bmFtZSAiX190aW1lIiwgOnBlcmlvZCAibGF0ZXN0LWRheSJ9KSwgOnNwbGl0ICgpLCA6cGluYm9hcmQgezptZWFzdXJlICJkZWxldGVkIiwgOmRpbWVuc2lvbnMgKCl9fQ==")
         (is (has-title? page "Welcome")))))
 
   (it "raw data modal" page

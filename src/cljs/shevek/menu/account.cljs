@@ -12,7 +12,7 @@
 
 (defn account-menu [class]
   [:a.item
-   {:href "#/account" :class class}
+   {:href "/account" :class class}
    [:i.user.icon] (:fullname (current-user))])
 
 (defevh :account-saved [db {:keys [error] :as response} edited-user cancel]

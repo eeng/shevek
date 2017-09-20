@@ -32,7 +32,7 @@
 
 (defn- menu []
   [:div.ui.fixed.inverted.menu
-   [:a.item {:href "#/" :class (current-page-class :home)}
+   [:a.item {:href "/" :class (current-page-class :home)}
     [:i.home.layout.icon] (t :home/menu)]
    [cubes-menu]
    [dashboards-menu]
@@ -41,7 +41,7 @@
     (when (current-page? :viewer) [share-menu])
     [settings-menu]
     (when (admin?)
-      [:a.icon.item {:href "#/admin" :class (current-page-class :admin) :title (t :admin/menu)}
+      [:a.icon.item {:href "/admin" :class (current-page-class :admin) :title (t :admin/menu)}
        [:i.users.icon]])
     [account-menu (current-page-class :account)]
     [:a.item {:on-click #(dispatch :logout)}

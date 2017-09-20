@@ -23,11 +23,10 @@
   {:status 403 :body {:error "Not authorized"}})
 
 (defroutes app-routes
-  (GET "/" [] (-> "public/index.html" io/resource slurp))
+  (resources "/assets")
+  (GET "/*" [] (-> "public/index.html" io/resource slurp))
   (POST "/login" [] auth/controller)
-  (POST "/rpc" [] (restrict rpc/controller {:handler should-be-authenticated :on-error not-authenticated}))
-  (resources "/")
-  (not-found (-> "public/404.html" io/resource slurp)))
+  (POST "/rpc" [] (restrict rpc/controller {:handler should-be-authenticated :on-error not-authenticated})))
 
 ; This needs to be a defn a not a def because of the config which will only be available after mount/start
 (defn app []

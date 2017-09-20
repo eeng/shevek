@@ -4,13 +4,11 @@
             [shevek.lib.base64 :as b64]
             [schema.core :as s]
             [shevek.schemas.app-db :refer [CurrentReport]]
-            [shevek.lib.logger :as log]))
+            [shevek.lib.logger :as log]
+            [shevek.navigation :refer [set-url]]))
 
 (defn store [encoded-report]
-  (let [current-path (.-hash js/location)
-        next-path (str "#/viewer/" (js/encodeURI encoded-report))]
-    (when (not= next-path current-path)
-      (.pushState js/history {}, nil, next-path))))
+  (set-url (str "/viewer/" (js/encodeURI encoded-report))))
 
 (defn store-viewer-in-url [{:keys [viewer] :as db}]
   (-> viewer viewer->report pr-str b64/encode store)

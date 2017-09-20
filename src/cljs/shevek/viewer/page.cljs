@@ -45,8 +45,8 @@
 (defn prepare-cube [db cube report]
   (if (current-page? :viewer)
     (dispatch :viewer-initialized)
-    (navigate "/viewer"))
-  (assoc db :viewer {:cube {:name cube}} :current-report report)) ; So we can display immediately the cube in the menu
+    (dispatch :navigate :viewer))
+  (assoc db :viewer {:cube {:name cube}} :current-report report))
 
 (defevh :cube-selected [db cube]
   (prepare-cube db cube nil))
