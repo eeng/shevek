@@ -2,6 +2,7 @@
 
 body {
   background-color: #F7F7F7;
+  overflow-y: hidden;
 }
 
 .preloader {
@@ -16,7 +17,13 @@ body {
 }
 
 .page {
-  padding-top: 40px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding-bottom: 60px;
 
   > .ui.container {
