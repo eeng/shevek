@@ -5,17 +5,18 @@
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]))
 
 (deftest table-visualization-tests
-  (testing "one dimension and one measure"
+  (testing "one dimension and two measures"
     (render-component
-     [table-visualization {:measures [{:name "count" :title "Cantidad"}]
+     [table-visualization {:measures [{:name "count" :title "Cantidad"}
+                                      {:name "delta" :title "Delta"}]
                            :split [{:name "country" :title "País"}]
-                           :results [{:count 300}
-                                     {:count 200 :country "Canada"}
-                                     {:count 100 :country "Argentina"}]}])
-    (is (= ["País" "Cantidad"] (texts ".pivot-table thead th")))
-    (is (= [["Total" "300"]
-            ["Canada" "200"]
-            ["Argentina" "100"]]
+                           :results [{:count 300 :delta 0.5}
+                                     {:count 200 :delta 0.2 :country "Canada"}
+                                     {:count 100 :delta 0.3 :country "Argentina"}]}])
+    (is (= ["País" "Cantidad" "Delta"] (texts ".pivot-table thead th")))
+    (is (= [["Total" "300" "0.5"]
+            ["Canada" "200" "0.2"]
+            ["Argentina" "100" "0.3"]]
            (texts ".pivot-table tbody tr" "td"))))
 
   (testing "two dimensions"
@@ -40,6 +41,16 @@
      [table-visualization {:measures [{:name "amount" :format "$0,0.00a"}]
                            :split [{:name "country"}]
                            :results [{:amount 300}]}])
-    (is (= ["Total" "$300.00"] (texts ".pivot-table td")))))
+    (is (= ["Total" "$300.00"] (texts ".pivot-table td"))))
+
+  (testing "dimension formatting"
+    (render-component
+     [table-visualization {:measures [{:name "amount"}]
+                           :split [{:name "__time" :granularity "P1D"}]
+                           :results [{:__time "2017-08-28T10:00:00.000-03:00" :amount 100}
+                                     {:__time nil :amount 200}]}])
+    (is (= [["Aug 28, 2017" "100"]
+            ["Ø" "200"]]
+           (texts ".pivot-table tbody tr" "td")))))
 
 (use-fixtures :each with-container)
