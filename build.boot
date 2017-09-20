@@ -109,7 +109,7 @@
         (watch)
         (notify :visual true :title "App")
         (refresh)
-        (reload :asset-path "public")
+        (reload)
         (cljs-repl)
         (cljs-devtools)
         (build-and-start-app-for-dev)))
