@@ -253,7 +253,7 @@
                   :select-measures "Por favor seleccion las métricas permitidas"
                   :no-measures "Ninguna"}
     :account {:title "Tu Cuenta"
-              :subtitle "Aquí podés cambiar los detalles de tu perfil"
+              :subtitle "Aquí puede cambiar los detalles de su perfil"
               :current-password "Password Actual"
               :new-password "Nuevo Password"
               :saved "Tu cuenta se grabó correctamente"
