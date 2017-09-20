@@ -4,8 +4,8 @@
             [shevek.asserts :refer [submap? submaps?]]
             [cljs-react-test.utils :as tu]
             [cljs-react-test.simulate :as sim]
-            [dommy.core :as d :refer-macros [sel sel1]]
             [reagent.core :as r]
+            [cljsjs.jquery]
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]))
 
 (def ^:dynamic container)
@@ -14,6 +14,15 @@
                       (binding [container (tu/new-container!)]
                         (test-fn)
                         (tu/unmount! container))))
+
+(defn texts
+  ([selector]
+   (->> selector js/$ .toArray (map #(.-textContent %))))
+  ([parent-selector child-selector]
+   (->> parent-selector js/$ .toArray
+        (map (fn [parent]
+               (->> (js/$ child-selector parent) .toArray
+                    (map #(.-textContent %))))))))
 
 (deftest table-visualization-tests
   (testing "one dimension and one measure"
@@ -24,11 +33,11 @@
                                      {:count 200 :country "Canada"}
                                      {:count 100 :country "Argentina"}]}]
      container)
-    (is (= ["País" "Cantidad"]
-           (map d/text (sel [:.pivot-table :thead :th]))))
-    (is (= [["Total" "300"] ["Canada" "200"] ["Argentina" "100"]]
-           (->> (sel [:.pivot-table :tbody :tr])
-                (map #(map d/text (sel % :td)))))))
+    (is (= ["País" "Cantidad"] (texts ".pivot-table thead th")))
+    (is (= [["Total" "300"]
+            ["Canada" "200"]
+            ["Argentina" "100"]]
+           (texts ".pivot-table tbody tr" "td"))))
 
   (testing "two dimensions"
     (r/render-component
@@ -39,16 +48,14 @@
                                                                               {:count 70 :city "Toronto"}]}
                                      {:count 100 :country "Argentina" :_results [{:count 100 :city "Santa Fe"}]}]}]
      container)
-    (is (= ["Country, City" "Count"]
-           (map d/text (sel [:.pivot-table :thead :th]))))
-    (is (= [["Total" "300"]
+    (is (= [["Country, City" "Count"]
+            ["Total" "300"]
             ["Canada" "200"]
             ["Vancouver" "130"]
             ["Toronto" "70"]
             ["Argentina" "100"]
             ["Santa Fe" "100"]]
-           (->> (sel [:.pivot-table :tbody :tr])
-                (map #(map d/text (sel % :td)))))))
+           (texts ".pivot-table tr" "th,td"))))
 
   (testing "measure formatting"
     (r/render-component
@@ -56,6 +63,4 @@
                            :split [{:name "country"}]
                            :results [{:amount 300}]}]
      container)
-    (is (= [["Total" "$300.00"]]
-           (->> (sel [:.pivot-table :tbody :tr])
-                (map #(map d/text (sel % :td))))))))
+    (is (= ["Total" "$300.00"] (texts ".pivot-table td")))))

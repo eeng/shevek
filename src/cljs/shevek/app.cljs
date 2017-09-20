@@ -7,7 +7,8 @@
             [shevek.lib.error]
             [secretary.core :as secretary]
             [goog.events :as events]
-            [goog.history.EventType :as EventType])
+            [goog.history.EventType :as EventType]
+            [cljsjs.jquery])
   (:import goog.History))
 
 (defonce history

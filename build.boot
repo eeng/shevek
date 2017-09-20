@@ -52,7 +52,7 @@
                     [lukesnape/boot-asset-fingerprint "1.5.1" :scope "test"]
                     [cljsjs/react-with-addons "15.6.1-0"]
                     [cljs-react-test "0.1.4-SNAPSHOT" :scope "test"]
-                    [prismatic/dommy "1.1.0"]])
+                    [cljsjs/jquery "3.2.1-0"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
@@ -164,7 +164,7 @@
   "Package the project for deploy. Then start with: java -Dconf=dist/config.edn -jar dist/shevek.jar"
   []
   (comp (cljs :optimizations :advanced
-              :compiler-options {:externs ["src/externs/jquery.js" "src/externs/semantic-ui.js" "src/externs/calendar.js"]
+              :compiler-options {:externs ["src/externs/semantic-ui.js" "src/externs/calendar.js"]
                                  :closure-defines {"goog.DEBUG" false}})
         (less)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
