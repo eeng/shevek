@@ -33,7 +33,7 @@
                     [secretary "1.2.3"]
                     [funcool/cuerdas "2.0.3"]
                     [clj-time "0.14.0"]
-                    [com.andrewmcveigh/cljs-time "0.5.0"]
+                    [com.andrewmcveigh/cljs-time "0.5.1"]
                     [com.taoensso/timbre "4.8.0"]
                     [com.rpl/specter "1.0.2"]
                     [prismatic/schema "1.1.6"]
