@@ -121,14 +121,14 @@
               {:name "lentes_facturadas" :description "Lentes procesadas en la sección Vitolen (calculadas a partir de eventos de facturación)"
                :expression "(where {$seccion \"Vitolen\"} (sum $lentes_procesadas))"}
               {:name "indicador_general" :title "R/LP"
-               :description "Si LF = 0 entonces Indicador = R/LP; sino Indicador = R/LF"
+               :description "Indicador Global: Si LF = 0 entonces Indicador = R/LP; sino Indicador = R/LF"
                :type "javascript" :format "0.0%" :favorite true
                :expression "(js [(sum $lentes_repetidas)
                                  (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))
                                  (sum $lentes_procesadas)]
                                 \"function(r, lf, lp) { return r / (lf == 0 ? lp : lf) }\")"}
               {:name "indicador_procesos" :title "R/(LP+R)"
-               :description "Si LF = 0 entonces Indicador = R/(LP+R); sino Indicador = R/(LF+R)"
+               :description "Indicador Procesos: Si LF = 0 entonces Indicador = R/(LP+R); sino Indicador = R/(LF+R)"
                :type "javascript" :format "0.0%"
                :expression "(js [(sum $lentes_repetidas)
                                  (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))
