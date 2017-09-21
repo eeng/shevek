@@ -74,7 +74,7 @@
   [:div#login.ui.center.aligned.grid
    [:div.column
     [:h1.ui.blue.header
-     [:img {:src "images/logo.png"}]
+     [:img {:src "public/images/logo.png"}]
      [:div.content "Shevek"
       [:div.sub.header "Data Warehouse Visualization System"]]]
     [:div.ui.segment (rpc/loading-class :logging-in)
