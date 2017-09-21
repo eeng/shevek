@@ -31,8 +31,8 @@
               :unauthorized "Oops! This report is no longer available."}
     :viewer {:dimensions "Dimensions"
              :measures "Measures"
-             :filter "Filter"
-             :split "Split"
+             :filters "Filters"
+             :row-splits "Rows"
              :pinboard "Pinboard"
              :limit "Limit"
              :sort-by "Sort By"
@@ -178,7 +178,8 @@
               :unauthorized "Oops! Este reporte ya no está disponible."}
     :viewer {:dimensions "Dimensiones"
              :measures "Métricas"
-             :filter "Filtros"
+             :filters "Filtros"
+             :row-splits "Filas"
              :limit "Límite"
              :sort-by "Ordenar Por"
              :granularity "Granularidad"

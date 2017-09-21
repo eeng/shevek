@@ -84,12 +84,12 @@
        (when icon-after? [:span title])])
     [:th opts title]))
 
-(defn table-visualization [{:keys [measures split results]}]
+(defn table-visualization [{:keys [measures row-splits results]}]
   (let [max-values (calculate-max-values measures results)]
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
      [:thead>tr
-      [sortable-th (->> split (map :title) (str/join ", ")) split split]
+      [sortable-th (->> row-splits (map :title) (str/join ", ")) row-splits row-splits]
       (for [{:keys [name title] :as measure} measures]
-        ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
+        ^{:key name} [sortable-th title (repeat (count row-splits) measure) row-splits {:class "right aligned"}])]
      [:tbody
-      (doall (table-rows results split 0 measures max-values))]]))
+      (doall (table-rows results row-splits 0 measures max-values))]]))

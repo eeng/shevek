@@ -9,7 +9,7 @@
     (render-component
      [table-visualization {:measures [{:name "count" :title "Cantidad"}
                                       {:name "delta" :title "Delta"}]
-                           :split [{:name "country" :title "País"}]
+                           :row-splits [{:name "country" :title "País"}]
                            :results [{:count 300 :delta 0.5}
                                      {:count 200 :delta 0.2 :country "Canada"}
                                      {:count 100 :delta 0.3 :country "Argentina"}]}])
@@ -21,7 +21,7 @@
 
   (testing "two dimensions"
     (render-component
-     [table-visualization {:split [{:name "country" :title "Country"} {:name "city" :title "City"}]
+     [table-visualization {:row-splits [{:name "country" :title "Country"} {:name "city" :title "City"}]
                            :measures [{:name "count" :title "Count"}]
                            :results [{:count 300}
                                      {:count 200 :country "Canada" :_results [{:count 130 :city "Vancouver"}
@@ -39,14 +39,14 @@
   (testing "measure formatting"
     (render-component
      [table-visualization {:measures [{:name "amount" :format "$0,0.00a"}]
-                           :split [{:name "country"}]
+                           :row-splits [{:name "country"}]
                            :results [{:amount 300}]}])
     (is (= ["Total" "$300.00"] (texts ".pivot-table td"))))
 
   (testing "dimension formatting"
     (render-component
      [table-visualization {:measures [{:name "amount"}]
-                           :split [{:name "__time" :granularity "P1D"}]
+                           :row-splits [{:name "__time" :granularity "P1D"}]
                            :results [{:__time "2017-08-28T10:00:00.000-03:00" :amount 100}
                                      {:__time nil :amount 200}]}])
     (is (= [["Aug 28, 2017" "100"]

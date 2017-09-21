@@ -36,8 +36,8 @@
 
 (s/defschema Query
   {:cube s/Str
-   :filter [(s/one TimeFilter "tf") NormalFilter]
-   (s/optional-key :split) [Split]
+   :filters [(s/one TimeFilter "tf") NormalFilter]
+   (s/optional-key :splits) [Split]
    :measures [Measure]
    (s/optional-key :totals) s/Bool
    (s/optional-key :time-zone) s/Str})
@@ -48,7 +48,7 @@
 
 (s/defschema RawQuery
   {:cube s/Str
-   :filter [(s/one TimeFilter "tf") NormalFilter]
+   :filters [(s/one TimeFilter "tf") NormalFilter]
    (s/optional-key :paging) Paging
    (s/optional-key :time-zone) s/Str})
 

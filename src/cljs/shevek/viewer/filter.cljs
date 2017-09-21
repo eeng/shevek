@@ -29,16 +29,16 @@
 (defevhi :dimension-added-to-filter [db {:keys [name] :as dim}]
   {:after [store-viewer-in-url]}
   (reset! last-added-filter name)
-  (update-in db [:viewer :filter] add-dimension (build-filter dim {:operator "include" :value #{}})))
+  (update-in db [:viewer :filters] add-dimension (build-filter dim {:operator "include" :value #{}})))
 
 (defevhi :filter-options-changed [db dim opts]
   {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :filter] replace-dimension (build-filter dim opts))
+  (-> (update-in db [:viewer :filters] replace-dimension (build-filter dim opts))
       (send-queries dim)))
 
 (defevhi :dimension-removed-from-filter [db dim]
   {:after [store-viewer-in-url]}
-  (-> (update-in db [:viewer :filter] remove-dimension dim)
+  (-> (update-in db [:viewer :filters] remove-dimension dim)
       (send-queries dim)))
 
 (defn update-filter-or-remove [dim opts]
@@ -52,7 +52,7 @@
         toggle (toggle-filter-value selected?)]
     (if already-in-filter?
       (update-filter-or-remove dim {:operator (:operator dim) :value (toggle (:value dim) toggled-value)})
-      (-> (update-in db [:viewer :filter] add-dimension (assoc dim :value #{toggled-value}))
+      (-> (update-in db [:viewer :filters] add-dimension (assoc dim :value #{toggled-value}))
           (send-queries dim)))))
 
 (defn selected-path->filters [selected-path operator]
@@ -60,14 +60,14 @@
 
 (defevhi :pivot-table-row-filtered [db selected-path operator]
   {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :filter] merge-dimensions (selected-path->filters selected-path operator))
+  (-> (update-in db [:viewer :filters] merge-dimensions (selected-path->filters selected-path operator))
       (send-queries nil)))
 
 (defevh :filter-values-requested [db {:keys [name] :as dim} search]
   (send-query db {:cube (viewer :cube)
-                  :filter (cond-> [(first (viewer :filter))]
-                                  (seq search) (conj (assoc dim :operator "search" :value search)))
-                  :split [(assoc dim :limit 50)]
+                  :filters (cond-> [(first (viewer :filters))]
+                                   (seq search) (conj (assoc dim :operator "search" :value search)))
+                  :row-splits [(assoc dim :limit 50)]
                   :measures [{:expression "(count)" :name "rowCount"}]}
               [:filter name]))
 
@@ -187,7 +187,7 @@
     ^{:key (:name dim)} [normal-filter-popup dim]))
 
 (defevh :filter-popup-closed [{:keys [viewer]} {:keys [name]}]
-  (if-let [dim (find-dimension name (:filter viewer))]
+  (if-let [dim (find-dimension name (:filters viewer))]
     (when (and (not (time-dimension? dim)) (empty? (dim :value)))
       (dispatch :dimension-removed-from-filter dim))))
 
@@ -209,6 +209,6 @@
 
 (defn filter-panel []
   [:div.filter.panel (droppable #(dispatch :dimension-added-to-filter %))
-   [panel-header (t :viewer/filter)]
-   (for [dim (viewer :filter)]
+   [panel-header (t :viewer/filters)]
+   (for [dim (viewer :filters)]
      ^{:key (:name dim)} [filter-item dim])])

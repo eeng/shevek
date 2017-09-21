@@ -16,8 +16,9 @@
                   (take 3 measures))]
     {:cube cube
      :viztype :totals
-     :filter [(build-time-filter cube)]
-     :split []
+     :filters [(build-time-filter cube)]
+     :row-splits []
+     :column-splits []
      :measures (vec measures)
      :pinboard {:measure (first measures) :dimensions []}}))
 
@@ -35,8 +36,9 @@
 (defn report->viewer [{:keys [pinboard viztype] :as report} cube]
   {:cube cube
    :viztype (keyword viztype)
-   :filter (report-dims->viewer (report :filter) cube)
-   :split (report-dims->viewer (report :split) cube)
+   :filters (report-dims->viewer (report :filters) cube)
+   :row-splits (report-dims->viewer (report :row-splits) cube)
+   :column-splits (report-dims->viewer (report :column-splits) cube)
    :measures (filterv some? (map #(find-dimension % (cube :measures)) (report :measures)))
    :pinboard {:measure (find-dimension (:measure pinboard) (cube :measures))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
@@ -48,23 +50,28 @@
           value (update :value vec)
           sort-by (update :sort-by viewer-dim->report)))
 
-(defn viewer->report [{:keys [cube measures filter split pinboard viztype]}]
+(defn viewer->report [{:keys [cube measures filters row-splits column-splits pinboard viztype]}]
   {:cube (:name cube)
    :viztype (when viztype (name viztype))
    :measures (map :name measures)
-   :filter (map viewer-dim->report filter)
-   :split (map viewer-dim->report split)
+   :filters (map viewer-dim->report filters)
+   :row-splits (map viewer-dim->report row-splits)
+   :column-splits (map viewer-dim->report column-splits)
    :pinboard {:measure (-> pinboard :measure :name)
               :dimensions (map viewer-dim->report (:dimensions pinboard))}})
 
 (defn- add-str-interval [viewer]
-  (setval [:filter ALL time-dimension? :interval]
+  (setval [:filters ALL time-dimension? :interval]
           (mapv to-iso8601 (effective-interval viewer))
           viewer))
 
+(defn splits [{:keys [row-splits column-splits]}]
+  (concat row-splits column-splits))
+
 (defn viewer->query [{:keys [cube] :as viewer}]
   (-> (add-str-interval viewer)
-      (assoc :cube (cube :name))
+      (assoc :cube (cube :name)
+             :splits (splits viewer))
       (st/select-schema Query)))
 
 (defn viewer->raw-query [{:keys [cube] :as viewer}]

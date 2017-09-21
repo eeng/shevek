@@ -110,15 +110,15 @@
            ([from to] {:name "__time" :interval [from to]}))]
 
     (testing "when the period span less than a week it should be PT1H"
-      (is (= "PT1H" (default-granularity {:filter [(time-dim :latest-day)]})))
-      (is (= "PT1H" (default-granularity {:filter [(time-dim (d 2016 1 1) (d 2016 1 2))]})))
-      (is (= "PT1H" (default-granularity {:filter [(time-dim (d 2016 1 1) (d 2016 1 8))]}))))
+      (is (= "PT1H" (default-granularity {:filters [(time-dim :latest-day)]})))
+      (is (= "PT1H" (default-granularity {:filters [(time-dim (d 2016 1 1) (d 2016 1 2))]})))
+      (is (= "PT1H" (default-granularity {:filters [(time-dim (d 2016 1 1) (d 2016 1 8))]}))))
 
     (testing "when the period span between than a week and few months it should be P1D"
-      (is (= "P1D" (default-granularity {:filter [(time-dim :current-month)]})))
-      (is (= "P1D" (default-granularity {:filter [(time-dim (d 2016 1 1) (d 2016 1 9))]})))
-      (is (= "P1D" (default-granularity {:filter [(time-dim (d 2016 1 1) (d 2016 2 28))]}))))
+      (is (= "P1D" (default-granularity {:filters [(time-dim :current-month)]})))
+      (is (= "P1D" (default-granularity {:filters [(time-dim (d 2016 1 1) (d 2016 1 9))]})))
+      (is (= "P1D" (default-granularity {:filters [(time-dim (d 2016 1 1) (d 2016 2 28))]}))))
 
     (testing "when the period span more than a few months it should be P1M"
-      (is (= "P1M" (default-granularity {:filter [(time-dim :current-year)]})))
-      (is (= "P1M" (default-granularity {:filter [(time-dim (d 2016 1 1) (d 2016 4 1))]}))))))
+      (is (= "P1M" (default-granularity {:filters [(time-dim :current-year)]})))
+      (is (= "P1M" (default-granularity {:filters [(time-dim (d 2016 1 1) (d 2016 4 1))]}))))))

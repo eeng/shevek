@@ -9,6 +9,7 @@
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
+            [shevek.schemas.conversion :refer [splits]]
             [cuerdas.core :as str]
             [shevek.viewer.url :refer [store-viewer-in-url]]))
 
@@ -20,45 +21,45 @@
             (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer))))))
 
 (defn- adjust-viztype [{:keys [viewer] :as db}]
-  (let [{old-viztype :viztype split :split} viewer
+  (let [{old-viztype :viztype} viewer
         new-viztype (cond
-                      (and (= old-viztype :totals) (seq split)) :table
-                      (empty? split) :totals
+                      (and (= old-viztype :totals) (seq (splits viewer))) :table
+                      (empty? (splits viewer)) :totals
                       :else old-viztype)]
     (assoc-in db [:viewer :viztype] new-viztype)))
 
-(defevhi :split-dimension-added [{:keys [viewer] :as db} dim]
+(defevhi :split-dimension-added [{:keys [viewer row-splits] :as db} dim]
   {:after [store-viewer-in-url]}
-  (let [limit (when (seq (:split viewer)) 5)]
-    (-> (update-in db [:viewer :split] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
+  (let [limit (when (seq row-splits) 5)]
+    (-> (update-in db [:viewer :row-splits] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
         adjust-viztype
         send-main-query)))
 
 (defevhi :split-replaced [db dim]
   {:after [close-popup store-viewer-in-url]}
-  (-> (assoc-in db [:viewer :split] [(init-splitted-dim dim db)])
+  (-> (assoc-in db [:viewer :row-splits] [(init-splitted-dim dim db)])
       adjust-viztype
       send-main-query))
 
 (defevhi :split-dimension-replaced [db old-dim new-dim]
   {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :split] replace-dimension old-dim (init-splitted-dim new-dim db))
+  (-> (update-in db [:viewer :row-splits] replace-dimension old-dim (init-splitted-dim new-dim db))
       send-main-query))
 
 (defevhi :split-dimension-removed [db dim]
   {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :split] remove-dimension dim)
+  (-> (update-in db [:viewer :row-splits] remove-dimension dim)
       adjust-viztype
       send-main-query))
 
 (defevhi :split-options-changed [db dim opts]
   {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :split] replace-dimension (merge dim opts))
+  (-> (update-in db [:viewer :row-splits] replace-dimension (merge dim opts))
       send-main-query))
 
 (defevhi :splits-sorted-by [db sort-bys descending]
   {:after [store-viewer-in-url]}
-  (-> (update-in db [:viewer :split]
+  (-> (update-in db [:viewer :row-splits]
                  (fn [splits]
                    (->> (zipmap splits sort-bys)
                         (mapv (fn [[split sort-by]]
@@ -120,6 +121,6 @@
 
 (defn split-panel []
   [:div.split.panel (droppable #(dispatch :split-dimension-added %))
-   [panel-header (t :viewer/split)]
-   (for [dim (viewer :split)]
+   [panel-header (t :viewer/row-splits)]
+   (for [dim (viewer :row-splits)]
      ^{:key (:name dim)} [split-item dim])])

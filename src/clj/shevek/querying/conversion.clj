@@ -99,7 +99,7 @@
          (merge dq))))
 
 (defn add-druid-filters [dq q]
-  (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? (:filter q))]
+  (let [[time-filters normal-filters] ((juxt filter remove) time-dimension? (:filters q))]
     (-> (assoc dq :intervals (str/join "/" (-> time-filters first :interval)))
         (assoc-if-seq :filter (to-druid-filter (->> normal-filters (filter with-value?)) q)))))
 

@@ -28,8 +28,9 @@
    :cube s/Str
    :viztype s/Str
    :measures [s/Str]
-   :filter [Filter]
-   :split [Split]
+   :filters [Filter]
+   :row-splits [Split]
+   :column-splits [Split]
    :pinboard Pinboard
    :user-id s/Str
    (s/optional-key :dashboards-ids) [s/Str]

@@ -101,7 +101,7 @@
       (let [measure (viewer :pinboard :measure)
             results (viewer :results :pinboard name)
             filtered-results (filter-matching @search (partial format-dimension dim) results)
-            filter-dim (or (find-dimension name (viewer :filter))
+            filter-dim (or (find-dimension name (viewer :filters))
                            (assoc (clean-dim dim) :operator @unfiltered-operator))]
         [:div.dimension.panel.ui.basic.segment
          (merge {:ref #(when % (adjust-max-height %))}

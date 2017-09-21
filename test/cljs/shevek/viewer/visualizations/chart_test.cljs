@@ -8,7 +8,7 @@
   (testing "labels"
     (is (submap? {:labels ["Argentina" "Brasil"]}
                  (build-chart-data {:name "added"}
-                                   {:split [{:name "country"}]
+                                   {:splits [{:name "country"}]
                                     :results [{}
                                               {:country "Argentina"}
                                               {:country "Brasil"}]}))))
@@ -18,7 +18,7 @@
       (is (= [{:data [100 200] :label "Added" :backgroundColor ["#42a5f5" "#ff7043"]}]
              (:datasets
               (build-chart-data {:name "added" :title "Added"}
-                                {:split [{:name "country"}]
+                                {:splits [{:name "country"}]
                                  :results [{:added 300}
                                            {:added 100 :country "Argentina"}
                                            {:added 200 :country "Brasil"}]
@@ -28,7 +28,7 @@
       (is (= [{:data [100 200] :label "Added" :borderColor "#42a5f5" :backgroundColor "rgba(66, 165, 245, 0.3)"}]
              (:datasets
               (build-chart-data {:name "added" :title "Added"}
-                                {:split [{:name "country"}]
+                                {:splits [{:name "country"}]
                                  :results [{:added 300}
                                            {:added 100 :country "Argentina"}
                                            {:added 200 :country "Brasil"}]
@@ -40,7 +40,7 @@
                     (:datasets
                      (build-chart-data
                       {:name "added" :title "Added"}
-                      {:split [{:name "country"} {:name "city"}]
+                      {:splits [{:name "country"} {:name "city"}]
                        :results [{}
                                  {:country "Argentina" :_results [{:added 20 :city "Santa Fe"}
                                                                   {:added 80 :city "Rafaela"}]}
@@ -55,7 +55,7 @@
                     (:datasets
                      (build-chart-data
                       {:name "added" :title "Added"}
-                      {:split [{:name "country"} {:name "city"}]
+                      {:splits [{:name "country"} {:name "city"}]
                        :results [{}
                                  {:country "Argentina" :_results [{:added 30 :city "Santa Fe"}
                                                                   {:added 80 :city "Rafaela"}

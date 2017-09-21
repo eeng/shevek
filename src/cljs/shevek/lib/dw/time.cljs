@@ -42,8 +42,8 @@
                    (if (str/starts-with? (name period) "latest") :minute :day))]
     (format-interval (to-interval period max-time) formatter)))
 
-(defn effective-interval [{:keys [filter cube]}]
-  (let [{:keys [period interval]} (time-dimension filter)]
+(defn effective-interval [{:keys [filters cube]}]
+  (let [{:keys [period interval]} (time-dimension filters)]
     (if period
       (to-interval period (:max-time cube))
       [(first interval) (d/end-of-day (second interval))])))

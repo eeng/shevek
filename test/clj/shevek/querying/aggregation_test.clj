@@ -12,9 +12,9 @@
       (with-redefs [druid/send-query (fn [_ dq] (swap! queries-sent conj dq) [])]
         (query dw
                {:cube "wikiticker"
-                :split [{:name "page"}]
+                :splits [{:name "page"}]
                 :measures [{:name "count" :expression "(sum $count)"}]
-                :filter [{:interval ["2015-09-12" "2015-09-13"]}]
+                :filters [{:interval ["2015-09-12" "2015-09-13"]}]
                 :totals true})
         (is (submaps? [{:queryType "timeseries" :granularity "all"}
                        {:queryType "topN" :dimension "page"}]
@@ -37,9 +37,9 @@
                        {:country "Brasil" :count 2 :_results [{:city "Rio de Janerio" :count 5}]}]
                       (query dw
                              {:cube "wikiticker"
-                              :split [{:name "country"} {:name "city"}]
+                              :splits [{:name "country"} {:name "city"}]
                               :measures [{:name "count" :expression "(sum $count)"}]
-                              :filter [{:interval ["2015-09-12" "2015-09-13"]}]})))
+                              :filters [{:interval ["2015-09-12" "2015-09-13"]}]})))
         (is (submaps? [{:queryType "topN" :dimension "country"}
                        {:queryType "topN" :dimension "city"
                         :filter {:dimension "country" :type "selector" :value "Argentina"}}
@@ -60,10 +60,10 @@
              :else []))]
         (query dw
                {:cube "wikiticker"
-                :split [{:name "__time" :granularity "PT12H"} {:name "country"}]
+                :splits [{:name "__time" :granularity "PT12H"} {:name "country"}]
                 :measures [{:name "count" :expression "(sum $count)"}]
-                :filter [{:interval ["2015-09-01" "2015-09-01"]}
-                         {:name "country" :operator "is" :value "Argentina"}]})
+                :filters [{:interval ["2015-09-01" "2015-09-01"]}
+                          {:name "country" :operator "is" :value "Argentina"}]})
         (is (submaps? [{:queryType "timeseries"}
                        {:queryType "topN" :dimension "country"
                         :intervals "2015-09-01T00:00:00.000Z/2015-09-01T12:00:00.000Z"

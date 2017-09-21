@@ -10,11 +10,11 @@
                   :granularity {:type "all"}
                   :intervals "2015/2016"}
                  (to-druid-query {:cube "wikiticker"
-                                  :filter [{:interval ["2015" "2016"]}]}))))
+                                  :filters [{:interval ["2015" "2016"]}]}))))
 
   (testing "other filters should work exactly the same as the normal query"
     (is (submap? {:filter {:dimension "isRobot" :type "selector" :value "true"}}
-                 (to-druid-query {:filter [{:name "isRobot" :operator "is" :value "true"}]}))))
+                 (to-druid-query {:filters [{:name "isRobot" :operator "is" :value "true"}]}))))
 
   (testing "should pass through the paging spec or use a default with limit 100"
     (is (submap? {:pagingSpec {:threshold 100 :fromNext true}}

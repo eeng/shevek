@@ -18,19 +18,19 @@
     (is (= [{:name "time" :period "current-day"}
             {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
             {:name "page" :operator "exclude" :value [nil]}]
-           (-> {:filter [{:name "time" :type "..." :period :current-day}
-                         {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
-                         {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
-               viewer->report :filter))))
+           (-> {:filters [{:name "time" :type "..." :period :current-day}
+                          {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
+                          {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
+               viewer->report :filters))))
 
   (testing "in each split should store only the dimension name besides its own fields"
     (is (= [{:name "page" :limit 10 :sort-by {:name "page" :descending true}}
             {:name "time" :granularity "P1D" :sort-by {:name "count" :descending false}}]
-           (-> {:split [{:name "page" :type "t" :limit 10
-                         :sort-by {:name "page" :type "t" :descending true}}
-                        {:name "time" :type "t" :granularity "P1D" :column "..." :extraction "..."
-                         :sort-by {:name "count" :type "t" :expression "e" :format "f" :descending false :favorite true}}]}
-               viewer->report :split))))
+           (-> {:row-splits [{:name "page" :type "t" :limit 10
+                              :sort-by {:name "page" :type "t" :descending true}}
+                             {:name "time" :type "t" :granularity "P1D" :column "..." :extraction "..."
+                              :sort-by {:name "count" :type "t" :expression "e" :format "f" :descending false :favorite true}}]}
+               viewer->report :row-splits))))
 
   (testing "should convert the pinboard"
     (is (= {:measure "count"
@@ -51,12 +51,12 @@
     (is (= [{:name "time" :title "Fecha" :period :current-day}
             {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
             {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
-           (-> {:filter [{:name "time" :period "current-day"}
-                         {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
-                         {:name "page" :operator "exclude" :value [nil]}]}
+           (-> {:filters [{:name "time" :period "current-day"}
+                          {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
+                          {:name "page" :operator "exclude" :value [nil]}]}
                (report->viewer {:dimensions [{:name "time" :title "Fecha"}
                                              {:name "page" :title "Pag"}]})
-               :filter))))
+               :filters))))
 
   (testing "should converted back the pinboard with the info in the cube"
     (is (= {:measure {:name "count" :type "longSum"}
