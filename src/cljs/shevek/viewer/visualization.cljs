@@ -7,20 +7,19 @@
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.visualizations.totals :refer [totals-visualization]]
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]
-            [shevek.viewer.visualizations.chart :refer [chart-visualization]]
-            [shevek.schemas.conversion :refer [splits]]))
+            [shevek.viewer.visualizations.chart :refer [chart-visualization]]))
 
-(defn visualization [{:keys [results measures viztype] :as viz}]
+(defn visualization [{:keys [results measures viztype splits] :as viz}]
   (when results ; Results are nil until first query finish
     [:div.visualization
      (cond
        (empty? measures)
        [warning (t :viewer/no-measures)]
 
-       (and (empty? results) (seq (splits viz)))
+       (and (empty? results) (seq splits))
        [warning (t :viewer/no-results)]
 
-       (and (not= viztype :totals) (empty? (splits viz)))
+       (and (not= viztype :totals) (empty? splits))
        [warning (t :viewer/split-required (translation :viewer.viztype viztype))]
 
        :else

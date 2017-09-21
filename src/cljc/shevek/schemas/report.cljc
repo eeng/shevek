@@ -29,8 +29,7 @@
    :viztype s/Str
    :measures [s/Str]
    :filters [Filter]
-   :row-splits [Split]
-   :column-splits [Split]
+   :splits [Split]
    :pinboard Pinboard
    :user-id s/Str
    (s/optional-key :dashboards-ids) [s/Str]

@@ -40,7 +40,7 @@
     (rpc/loading db results-keys)))
 
 (defevh :visualization/query-executed [db results results-keys viewer]
-  (let [viz (-> (select-keys viewer [:viztype :row-splits :measures])
+  (let [viz (-> (select-keys viewer [:viztype :splits :measures])
                 (assoc :results results))]
     (-> (assoc-in db results-keys viz)
         (rpc/loaded results-keys))))
@@ -62,7 +62,7 @@
 (defn send-pinned-dim-query [{:keys [viewer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (:cube viewer)
                    :filters (remove-dim-unless-time dim (:filters viewer))
-                   :row-splits [dim]
+                   :splits [dim]
                    :measures (vector (get-in viewer [:pinboard :measure]))}
                   search-filter (update :filters add-dimension search-filter))]
     (send-query db q [:pinboard name])))

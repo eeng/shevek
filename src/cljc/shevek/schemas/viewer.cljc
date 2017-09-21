@@ -51,7 +51,7 @@
 ; A visualization is build when viewer results arrived, represents all the necessary data to render the visualization component. It maintains a copy of the split and measures so the component doesn't get rendered while executing query.
 (s/defschema Visualization
   {:viztype s/Keyword ; The viztype needs to be copied from the viewer here for the case when a dim is added to the split and change the viztype. We want to change viztype button inmediately but the viztype in the visualization only when results arrive.
-   :row-splits [Split]
+   :splits [Split]
    :measures [Measure]
    :results [Result]})
 
@@ -60,8 +60,7 @@
    (s/optional-key :viztype) s/Keyword
    (s/optional-key :filters) Filters
    (s/optional-key :raw-data-filter) Filters
-   (s/optional-key :row-splits) [Split]
-   (s/optional-key :column-splits) [Split]
+   (s/optional-key :splits) [Split]
    (s/optional-key :measures) [Measure]
    (s/optional-key :pinboard) Pinboard
    (s/optional-key :results) {(s/optional-key :filter) {s/Str [Result]}

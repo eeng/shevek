@@ -2,8 +2,7 @@
   (:require [cljsjs.chartjs]
             [reagent.core :as r]
             [shevek.viewer.shared :refer [format-dimension dimension-value format-measure]]
-            [shevek.i18n :refer [t]]
-            [shevek.schemas.conversion :refer [splits]]))
+            [shevek.i18n :refer [t]]))
 
 (def colors
   (cycle ["#42a5f5" "#ff7043" "#9ccc65" "#ffca28" "#8d6e63" "#5c6bc0" "#ef5350" "#66bb6a" "#ffee58"
@@ -102,13 +101,12 @@
 
 ; Chart.js doesn't allow to update the type so we need to remount on viztype change, hence that :key.
 ; Also when split count change because the tooltips title callbacks are installed only on mount
-(defn chart-visualization [{:keys [measures viztype] :as viz}]
-  (let [{:keys [splits] :as viz} (assoc viz :splits (splits viz))]
-    (if (> (count splits) 2)
-      [:div.icon-hint
-       [:i.warning.circle.icon]
-       [:div.text (t :viewer/too-many-splits-for-chart)]]
-      [:div.charts
-       (for [{:keys [name] :as measure} measures]
-         [:div.chart-container {:key name :ref #(when % (set-chart-height % (count measures)))}
-          ^{:key (str viztype (count splits))} [chart measure viz]])])))
+(defn chart-visualization [{:keys [measures viztype splits] :as viz}]
+  (if (> (count splits) 2)
+    [:div.icon-hint
+     [:i.warning.circle.icon]
+     [:div.text (t :viewer/too-many-splits-for-chart)]]
+    [:div.charts
+     (for [{:keys [name] :as measure} measures]
+       [:div.chart-container {:key name :ref #(when % (set-chart-height % (count measures)))}
+        ^{:key (str viztype (count splits))} [chart measure viz]])]))

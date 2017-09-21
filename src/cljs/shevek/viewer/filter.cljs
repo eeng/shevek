@@ -67,7 +67,7 @@
   (send-query db {:cube (viewer :cube)
                   :filters (cond-> [(first (viewer :filters))]
                                    (seq search) (conj (assoc dim :operator "search" :value search)))
-                  :row-splits [(assoc dim :limit 50)]
+                  :splits [(assoc dim :limit 50)]
                   :measures [{:expression "(count)" :name "rowCount"}]}
               [:filter name]))
 
