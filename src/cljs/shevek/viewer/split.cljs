@@ -15,6 +15,7 @@
 (defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
   (let [first-measure (or (-> viewer :measures first) (-> viewer :cube :measures first))]
     (cond-> (assoc (clean-dim dim)
+                   :on "rows"
                    :limit (or limit (and (time-dimension? dim) 1000) 50)
                    :sort-by (or sort-by (assoc first-measure :descending (not (time-dimension? dim)))))
             (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer))))))
@@ -68,13 +69,21 @@
 (def granularities {"PT5M" "5m", "PT1H" "1H", "P1D" "1D", "P1W" "1W", "P1M" "1M"})
 
 (defn- split-popup [dim]
-  (let [opts (r/atom (select-keys dim [:limit :sort-by :granularity]))
+  (let [opts (r/atom (select-keys dim [:on :limit :sort-by :granularity]))
         posible-sort-bys (conj (current-cube :measures) (clean-dim dim))]
     (fn [dim]
       (let [desc (get-in @opts [:sort-by :descending])
-            current-granularity (@opts :granularity)]
+            {:keys [current-granularity on]} @opts]
         [:div.split.popup
          [:div.ui.form
+          [:div.field
+           [:label (t :viewer/split-on)]
+           [:div.ui.two.small.basic.buttons
+            (for [[split-on title] [["rows" (t :viewer/rows)] ["columns" (t :viewer/columns)]]]
+              [:button.ui.button {:key split-on
+                                  :class (when (= on split-on) "active")
+                                  :on-click #(swap! opts assoc :on split-on)}
+               title])]]
           (when (time-dimension? dim)
             [:div.field.periods
              [:label (t :viewer/granularity)]
@@ -109,10 +118,11 @@
 ; The button has to be a link otherwise Firefox wouldn't fire the click event on the icon
 (defn- split-item [_]
   (let [timestamp (js/Date.)]
-    (fn [{:keys [title] :as dim}]
+    (fn [{:keys [title on] :as dim}]
       (let [popup-key (-> dim (assoc :timestamp timestamp) hash)]
-        [:a.ui.orange.compact.right.labeled.icon.button
-         (merge {:on-click #(show-popup % ^{:key popup-key} [split-popup dim] {:position "bottom center"})}
+        [:a.ui.compact.right.labeled.icon.button
+         (merge {:on-click #(show-popup % ^{:key popup-key} [split-popup dim] {:position "bottom center"})
+                 :class (if (= on "columns") "purple" "orange")}
                 (draggable dim)
                 (droppable #(dispatch :split-dimension-replaced dim %)))
          [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]

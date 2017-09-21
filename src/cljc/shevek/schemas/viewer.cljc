@@ -15,6 +15,7 @@
 (s/defschema Split
   (assoc Dimension
          :limit s/Int
+         (s/optional-key :on) (s/enum "rows" "columns")
          (s/optional-key :sort-by) SortBy
          (s/optional-key :granularity) s/Str))
 

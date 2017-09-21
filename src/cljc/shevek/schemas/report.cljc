@@ -8,6 +8,7 @@
 (s/defschema Split
   {:name s/Str
    :limit s/Num
+   :on s/Str
    (s/optional-key :sort-by) SortBy
    (s/optional-key :granularity) s/Str})
 
