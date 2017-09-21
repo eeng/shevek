@@ -28,6 +28,7 @@
 (s/defschema Split
   {:name s/Str
    (s/optional-key :type) s/Str ; Needed for dimension sorting
+   (s/optional-key :on) (s/enum "rows" "columns")
    (s/optional-key :limit) s/Int
    (s/optional-key :sort-by) SortBy
    (s/optional-key :granularity) s/Str

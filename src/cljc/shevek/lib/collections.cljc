@@ -9,9 +9,12 @@
 (defn find-by [key value coll]
   (detect #(= (get % key) value) coll))
 
-(defn assoc-if-seq [map key val]
-  (cond-> map
-          (seq val) (assoc key val)))
+(defn assoc-if-seq [m & entries]
+  (reduce (fn [m [key val]]
+            (cond-> m
+                    (seq val) (assoc key val)))
+          m
+          (partition 2 entries)))
 
 (defn sequential-or-set? [x]
   (or (sequential? x) (set? x)))

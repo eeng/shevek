@@ -1,6 +1,6 @@
 (ns shevek.querying.aggregation
   (:require [shevek.lib.collections :refer [assoc-if-seq find-by]]
-            [shevek.lib.druid-driver :refer [send-query]]
+            [shevek.lib.druid-driver :as driver]
             [shevek.lib.dates :refer [plus-period]]
             [shevek.lib.dw.dims :refer [time-dimension?]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
@@ -8,9 +8,14 @@
             [schema.core :as s]
             [com.rpl.specter :refer [setval ALL]]))
 
-(defn- send-query-and-simplify-results [dw q]
+(defn- row-split? [{:keys [on] :or {on "rows"}}]
+  (= on "rows"))
+
+(def column-split? (comp not row-split?))
+
+(defn- send-query [dw q]
   (let [dq (to-druid-query q)
-        dr (send-query dw dq)]
+        dr (driver/send-query dw dq)]
     (from-druid-results q dq dr)))
 
 (defn- add-filter-for-dim [filters {:keys [name granularity] :as dim} result]
@@ -20,19 +25,32 @@
               [dim-value (plus-period dim-value granularity)] filters)
       (conj filters (assoc dim :operator "is" :value dim-value)))))
 
-(defn- send-queries-for-splits [dw {:keys [splits filters] :as q}]
-  (let [[dim & dims] splits]
+(defn- resolve-col-splits [dw {:keys [splits filters] :as q}]
+  (let [[dim & dims] (filter column-split? splits)
+        filtered-query #(assoc q :splits %1 :filters (add-filter-for-dim filters dim %2))]
     (when dim
-      (->> (send-query-and-simplify-results dw (assoc q :dimension dim))
-           (pmap #(assoc-if-seq % :child-rows
-                    (send-queries-for-splits dw
-                      (assoc q :splits dims
-                               :filters (add-filter-for-dim filters dim %)))))
+      (->> (send-query dw (assoc q :dimension dim))
+           (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw (filtered-query dims %))))
            doall))))
 
+(defn- resolve-row-splits [dw {:keys [splits filters] :as q}]
+  (let [[row-splits col-splits] ((juxt filter remove) row-split? splits)
+        [dim & dims] row-splits
+        filtered-query #(assoc q :splits %1 :filters (add-filter-for-dim filters dim %2))
+        nested-child-rows #(resolve-row-splits dw (filtered-query (concat dims col-splits) %))
+        nested-child-cols #(resolve-col-splits dw (filtered-query col-splits %))]
+    (when dim
+      (->> (send-query dw (assoc q :dimension dim))
+           (pmap #(assoc-if-seq % :child-rows (nested-child-rows %) :child-cols (nested-child-cols %)))
+           doall))))
+
+(defn- resolve-totals [dw q]
+  (->> (send-query dw q)
+       (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw q)))))
+
 (s/defn query [dw {:keys [cube totals] :as q} :- Query]
-  (concat (if totals (send-query-and-simplify-results dw q) [])
-          (send-queries-for-splits dw q)))
+  (concat (if totals (resolve-totals dw q) [])
+          (resolve-row-splits dw q)))
 
 ;; Examples
 
@@ -124,3 +142,23 @@
           :measures [{:name "count" :expression "(sum $count)"}]
           :filters [{:interval ["2015-09-12" "2015-09-13"]}]
           :time-zone "Europe/Paris"})
+
+; Column split
+#_(query shevek.dw/dw
+         {:cube "wikiticker"
+          :splits [{:name "isUnpatrolled" :limit 2 :on "columns"}]
+          :measures [{:name "count" :expression "(sum $count)"}]
+          :filters [{:interval ["2015-09-12" "2015-09-13"]}]
+          :totals true})
+
+; Two row splits, one column split and one measure
+#_(query shevek.dw/dw
+         {:cube "wikiticker"
+          :splits [{:name "countryName" :limit 2 :on "rows"}
+                   {:name "cityName" :limit 2 :on "rows"}
+                   {:name "isUnpatrolled" :limit 2 :on "columns"}]
+          :measures [{:name "count" :expression "(sum $count)"}]
+          :filters [{:interval ["2015-09-12" "2015-09-13"]}
+                    {:name "countryName" :operator "exclude" :value #{nil}}
+                    {:name "cityName" :operator "exclude" :value #{nil}}]
+          :totals true})
