@@ -5,8 +5,7 @@
             [shevek.reflow.core :as reflow]
             [shevek.reflow.interceptors :as i]
             [shevek.lib.error]
-            [shevek.navigation :refer [init-navigation]]
-            [cljsjs.jquery]))
+            [shevek.navigation :refer [init-navigation]]))
 
 (defn init-reflow []
   (reflow/init (-> (i/router) (i/logger) (schema/checker)))
