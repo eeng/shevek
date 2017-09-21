@@ -65,9 +65,9 @@
                :class "large raw-data"
                :js-opts {:observeChanges false}})
   (let [viewer (cond-> viewer
-                       selected-path (update :filter merge-dimensions (selected-path->filters selected-path "include")))
+                       selected-path (update :filters merge-dimensions (selected-path->filters selected-path "include")))
         q (-> (viewer->raw-query viewer)
               (assoc-in [:paging :threshold] limit))]
     (rpc/call "querying/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
-    (-> (assoc-in db [:viewer :raw-data-filter] (:filter viewer))
+    (-> (assoc-in db [:viewer :raw-data-filter] (:filters viewer))
         (rpc/loading [:viewer :results :raw]))))
