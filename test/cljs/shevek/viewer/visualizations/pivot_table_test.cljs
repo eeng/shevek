@@ -5,7 +5,7 @@
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]))
 
 (deftest table-visualization-tests
-  (testing "one dimension and two measures"
+  (testing "one dimension on rows and two measures"
     (render-component
      [table-visualization {:measures [{:name "count" :title "Cantidad"}
                                       {:name "delta" :title "Delta"}]
@@ -19,7 +19,7 @@
             ["Argentina" "100" "0.3"]]
            (texts ".pivot-table tbody tr" "td"))))
 
-  (testing "two dimensions"
+  (testing "two dimensions on rows"
     (render-component
      [table-visualization {:splits [{:name "country" :title "Country"} {:name "city" :title "City"}]
                            :measures [{:name "count" :title "Count"}]
@@ -34,6 +34,44 @@
             ["Toronto" "70"]
             ["Argentina" "100"]
             ["Santa Fe" "100"]]
+           (texts ".pivot-table tr" "th,td"))))
+
+  (testing "one dimension on rows, one on columns and one measure"
+    (render-component
+     [table-visualization {:measures [{:name "count" :title "Count"}]
+                           :splits [{:name "country" :title "Country" :on "rows"}
+                                    {:name "isRobot" :title "Is Robot" :on "columns"}]
+                           :results [{:count 300 :_results [{:count 210 :isRobot "Yes"}
+                                                            {:count 90 :isRobot "No"}]}
+                                     {:count 200 :country "Chile" :_results [{:count 130 :isRobot "Yes"}
+                                                                             {:count 70 :isRobot "No"}]}
+                                     {:count 100 :country "Brasil" :_results [{:count 80 :isRobot "Yes"}
+                                                                              {:count 20 :isRobot "No"}]}]}])
+    (is (= [["Count" "Is Robot"]
+            ["Country" "Yes" "No" "Total"]
+            ["Total" "210" "90" "300"]
+            ["Chile" "130" "70" "200"]
+            ["Brasil" "80" "20" "100"]]
+           (texts ".pivot-table tr" "th,td"))))
+
+  (testing "one dimension on rows, one on columns and two measure"
+    (render-component
+     [table-visualization {:measures [{:name "m1" :title "M1"}
+                                      {:name "m2" :title "M2"}]
+                           :splits [{:name "country" :title "Country" :on "rows"}
+                                    {:name "isRobot" :title "Is Robot" :on "columns"}]
+                           :results [{:m1 300 :m2 30 :_results [{:m1 210 :m2 21 :isRobot "Yes"}
+                                                                {:m1 90 :m2 9 :isRobot "No"}]}
+                                     {:m1 200 :m2 20 :country "Chile" :_results [{:m1 130 :m2 13 :isRobot "Yes"}
+                                                                                 {:m1 70 :m2 7 :isRobot "No"}]}
+                                     {:m1 100 :m2 10 :country "Brasil" :_results [{:m1 80 :m2 8 :isRobot "Yes"}
+                                                                                  {:m1 20 :m2 2 :isRobot "No"}]}]}])
+    (is (= [["" "Is Robot"]
+            ["" "Yes" "No" "Total"]
+            ["Country" "M1" "M2" "M1" "M2" "Total M1" "Total M2"]
+            ["Total" "210" "21" "90" "9" "300" "30"]
+            ["Chile" "130" "13" "70" "7" "200" "20"]
+            ["Brasil" "80" "8" "20" "2" "100" "10"]]
            (texts ".pivot-table tr" "th,td"))))
 
   (testing "measure formatting"
