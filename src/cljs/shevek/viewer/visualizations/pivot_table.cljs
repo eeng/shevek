@@ -30,21 +30,22 @@
     [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
 
 (defn- table-row [result dim depth measures max-values value-result-path]
-  (let [selected-path (map (fn [[d r]] [d (dimension-value d r)]) value-result-path)
-        row-key (hash selected-path)
-        totals-row (totals-result? result dim)]
-    [:tr {:on-click #(when (and (not totals-row) (current-page? :viewer))
-                       (show-popup % ^{:key (hash result)} [row-popup dim result selected-path]
+  (let [totals-row? (totals-result? result dim)
+        simplified-path (map (fn [[{:keys [name]} value]] [(if totals-row? "GRAND_TOTAL" name) value]) value-result-path)
+        row-key (hash simplified-path)]
+    [:tr {:on-click #(when (and (not totals-row?) (current-page? :viewer))
+                       (show-popup % ^{:key (hash result)} [row-popup dim result value-result-path]
                                    {:position "top center" :distanceAway 135 :setFluidWidth true
                                     :class "pivot-table-popup" :id row-key}))
-          :class (when (and (not totals-row) (popup-opened? row-key)) "active")}
+          :class (when (and (not totals-row?) (popup-opened? row-key)) "active")
+          :key row-key}
      [:td
       [:div {:class (str "depth-" depth)} (format-dimension dim result)]]
      (for [measure measures
            :let [measure-name (-> measure :name keyword)
                  measure-value (measure-name result)]]
        [:td.right.aligned {:key measure-name}
-        [:div.bg (when-not totals-row
+        [:div.bg (when-not totals-row?
                    {:class (when (neg? measure-value) "neg")
                     :style {:width (calculate-rate measure-value (max-values measure-name))}})]
         (format-measure measure result)])]))
@@ -55,9 +56,10 @@
   ([results [dim & dims] depth measures max-values value-result-path]
    (when dim
      (mapcat (fn [result]
-               (let [new-path (conj value-result-path [dim result])]
-                 (into [(table-row result dim depth measures max-values new-path)]
-                       (table-rows (:_results result) dims (inc depth) measures max-values new-path))))
+               (let [new-path (conj value-result-path [dim (dimension-value dim result)])
+                     parent-row (table-row result dim depth measures max-values new-path)
+                     child-rows (table-rows (:_results result) dims (inc depth) measures max-values new-path)]
+                 (into [parent-row] child-rows)))
              results))))
 
 (defn- calculate-max-values [measures results]
@@ -89,4 +91,5 @@
       [sortable-th (->> split (map :title) (str/join ", ")) split split]
       (for [{:keys [name title] :as measure} measures]
         ^{:key name} [sortable-th title (repeat (count split) measure) split {:class "right aligned"}])]
-     (into [:tbody] (table-rows results split 0 measures max-values))]))
+     [:tbody
+      (doall (table-rows results split 0 measures max-values))]]))
