@@ -42,9 +42,9 @@
                       {:name "added" :title "Added"}
                       {:splits [{:name "country"} {:name "city"}]
                        :results [{}
-                                 {:country "Argentina" :_results [{:added 20 :city "Santa Fe"}
+                                 {:country "Argentina" :child-rows [{:added 20 :city "Santa Fe"}
                                                                   {:added 80 :city "Rafaela"}]}
-                                 {:country "Brasil" :_results [{:added 160 :city "Sao Paulo"}
+                                 {:country "Brasil" :child-rows [{:added 160 :city "Sao Paulo"}
                                                                {:added 40 :city "Brasilia"}]}]
                        :viztype :bar-chart})))))
 
@@ -57,8 +57,8 @@
                       {:name "added" :title "Added"}
                       {:splits [{:name "country"} {:name "city"}]
                        :results [{}
-                                 {:country "Argentina" :_results [{:added 30 :city "Santa Fe"}
+                                 {:country "Argentina" :child-rows [{:added 30 :city "Santa Fe"}
                                                                   {:added 80 :city "Rafaela"}
                                                                   {:added 25 :city "Ceres"}]}
-                                 {:country "Brasil" :_results '({:added 70 :city "Sao Paulo"}
+                                 {:country "Brasil" :child-rows '({:added 70 :city "Sao Paulo"}
                                                                 {:added 40 :city "Brasilia"})}]})))))))

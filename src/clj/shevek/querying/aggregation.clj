@@ -24,7 +24,7 @@
   (let [[dim & dims] splits]
     (when dim
       (->> (send-query-and-simplify-results dw (assoc q :dimension dim))
-           (pmap #(assoc-if-seq % :_results
+           (pmap #(assoc-if-seq % :child-rows
                     (send-queries-for-splits dw
                       (assoc q :splits dims
                                :filters (add-filter-for-dim filters dim %)))))

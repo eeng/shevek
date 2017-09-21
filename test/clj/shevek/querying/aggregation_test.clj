@@ -7,7 +7,7 @@
 (def dw :dw)
 
 (deftest query-test
-  (testing "query with one dimension with totals should issue two druid queries"
+  (testing "one dimension and totals should issue two druid queries"
     (let [queries-sent (atom [])]
       (with-redefs [druid/send-query (fn [_ dq] (swap! queries-sent conj dq) [])]
         (query dw
@@ -20,7 +20,7 @@
                        {:queryType "topN" :dimension "page"}]
                       @queries-sent)))))
 
-  (testing "query with two normal dimensions should issue one query for the first dim and one for each result as filter for the second dim"
+  (testing "two normal dimensions should issue one query for the first dim and one for each result as filter for the second dim"
     (let [queries-sent (atom [])]
       (with-redefs
         [druid/send-query
@@ -33,8 +33,9 @@
              [{:result [{:city "Cordoba" :count 3} {:city "Rafaela" :count 4}]}]
              (= "Brasil" (get-in dq [:filter :value]))
              [{:result [{:city "Rio de Janerio" :count 5}]}]))]
-        (is (submaps? [{:country "Argentina" :count 1 :_results [{:city "Cordoba" :count 3} {:city "Rafaela" :count 4}]}
-                       {:country "Brasil" :count 2 :_results [{:city "Rio de Janerio" :count 5}]}]
+        (is (submaps? [{:country "Argentina" :count 1 :child-rows [{:city "Cordoba" :count 3}
+                                                                   {:city "Rafaela" :count 4}]}
+                       {:country "Brasil" :count 2 :child-rows [{:city "Rio de Janerio" :count 5}]}]
                       (query dw
                              {:cube "wikiticker"
                               :splits [{:name "country"} {:name "city"}]
@@ -47,7 +48,7 @@
                         :filter {:dimension "country" :type "selector" :value "Brasil"}}]
                       (sort-by (juxt (comp not nil? :filter) (comp :value :filter)) @queries-sent))))))
 
-  (testing "query with one time and one normal dimension should issue one query for the time dim and for each result should issue another query with the interval set accordingly"
+  (testing "one time and one normal dimension should issue one query for the time dim and for each result should issue another query with the interval set accordingly"
     (let [queries-sent (atom [])]
       (with-redefs
         [druid/send-query

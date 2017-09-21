@@ -39,7 +39,7 @@
 (defn- build-datasets [measure {:keys [splits viztype results]}]
   (case (count splits)
     1 [(build-dataset-for-one-split measure results viztype)]
-    2 (let [subresults (map :_results results)
+    2 (let [subresults (map :child-rows results)
             biggest-size (->> subresults (map count) (apply max))
             filled-subresults (map #(fill-vector biggest-size %) subresults)
             transposed-subresults (apply map (fn [& args] args) filled-subresults)]

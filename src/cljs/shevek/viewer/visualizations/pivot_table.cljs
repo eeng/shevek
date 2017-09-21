@@ -58,7 +58,7 @@
      (mapcat (fn [result]
                (let [new-path (conj value-result-path [dim (dimension-value dim result)])
                      parent-row (table-row result dim depth measures max-values new-path)
-                     child-rows (table-rows (:_results result) dims (inc depth) measures max-values new-path)]
+                     child-rows (table-rows (:child-rows result) dims (inc depth) measures max-values new-path)]
                  (into [parent-row] child-rows)))
              results))))
 
