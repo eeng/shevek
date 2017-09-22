@@ -2,16 +2,11 @@
   (:require [shevek.lib.collections :refer [assoc-if-seq find-by]]
             [shevek.lib.druid-driver :as driver]
             [shevek.lib.dates :refer [plus-period]]
-            [shevek.lib.dw.dims :refer [time-dimension?]]
+            [shevek.lib.dw.dims :refer [time-dimension? partition-splits row-split? col-split?]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
             [shevek.schemas.query :refer [Query]]
             [schema.core :as s]
             [com.rpl.specter :refer [setval ALL]]))
-
-(defn- row-split? [{:keys [on] :or {on "rows"}}]
-  (= on "rows"))
-
-(def column-split? (comp not row-split?))
 
 (defn- send-query [dw q]
   (let [dq (to-druid-query q)
@@ -26,7 +21,7 @@
       (conj filters (assoc dim :operator "is" :value dim-value)))))
 
 (defn- resolve-col-splits [dw {:keys [splits filters] :as q}]
-  (let [[dim & dims] (filter column-split? splits)
+  (let [[dim & dims] (filter col-split? splits)
         filtered-query #(assoc q :splits %1 :filters (add-filter-for-dim filters dim %2))]
     (when dim
       (->> (send-query dw (assoc q :dimension dim))
@@ -34,7 +29,7 @@
            doall))))
 
 (defn- resolve-row-splits [dw {:keys [splits filters] :as q}]
-  (let [[row-splits col-splits] ((juxt filter remove) row-split? splits)
+  (let [[row-splits col-splits] (partition-splits splits)
         [dim & dims] row-splits
         filtered-query #(assoc q :splits %1 :filters (add-filter-for-dim filters dim %2))
         nested-child-rows #(resolve-row-splits dw (filtered-query (concat dims col-splits) %))
@@ -143,11 +138,12 @@
           :filters [{:interval ["2015-09-12" "2015-09-13"]}]
           :time-zone "Europe/Paris"})
 
-; Column split
+; One column split and two measures
 #_(query shevek.dw/dw
          {:cube "wikiticker"
           :splits [{:name "isUnpatrolled" :limit 2 :on "columns"}]
-          :measures [{:name "count" :expression "(sum $count)"}]
+          :measures [{:name "count" :expression "(sum $count)"}
+                     {:name "added" :expression "(sum $added)"}]
           :filters [{:interval ["2015-09-12" "2015-09-13"]}]
           :totals true})
 
@@ -161,4 +157,14 @@
           :filters [{:interval ["2015-09-12" "2015-09-13"]}
                     {:name "countryName" :operator "exclude" :value #{nil}}
                     {:name "cityName" :operator "exclude" :value #{nil}}]
+          :totals true})
+
+; Different child-cols values for different parents
+#_(query shevek.dw/dw
+         {:cube "wikiticker"
+          :filters [{:name "__time" :interval ["2015" "2016"]}
+                    {:name "countryName" :operator "include" :value #{"Italy" "United States" "Russia"}}]
+          :splits [{:name "countryName" :on "rows"}
+                   {:name "isUnpatrolled" :on "columns"}]
+          :measures [{:name "count" :expression "(sum $count)"}]
           :totals true})

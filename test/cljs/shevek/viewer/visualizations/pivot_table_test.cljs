@@ -7,71 +7,97 @@
 (deftest table-visualization-tests
   (testing "one dimension on rows and two measures"
     (render-component
-     [table-visualization {:measures [{:name "count" :title "Cantidad"}
-                                      {:name "delta" :title "Delta"}]
-                           :splits [{:name "country" :title "País"}]
-                           :results [{:count 300 :delta 0.5}
-                                     {:count 200 :delta 0.2 :country "Canada"}
-                                     {:count 100 :delta 0.3 :country "Argentina"}]}])
-    (is (= ["País" "Cantidad" "Delta"] (texts ".pivot-table thead th")))
+     [table-visualization {:measures [{:name "m1" :title "M1"}
+                                      {:name "m2" :title "M2"}]
+                           :splits [{:name "a" :title "A"}]
+                           :results [{:m1 300 :m2 0.5}
+                                     {:m1 200 :m2 0.2 :a "A1"}
+                                     {:m1 100 :m2 0.3 :a "A2"}]}])
+    (is (= ["A" "M1" "M2"] (texts ".pivot-table thead th")))
     (is (= [["Total" "300" "0.5"]
-            ["Canada" "200" "0.2"]
-            ["Argentina" "100" "0.3"]]
+            ["A1" "200" "0.2"]
+            ["A2" "100" "0.3"]]
            (texts ".pivot-table tbody tr" "td"))))
 
   (testing "two dimensions on rows"
     (render-component
-     [table-visualization {:splits [{:name "country" :title "Country"} {:name "city" :title "City"}]
-                           :measures [{:name "count" :title "Count"}]
-                           :results [{:count 300}
-                                     {:count 200 :country "Canada" :child-rows [{:count 130 :city "Vancouver"}
-                                                                                {:count 70 :city "Toronto"}]}
-                                     {:count 100 :country "Argentina" :child-rows [{:count 100 :city "Santa Fe"}]}]}])
-    (is (= [["Country, City" "Count"]
+     [table-visualization {:splits [{:name "a" :title "A"} {:name "b" :title "B"}]
+                           :measures [{:name "m" :title "M"}]
+                           :results [{:m 300}
+                                     {:m 200 :a "A1" :child-rows [{:m 130 :b "B11"}
+                                                                  {:m 70 :b "B12"}]}
+                                     {:m 100 :a "A2" :child-rows [{:m 100 :b "B21"}]}]}])
+    (is (= [["A, B" "M"]
             ["Total" "300"]
-            ["Canada" "200"]
-            ["Vancouver" "130"]
-            ["Toronto" "70"]
-            ["Argentina" "100"]
-            ["Santa Fe" "100"]]
+            ["A1" "200"]
+            ["B11" "130"]
+            ["B12" "70"]
+            ["A2" "100"]
+            ["B21" "100"]]
            (texts ".pivot-table tr" "th,td"))))
 
- #_(testing "one dimension on rows, one on columns and one measure"
+  (testing "one dimension on columns"
+     (render-component
+      [table-visualization {:measures [{:name "m" :title "M"}]
+                            :splits [{:name "a" :title "A" :on "columns"}]
+                            :results [{:m 100 :child-cols [{:m 60 :a "A1"}
+                                                           {:m 40 :a "A2"}]}]}])
+     (is (= [["A" "A1" "A2" "Total"]
+             ["" "M" "M" "M"]
+             ["Total" "60" "40" "100"]]
+            (texts ".pivot-table tr" "th,td"))))
+
+  (testing "two dimension on columns and one measure"
+     (render-component
+      [table-visualization {:measures [{:name "m" :title "M"}]
+                            :splits [{:name "a" :title "A" :on "columns"}
+                                     {:name "b" :title "B" :on "columns"}]
+                            :results [{:m 100
+                                       :child-cols [{:m 60 :a "A1" :child-cols [{:m 20 :b "B1"}
+                                                                                {:m 40 :b "B2"}]}
+                                                    {:m 40 :a "A2" :child-cols [{:m 15 :b "B1"}
+                                                                                {:m 25 :b "B2"}]}]}]}])
+     (is (= [["A" "A1"              "A2"              "Total"]
+             ["B" "B1" "B2" "Total" "B1" "B2" "Total" "Total"]
+             [""  "M"  "M"  "M"     "M"  "M"  "M"     "M"]
+             ["Total" "20" "40" "60"    "15" "25" "40"    "100"]]
+            (texts ".pivot-table tr" "th,td"))))
+
+  (testing "one dimension on rows, one on columns and one measure"
     (render-component
-     [table-visualization {:measures [{:name "count" :title "Count"}]
-                           :splits [{:name "country" :title "Country" :on "rows"}
-                                    {:name "isRobot" :title "Is Robot" :on "columns"}]
-                           :results [{:count 300 :child-rows [{:count 210 :isRobot "Yes"}
-                                                              {:count 90 :isRobot "No"}]}
-                                     {:count 200 :country "Chile" :child-rows [{:count 130 :isRobot "Yes"}
-                                                                               {:count 70 :isRobot "No"}]}
-                                     {:count 100 :country "Brasil" :child-rows [{:count 80 :isRobot "Yes"}
-                                                                                {:count 20 :isRobot "No"}]}]}])
-    (is (= [["Count" "Is Robot"]
-            ["Country" "Yes" "No" "Total"]
+     [table-visualization {:measures [{:name "m" :title "M"}]
+                           :splits [{:name "a" :title "A" :on "rows"}
+                                    {:name "b" :title "B" :on "columns"}]
+                           :results [{:m 300 :child-cols [{:m 210 :b "B1"}
+                                                          {:m 90 :b "B2"}]}
+                                     {:m 200 :a "A1" :child-cols [{:m 130 :b "B1"}
+                                                                  {:m 70 :b "B2"}]}
+                                     {:m 100 :a "B1" :child-cols [{:m 80 :b "B1"}
+                                                                  {:m 20 :b "B2"}]}]}])
+    (is (= [["B" "B1" "B2" "Total"]
+            ["A" "M"  "M"  "M"]
             ["Total" "210" "90" "300"]
-            ["Chile" "130" "70" "200"]
-            ["Brasil" "80" "20" "100"]]
+            ["A1" "130" "70" "200"]
+            ["B1" "80" "20" "100"]]
            (texts ".pivot-table tr" "th,td"))))
 
- #_(testing "one dimension on rows, one on columns and two measure"
+  (testing "one dimension on rows, one on columns and two measure"
     (render-component
      [table-visualization {:measures [{:name "m1" :title "M1"}
                                       {:name "m2" :title "M2"}]
-                           :splits [{:name "country" :title "Country" :on "rows"}
-                                    {:name "isRobot" :title "Is Robot" :on "columns"}]
-                           :results [{:m1 300 :m2 30 :child-rows [{:m1 210 :m2 21 :isRobot "Yes"}
-                                                                  {:m1 90 :m2 9 :isRobot "No"}]}
-                                     {:m1 200 :m2 20 :country "Chile" :child-rows [{:m1 130 :m2 13 :isRobot "Yes"}
-                                                                                   {:m1 70 :m2 7 :isRobot "No"}]}
-                                     {:m1 100 :m2 10 :country "Brasil" :child-rows [{:m1 80 :m2 8 :isRobot "Yes"}
-                                                                                    {:m1 20 :m2 2 :isRobot "No"}]}]}])
-    (is (= [["" "Is Robot"]
-            ["" "Yes" "No" "Total"]
-            ["Country" "M1" "M2" "M1" "M2" "Total M1" "Total M2"]
+                           :splits [{:name "a" :title "A" :on "rows"}
+                                    {:name "b" :title "B" :on "columns"}]
+                           :results [{:m1 300 :m2 30 :child-cols [{:m1 210 :m2 21 :b "B1"}
+                                                                  {:m1 90 :m2 9 :b "B2"}]}
+                                     {:m1 200 :m2 20 :a "A1" :child-cols [{:m1 130 :m2 13 :b "B1"}
+                                                                          {:m1 70 :m2 7 :b "B2"}]}
+                                     {:m1 100 :m2 10 :a "A2" :child-cols [{:m1 80 :m2 8 :b "B1"}
+                                                                          {:m1 20 :m2 2 :b "B2"}]}]}])
+    (is (= [["B" "B1" "B2" "Total"]
+            ["A" "M1" "M2" "M1" "M2" "M1" "M2"]
             ["Total" "210" "21" "90" "9" "300" "30"]
-            ["Chile" "130" "13" "70" "7" "200" "20"]
-            ["Brasil" "80" "8" "20" "2" "100" "10"]]
+            ["A1" "130" "13" "70" "7" "200" "20"]
+            ["A2" "80" "8" "20" "2" "100" "10"]]
            (texts ".pivot-table tr" "th,td"))))
 
   (testing "measure formatting"

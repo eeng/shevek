@@ -8,7 +8,7 @@
   (agg/query :dw q))
 
 (deftest query-test
-  (testing "one dimension and totals should issue two druid queries"
+  (testing "totals and one row split"
     (let [queries-sent (atom [])]
       (with-redefs [druid/send-query (fn [_ dq] (swap! queries-sent conj dq) [])]
         (query {:cube "wikiticker"
@@ -20,7 +20,7 @@
                        {:queryType "topN" :dimension "page"}]
                       @queries-sent)))))
 
-  (testing "two normal dimensions should issue one query for the first dim and one for each result as filter for the second dim"
+  (testing "two row splits"
     (let [queries-sent (atom [])]
       (with-redefs
         [druid/send-query
@@ -47,7 +47,7 @@
                         :filter {:dimension "country" :type "selector" :value "Brasil"}}]
                       (sort-by (juxt (comp not nil? :filter) (comp :value :filter)) @queries-sent))))))
 
-  (testing "one time and one normal dimension should issue one query for the time dim and for each result should issue another query with the interval set accordingly"
+  (testing "one time and one normal dimension on rows"
     (let [queries-sent (atom [])]
       (with-redefs
         [druid/send-query

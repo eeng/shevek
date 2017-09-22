@@ -87,7 +87,7 @@
     (cond-> value
             format (num/format format))))
 
-(defn- totals-result? [result dim]
+(defn totals-result? [result dim]
   (not (contains? result (-> dim :name keyword))))
 
 (defn format-dim-value [value {:keys [granularity name type] :as dim}]

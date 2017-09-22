@@ -51,3 +51,11 @@
 
 (defn numeric-dim? [{:keys [type]}]
   (some #{"LONG" "FLOAT"} [type]))
+
+(defn row-split? [{:keys [on] :or {on "rows"}}]
+  (= on "rows"))
+
+(def col-split? (comp not row-split?))
+
+(defn partition-splits [splits]
+  ((juxt filter remove) row-split? splits))

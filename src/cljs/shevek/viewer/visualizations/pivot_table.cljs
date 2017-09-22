@@ -6,13 +6,8 @@
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
-            [shevek.viewer.filter :refer [build-filter]]))
-
-(defn- calculate-rate [measure-value max-value]
-  (let [rate (if (zero? max-value)
-               0
-               (/ measure-value max-value))]
-    (str (* (Math/abs rate) 100) "%")))
+            [shevek.viewer.filter :refer [build-filter]]
+            [shevek.lib.dw.dims :refer [partition-splits]]))
 
 (defn- row-popup [dim result selected-path]
   [:div
@@ -29,38 +24,47 @@
      (t :raw-data/button)]
     [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
 
-(defn- table-row [result dim depth measures max-values value-result-path]
+(defn- proportion-bg [measure-value max-value]
+  (let [rate (if (zero? max-value) 0 (/ measure-value max-value))
+        width (str (* (Math/abs rate) 100) "%")]
+    [:div.bg {:class (when (neg? measure-value) "neg")
+              :style {:width width}}]))
+
+(defn- recursive-self-and-children [result]
+  (concat (mapcat recursive-self-and-children (:child-cols result)) [result]))
+
+(defn- table-row [result dim {:keys [measures max-values]} value-result-path]
   (let [totals-row? (totals-result? result dim)
         simplified-path (map (fn [[{:keys [name]} value]] [(if totals-row? "GRAND_TOTAL" name) value]) value-result-path)
-        row-key (hash simplified-path)]
-    [:tr {:on-click #(when (and (not totals-row?) (current-page? :viewer))
-                       (show-popup % ^{:key (hash result)} [row-popup dim result value-result-path]
-                                   {:position "top center" :distanceAway 135 :setFluidWidth true
-                                    :class "pivot-table-popup" :id row-key}))
-          :class (when (and (not totals-row?) (popup-opened? row-key)) "active")
-          :key row-key}
-     [:td
-      [:div {:class (str "depth-" depth)} (format-dimension dim result)]]
-     (for [measure measures
+        row-key (hash simplified-path)
+        depth (dec (count value-result-path))]
+    (into
+     [:tr {:on-click #(when (and (not totals-row?) (current-page? :viewer))
+                        (show-popup % ^{:key (hash result)} [row-popup dim result value-result-path]
+                                    {:position "top center" :distanceAway 135 :setFluidWidth true
+                                     :class "pivot-table-popup" :id row-key}))
+           :class (when (and (not totals-row?) (popup-opened? row-key)) "active")
+           :key row-key}
+      [:td
+       [:div {:class (str "depth-" depth)} (format-dimension dim result)]]]
+     (for [result (recursive-self-and-children result)
+           measure measures
            :let [measure-name (-> measure :name keyword)
                  measure-value (measure-name result)]]
-       [:td.right.aligned {:key measure-name}
-        [:div.bg (when-not totals-row?
-                   {:class (when (neg? measure-value) "neg")
-                    :style {:width (calculate-rate measure-value (max-values measure-name))}})]
-        (format-measure measure result)])]))
+       [:td.right.aligned
+        (when-not totals-row? [proportion-bg measure-value (max-values measure-name)])
+        (format-measure measure result)]))))
 
 (defn- table-rows
-  ([results dims depth measures max-values]
-   (table-rows results dims depth measures max-values []))
-  ([results [dim & dims] depth measures max-values value-result-path]
-   (when dim
-     (mapcat (fn [result]
-               (let [new-path (conj value-result-path [dim (dimension-value dim result)])
-                     parent-row (table-row result dim depth measures max-values new-path)
-                     child-rows (table-rows (:child-rows result) dims (inc depth) measures max-values new-path)]
-                 (into [parent-row] child-rows)))
-             results))))
+  ([{:keys [results row-splits] :as viz}]
+   (table-rows results row-splits viz []))
+  ([results [dim & row-splits] viz value-result-path]
+   (mapcat (fn [result]
+             (let [new-path (conj value-result-path [dim (dimension-value dim result)])
+                   parent-row (table-row result dim viz new-path)
+                   child-rows (table-rows (:child-rows result) row-splits viz new-path)]
+               (into [parent-row] child-rows)))
+           results)))
 
 (defn- calculate-max-values [measures results]
   (reduce (fn [max-values measure-name]
@@ -84,14 +88,42 @@
        (when icon-after? [:span title])])
     [:th opts title]))
 
-(defn- table-headers [{:keys [measures splits]}]
-  [:tr
-   [sortable-th (->> splits (map :title) (str/join ", ")) splits splits]
-   (for [{:keys [name title] :as measure} measures]
-     ^{:key name} [sortable-th title (repeat (count splits) measure) splits {:class "right aligned"}])])
+(defn- self-and-children [{:keys [child-cols] :as result}]
+  (concat child-cols [result]))
 
-(defn table-visualization [{:keys [measures splits results] :as viewer}]
-  (let [max-values (calculate-max-values measures results)]
+(defn- calculate-col-span [{:keys [grand-total?] :as result} col-splits measures]
+  (if (or grand-total? (empty? col-splits))
+    (count measures)
+    (->> (self-and-children result)
+         (map #(calculate-col-span % (rest col-splits) measures))
+         (reduce +))))
+
+(defn- measure-headers [{:keys [measures row-splits splits]} results]
+  (into
+   [:tr [sortable-th (->> row-splits (map :title) (str/join ", ")) splits splits]]
+   (for [result results
+         {:keys [title] :as measure} measures]
+     [sortable-th title (repeat (count splits) measure) splits {:class "right aligned"}])))
+
+(defn- col-split-headers [{:keys [title] :as dim} next-col-splits measures results]
+  (into
+   [:tr [:th title]]
+   (for [result results
+         :let [col-span (calculate-col-span result next-col-splits measures)]]
+     [:th.right.aligned {:col-span (when-not (= 1 col-span) col-span)}
+      (format-dimension dim result)])))
+
+(defn- table-headers [[dim & next-col-splits] results rows {:keys [measures] :as viz}]
+  (if dim
+    (let [row (col-split-headers dim next-col-splits measures results)
+          next-results (mapcat #(if (or (:grand-total? %) (empty? next-col-splits)) [%] (self-and-children %)) results)]
+      (table-headers next-col-splits next-results (conj rows row) viz))
+    (conj rows (measure-headers viz results))))
+
+(defn table-visualization [{:keys [measures splits results] :as viz}]
+  (let [max-values (calculate-max-values measures results)
+        [row-splits col-splits] (partition-splits splits)
+        viz (assoc viz :max-values max-values :row-splits row-splits :col-splits col-splits)]
     [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
-     [:thead [table-headers viewer]]
-     [:tbody (doall (table-rows results splits 0 measures max-values))]]))
+     (into [:thead] (table-headers col-splits (self-and-children (assoc (first results) :grand-total? true)) [] viz))
+     [:tbody (doall (table-rows viz))]]))
