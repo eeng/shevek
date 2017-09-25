@@ -7,6 +7,9 @@
 (defn query [q]
   (agg/query :dw q))
 
+(defn filter-values [{:keys [filter]}]
+  (->> filter :fields (map #(or (:value %) (:values %)))))
+
 (deftest query-test
   (testing "totals and one row split"
     (let [queries-sent (atom [])]
@@ -104,11 +107,11 @@
            (and (= queryType "topN") (= dimension "dimA") (nil? filter))
            [{:result [{:dimA "A1" :count 60} {:dimA "A2" :count 40}]}]
 
-           (and (= queryType "topN") (= dimension "dimB") (= (filter :value) "A1"))
-           [{:result [{:dimB "B1" :count 20} {:dimB "B2" :count 40}]}]
+           (and (= queryType "topN") (= dimension "dimB") (= (filter-values dq) ["A1" ["B1" "B2"]]))
+           [{:result [{:dimB "B2" :count 40} {:dimB "B1" :count 20}]}] ; Sorted different than the totals child-cols
 
-           (and (= queryType "topN") (= dimension "dimB") (= (filter :value) "A2"))
-           [{:result [{:dimB "B1" :count 15} {:dimB "B2" :count 25}]}]
+           (and (= queryType "topN") (= dimension "dimB") (= (filter-values dq) ["A2" ["B1" "B2"]]))
+           [{:result [{:dimB "B2" :count 25}]}] ; Missing B1 value
 
            :else (throw (Exception. (str "Unexpected query " dq)))))]
 
@@ -117,7 +120,7 @@
               {:count 60 :dimA "A1"
                :child-cols [{:dimB "B1" :count 20} {:dimB "B2" :count 40}]}
               {:count 40 :dimA "A2"
-               :child-cols [{:dimB "B1" :count 15} {:dimB "B2" :count 25}]}]
+               :child-cols [nil {:dimB "B2" :count 25}]}]
              (query {:cube "wikiticker"
                      :splits [{:name "dimA" :on "rows"} {:name "dimB" :on "columns"}]
                      :measures [{:name "count" :expression "(sum $count)"}]
@@ -171,19 +174,19 @@
            (and (= queryType "topN") (= dimension "dimB") (= (filter :value) "A1"))
            [{:result [{:dimB "B1" :count 10} {:dimB "B2" :count 50}]}]
 
-           (and (= queryType "topN") (= dimension "dimC") (= (filter :value) "A1"))
+           (and (= queryType "topN") (= dimension "dimC") (= (filter-values dq) ["A1" ["C1" "C2"]]))
            [{:result [{:dimC "C1" :count 20} {:dimC "C2" :count 40}]}]
 
            (and (= queryType "topN") (= dimension "dimB") (= (filter :value) "A2"))
            [{:result []}]
 
-           (and (= queryType "topN") (= dimension "dimC") (= (filter :value) "A2"))
+           (and (= queryType "topN") (= dimension "dimC") (= (filter-values dq) ["A2" ["C1" "C2"]]))
            [{:result [{:dimC "C1" :count 15} {:dimC "C2" :count 25}]}]
 
-           (and (= queryType "topN") (= dimension "dimC") (= ["A1" "B1"] (->> filter :fields (map :value))))
+           (and (= queryType "topN") (= dimension "dimC") (= (filter-values dq) ["A1" "B1" ["C1" "C2"]]))
            [{:result [{:dimC "C1" :count 5} {:dimC "C2" :count 5}]}]
 
-           (and (= queryType "topN") (= dimension "dimC") (= ["A1" "B2"] (->> filter :fields (map :value))))
+           (and (= queryType "topN") (= dimension "dimC") (= (filter-values dq) ["A1" "B2" ["C1" "C2"]]))
            [{:result [{:dimC "C1" :count 15} {:dimC "C2" :count 35}]}]
 
            :else (throw (Exception. (str "Unexpected query " dq)))))]
