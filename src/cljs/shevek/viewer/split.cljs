@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.i18n :refer [t]]
-            [shevek.lib.dw.dims :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim]]
+            [shevek.lib.dw.dims :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim row-split?]]
             [shevek.lib.dw.time :refer [default-granularity]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
@@ -28,9 +28,9 @@
                       :else old-viztype)]
     (assoc-in db [:viewer :viztype] new-viztype)))
 
-(defevhi :split-dimension-added [{:keys [viewer splits] :as db} dim]
+(defevhi :split-dimension-added [{:keys [viewer] :as db} dim]
   {:after [store-viewer-in-url]}
-  (let [limit (when (seq splits) 5)]
+  (let [limit (when (->> viewer :splits (filter row-split?) seq) 5)]
     (-> (update-in db [:viewer :splits] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
         adjust-viztype
         send-main-query)))
