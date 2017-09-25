@@ -77,15 +77,14 @@
 (defn dimension-value [{:keys [name]} result]
   (->> name keyword (get result)))
 
-; TODO this is wrong, shouldn't do the gstr/format if the measure already has a format.
 (defn format-measure [{:keys [type format] :as dim} result]
-  (let [value (or (dimension-value dim result) 0)
-        value (condp = type
-                "doubleSum" (gstr/format "%.2f" value)
-                "hyperUnique" (gstr/format "%.0f" value)
-                value)]
-    (cond-> value
-            format (num/format format))))
+  (if-let [value (dimension-value dim result)]
+    (if format
+      (num/format value format)
+      (condp = type
+        "doubleSum" (gstr/format "%.2f" value)
+        "hyperUnique" (gstr/format "%.0f" value)
+        value))))
 
 (defn totals-result? [result dim]
   (not (contains? result (-> dim :name keyword))))

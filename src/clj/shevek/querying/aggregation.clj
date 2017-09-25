@@ -24,12 +24,6 @@
               [value (plus-period value granularity)] filters)
       (conj filters (assoc dim :operator "is" :value value)))))
 
-(defn- complete-column-results [grand-total-dim-values dim results]
-  (if (seq grand-total-dim-values)
-    (let [corresponding-result (fn [value] (detect #(= (dim-value dim %) value) results))]
-      (map corresponding-result grand-total-dim-values))
-    results))
-
 (defn- resolve-col-splits [dw {:keys [splits filters] :as q} grand-total]
   (let [[dim & dims] (filter col-split? splits)
         nested-query #(assoc q :splits %1 :filters (add-filter-for-dim filters dim %2))
@@ -38,9 +32,7 @@
                        (seq grand-total) (update :filters conj (assoc dim :operator "include" :value posible-values)))]
     (when dim
       (->> (send-query dw this-q)
-           (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw (nested-query dims %) (mapcat :child-cols grand-total))))
-           (complete-column-results posible-values dim)
-           doall))))
+           (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw (nested-query dims %) (mapcat :child-cols grand-total))))))))
 
 (defn- resolve-row-splits [dw {:keys [splits filters] :as q} grand-total]
   (let [[row-splits col-splits] (partition-splits splits)

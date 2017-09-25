@@ -118,9 +118,9 @@
       (is (= [{:count 100
                :child-cols [{:dimB "B1" :count 35} {:dimB "B2" :count 65}]}
               {:count 60 :dimA "A1"
-               :child-cols [{:dimB "B1" :count 20} {:dimB "B2" :count 40}]}
+               :child-cols [{:dimB "B2" :count 40} {:dimB "B1" :count 20}]}
               {:count 40 :dimA "A2"
-               :child-cols [nil {:dimB "B2" :count 25}]}]
+               :child-cols [{:dimB "B2" :count 25}]}]
              (query {:cube "wikiticker"
                      :splits [{:name "dimA" :on "rows"} {:name "dimB" :on "columns"}]
                      :measures [{:name "count" :expression "(sum $count)"}]

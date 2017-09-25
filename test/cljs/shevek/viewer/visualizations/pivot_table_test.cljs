@@ -53,10 +53,8 @@
                             :splits [{:name "a" :title "A" :on "columns"}
                                      {:name "b" :title "B" :on "columns"}]
                             :results [{:m 100
-                                       :child-cols [{:m 60 :a "A1" :child-cols [{:m 20 :b "B1"}
-                                                                                {:m 40 :b "B2"}]}
-                                                    {:m 40 :a "A2" :child-cols [{:m 15 :b "B1"}
-                                                                                {:m 25 :b "B2"}]}]}]}])
+                                       :child-cols [{:m 60 :a "A1" :child-cols [{:m 20 :b "B1"} {:m 40 :b "B2"}]}
+                                                    {:m 40 :a "A2" :child-cols [{:m 15 :b "B1"} {:m 25 :b "B2"}]}]}]}])
      (is (= [["A" "A1"              "A2"              "Total"]
              ["B" "B1" "B2" "Total" "B1" "B2" "Total" "Total"]
              [""  "M"  "M"  "M"     "M"  "M"  "M"     "M"]
@@ -68,17 +66,14 @@
      [table-visualization {:measures [{:name "m" :title "M"}]
                            :splits [{:name "a" :title "A" :on "rows"}
                                     {:name "b" :title "B" :on "columns"}]
-                           :results [{:m 300 :child-cols [{:m 210 :b "B1"}
-                                                          {:m 90 :b "B2"}]}
-                                     {:m 200 :a "A1" :child-cols [{:m 130 :b "B1"}
-                                                                  {:m 70 :b "B2"}]}
-                                     {:m 100 :a "B1" :child-cols [{:m 80 :b "B1"}
-                                                                  {:m 20 :b "B2"}]}]}])
+                           :results [{:m 300 :child-cols [{:m 210 :b "B1"} {:m 90 :b "B2"}]}
+                                     {:m 200 :a "A1" :child-cols [{:m 130 :b "B1"} {:m 70 :b "B2"}]}
+                                     {:m 100 :a "A2" :child-cols [{:m 80 :b "B1"} {:m 20 :b "B2"}]}]}])
     (is (= [["B" "B1" "B2" "Total"]
             ["A" "M"  "M"  "M"]
             ["Total" "210" "90" "300"]
             ["A1" "130" "70" "200"]
-            ["B1" "80" "20" "100"]]
+            ["A2" "80" "20" "100"]]
            (texts ".pivot-table tr" "th,td"))))
 
   (testing "one dimension on rows, one on columns and two measure"
@@ -99,6 +94,23 @@
             ["A1" "130" "13" "70" "7" "200" "20"]
             ["A2" "80" "8" "20" "2" "100" "10"]]
            (texts ".pivot-table tr" "th,td"))))
+
+  (testing "missing and unsorted children"
+    (render-component
+     [table-visualization
+      {:measures [{:name "m" :title "M"}]
+       :splits [{:name "a" :title "A" :on "rows"}
+                {:name "b" :title "B" :on "columns"}
+                {:name "c" :title "C" :on "columns"}]
+       :results [{:m 300 :child-cols [{:m 100 :b "B1" :child-cols [{:m 30 :c "C1"} {:m 70 :c "C2"}]}
+                                      {:m 200 :b "B2" :child-cols [{:m 20 :c "C1"} {:m 180 :c "C2"}]}]}
+                 {:m 140 :a "A1" :child-cols [{:m 90 :b "B1" :child-cols [{:m 90 :c "C1"}]}
+                                              {:m 50 :b "B2" :child-cols [{:m 50 :c "C2"}]}]}
+                 {:m 160 :a "A2" :child-cols [{:m 160 :b "B1" :child-cols [{:m 50 :c "C2"} {:m 110 :c "C1"}]}]}]}])
+    (is (= [["Total" "30" "70" "100" "20" "180" "200" "300"]
+            ["A1" "90" "" "90" "" "50" "50" "140"]
+            ["A2" "110" "50" "160" "" "" "" "160"]]
+           (texts ".pivot-table tbody tr" "td"))))
 
   (testing "measure formatting"
     (render-component

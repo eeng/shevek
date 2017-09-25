@@ -7,6 +7,7 @@
             [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.viewer.filter :refer [build-filter]]
+            [shevek.lib.collections :refer [detect]]
             [shevek.lib.dw.dims :refer [partition-splits]]))
 
 (defn- row-popup [dim result selected-path]
@@ -30,12 +31,18 @@
     [:div.bg {:class (when (neg? measure-value) "neg")
               :style {:width width}}]))
 
-(defn- recursive-self-and-children [result]
-  (concat (mapcat recursive-self-and-children (:child-cols result)) [result]))
+(defn- recursive-self-and-children [result grand-total [col-split & col-splits]]
+  (let [corresponding (fn [result coll]
+                        (or (detect #(= (dimension-value col-split %) (dimension-value col-split result)) coll)
+                            {(keyword (:name col-split)) (dimension-value col-split result)}))
+        completed-children (map #(corresponding % (:child-cols result)) (:child-cols grand-total))]
+    (concat (mapcat #(recursive-self-and-children % (corresponding % (:child-cols grand-total)) col-splits)
+                    completed-children)
+            [result])))
 
-(defn- table-row [result dim {:keys [measures max-values]} value-result-path]
+(defn- table-row [result dim {:keys [measures max-values results col-splits]} value-result-path]
   (let [totals-row? (totals-result? result dim)
-        simplified-path (map (fn [[{:keys [name]} value]] [(if totals-row? "GRAND_TOTAL" name) value]) value-result-path)
+        simplified-path (map (fn [[{:keys [name]} value]] [(if totals-row? "grand-total" name) value]) value-result-path)
         row-key (hash simplified-path)
         depth (dec (count value-result-path))]
     (into
@@ -47,7 +54,7 @@
            :key row-key}
       [:td
        [:div {:class (str "depth-" depth)} (format-dimension dim result)]]]
-     (for [result (recursive-self-and-children result)
+     (for [result (recursive-self-and-children result (first results) col-splits)
            measure measures
            :let [measure-name (-> measure :name keyword)
                  measure-value (measure-name result)]]
