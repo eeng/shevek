@@ -53,14 +53,14 @@
            :class (if totals-row? "grand-total" (when (popup-opened? row-key) "active"))
            :key row-key}
       [:td
-       [:div {:class (str "depth-" depth)} (format-dimension dim result)]]]
+       [:span {:class (str "depth-" depth)} (format-dimension dim result)]]]
      (for [result (recursive-self-and-children result (first results) col-splits)
            measure measures
            :let [measure-name (-> measure :name keyword)
                  value (measure-value measure result)]]
-       [:td.right.aligned {:title value}
+       [:td.right.aligned
         (when-not totals-row? [proportion-bg value (max-values measure-name)])
-        (format-measure measure result)]))))
+        [:span {:title value} (format-measure measure result)]]))))
 
 (defn- table-rows
   ([{:keys [results row-splits] :as viz}]
