@@ -121,5 +121,5 @@
                           (:limit dimension) (take (:limit dimension))
                           true (map (fn [{:keys [result timestamp]}]
                                      (if dimension
-                                       (assoc result :__time timestamp)
+                                       (assoc result (keyword (:name dimension)) timestamp)
                                        result))))))

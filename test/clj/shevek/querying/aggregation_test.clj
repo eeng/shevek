@@ -127,6 +127,35 @@
                      :filters [{:interval ["2015" "2016"]}]
                      :totals true})))))
 
+  (testing "one row split, one column time split and one measure"
+    (with-redefs
+      [druid/send-query
+       (fn [_ {:keys [queryType dimension filter granularity] :as dq}]
+         (cond
+           (and (= queryType "timeseries") (= granularity "all"))
+           [{:result {:count 100}}]
+
+           (and (= queryType "timeseries") (= (:period granularity) "P1D") (nil? filter))
+           [{:result {:count 35} :timestamp "2001"} {:result {:count 65} :timestamp "2002"}]
+
+           (and (= queryType "topN") (= dimension "dimA") (nil? filter))
+           [{:result [{:dimA "A1" :count 60}]}]
+
+           (and (= queryType "timeseries") (= (:period granularity) "P1D") (= (filter :value) "A1"))
+           [{:result {:count 40} :timestamp "2001"} {:result {:count 20} :timestamp "2002"}]
+
+           :else (throw (Exception. (str "Unexpected query " dq)))))]
+
+      (is (= [{:count 100
+               :child-cols [{:dimB "2001" :count 35} {:dimB "2002" :count 65}]}
+              {:count 60 :dimA "A1"
+               :child-cols [{:dimB "2001" :count 40} {:dimB "2002" :count 20}]}]
+             (query {:cube "wikiticker"
+                     :splits [{:name "dimA" :on "rows"} {:name "dimB" :on "columns" :granularity "P1D"}]
+                     :measures [{:name "count" :expression "(sum $count)"}]
+                     :filters [{:interval ["2001" "2002"]}]
+                     :totals true})))))
+
   (testing "two column splits and one measure"
     (with-redefs
       [druid/send-query
