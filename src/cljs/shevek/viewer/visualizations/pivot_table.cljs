@@ -4,7 +4,7 @@
             [shevek.i18n :refer [t]]
             [shevek.navigation :refer [current-page?]]
             [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value]]
+            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value measure-value]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.viewer.filter :refer [build-filter]]
             [shevek.lib.collections :refer [detect]]
@@ -57,9 +57,9 @@
      (for [result (recursive-self-and-children result (first results) col-splits)
            measure measures
            :let [measure-name (-> measure :name keyword)
-                 measure-value (measure-name result)]]
-       [:td.right.aligned
-        (when-not totals-row? [proportion-bg measure-value (max-values measure-name)])
+                 value (measure-value measure result)]]
+       [:td.right.aligned {:title value}
+        (when-not totals-row? [proportion-bg value (max-values measure-name)])
         (format-measure measure result)]))))
 
 (defn- table-rows

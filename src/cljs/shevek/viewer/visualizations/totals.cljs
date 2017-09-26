@@ -1,14 +1,10 @@
 (ns shevek.viewer.visualizations.totals
-  (:require [shevek.viewer.shared :refer [format-measure]]))
+  (:require [shevek.viewer.shared :refer [format-measure measure-value]]))
 
-(defn- sort-results-according-to-selected-measures [{:keys [results measures]}]
-  (let [result (first results)]
-    (map #(assoc % :value (format-measure % result)) measures)))
-
-(defn totals-visualization [viz]
-  (let [result (sort-results-according-to-selected-measures viz)]
+(defn totals-visualization [{:keys [results measures]}]
+  (let [grand-total (first results)]
     [:div.ui.statistics
-     (for [{:keys [name title value]} result]
-       [:div.statistic {:key name}
+     (for [{:keys [name title] :as measure} measures]
+       [:div.statistic {:key name :title (measure-value measure grand-total)}
         [:div.label title]
-        [:div.value value]])]))
+        [:div.value (format-measure measure grand-total)]])]))
