@@ -78,7 +78,7 @@
   (->> name keyword (get result)))
 
 (defn format-measure [{:keys [type format] :as dim} result]
-  (if-let [value (dimension-value dim result)]
+  (let [value (or (dimension-value dim result) 0)]
     (if format
       (num/format value format)
       (condp = type
