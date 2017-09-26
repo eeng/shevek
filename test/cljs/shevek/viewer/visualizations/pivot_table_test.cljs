@@ -24,8 +24,7 @@
      [table-visualization {:splits [{:name "a" :title "A"} {:name "b" :title "B"}]
                            :measures [{:name "m" :title "M"}]
                            :results [{:m 300}
-                                     {:m 200 :a "A1" :child-rows [{:m 130 :b "B11"}
-                                                                  {:m 70 :b "B12"}]}
+                                     {:m 200 :a "A1" :child-rows [{:m 130 :b "B11"} {:m 70 :b "B12"}]}
                                      {:m 100 :a "A2" :child-rows [{:m 100 :b "B21"}]}]}])
     (is (= [["A, B" "M"]
             ["Total" "300"]
@@ -34,18 +33,17 @@
             ["B12" "70"]
             ["A2" "100"]
             ["B21" "100"]]
-           (texts ".pivot-table tr" "th,td"))))
+           (texts ".pivot-table tr" "th,td")))
 
-  (testing "one dimension on columns"
+   (testing "one dimension on columns"
      (render-component
       [table-visualization {:measures [{:name "m" :title "M"}]
                             :splits [{:name "a" :title "A" :on "columns"}]
-                            :results [{:m 100 :child-cols [{:m 60 :a "A1"}
-                                                           {:m 40 :a "A2"}]}]}])
-     (is (= [["A" "A1" "A2" "Total"]
-             ["" "M" "M" "M"]
+                            :results [{:m 100 :child-cols [{:m 60 :a "A1"} {:m 40 :a "A2"}]}]}])
+     (is (= [["M"     "A"]
+             [""      "A1" "A2" "Total"]
              ["Total" "60" "40" "100"]]
-            (texts ".pivot-table tr" "th,td"))))
+            (texts ".pivot-table tr" "th,td")))))
 
   (testing "two dimension on columns and one measure"
      (render-component
@@ -55,9 +53,10 @@
                             :results [{:m 100
                                        :child-cols [{:m 60 :a "A1" :child-cols [{:m 20 :b "B1"} {:m 40 :b "B2"}]}
                                                     {:m 40 :a "A2" :child-cols [{:m 15 :b "B1"} {:m 25 :b "B2"}]}]}]}])
-     (is (= [["A" "A1"              "A2"              "Total"]
-             ["B" "B1" "B2" "Total" "B1" "B2" "Total" "Total"]
-             [""  "M"  "M"  "M"     "M"  "M"  "M"     "M"]
+     (is (= [["M"     "A"]
+             [""      "A1"              "A2"              "Total"]
+             [""      "B"]
+             [""      "B1" "B2" "Total" "B1" "B2" "Total" "Total"]
              ["Total" "20" "40" "60"    "15" "25" "40"    "100"]]
             (texts ".pivot-table tr" "th,td"))))
 
@@ -69,8 +68,8 @@
                            :results [{:m 300 :child-cols [{:m 210 :b "B1"} {:m 90 :b "B2"}]}
                                      {:m 200 :a "A1" :child-cols [{:m 130 :b "B1"} {:m 70 :b "B2"}]}
                                      {:m 100 :a "A2" :child-cols [{:m 80 :b "B1"} {:m 20 :b "B2"}]}]}])
-    (is (= [["B" "B1" "B2" "Total"]
-            ["A" "M"  "M"  "M"]
+    (is (= [["M" "B"]
+            ["A" "B1" "B2" "Total"]
             ["Total" "210" "90" "300"]
             ["A1" "130" "70" "200"]
             ["A2" "80" "20" "100"]]

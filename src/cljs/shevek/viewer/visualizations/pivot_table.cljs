@@ -79,22 +79,6 @@
           {}
           (map (comp keyword :name) measures)))
 
-(defn- sortable-th [title on-click-sort-splits-by split opts]
-  (if (current-page? :viewer)
-    (let [on-click-sort-splits-by (map #(select-keys % [:name :title :type :expression]) on-click-sort-splits-by)
-          sort-bys (map (comp :name :sort-by) split)
-          descendings (->> split (map (comp :descending :sort-by)) distinct)
-          show-icon? (and (= sort-bys (map :name on-click-sort-splits-by))
-                          (= (count descendings) 1))
-          icon-after? (= (:class opts) "right aligned")
-          desc (first descendings)]
-      [:th (assoc opts :on-click #(dispatch :splits-sorted-by on-click-sort-splits-by (if show-icon? (not desc) true)))
-       (when-not icon-after? [:span title])
-       (when show-icon?
-         [:i.icon.caret {:class (if desc "down" "up")}])
-       (when icon-after? [:span title])])
-    [:th opts title]))
-
 (defn- self-and-children [{:keys [child-cols] :as result}]
   (concat child-cols [result]))
 
@@ -105,27 +89,62 @@
          (map #(calculate-col-span % (rest col-splits) measures))
          (reduce +))))
 
-(defn- measure-headers [{:keys [measures row-splits splits]} results]
-  (into
-   [:tr [sortable-th (->> row-splits (map :title) (str/join ", ")) splits splits]]
-   (for [result results
-         {:keys [title] :as measure} measures]
-     [sortable-th title (repeat (count splits) measure) splits {:class "right aligned"}])))
+(defn- sortable-th [title sorting-mapping opts]
+  (if (current-page? :viewer)
+    (let [requested-sort-bys (map :name (vals sorting-mapping))
+          current-sort-bys (map (comp :name :sort-by) (keys sorting-mapping))
+          descendings (->> (keys sorting-mapping) (map (comp :descending :sort-by)) distinct)
+          show-icon? (and (= current-sort-bys requested-sort-bys)
+                          (= (count descendings) 1))
+          icon-after? (= (:class opts) "right aligned")
+          desc (first descendings)]
+      [:th (assoc opts :on-click #(dispatch :splits-sorted-by sorting-mapping (if show-icon? (not desc) true)))
+       (when-not icon-after? [:span title])
+       (when show-icon?
+         [:i.icon.caret {:class (if desc "down" "up")}])
+       (when icon-after? [:span title])])
+    [:th opts title]))
 
-(defn- col-split-headers [{:keys [title] :as dim} next-col-splits measures results]
-  (into
-   [:tr [:th title]]
-   (for [result results
-         :let [col-span (calculate-col-span result next-col-splits measures)]]
-     [:th.right.aligned {:col-span (when-not (= 1 col-span) col-span)}
-      (format-dimension dim result)])))
+(defn- row-splits-header [{:keys [row-splits]}]
+  [sortable-th (->> row-splits (map :title) (str/join ", ")) (zipmap row-splits row-splits)])
 
-(defn- table-headers [[dim & next-col-splits] results rows {:keys [measures] :as viz}]
+(defn- col-split-header [{:keys [title] :as dim} opts]
+  [sortable-th title {dim dim} opts])
+
+(defn- measure-header [{:keys [title] :as measure} {:keys [splits]} opts]
+  [sortable-th title (zipmap splits (repeat measure)) opts])
+
+(defn- measure-headers [{:keys [measures] :as viz} results]
+  (into
+   [:tr [row-splits-header viz]]
+   (for [result results measure measures]
+     [measure-header measure viz {:class "right aligned"}])))
+
+(defn- multiple-measures-layout? [{:keys [measures col-splits]}]
+  (or (> (count measures) 1) (empty? col-splits)))
+
+(defn- col-split-headers [dim next-col-splits results
+                          {:keys [measures col-splits row-splits] :as viz}]
+  (let [results (map #(assoc % :col-span (calculate-col-span % next-col-splits measures)) results)
+        full-col-span (->> results (map :col-span results) (reduce +))
+        dim-values (for [result results :let [col-span (:col-span result)]]
+                    [:th.right.aligned.dim-value {:col-span (when-not (= 1 col-span) col-span)}
+                     (format-dimension dim result)])]
+    (if (multiple-measures-layout? viz)
+      [(into [:tr [col-split-header dim]] dim-values)]
+      [[:tr
+        (if (= dim (first col-splits)) [measure-header (first measures) viz] [:th])
+        [col-split-header dim {:col-span full-col-span :class "right aligned"}]]
+       (into [:tr (if (= dim (last col-splits)) [row-splits-header viz] [:th])] dim-values)])))
+
+(defn- table-headers [[dim & next-col-splits] results rows viz]
   (if dim
-    (let [row (col-split-headers dim next-col-splits measures results)
+    (let [new-rows (col-split-headers dim next-col-splits results viz)
           next-results (mapcat #(if (or (:grand-total? %) (empty? next-col-splits)) [%] (self-and-children %)) results)]
-      (table-headers next-col-splits next-results (conj rows row) viz))
-    (conj rows (measure-headers viz results))))
+      (table-headers next-col-splits next-results (into rows new-rows) viz))
+    (if (multiple-measures-layout? viz)
+      (conj rows (measure-headers viz results))
+      rows)))
 
 (defn table-visualization [{:keys [measures splits results] :as viz}]
   (let [max-values (calculate-max-values measures results)

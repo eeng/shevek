@@ -5,12 +5,14 @@
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim row-split?]]
             [shevek.lib.dw.time :refer [default-granularity]]
             [shevek.lib.react :refer [without-propagation]]
+            [shevek.lib.collections :refer [includes?]]
             [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
+            [shevek.viewer.url :refer [store-viewer-in-url]]
             [cuerdas.core :as str]
-            [shevek.viewer.url :refer [store-viewer-in-url]]))
+            [com.rpl.specter :refer [transform ALL]]))
 
 (defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
   (let [first-measure (or (-> viewer :measures first) (-> viewer :cube :measures first))]
@@ -59,11 +61,11 @@
 
 (defevhi :splits-sorted-by [db sort-bys descending]
   {:after [store-viewer-in-url]}
-  (-> (update-in db [:viewer :splits]
-                 (fn [splits]
-                   (->> (zipmap splits sort-bys)
-                        (mapv (fn [[split sort-by]]
-                                (assoc split :sort-by (assoc sort-by :descending descending)))))))
+  (-> (transform [:viewer :splits ALL (partial includes? (keys sort-bys))]
+                 #(assoc % :sort-by (-> (sort-bys %)
+                                        (select-keys [:name :title :type :expression])
+                                        (assoc :descending descending)))
+                 db)
       (send-main-query)))
 
 (def granularities {"PT5M" "5m", "PT1H" "1H", "P1D" "1D", "P1W" "1W", "P1M" "1M"})
