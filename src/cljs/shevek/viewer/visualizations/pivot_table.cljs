@@ -50,7 +50,7 @@
                         (show-popup % ^{:key (hash result)} [row-popup dim result value-result-path]
                                     {:position "top center" :distanceAway 135 :setFluidWidth true
                                      :class "pivot-table-popup" :id row-key}))
-           :class (when (and (not totals-row?) (popup-opened? row-key)) "active")
+           :class (if totals-row? "grand-total" (when (popup-opened? row-key) "active"))
            :key row-key}
       [:td
        [:div {:class (str "depth-" depth)} (format-dimension dim result)]]]

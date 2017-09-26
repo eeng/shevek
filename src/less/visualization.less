@@ -34,7 +34,7 @@
         th.dim-value { font-weight: normal }
       }
       tbody tr {
-        .selectable;
+        &:not(.grand-total) { .selectable };
         opacity: .999;
         td {
           position: relative;
