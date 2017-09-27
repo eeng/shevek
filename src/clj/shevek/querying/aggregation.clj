@@ -45,9 +45,15 @@
            (pmap #(assoc-if-seq % :child-rows (nested-child-rows %) :child-cols (nested-child-cols %)))
            doall))))
 
+(defn- build-row-if-no-results [{:keys [measures]} results]
+  (if (seq results)
+    results
+    (vector (zipmap (map (comp keyword :name) measures) (repeat 0)))))
+
 (defn- resolve-grand-totals [dw q]
   (->> (send-query dw q)
-       (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw q [])))))
+       (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw q [])))
+       (build-row-if-no-results q)))
 
 (s/defn query [dw {:keys [cube totals] :as q} :- Query]
   (let [grand-totals (if totals (resolve-grand-totals dw q) [])]
@@ -61,7 +67,7 @@
          {:cube "wikiticker"
           :measures [{:name "count" :expression "(sum $count)"}
                      {:name "added" :expression "(sum $added)"}]
-          :filters [{:interval ["2015-09-12" "2015-09-13"]}]
+          :filters [{:interval ["2015" "2016"]}]
           :totals true})
 
 ; One dimension and one measure
@@ -83,7 +89,7 @@
          {:cube "wikiticker"
           :splits [{:name "page" :limit 5}]
           :measures [{:name "count" :expression "(sum $count)"}]
-          :filters [{:interval ["2015-09-12" "2015-09-13"]}]
+          :filters [{:interval ["2015" "2016"]}]
           :totals true})
 
 ; Two dimensions

@@ -11,6 +11,15 @@
   (->> filter :fields (map #(or (:value %) (:values %)))))
 
 (deftest query-test
+  (testing "only totals should return row with zeros as Druid return an empty list"
+    (with-redefs [druid/send-query (constantly [])]
+      (is (= [{:m1 0 :m2 0}]
+             (query {:cube "wikiticker"
+                     :splits []
+                     :measures [{:name "m1" :expression "(sum $m1)"} {:name "m2" :expression "(sum $m2)"}]
+                     :filters [{:interval ["2015" "2016"]}]
+                     :totals true})))))
+
   (testing "totals and one row split"
     (let [queries-sent (atom [])]
       (with-redefs [druid/send-query (fn [_ dq] (swap! queries-sent conj dq) [])]

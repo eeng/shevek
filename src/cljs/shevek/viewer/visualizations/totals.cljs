@@ -7,4 +7,4 @@
      (for [{:keys [name title] :as measure} measures]
        [:div.statistic {:key name :title (measure-value measure grand-total)}
         [:div.label title]
-        [:div.value (format-measure measure grand-total :nil-as-zero? true)]])]))
+        [:div.value (format-measure measure grand-total)]])]))
