@@ -75,7 +75,7 @@
         posible-sort-bys (conj (current-cube :measures) (clean-dim dim))]
     (fn [dim]
       (let [desc (get-in @opts [:sort-by :descending])
-            {:keys [current-granularity on]} @opts]
+            {:keys [granularity on]} @opts]
         [:div.split.popup
          [:div.ui.form
           [:div.field
@@ -92,7 +92,7 @@
              [:div.ui.five.small.basic.buttons
               (for [[period title] granularities]
                 [:button.ui.button {:key period
-                                    :class (when (= current-granularity period) "active")
+                                    :class (when (= granularity period) "active")
                                     :on-click #(swap! opts assoc :granularity period)}
                  title])]])
           [:div.field
