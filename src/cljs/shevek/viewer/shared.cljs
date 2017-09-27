@@ -77,8 +77,7 @@
 (defn dimension-value [{:keys [name]} result]
   (->> name keyword (get result)))
 
-(defn measure-value [dim result]
-  (or (dimension-value dim result) 0))
+(def measure-value dimension-value)
 
 (defn format-measure [{:keys [type format] :as dim} result]
   (let [value (measure-value dim result)]
