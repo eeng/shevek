@@ -150,6 +150,6 @@
   (let [max-values (calculate-max-values measures results)
         [row-splits col-splits] (partition-splits splits)
         viz (assoc viz :max-values max-values :row-splits row-splits :col-splits col-splits)]
-    [:table.ui.very.basic.compact.fixed.single.line.table.pivot-table
+    [:table.ui.very.basic.compact.table.pivot-table
      (into [:thead] (table-headers col-splits (self-and-children (assoc (first results) :grand-total? true)) [] viz))
      [:tbody (doall (table-rows viz))]]))

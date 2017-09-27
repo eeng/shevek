@@ -23,7 +23,8 @@
     }
 
     .pivot-table {
-      th:first-child, td:first-child { padding-left: 0.5em }
+      th, td { white-space: nowrap; }
+      th:first-child, td:first-child { padding-left: 0.5em; }
       th:last-child, td:last-child { padding-right: 0.5em }
       thead {
         th:not(.dim-value) {
