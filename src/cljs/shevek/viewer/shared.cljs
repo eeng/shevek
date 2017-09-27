@@ -80,7 +80,7 @@
 (def measure-value dimension-value)
 
 (defn format-measure [{:keys [type format] :as dim} result]
-  (let [value (measure-value dim result)]
+  (when-let [value (measure-value dim result)]
     (if format
       (num/format value format)
       (condp = type
