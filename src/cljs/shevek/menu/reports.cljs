@@ -41,17 +41,18 @@
     (rpc/call "reports/save-report" :args [report] :handler #(dispatch :report-saved % editing-current? after-save))
     (rpc/loading db :saving-report)))
 
+; There may be a new dashbard in the collection if the form is open
 (defn- save-report-form [form-data after-save]
   (let [valid? #(seq (:name @form-data))
         cancel #(reset! form-data nil)
         save #(when (valid?) (dispatch :save-report @form-data (fn [] (after-save) (cancel))));
-        shortcuts (kb-shortcuts :enter save :escape cancel)]
+        shortcuts (kb-shortcuts :enter save :escape cancel)
+        dashboards (->> (db/get :dashboards) (remove new-record?) (map (juxt :name :id)))]
     (fn []
       [:div.ui.form (assoc (rpc/loading-class :saving-report) :ref shortcuts)
        [input-field form-data :name {:label (t :reports/name) :class "required" :auto-focus true}]
        [input-field form-data :description {:label (t :reports/description) :as :textarea :rows 2}]
-       [input-field form-data :dashboards-ids {:label (t :reports/dashboards) :as :select-multiple
-                                               :collection (map (juxt :name :id) (db/get :dashboards))}]
+       [input-field form-data :dashboards-ids {:label (t :reports/dashboards) :as :select-multiple :collection dashboards}]
        [:button.ui.primary.button {:on-click save :class (when-not (valid?) "disabled")} (t :actions/save)]
        [:button.ui.button {:on-click cancel} (t :actions/cancel)]])))
 
