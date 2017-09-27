@@ -73,9 +73,9 @@
                (into [parent-row] child-rows)))
            results)))
 
-(defn- calculate-max-values [measures results]
+(defn- calculate-max-values [measures [_ & results]]
   (reduce (fn [max-values measure-name]
-            (assoc max-values measure-name (->> results rest (map measure-name) (apply max))))
+            (assoc max-values measure-name (->> results (map measure-name) (map Math/abs) (apply max))))
           {}
           (map (comp keyword :name) measures)))
 
