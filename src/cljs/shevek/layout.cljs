@@ -16,6 +16,7 @@
             [shevek.menu.reports :refer [reports-menu]]
             [shevek.menu.dashboards :refer [dashboards-menu]]
             [shevek.menu.share :refer [share-menu]]
+            [shevek.menu.fullscreen :refer [fullscreen-menu]]
             [shevek.menu.settings :refer [settings-menu]]
             [shevek.menu.account :as account :refer [account-menu]]))
 
@@ -38,6 +39,7 @@
    [dashboards-menu]
    [reports-menu]
    [:div.right.menu
+    (when (current-page? :viewer) [fullscreen-menu])
     (when (current-page? :viewer) [share-menu])
     [settings-menu]
     (when (admin?)

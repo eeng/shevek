@@ -20,9 +20,10 @@
     width: 250px;
     min-width: 250px;
   }
+  .left-column { margin-right: 0; }
+  .right-column { margin-left: 0; }
   .center-column {
     flex: 1;
-    margin: @gutter 0;
     overflow-x: auto; // Necessary when the pivot-table is too big so it can scroll horizontally
   }
 
@@ -88,6 +89,7 @@
     display: flex;
     flex-direction: row;
     flex-shrink: 0; // Without this on certain browsers this row would shrink when visualization content overflows
+    margin-bottom: @gutter;
     .filter-split { flex-grow: 1 }
     .viztype-selector {
       width: 90px;
@@ -117,7 +119,6 @@
 
   .visualization-container {
     flex: 1;
-    margin-top: @gutter;
     padding: @panel-horizontal-padding;
     overflow-y: auto;
   }

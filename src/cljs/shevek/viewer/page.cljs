@@ -67,16 +67,21 @@
 
 (defn page []
   (dispatch :viewer-initialized)
-  [:div#viewer
-   [:div.left-column
-    [dimensions-panel]
-    [measures-panel]]
-   [:div.center-column
-    [:div.top-row
-     [:div.filter-split
-       [filter-panel]
-       [split-panel]]
-     [viztype-selector]]
-    [visualization-panel]]
-   [:div.right-column
-    [pinboard-panels]]])
+  (fn []
+    (let [fullscreen? (db/get-in [:viewer :fullscreen])]
+      [:div#viewer
+       (when-not fullscreen?
+         [:div.left-column
+          [dimensions-panel]
+          [measures-panel]])
+       [:div.center-column
+        (when-not fullscreen?
+          [:div.top-row
+           [:div.filter-split
+            [filter-panel]
+            [split-panel]]
+           [viztype-selector]])
+        [visualization-panel]]
+       (when-not fullscreen?
+         [:div.right-column
+          [pinboard-panels]])])))
