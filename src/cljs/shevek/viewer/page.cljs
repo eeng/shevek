@@ -81,7 +81,8 @@
             [filter-panel]
             [split-panel]]
            [viztype-selector]])
-        [visualization-panel]]
+        [:div.bottom-row.panel
+         [visualization-panel]]]
        (when-not fullscreen?
          [:div.right-column
           [pinboard-panels]])])))

@@ -11,7 +11,7 @@
 
   @gutter: 10px;
 
-  .left-column, .center-column, .right-column {
+  .left-column, .right-column {
     display: flex;
     flex-direction: column;
     margin: @gutter;
@@ -23,8 +23,18 @@
   .left-column { margin-right: 0; }
   .right-column { margin-left: 0; }
   .center-column {
+    display: flex;
+    flex-direction: column;
     flex: 1;
-    overflow-x: auto; // Necessary when the pivot-table is too big so it can scroll horizontally
+    overflow: hidden; // Necessary when the pivot-table is too big so it can scroll
+    .top-row {
+      margin: @gutter;
+      margin-bottom: 0;
+    }
+    .bottom-row {
+      height: 100%;
+      margin: @gutter;
+    }
   }
 
   .panel {
@@ -118,9 +128,9 @@
   }
 
   .visualization-container {
-    flex: 1;
+    height: 100%;
     padding: @panel-horizontal-padding;
-    overflow-y: auto;
+    overflow: auto;
   }
 
   .pinboard {

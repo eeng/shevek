@@ -29,7 +29,7 @@
          [chart-visualization viz]))]))
 
 (defn visualization-panel []
-  [:div.visualization-container.zone.panel.ui.basic.segment
+  [:div.visualization-container.ui.basic.segment
    (merge (droppable #(dispatch :split-replaced %))
           (rpc/loading-class [:viewer :visualization]))
    [visualization (db/get-in [:viewer :visualization])]])
