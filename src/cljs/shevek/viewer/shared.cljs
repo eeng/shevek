@@ -79,9 +79,8 @@
 
 (def measure-value dimension-value)
 
-(defn format-measure [{:keys [type format] :as dim} result & {:keys [nil-as-zero?] :or {nil-as-zero? false}}]
-  (when-let [value (cond-> (measure-value dim result)
-                           nil-as-zero? (or 0))]
+(defn format-measure [{:keys [type format] :as dim} result]
+  (when-let [value (measure-value dim result)]
     (if format
       (num/format value format)
       (condp = type
