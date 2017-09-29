@@ -37,8 +37,8 @@
 (defn- report-card [{:keys [name description] :as report}]
   (dispatch :dashboard/cube-requested report)
   (fn []
-    [:a.report.card {:on-click #(dispatch :report-selected report)}
-     [:div.content
+    [:div.report.card
+     [:div.content {:on-click #(dispatch :report-selected report)}
       [:div.header name]
       [:div.meta description]]
      [:div.content.visualization-container

@@ -1,10 +1,8 @@
 #dashboard {
-  .cube.card {
-    .header { margin-bottom: .2em }
-  }
   .report.card {
     .content:first-child {
       flex-grow: 0;
+      cursor: pointer;
     }
     .visualization-container {
       height: 393px;
@@ -12,6 +10,7 @@
       padding: .9em .7em;
       position: relative;
       .ui.statistics { padding: 10px; }
+      th, td { cursor: default !important; }
     }
     .dimmer { background-color: rgba(255, 255, 255, 0.3); } // Tiene 0.8 de transparencia en Semantic
   }
