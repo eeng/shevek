@@ -1,9 +1,12 @@
 #admin {
   section.users {
     margin-bottom: 3em;
-    .red.button:active {
-      background-color: #d01919 !important;
-      color: white !important;
+    .red.button {
+      transition: all .7s linear;
+      &:active {
+        background-color: #d01919 !important;
+        color: white !important;
+      }
     }
     h3.header {
       .more.muted;
