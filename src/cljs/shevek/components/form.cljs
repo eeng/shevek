@@ -140,24 +140,20 @@
         [:i.search.icon])]))
 
 (defonce holding (r/atom nil))
-(def holding-time 1)
+
+(defn stop-timeout []
+  (swap! holding js/clearTimeout))
 
 (defn cancel-timeout []
   (when @holding
-    (swap! holding js/clearTimeout)
+    (stop-timeout)
     (notify (t :actions/hold-delete) :type :info)))
 
-(defonce mouseup-listener
-  (do
-    (.addEventListener js/document "mouseup" cancel-timeout true)
-    true))
-
 (defn start-timeout [action]
-  (let [later (fn []
-                (action)
-                (reset! holding nil))]
-    (reset! holding (js/setTimeout later (* holding-time 1000)))))
+  (reset! holding (js/setTimeout #(do (stop-timeout) (action)) 1000)))
 
 (defn hold-to-confirm [on-confirm]
   {:on-mouse-down #(start-timeout on-confirm)
+   :on-mouse-up cancel-timeout
+   :on-mouse-leave cancel-timeout
    :on-click #(.stopPropagation %)})
