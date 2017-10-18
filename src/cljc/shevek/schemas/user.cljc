@@ -1,9 +1,11 @@
 (ns shevek.schemas.user
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [shevek.schemas.report :refer [Filter]]))
 
 (s/defschema CubePermissions
   {:name s/Str
-   (s/optional-key :measures) (s/cond-pre (s/eq "all") [s/Str])})
+   (s/optional-key :measures) (s/cond-pre (s/eq "all") [s/Str])
+   (s/optional-key :filters) [Filter]})
 
 (s/defschema User
   {(s/optional-key :id) s/Str

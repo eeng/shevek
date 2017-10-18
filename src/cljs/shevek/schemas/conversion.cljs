@@ -75,6 +75,3 @@
   (-> (add-str-interval viewer)
       (assoc :cube (cube :name))
       (st/select-schema RawQuery)))
-
-(defn report->query [report cube]
-  (-> report (report->viewer cube) (assoc :totals true) viewer->query))

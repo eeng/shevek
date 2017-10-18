@@ -15,8 +15,9 @@
              Report save-report
              Dashboard save-dashboard})
 
-(defn make [schema args]
-  (c/complete args schema))
+(defn make
+  ([schema] (make schema {}))
+  ([schema args] (c/complete args schema)))
 
 (defn make!
   ([schema] (make! schema {}))
