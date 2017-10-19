@@ -11,8 +11,8 @@
 (defn includes-dim? [coll dim]
   (some #(dim= % dim) coll))
 
-(defn time-dimension? [{:keys [name interval granularity]}]
-  (or (= name "__time") interval granularity))
+(defn time-dimension? [{:keys [name interval period granularity]}]
+  (or (= name "__time") interval period granularity))
 
 (defn time-dimension [dimensions]
   (some #(when (time-dimension? %) %) dimensions))

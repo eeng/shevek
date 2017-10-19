@@ -1,4 +1,5 @@
 (ns shevek.lib.dates
+  (:require [clj-time.core :as t])
   (:import org.joda.time.DateTime org.joda.time.Period))
 
 (defn plus-period [str-date str-period]

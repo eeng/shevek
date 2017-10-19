@@ -1,7 +1,7 @@
 (ns shevek.lib.dw.time
   (:require [cljs-time.core :as t]
             [cljs-time.format :as f]
-            [shevek.lib.dates :as d :refer [parse-time]]
+            [shevek.lib.dates :as d]
             [cuerdas.core :as str]
             [shevek.lib.dw.dims :refer [time-dimension]]))
 

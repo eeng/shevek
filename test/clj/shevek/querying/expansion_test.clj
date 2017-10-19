@@ -1,6 +1,7 @@
 (ns shevek.querying.expansion-test
   (:require [clojure.test :refer :all]
-            [shevek.querying.expansion :refer [expand-query]]))
+            [shevek.querying.expansion :refer [expand-query]]
+            [shevek.lib.time :refer [date-time now]]))
 
 (deftest expand-query-test
   (testing "should gather measures information from the schema"
@@ -32,4 +33,19 @@
     (is (= "America/Lima"
            (:time-zone (expand-query {} {:default-time-zone "America/Lima"}))))
     (is (= "America/Buenos_Aires"
-           (:time-zone (expand-query {:time-zone "America/Buenos_Aires"} {:default-time-zone "America/Lima"}))))))
+           (:time-zone (expand-query {:time-zone "America/Buenos_Aires"} {:default-time-zone "America/Lima"})))))
+
+  (testing "should convert relative periods to absolute intervals"
+    (with-redefs [now (constantly (date-time 2017 3 15 10 30))]
+      (is (= ["2017-03-15T00:00:00.000Z" "2017-03-15T23:59:59.999Z"]
+             (->> (expand-query {:filters [{:period "current-day"}]} {})
+                  :filters first :interval))))
+
+    (is (= ["2017-03-05T17:29:00.000Z" "2017-03-06T17:29:00.000Z"]
+           (->> (expand-query {:filters [{:period "latest-day"}]} {:max-time "2017-03-06T17:28"})
+                :filters first :interval))))
+
+  (testing "should expand absolute interval to"
+    (is (= ["2017-01-01T03:00:00.000Z" "2018-01-01T23:59:59.999Z"]
+           (->> (expand-query {:filters [{:interval ["2017" "2018"]}]} {})
+                :filters first :interval)))))
