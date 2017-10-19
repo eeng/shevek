@@ -181,3 +181,11 @@
                    {:name "isUnpatrolled" :on "columns"}]
           :measures [{:name "count" :expression "(sum $count)"}]
           :totals true})
+
+; Extraction functions
+#_(query shevek.dw/dw
+         {:cube "wikiticker"
+          :filters [{:interval ["2015" "2016"]}
+                    {:name "año" :operator "include" :value #{"2015"} :column "__time" :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}]
+          :measures [{:name "count" :expression "(sum $count)"}]
+          :totals true})
