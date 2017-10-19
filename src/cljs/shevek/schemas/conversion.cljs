@@ -10,15 +10,18 @@
   (assoc (time-dimension dimensions)
          :period :latest-day))
 
-(defn build-new-viewer [{:keys [measures] :as cube}]
-  (let [measures (if (some :favorite measures)
-                  (filter :favorite measures)
-                  (take 3 measures))]
+(defn- default-measures [{:keys [measures]}]
+  (vec (if (some :favorite measures)
+         (filter :favorite measures)
+         (take 3 measures))))
+
+(defn build-new-viewer [cube]
+  (let [measures (default-measures cube)]
     {:cube cube
      :viztype :totals
      :filters [(build-time-filter cube)]
      :splits []
-     :measures (vec measures)
+     :measures measures
      :pinboard {:measure (first measures) :dimensions []}}))
 
 (defn- report-dim->viewer [{:keys [name period interval sort-by value] :as dim}
@@ -38,7 +41,8 @@
    :filters (report-dims->viewer (report :filters) cube)
    :splits (report-dims->viewer (report :splits) cube)
    :measures (filterv some? (map #(find-dimension % (cube :measures)) (report :measures)))
-   :pinboard {:measure (find-dimension (:measure pinboard) (cube :measures))
+   :pinboard {:measure (or (find-dimension (:measure pinboard) (cube :measures)) 
+                           (first (default-measures cube)))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
 (defn- viewer-dim->report [{:keys [period interval value sort-by] :as dim}]

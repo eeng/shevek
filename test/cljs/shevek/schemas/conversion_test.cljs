@@ -67,6 +67,12 @@
                                 :measures [{:name "otherM" :type "..."} {:name "count" :type "longSum"}]})
                :pinboard))))
 
+  (testing "if the pinboard measure in the report doesn't exist on the cube (because the user shouldn't see it) should use the first available measure"
+    (is (= {:measure {:name "count" :type "longSum"} :dimensions []}
+           (-> {:pinboard {:measure "secretAmount"}}
+               (report->viewer {:measures [{:name "count" :type "longSum"}]})
+               :pinboard))))
+
   (testing "should convert back the viztype"
     (is (= :pie-chart (:viztype (report->viewer {:viztype "pie-chart"} {})))))
 
