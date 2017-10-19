@@ -4,7 +4,8 @@
             [shevek.schema.repository :refer [find-cube]]
             [shevek.querying.aggregation :as agg]
             [shevek.querying.raw :as raw]
-            [shevek.querying.auth :as auth]))
+            [shevek.querying.auth :as auth]
+            [shevek.querying.expansion :refer [expand-query]]))
 
 (defn- expand-with-schema [{:keys [cube] :as q}]
   (let [{:keys [default-time-zone]} (find-cube db cube)]
@@ -20,3 +21,8 @@
   (->> (expand-with-schema q)
        (auth/filter-query user)
        (raw/query dw)))
+
+(defn querz [{:keys [user]} {:keys [cube] :as q}]
+  (->> (expand-query q (find-cube db cube))
+       (auth/filter-query user)
+       (agg/query dw)))

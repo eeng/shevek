@@ -49,3 +49,7 @@
     (is (= ["2017-01-01T03:00:00.000Z" "2018-01-01T23:59:59.999Z"]
            (->> (expand-query {:filters [{:interval ["2017" "2018"]}]} {})
                 :filters first :interval)))))
+
+  ; TODO should respect query and default-time-zone
+
+  ; TODO max-time should be stored on the db

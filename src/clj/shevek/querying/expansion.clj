@@ -13,7 +13,8 @@
 
 (defn- relative-to-absolute-time [q max-time]
   (transform [:filters ALL time-dimension?]
-             #(assoc % :interval (effective-interval % max-time))
+             #(-> (assoc % :interval (effective-interval % max-time))
+                  (dissoc :period))
              q))
 
 ; TODO ver si las keys se podrian sacar direcamente de los schemas para no duplicar esa info
