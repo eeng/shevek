@@ -6,9 +6,11 @@
             [shevek.querying.raw :as raw]
             [shevek.querying.auth :as auth]
             [shevek.querying.expansion :refer [expand-query]]
-            [shevek.schema.api :refer [max-time]]))
+            [shevek.schema.api :refer [max-time]]
+            [shevek.schemas.query2 :refer [Query]]
+            [schema.core :as s]))
 
-(defn query [{:keys [user]} {:keys [cube] :as q}]
+(s/defn query [{:keys [user]} {:keys [cube] :as q} :- Query]
   (->> (find-cube db cube)
        (merge {:max-time (max-time nil cube)}) ; TODO remove
        (expand-query q)

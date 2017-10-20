@@ -1,4 +1,4 @@
-(require '[shevek.querying.api2 :refer [query]])
+(require '[shevek.querying.api2 :refer [query]] :reload)
 (def request {})
 
 ; Totals query
@@ -122,6 +122,6 @@
 #_(query request
          {:cube "wikiticker"
           :filters [{:period "latest-day"}
-                    {:name "año" :operator "include" :value #{"2015"} :column "__time" :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}]
+                    {:name "year" :operator "include" :value #{"2015"}}]
           :measures ["count"]
           :totals true})
