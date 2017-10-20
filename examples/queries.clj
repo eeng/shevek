@@ -4,8 +4,7 @@
 ; Totals query
 #_(query user
          {:cube "wikiticker"
-          :measures ["count"
-                     {:name "added" :expression "(sum $added)"}]
+          :measures ["count" "added"]
           :filters [{:period "latest-day"}]})
 
 ; One dimension and one measure
@@ -93,8 +92,7 @@
 #_(query user
          {:cube "wikiticker"
           :splits [{:name "isUnpatrolled" :limit 2 :on "columns"}]
-          :measures ["count"
-                     {:name "added" :expression "(sum $added)"}]
+          :measures ["count" "added"]
           :filters [{:period "latest-day"}]
           :totals true})
 

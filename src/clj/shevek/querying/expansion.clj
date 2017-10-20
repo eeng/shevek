@@ -24,7 +24,7 @@
         (merge dim))))
 
 (defn expand-query
-  "Take a query and the corresponding cube schema and expands the query parts with the schema information"
+  "Take a query and the corresponding cube schema and expands it with some schema information necessary to execute the query"
   [q {:keys [measures dimensions default-time-zone max-time]}]
   (-> q
       (update :measures (partial map #(expand-dim % measures [:expression])))
