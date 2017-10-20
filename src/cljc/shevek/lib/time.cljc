@@ -66,3 +66,7 @@
 
 (defn system-time-zone []
   (str (t/default-time-zone)))
+
+(defn from-time-zone [dt tz]
+  #?(:clj (t/from-time-zone dt (t/time-zone-for-id tz))))
+  ; TODO cljs

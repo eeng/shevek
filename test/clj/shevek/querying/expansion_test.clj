@@ -49,21 +49,21 @@
   (testing "should convert relative periods to absolute intervals"
     (with-redefs [now (constantly (date-time 2017 3 15 10 30))]
       (is (= ["2017-03-15T00:00:00.000Z" "2017-03-15T23:59:59.999Z"]
-             (->> (expand-query {:filters [{:period "current-day"}]} {})
+             (->> (expand-query {:filters [{:period "current-day"}]} {:default-time-zone "Europe/London"})
                   :filters first :interval))))
 
     (is (= ["2017-03-05T17:29:00.000Z" "2017-03-06T17:29:00.000Z"]
-           (->> (expand-query {:filters [{:period "latest-day"}]} {:max-time "2017-03-06T17:28"})
+           (->> (expand-query {:filters [{:period "latest-day"}]}
+                              {:max-time "2017-03-06T17:28" :default-time-zone "Europe/London"})
                 :filters first :interval))))
 
   (testing "should expand absolute interval to the end of the day"
-    (is (= ["2017-01-01T03:00:00.000Z" "2018-01-01T23:59:59.999Z"]
-           (->> (expand-query {:filters [{:interval ["2017" "2018"]}]} {})
+    (is (= ["2017-01-01T00:00:00.000Z" "2018-01-01T23:59:59.999Z"]
+           (->> (expand-query {:filters [{:interval ["2017" "2018"]}]} {:default-time-zone "Europe/London"})
                 :filters first :interval))))
 
   (testing "should respect the time-zone for the relative to absolute time conversion"
     (with-redefs [now (constantly (date-time 2017 3 15))]
       (is (= ["2017-03-01T03:00:00.000Z" "2017-04-01T02:59:59.999Z"]
-             (->> (expand-query {:filters [{:period "current-month"}]}
-                                {:default-time-zone "America/Buenos_Aires"})
+             (->> (expand-query {:filters [{:period "current-month"}] :time-zone "America/Argentina/Buenos_Aires"} {})
                   :filters first :interval))))))

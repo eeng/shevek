@@ -1,19 +1,13 @@
 (ns shevek.querying.expansion
   (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension?]]
             [shevek.lib.collections :refer [reverse-merge]]
-            [shevek.lib.period :refer [to-interval normalize-interval]]
+            [shevek.lib.period :refer [effective-interval]]
             [shevek.lib.time :as t]
             [com.rpl.specter :refer [transform ALL]]))
 
-(defn- effective-interval [{:keys [period interval time-zone]} max-time]
-  (let [interval (if period
-                   (to-interval period max-time)
-                   (normalize-interval interval))]
-    (map t/to-iso8601 interval)))
-
-(defn- relative-to-absolute-time [q max-time]
+(defn- relative-to-absolute-time [{:keys [time-zone] :as q} max-time]
   (transform [:filters ALL time-dimension?]
-             #(-> (assoc % :interval (effective-interval % max-time))
+             #(-> (assoc % :interval (map t/to-iso8601 (effective-interval % max-time time-zone)))
                   (dissoc :period))
              q))
 
