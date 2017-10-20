@@ -55,8 +55,9 @@
        (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw q [])))
        (build-row-if-no-results q)))
 
-(s/defn query [dw {:keys [cube totals] :as q} :- Query]
-  (let [grand-totals (if totals (resolve-grand-totals dw q) [])]
+(s/defn query [dw {:keys [cube totals splits] :as q} :- Query]
+  (let [totals (or totals (empty? splits))
+        grand-totals (if totals (resolve-grand-totals dw q) [])]
     (concat grand-totals
             (resolve-row-splits dw q grand-totals))))
 

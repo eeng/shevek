@@ -21,8 +21,3 @@
   (->> (expand-with-schema q)
        (auth/filter-query user)
        (raw/query dw)))
-
-(defn querz [{:keys [user]} {:keys [cube] :as q}]
-  (->> (expand-query q (find-cube db cube))
-       (auth/filter-query user)
-       (agg/query dw)))

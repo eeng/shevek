@@ -22,12 +22,21 @@
                                          :extraction [{:type "timeFormat" :format "Y"}]}]})))))
 
   (testing "should gather dimensions information from the schema for the splits"
-    (is (= [{:name "año" :operator "include" :value #{"2015"} :column "__time" :type "STRING"
+    (is (= [{:name "año" :operator "include" :value #{"2015"} :column "__time"
              :extraction [{:type "timeFormat" :format "Y"}]}]
            (:splits
             (expand-query {:splits [{:name "año" :operator "include" :value #{"2015"}}]}
-                          {:dimensions [{:name "año" :column "__time" :type "STRING"
+                          {:dimensions [{:name "año" :column "__time"
                                          :extraction [{:type "timeFormat" :format "Y"}]}]})))))
+
+  (testing "should gather dimension/measure information from the schema for the sort-by in the splits"
+    (is (= [{:name "d" :descending true :type "LONG"}
+            {:name "m" :descending false :expression "(sum $m)"}]
+           (->> (expand-query {:splits [{:name "d" :sort-by {:name "d" :descending true}}
+                                        {:name "e" :sort-by {:name "m" :descending false}}]}
+                              {:dimensions [{:name "d" :type "LONG"}]
+                               :measures [{:name "m" :expression "(sum $m)"}]})
+                :splits (map :sort-by)))))
 
   (testing "should set the schema default-time-zone if not present"
     (is (= "America/Lima"

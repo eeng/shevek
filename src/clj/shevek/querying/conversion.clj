@@ -52,7 +52,7 @@
 (defn- generate-metric-field [{:keys [name sort-by] :as dim} measures]
   (let [descending (or (nil? (:descending sort-by)) (:descending sort-by))
         field (if (sort-by-same? dim)
-                {:type "dimension" :ordering (if (numeric-dim? dim) "numeric" "lexicographic")}
+                {:type "dimension" :ordering (if (numeric-dim? sort-by) "numeric" "lexicographic")}
                 {:type "numeric" :metric (or (:name sort-by) (-> measures first :name))})]
     (if (or (and (sort-by-same? dim) (not descending))
             (and (not (sort-by-same? dim)) descending))

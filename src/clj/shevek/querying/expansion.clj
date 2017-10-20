@@ -17,18 +17,19 @@
                   (dissoc :period))
              q))
 
-; TODO ver si las keys se podrian sacar direcamente de los schemas para no duplicar esa info
+(defn- expand-dim [dim dimensions schema-keys-to-keep]
+  (let [dim (if (string? dim) {:name dim} dim)]
+    (-> (find-dimension (:name dim) dimensions)
+        (select-keys schema-keys-to-keep)
+        (merge dim))))
+
 (defn expand-query
   "Take a query and the corresponding cube schema and expands the query parts with the schema information"
   [q {:keys [measures dimensions default-time-zone max-time]}]
-  (let [expand-measure #(-> (find-dimension % measures)
-                            (select-keys [:name :expression]))
-        expand-dimension #(-> (find-dimension (:name %) dimensions)
-                              (select-keys [:name :column :extraction :type])
-                              (merge %))]
-    (-> q
-        (update :measures (partial map expand-measure))
-        (update :filters (partial map expand-dimension))
-        (update :splits (partial map expand-dimension))
-        (reverse-merge {:time-zone default-time-zone})
-        (relative-to-absolute-time max-time))))
+  (-> q
+      (update :measures (partial map #(expand-dim % measures [:expression])))
+      (update :filters (partial map #(expand-dim % dimensions [:column :extraction])))
+      (update :splits (partial map #(cond-> (expand-dim % dimensions [:column :extraction])
+                                            (:sort-by %) (update :sort-by expand-dim (concat dimensions measures) [:type :expression]))))
+      (reverse-merge {:time-zone default-time-zone})
+      (relative-to-absolute-time max-time)))

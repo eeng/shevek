@@ -110,11 +110,11 @@
 
     (testing "ordering by numeric dimensions should use numeric sorting"
       (is (submap? {:metric {:type "dimension" :ordering "numeric"}}
-                   (to-druid-query {:dimension {:name "aLong" :type "LONG"
-                                                :sort-by {:name "aLong" :descending false}}})))
+                   (to-druid-query {:dimension {:name "aLong"
+                                                :sort-by {:name "aLong" :descending false :type "LONG"}}})))
       (is (submap? {:metric {:type "dimension" :ordering "numeric"}}
-                   (to-druid-query {:dimension {:name "aFloat" :type "FLOAT"
-                                                :sort-by {:name "aFloat" :descending false}}})))))
+                   (to-druid-query {:dimension {:name "aFloat"
+                                                :sort-by {:name "aFloat" :descending false :type "FLOAT"}}})))))
 
   (testing "measures"
     (testing "arithmetic expression"
