@@ -5,8 +5,6 @@
             [shevek.lib.dw.dims :refer [time-dimension? partition-splits row-split? col-split?]]
             [shevek.lib.collections :refer [detect]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
-            [shevek.schemas.query :refer [Query]]
-            [schema.core :as s]
             [com.rpl.specter :refer [setval ALL]]))
 
 (defn- send-query [dw q]
@@ -55,7 +53,7 @@
        (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw q [])))
        (build-row-if-no-results q)))
 
-(s/defn query [dw {:keys [cube totals splits] :as q} :- Query]
+(defn query [dw {:keys [cube totals splits] :as q}]
   (let [totals (or totals (empty? splits))
         grand-totals (if totals (resolve-grand-totals dw q) [])]
     (concat grand-totals

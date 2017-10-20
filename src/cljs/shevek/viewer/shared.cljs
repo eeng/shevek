@@ -124,7 +124,7 @@
                   (-> (first value) (format-dim-value dim) (str/prune 15))
                   (count value))]
     (cond
-      period [:span (translation :viewer.period period)]
+      period [:span (translation :viewer.period (keyword period))]
       interval [:span (format-interval interval)]
       :else [:span title " "
              (when (seq value)

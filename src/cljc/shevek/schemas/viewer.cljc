@@ -22,7 +22,7 @@
 (s/defschema TimeFilter
   (assoc Dimension
          :name (s/eq "__time")
-         (s/optional-key :period) s/Keyword
+         (s/optional-key :period) s/Str
          (s/optional-key :interval) [(s/one s/Any "from") (s/one s/Any "to")]))
 
 (s/defschema NormalFilter

@@ -68,22 +68,23 @@
                   :filters (cond-> [(first (viewer :filters))]
                                    (seq search) (conj (assoc dim :operator "search" :value search)))
                   :splits [(assoc dim :limit 50)]
-                  :measures [{:expression "(count)" :name "rowCount"}]}
+                  :measures [{:name "rowCount"}]}
               [:filter name]))
 
 (def available-relative-periods
-  {:latest-hour "1H" :latest-day "1D" :latest-7days "7D" :latest-30days "30D" :latest-90days "90D"
-   :current-day "D" :current-week "W" :current-month "M" :current-quarter "Q" :current-year "Y"
-   :previous-day "D" :previous-week "W" :previous-month "M" :previous-quarter "Q" :previous-year "Y"})
+  {"latest-hour" "1H" "latest-day" "1D" "latest-7days" "7D" "latest-30days" "30D" "latest-90days" "90D"
+   "current-day" "D" "current-week" "W" "current-month" "M" "current-quarter" "Q" "current-year" "Y"
+   "previous-day" "D" "previous-week" "W" "previous-month" "M" "previous-quarter" "Q" "previous-year" "Y"})
 
 (defn- period-buttons [dim showed-period header periods]
   [:div.periods
    [:h2.ui.sub.header header]
    [:div.ui.five.small.basic.buttons
-     (for [period periods]
+     (for [period periods
+           :let [active? (= period (:period dim))]]
        [:button.ui.button {:key period
-                           :class (when (= period (:period dim)) "active")
-                           :on-click #(when-not (= period (:period dim))
+                           :class (when active? "active")
+                           :on-click #(when-not active?
                                         (dispatch :filter-options-changed dim {:period period}))
                            :on-mouse-over #(reset! showed-period period)
                            :on-mouse-out #(reset! showed-period (dim :period))}
@@ -94,11 +95,11 @@
     (fn [dim]
       [:div.relative.period-type
        [period-buttons dim showed-period (t :viewer.period/latest)
-        [:latest-hour :latest-day :latest-7days :latest-30days :latest-90days]]
+        ["latest-hour" "latest-day" "latest-7days" "latest-30days" "latest-90days"]]
        [period-buttons dim showed-period (t :viewer.period/current)
-        [:current-day :current-week :current-month :current-quarter :current-year]]
+        ["current-day" "current-week" "current-month" "current-quarter" "current-year"]]
        [period-buttons dim showed-period (t :viewer.period/previous)
-        [:previous-day :previous-week :previous-month :previous-quarter :previous-year]]
+        ["previous-day" "previous-week" "previous-month" "previous-quarter" "previous-year"]]
        [:div.ui.label (if @showed-period
                         (format-period @showed-period (current-cube :max-time))
                         (format-interval interval))]])))
@@ -123,7 +124,7 @@
 (defn- menu-item-for-period-type [period-type period-type-value]
   [:a.item {:class (when (= @period-type period-type-value) "active")
             :on-click #(reset! period-type period-type-value)}
-   (translation :viewer.period period-type-value)])
+   (translation :viewer.period (keyword period-type-value))])
 
 (defn- time-filter-popup [{:keys [period] :as dim}]
   (let [period-type (r/atom (if period :relative :specific))]

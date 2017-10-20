@@ -1,10 +1,8 @@
 (ns shevek.querying.auth
-  (:require [shevek.schemas.query :refer [Query]]
-            [shevek.lib.collections :refer [find-by]]
-            [shevek.schema.auth :refer [filter-measures]]
-            [schema.core :as s]))
+  (:require [shevek.lib.collections :refer [find-by]]
+            [shevek.schema.auth :refer [filter-measures]]))
 
-(s/defn filter-query [{:keys [allowed-cubes] :as user} {:keys [cube] :as q} :- Query]
+(defn filter-query [{:keys [allowed-cubes] :as user} {:keys [cube] :as q}]
   (let [{:keys [filters]} (find-by :name cube allowed-cubes)]
     (-> q
         (update :filters concat filters)

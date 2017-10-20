@@ -95,14 +95,14 @@
              (to-interval :previous-year nil))))))
 
 (deftest format-period-test
-  (testing "periods :latest-xx"
-    (is (= "Apr 24, 4:42pm - Apr 24, 5:42pm" (format-period :latest-hour (d 2000 4 24 17 41 59))))
-    (is (= "Apr 23, 5:42pm - Apr 24, 5:42pm" (format-period :latest-day (d 2000 4 24 17 41 59)))))
+  (testing "periods latest-xx"
+    (is (= "Apr 24, 4:42pm - Apr 24, 5:42pm" (format-period "latest-hour" (d 2000 4 24 17 41 59))))
+    (is (= "Apr 23, 5:42pm - Apr 24, 5:42pm" (format-period "latest-day" (d 2000 4 24 17 41 59)))))
 
-  (testing "periods :current-xx"
+  (testing "periods current-xx"
     (with-redefs [now (constantly (d 2016 4 3 17 30))]
-      (is (= "Apr 3, 2016" (format-period :current-day nil)))
-      (is (= "Mar 28, 2016 - Apr 3, 2016" (format-period :current-week nil))))))
+      (is (= "Apr 3, 2016" (format-period "current-day" nil)))
+      (is (= "Mar 28, 2016 - Apr 3, 2016" (format-period "current-week" nil))))))
 
 (deftest default-granularity-test
   (letfn [(time-dim

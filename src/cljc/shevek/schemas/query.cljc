@@ -1,44 +1,43 @@
 (ns shevek.schemas.query
   (:require [schema.core :as s]))
 
-(s/defschema Interval
-  [(s/one s/Str "from") (s/one s/Str "to")])
+(s/defschema AbsoluteTimeFilter
+  {(s/optional-key :name) s/Str
+   :interval [(s/one s/Str "from") (s/one s/Str "to")]})
+
+(s/defschema RelativeTimeFilter
+  {(s/optional-key :name) s/Str
+   :period s/Str})
 
 (s/defschema TimeFilter
-  {(s/optional-key :name) s/Str
-   :interval Interval})
+  (s/if :interval AbsoluteTimeFilter RelativeTimeFilter))
 
 (s/defschema NormalFilter
   {:name s/Str
    :operator (s/enum "include" "exclude" "search" "is")
-   :value (s/cond-pre s/Str #{(s/maybe s/Str)})
-   (s/optional-key :column) s/Str
-   (s/optional-key :extraction) [{s/Keyword s/Str}]})
+   :value (s/cond-pre s/Str #{(s/maybe s/Str)})})
 
-(s/defschema Measure
-  {:name s/Str
-   :expression s/Str})
+(def Measure s/Str)
 
 (s/defschema SortBy
   {:name s/Str
-   :descending s/Bool
-   (s/optional-key :expression) s/Str
-   (s/optional-key :type) s/Str}) ; Needed for dimension sorting
+   :descending s/Bool})
 
 (s/defschema Split
   {:name s/Str
    (s/optional-key :on) (s/enum "rows" "columns")
    (s/optional-key :limit) s/Int
    (s/optional-key :sort-by) SortBy
-   (s/optional-key :granularity) s/Str
-   (s/optional-key :column) s/Str
-   (s/optional-key :extraction) [{s/Keyword s/Str}]})
+   (s/optional-key :granularity) s/Str})
+
+(s/defschema Filters
+  [(s/one TimeFilter "tf") NormalFilter])
 
 (s/defschema Query
   {:cube s/Str
-   :filters [(s/one TimeFilter "tf") NormalFilter]
+   :filters Filters
    (s/optional-key :splits) [Split]
-   :measures [Measure]
+   :measures (s/constrained [Measure] seq)
    (s/optional-key :totals) s/Bool
    (s/optional-key :time-zone) s/Str})
 
@@ -48,7 +47,7 @@
 
 (s/defschema RawQuery
   {:cube s/Str
-   :filters [(s/one TimeFilter "tf") NormalFilter]
+   :filters Filters
    (s/optional-key :paging) Paging
    (s/optional-key :time-zone) s/Str})
 

@@ -11,6 +11,8 @@
                   (dissoc :period))
              q))
 
+(def row-count {:name "rowCount" :expression "(count)"})
+
 (defn- expand-dim [dim dimensions schema-keys-to-keep]
   (let [dim (if (string? dim) {:name dim} dim)]
     (-> (find-dimension (:name dim) dimensions)
@@ -21,7 +23,7 @@
   "Take a query and the corresponding cube schema and expands it with some schema information necessary to execute the query"
   [q {:keys [measures dimensions default-time-zone max-time]}]
   (-> q
-      (update :measures (partial map #(expand-dim % measures [:expression])))
+      (update :measures (partial map #(expand-dim % (conj measures row-count) [:expression])))
       (update :filters (partial map #(expand-dim % dimensions [:column :extraction])))
       (update :splits (partial map #(cond-> (expand-dim % dimensions [:column :extraction])
                                             (:sort-by %) (update :sort-by expand-dim (concat dimensions measures) [:type :expression]))))

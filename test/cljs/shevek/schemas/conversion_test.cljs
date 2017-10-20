@@ -14,11 +14,11 @@
            (-> {:measures [{:name "added"} {:name "deleted"}]}
                viewer->report :measures))))
 
-  (testing "in each filter should store only the dimension name besides its own fields and converted keywords, dates and sets"
+  (testing "in each filter should store only the dimension name besides its own fields, dates and sets"
     (is (= [{:name "time" :period "current-day"}
             {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
             {:name "page" :operator "exclude" :value [nil]}]
-           (-> {:filters [{:name "time" :type "..." :period :current-day}
+           (-> {:filters [{:name "time" :type "..." :period "current-day"}
                           {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
                           {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
                viewer->report :filters))))
@@ -47,8 +47,8 @@
     (is (= "pie-chart" (:viztype (viewer->report {:viztype :pie-chart}))))))
 
 (deftest report->viewer-tests
-  (testing "should convert back to keywords, dates and sets and add title and other fields"
-    (is (= [{:name "time" :title "Fecha" :period :current-day}
+  (testing "should convert back to dates and sets and add title and other fields"
+    (is (= [{:name "time" :title "Fecha" :period "current-day"}
             {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
             {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
            (-> {:filters [{:name "time" :period "current-day"}

@@ -38,6 +38,11 @@
                                :measures [{:name "m" :expression "(sum $m)"}]})
                 :splits (map :sort-by)))))
 
+  (testing "the special measure rowCount should be expanded with the count expression"
+    (is (= {:name "rowCount" :expression "(count)"}
+           (->> (expand-query {:measures ["rowCount"]} {})
+                :measures first))))
+
   (testing "should use the query time-zone, otherwise the schema default-time-zone, otherwise the system tz"
     (is (= "Europa/Paris"
            (:time-zone (expand-query {:time-zone "Europa/Paris"} {:default-time-zone "America/Lima"}))))
