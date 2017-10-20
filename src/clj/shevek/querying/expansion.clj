@@ -6,10 +6,12 @@
             [com.rpl.specter :refer [transform ALL]]))
 
 (defn- relative-to-absolute-time [{:keys [time-zone] :as q} max-time]
-  (transform [:filters ALL time-dimension?]
-             #(-> (assoc % :interval (map t/to-iso8601 (effective-interval % max-time time-zone)))
-                  (dissoc :period))
-             q))
+  (let [calculate-interval #(t/with-time-zone time-zone
+                              (map t/to-iso8601 (effective-interval % max-time)))]
+    (transform [:filters ALL time-dimension?]
+               #(-> (assoc % :interval (calculate-interval %))
+                    (dissoc :period))
+               q)))
 
 (def row-count {:name "rowCount" :expression "(count)"})
 

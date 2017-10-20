@@ -67,8 +67,13 @@
            (->> (expand-query {:filters [{:interval ["2017" "2018"]}]} {:default-time-zone "Europe/London"})
                 :filters first :interval))))
 
-  (testing "should respect the time-zone for the relative to absolute time conversion"
+  (testing "should respect the time-zone for the time calculations if present"
     (with-redefs [now (constantly (date-time 2017 3 15))]
       (is (= ["2017-03-01T03:00:00.000Z" "2017-04-01T02:59:59.999Z"]
-             (->> (expand-query {:filters [{:period "current-month"}] :time-zone "America/Argentina/Buenos_Aires"} {})
+             (->> (expand-query {:filters [{:period "current-month"}]
+                                 :time-zone "America/Argentina/Buenos_Aires"} {})
+                  :filters first :interval)))
+      (is (= ["2015-01-01T03:00:00.000Z" "2015-01-02T02:59:59.999Z"]
+             (->> (expand-query {:filters [{:interval ["2015-01-01" "2015-01-01"]}]
+                                 :time-zone "America/Argentina/Buenos_Aires"} {})
                   :filters first :interval))))))

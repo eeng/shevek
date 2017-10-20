@@ -2,10 +2,42 @@
   (:require #?@(:clj [[clj-time.core :as t]
                       [clj-time.format :as f]]
                 :cljs [[cljs-time.core :as t]
-                       [cljs-time.format :as f]])))
+                       [cljs-time.format :as f]
+                       [cljs-time.coerce :as c]])))
 
-(def date-time t/date-time)
-(def now t/now)
+(def ^:dynamic *time-zone*
+  #?(:clj (t/time-zone-for-id "UTC")
+     :cljs (t/default-time-zone)))
+
+(defmacro with-time-zone [tz-id & body]
+  `(binding [*time-zone* (t/time-zone-for-id ~tz-id)]
+     ~@body))
+
+(defn- from-time-zone [dt]
+  #?(:clj (t/from-time-zone dt *time-zone*)
+     :cljs (t/from-default-time-zone dt)))
+
+(defn- to-time-zone [dt]
+  #?(:clj (t/to-time-zone dt *time-zone*)
+     :cljs (t/to-default-time-zone dt)))
+
+(defn system-time-zone []
+  (str (t/default-time-zone)))
+
+(defn date-time [& args]
+  (from-time-zone (apply t/date-time args)))
+
+(defn parse-time [str]
+  (if (string? str)
+    #?(:clj (from-time-zone (f/parse str))
+       :cljs (let [parsed (.parse js/Date str)]
+               (when-not (js/isNaN parsed)
+                 (to-time-zone (c/from-long parsed)))))
+    str))
+
+(defn now []
+  (to-time-zone (t/now)))
+
 (def days t/days)
 (def hours t/hours)
 (def minus t/minus)
@@ -57,16 +89,3 @@
 
 (defn to-iso8601 [time]
   (f/unparse (:date-time f/formatters) time))
-
-(defn parse-time [str]
-  #?(:clj (if (string? str)
-            (org.joda.time.DateTime/parse str)
-            str)
-     :cljs str)) ; TODO revisar, en el server necesito parsear el max-time y los interval xq vienen como strings x ahora, pero en el client ya estaban parseados antes, unificar
-
-(defn system-time-zone []
-  (str (t/default-time-zone)))
-
-(defn from-time-zone [dt tz]
-  #?(:clj (t/from-time-zone dt (t/time-zone-for-id tz))))
-  ; TODO cljs

@@ -29,8 +29,7 @@
 (defn normalize-interval [[from to]]
   [(t/parse-time from) (t/end-of-day (t/parse-time to))])
 
-(defn effective-interval [{:keys [period interval]} max-time time-zone]
-  (let [interval (if period
-                   (to-interval period max-time)
-                   (normalize-interval interval))]
-    (map #(t/from-time-zone % time-zone) interval)))
+(defn effective-interval [{:keys [period interval]} max-time]
+  (if period
+    (to-interval period max-time)
+    (normalize-interval interval)))
