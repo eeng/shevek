@@ -2,14 +2,14 @@
   (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension?]]
             [shevek.lib.collections :refer [reverse-merge]]
             [shevek.lib.period :refer [to-interval normalize-interval]]
-            [shevek.lib.time :refer [to-iso8601]]
+            [shevek.lib.time :as t]
             [com.rpl.specter :refer [transform ALL]]))
 
-(defn- effective-interval [{:keys [period interval]} max-time]
+(defn- effective-interval [{:keys [period interval time-zone]} max-time]
   (let [interval (if period
                    (to-interval period max-time)
                    (normalize-interval interval))]
-    (map to-iso8601 interval)))
+    (map t/to-iso8601 interval)))
 
 (defn- relative-to-absolute-time [q max-time]
   (transform [:filters ALL time-dimension?]
@@ -31,5 +31,5 @@
       (update :filters (partial map #(expand-dim % dimensions [:column :extraction])))
       (update :splits (partial map #(cond-> (expand-dim % dimensions [:column :extraction])
                                             (:sort-by %) (update :sort-by expand-dim (concat dimensions measures) [:type :expression]))))
-      (reverse-merge {:time-zone default-time-zone})
+      (reverse-merge {:time-zone (or default-time-zone (t/system-time-zone))})
       (relative-to-absolute-time max-time)))

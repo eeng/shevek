@@ -63,3 +63,6 @@
             (org.joda.time.DateTime/parse str)
             str)
      :cljs str)) ; TODO revisar, en el server necesito parsear el max-time y los interval xq vienen como strings x ahora, pero en el client ya estaban parseados antes, unificar
+
+(defn system-time-zone []
+  (str (t/default-time-zone)))

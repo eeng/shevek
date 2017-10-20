@@ -38,11 +38,13 @@
                                :measures [{:name "m" :expression "(sum $m)"}]})
                 :splits (map :sort-by)))))
 
-  (testing "should set the schema default-time-zone if not present"
+  (testing "should use the query time-zone, otherwise the schema default-time-zone, otherwise the system tz"
+    (is (= "Europa/Paris"
+           (:time-zone (expand-query {:time-zone "Europa/Paris"} {:default-time-zone "America/Lima"}))))
     (is (= "America/Lima"
            (:time-zone (expand-query {} {:default-time-zone "America/Lima"}))))
-    (is (= "America/Buenos_Aires"
-           (:time-zone (expand-query {:time-zone "America/Buenos_Aires"} {:default-time-zone "America/Lima"})))))
+    (is (= "America/Argentina/Buenos_Aires"
+           (:time-zone (expand-query {} {})))))
 
   (testing "should convert relative periods to absolute intervals"
     (with-redefs [now (constantly (date-time 2017 3 15 10 30))]
@@ -54,11 +56,14 @@
            (->> (expand-query {:filters [{:period "latest-day"}]} {:max-time "2017-03-06T17:28"})
                 :filters first :interval))))
 
-  (testing "should expand absolute interval to"
+  (testing "should expand absolute interval to the end of the day"
     (is (= ["2017-01-01T03:00:00.000Z" "2018-01-01T23:59:59.999Z"]
            (->> (expand-query {:filters [{:interval ["2017" "2018"]}]} {})
-                :filters first :interval)))))
+                :filters first :interval))))
 
-  ; TODO should respect query and default-time-zone
-
-  ; TODO max-time should be stored on the db
+  (testing "should respect the time-zone for the relative to absolute time conversion"
+    (with-redefs [now (constantly (date-time 2017 3 15))]
+      (is (= ["2017-03-01T03:00:00.000Z" "2017-04-01T02:59:59.999Z"]
+             (->> (expand-query {:filters [{:period "current-month"}]}
+                                {:default-time-zone "America/Buenos_Aires"})
+                  :filters first :interval))))))
