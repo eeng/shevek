@@ -4,7 +4,7 @@
             [shevek.rpc :as rpc]
             [shevek.navigation :refer [current-page? navigate]]
             [shevek.lib.dw.cubes :refer [set-cube-defaults]]
-            [shevek.lib.dates :refer [parse-time]]
+            [shevek.lib.time :refer [parse-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name cube-authorized?]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
@@ -55,6 +55,7 @@
   (let [{:keys [cube] :as report} (restore-report-from-url encoded-report)]
     (prepare-cube db cube report)))
 
+; TODO no seria necesario parsear el max-time aca si se manda listo desde el server
 (defevh :max-time-arrived [db max-time]
   (if-let [new-data (> (parse-time max-time) (get-in db [:viewer :cube :max-time]))]
     (-> (assoc-in db [:viewer :cube :max-time] (parse-time max-time))

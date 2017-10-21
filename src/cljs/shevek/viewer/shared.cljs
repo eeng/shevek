@@ -2,7 +2,7 @@
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
             [reagent.core :as r]
-            [shevek.lib.dates :refer [format-time-according-to-period to-iso8601]]
+            [shevek.lib.dates :refer [format-time-according-to-period]]
             [shevek.lib.dw.time :refer [format-interval]]
             [shevek.lib.number :as num]
             [shevek.lib.util :refer [debounce]]

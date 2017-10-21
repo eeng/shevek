@@ -4,9 +4,11 @@
             [cuerdas.core :as str]
             [shevek.i18n :refer [t translation]]
             [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension merge-dimensions]]
-            [shevek.lib.dw.time :refer [format-period format-interval to-interval]]
+            [shevek.lib.dw.time :refer [format-period format-interval]]
+            [shevek.lib.period :refer [to-interval]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.lib.dates :refer [format-date parse-date]]
+            [shevek.lib.dates :refer [format-date]]
+            [shevek.lib.time :refer [parse-time]]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value debounce-dispatch highlight current-cube dimension-value send-pinboard-queries filter-title]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching]]
             [shevek.components.popup :refer [show-popup close-popup]]
@@ -107,7 +109,7 @@
 (defn- specific-period-time-filter [{:keys [period interval] :as dim}]
   (let [interval (or interval (to-interval period (current-cube :max-time)))
         form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
-        parse #(map parse-date ((juxt :from :to) %))
+        parse #(map parse-time ((juxt :from :to) %))
         accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})]
     (fn []
       (let [[from to] (parse @form-interval)

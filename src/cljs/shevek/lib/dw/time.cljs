@@ -1,33 +1,10 @@
 (ns shevek.lib.dw.time
   (:require [cljs-time.core :as t]
             [cljs-time.format :as f]
+            [shevek.lib.dw.dims :refer [time-dimension]]
+            [shevek.lib.period :refer [effective-interval to-interval]]
             [shevek.lib.dates :as d]
-            [cuerdas.core :as str]
-            [shevek.lib.dw.dims :refer [time-dimension]]))
-
-(defn to-interval [period max-time]
-  (let [now (d/now)
-        max-time (d/round-to-next-minute (or max-time now))
-        day-of-last-week (t/minus (d/beginning-of-week now) (t/days 1))
-        day-of-last-month (t/minus (d/beginning-of-month now) (t/days 1))
-        day-of-last-quarter (t/minus (d/beginning-of-quarter now) (t/days 1))
-        day-of-last-year (t/minus (d/beginning-of-year now) (t/days 1))]
-    (case period
-      :latest-hour [(t/minus max-time (t/hours 1)) max-time]
-      :latest-day [(t/minus max-time (t/days 1)) max-time]
-      :latest-7days [(t/minus max-time (t/days 7)) max-time]
-      :latest-30days [(t/minus max-time (t/days 30)) max-time]
-      :latest-90days [(t/minus max-time (t/days 90)) max-time]
-      :current-day [(d/beginning-of-day now) (d/end-of-day now)]
-      :current-week [(d/beginning-of-week now) (d/end-of-week now)]
-      :current-month [(d/beginning-of-month now) (d/end-of-month now)]
-      :current-quarter [(d/beginning-of-quarter now) (d/end-of-quarter now)]
-      :current-year [(d/beginning-of-year now) (d/end-of-year now)]
-      :previous-day [(d/beginning-of-day (d/yesterday)) (d/end-of-day (d/yesterday))]
-      :previous-week [(d/beginning-of-week day-of-last-week) (d/end-of-week day-of-last-week)]
-      :previous-month [(d/beginning-of-month day-of-last-month) (d/end-of-month day-of-last-month)]
-      :previous-quarter [(d/beginning-of-quarter day-of-last-quarter) (d/end-of-quarter day-of-last-quarter)]
-      :previous-year [(d/beginning-of-year day-of-last-year) (d/end-of-year day-of-last-year)])))
+            [cuerdas.core :as str]))
 
 (defn format-interval
   ([interval] (format-interval interval (d/formatter :day)))
@@ -40,16 +17,10 @@
 (defn format-period [period max-time]
   (let [formatter (d/formatter
                    (if (str/starts-with? period "latest") :minute :day))]
-    (format-interval (to-interval (keyword period) max-time) formatter)))
+    (format-interval (to-interval period max-time) formatter)))
 
-(defn effective-interval [{:keys [filters cube]}]
-  (let [{:keys [period interval]} (time-dimension filters)]
-    (if period
-      (to-interval period (:max-time cube))
-      [(first interval) (d/end-of-day (second interval))])))
-
-(defn default-granularity [viewer]
-  (let [[from to] (effective-interval viewer)
+(defn default-granularity [{:keys [filters cube]}]
+  (let [[from to] (effective-interval (time-dimension filters) (:max-time cube))
         span (t/in-days (t/interval from to))]
     (cond
       (<= span 7) "PT1H"

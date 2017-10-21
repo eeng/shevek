@@ -26,6 +26,7 @@
       "previous-quarter" [(t/beginning-of-quarter day-of-last-quarter) (t/end-of-quarter day-of-last-quarter)]
       "previous-year" [(t/beginning-of-year day-of-last-year) (t/end-of-year day-of-last-year)])))
 
+; TODO no me convence esto, los intervalos se le deberian pasar si tocar a druid, sino seria imposible usar una hora cualquiera
 (defn normalize-interval [[from to]]
   [(t/parse-time from) (t/end-of-day (t/parse-time to))])
 

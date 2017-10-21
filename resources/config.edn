@@ -163,5 +163,4 @@
                 {:name "regionIsoCode" :title "Region ISO Code"}
                 {:name "countryIsoCode" :title "Country ISO Code"}
                 {:name "year" :column "__time" :extraction [{:type "timeFormat" :format "Y"}]}]
-   :measures [{:name "count" :description "Some interesting count"}]
-   :default-time-zone "America/New_York"}]}
+   :measures [{:name "count" :description "Some interesting count"}]}]}

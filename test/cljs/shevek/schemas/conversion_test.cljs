@@ -3,7 +3,7 @@
   (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [submap? submaps? without?]]
             [shevek.schemas.conversion :refer [viewer->report report->viewer]]
-            [shevek.lib.dates :refer [date-time]]))
+            [shevek.lib.time :refer [date-time]]))
 
 (deftest viewer->report-tests
   (testing "should store only the cube name"

@@ -3,10 +3,11 @@
                       [clj-time.format :as f]]
                 :cljs [[cljs-time.core :as t]
                        [cljs-time.format :as f]
-                       [cljs-time.coerce :as c]])))
+                       [cljs-time.coerce :as c]])
+            [cuerdas.core :as str]))
 
 (def ^:dynamic *time-zone*
-  #?(:clj (t/time-zone-for-id "UTC")
+  #?(:clj t/utc
      :cljs (t/default-time-zone)))
 
 (defmacro with-time-zone [tz-id & body]
@@ -29,10 +30,11 @@
 
 (defn parse-time [str]
   (if (string? str)
-    #?(:clj (from-time-zone (f/parse str))
-       :cljs (let [parsed (.parse js/Date str)]
-               (when-not (js/isNaN parsed)
-                 (to-time-zone (c/from-long parsed)))))
+    (let [converter (if (str/includes? str "T") to-time-zone from-time-zone)]
+      #?(:clj (converter (f/parse str))
+         :cljs (let [parsed (.parse js/Date str)]
+                 (when-not (js/isNaN parsed)
+                   (converter (c/from-long parsed))))))
     str))
 
 (defn now []
@@ -88,4 +90,6 @@
              (t/hour time) (mod (inc (t/minute time)) 60) 0))
 
 (defn to-iso8601 [time]
-  (f/unparse (:date-time f/formatters) time))
+  (f/unparse (:date-time f/formatters)
+    #?(:clj (t/to-time-zone time t/utc)
+       :cljs (t/to-utc-time-zone time))))

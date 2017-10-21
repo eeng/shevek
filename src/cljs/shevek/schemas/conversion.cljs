@@ -1,6 +1,6 @@
 (ns shevek.schemas.conversion
   (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension]]
-            [shevek.lib.dates :refer [to-iso8601 parse-time]]
+            [shevek.lib.time :refer [to-iso8601 parse-time]]
             [shevek.schemas.query :refer [Query RawQuery]]
             [schema-tools.core :as st]
             [com.rpl.specter :refer [setval ALL]]))
@@ -57,12 +57,13 @@
    :pinboard {:measure (-> pinboard :measure :name)
               :dimensions (map viewer-dim->report (:dimensions pinboard))}})
 
-(defn viewer->query [{:keys [cube] :as viewer}]
-  (-> (assoc viewer :cube (cube :name))
-      (update :measures (partial map :name))
-      (st/select-schema Query)))
+(defn viewer->query
+  ([viewer] (viewer->query viewer Query))
+  ([{:keys [cube] :as viewer} schema]
+   (-> (assoc viewer :cube (cube :name))
+       (update :measures (partial map :name))
+       (update :filters (partial map viewer-dim->report)) ; TODO Sólo se usa para convertir el interval a string, pero ahora la conversion a query va a ser muy parecida a la de report, refactorizar. 
+       (st/select-schema schema))))
 
-(defn viewer->raw-query [{:keys [cube] :as viewer}]
-  (-> (assoc viewer :cube (cube :name))
-      (update :measures (partial map :name))
-      (st/select-schema RawQuery)))
+(defn viewer->raw-query [viewer]
+  (viewer->query viewer RawQuery))

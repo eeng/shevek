@@ -1,4 +1,4 @@
-(require '[shevek.querying.api2 :refer [query]] :reload)
+(require '[shevek.querying.api :refer [query]] :reload)
 (def request {})
 
 ; Totals query
@@ -62,7 +62,7 @@
 
 #_(query request
          {:cube "wikiticker"
-          :splits [{:name "countryName" :limit 5}]
+          :splits [{:name "countryName" :limit 5}]1
           :filters [{:period "latest-day"}
                     {:name "countryName" :operator "search" :value "arg"}]
           :measures ["count"]})

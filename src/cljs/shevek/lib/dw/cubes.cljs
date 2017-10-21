@@ -2,8 +2,9 @@
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]
-            [shevek.lib.dates :refer [parse-time]]))
+            [shevek.lib.time :refer [parse-time]]))
 
+; TODO no deberia ser necesario parsear aca si se envia listo desde el server
 (defn set-cube-defaults [{:keys [max-time] :as cube}]
   (cond-> cube
           max-time (update :max-time parse-time)))
