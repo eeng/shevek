@@ -16,7 +16,7 @@
 
   (testing "in each filter should store only the dimension name besides its own fields, dates and sets"
     (is (= [{:name "time" :period "current-day"}
-            {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
+            {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-06T02:59:59.999Z"]}
             {:name "page" :operator "exclude" :value [nil]}]
            (-> {:filters [{:name "time" :type "..." :period "current-day"}
                           {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}

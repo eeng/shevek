@@ -62,8 +62,8 @@
                               {:max-time "2017-03-06T17:28" :default-time-zone "Europe/London"})
                 :filters first :interval))))
 
-  (testing "should expand absolute interval to the end of the day"
-    (is (= ["2017-01-01T00:00:00.000Z" "2018-01-01T23:59:59.999Z"]
+  (testing "should not change absolute interval times"
+    (is (= ["2017-01-01T00:00:00.000Z" "2018-01-01T00:00:00.000Z"]
            (->> (expand-query {:filters [{:interval ["2017" "2018"]}]} {:default-time-zone "Europe/London"})
                 :filters first :interval))))
 
@@ -73,7 +73,7 @@
              (->> (expand-query {:filters [{:period "current-month"}]
                                  :time-zone "America/Argentina/Buenos_Aires"} {})
                   :filters first :interval)))
-      (is (= ["2015-01-01T03:00:00.000Z" "2015-01-02T02:59:59.999Z"]
-             (->> (expand-query {:filters [{:interval ["2015-01-01" "2015-01-01"]}]
+      (is (= ["2015-01-01T03:00:00.000Z" "2015-01-02T03:00:00.000Z"]
+             (->> (expand-query {:filters [{:interval ["2015-01-01" "2015-01-02"]}]
                                  :time-zone "America/Argentina/Buenos_Aires"} {})
                   :filters first :interval))))))
