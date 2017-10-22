@@ -11,7 +11,7 @@
             [cuerdas.core :as str]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.string :refer [format-bool]]
-            [shevek.lib.dates :refer [format-time]]))
+            [shevek.lib.time.ext :refer [format-time]]))
 
 (def limit 100)
 

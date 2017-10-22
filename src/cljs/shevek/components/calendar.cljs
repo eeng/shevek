@@ -1,12 +1,12 @@
 (ns shevek.components.calendar
   (:require [shevek.i18n :refer [translation]]
-            [shevek.lib.dates :as dates]
+            [shevek.lib.time.ext :as t]
             [shevek.lib.util :refer [trigger-change]]
             [cljs-time.coerce :as c]))
 
 (defn- format-js-date [date]
   (if date
-    (dates/format-date (c/from-date date))
+    (t/format-date (c/from-date date))
     ""))
 
 (defn build-range-calendar [dom-node]

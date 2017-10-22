@@ -39,4 +39,7 @@
            (is (= "2012-01-01T03:00:00.000Z" (to-iso8601 (parse-time "2012-01-01")))))))
     #?(:cljs
        (testing "if there is only a date should parse as local time"
-         (is (= "2012-01-01T03:00:00.000Z" (to-iso8601 (parse-time "2012-01-01"))))))))
+         (is (= "2012-01-01T03:00:00.000Z" (to-iso8601 (parse-time "2012-01-01"))))))
+
+    (testing "return nil if can't be parsed"
+      (is (nil? (parse-time "..."))))))

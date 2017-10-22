@@ -1,7 +1,7 @@
 (ns shevek.schema.metadata
   (:require [shevek.config :refer [config]]
             [shevek.lib.druid-driver :as druid]
-            [shevek.lib.dates :refer [minus-period]]
+            [shevek.lib.time.ext :refer [minus-period]]
             [clojure.set :refer [rename-keys]]))
 
 (defn cubes [dw]

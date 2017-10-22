@@ -1,7 +1,7 @@
 (ns shevek.querying.aggregation
   (:require [shevek.lib.collections :refer [assoc-if-seq find-by]]
             [shevek.lib.druid-driver :as driver]
-            [shevek.lib.dates :refer [plus-period]]
+            [shevek.lib.time.ext :refer [plus-period]]
             [shevek.lib.dw.dims :refer [time-dimension? partition-splits row-split? col-split?]]
             [shevek.lib.collections :refer [detect]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]

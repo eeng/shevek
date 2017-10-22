@@ -1,4 +1,4 @@
-(ns shevek.lib.dates
+(ns shevek.lib.time.ext
   (:require [clj-time.core :as t])
   (:import org.joda.time.DateTime org.joda.time.Period))
 

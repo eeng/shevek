@@ -62,7 +62,7 @@
   ([{:keys [cube] :as viewer} schema]
    (-> (assoc viewer :cube (cube :name))
        (update :measures (partial map :name))
-       (update :filters (partial map viewer-dim->report)) ; TODO Sólo se usa para convertir el interval a string, pero ahora la conversion a query va a ser muy parecida a la de report, refactorizar. 
+       (update :filters (partial map viewer-dim->report)) ; TODO Sólo se usa para convertir el interval a string, pero ahora la conversion a query va a ser muy parecida a la de report, refactorizar.
        (st/select-schema schema))))
 
 (defn viewer->raw-query [viewer]

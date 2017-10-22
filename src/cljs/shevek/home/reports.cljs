@@ -7,11 +7,11 @@
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
+            [shevek.lib.time.ext :refer [format-time]]
             [shevek.notification :refer [notify]]
             [shevek.home.dashboards :refer [fetch-dashboards]]
             [shevek.menu.reports :refer [fetch-reports save-report-form]]
-            [shevek.components.form :refer [search-input filter-matching by hold-to-confirm]]
-            [shevek.lib.dates :refer [format-time]]))
+            [shevek.components.form :refer [search-input filter-matching by hold-to-confirm]]))
 
 (defevh :delete-report [db {:keys [name] :as report}]
   (rpc/call "reports/delete-report" :args [report]

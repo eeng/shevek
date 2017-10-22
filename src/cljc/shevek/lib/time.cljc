@@ -28,14 +28,22 @@
 (defn date-time [& args]
   (from-time-zone (apply t/date-time args)))
 
-(defn parse-time [str]
-  (if (string? str)
-    (let [converter (if (str/includes? str "T") to-time-zone from-time-zone)]
-      #?(:clj (converter (f/parse str))
-         :cljs (let [parsed (.parse js/Date str)]
-                 (when-not (js/isNaN parsed)
-                   (converter (c/from-long parsed))))))
-    str))
+(defn parse-time [x]
+  (let [converter (if (or (and (string? x) (str/includes? x "T")) (not (string? x)))
+                    to-time-zone
+                    from-time-zone)]
+    #?(:clj
+       (cond
+         (string? x) (when-let [parsed (f/parse x)]
+                       (converter parsed))
+         (instance? org.joda.time.DateTime x) x)
+       :cljs
+       (cond
+         (or (string? x) (instance? js/Date x))
+         (let [parsed (.parse js/Date x)]
+           (when-not (js/isNaN parsed)
+             (converter (c/from-long parsed))))
+         (instance? goog.date.Date x) x))))
 
 (defn now []
   (to-time-zone (t/now)))

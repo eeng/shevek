@@ -1,6 +1,6 @@
-(ns shevek.lib.dw.time-test
+(ns shevek.lib.time.ext-test
   (:require-macros [cljs.test :refer [deftest testing is]])
-  (:require [shevek.lib.dw.time :refer [format-period default-granularity]]
+  (:require [shevek.lib.time.ext :refer [format-period default-granularity]]
             [shevek.lib.time :refer [now date-time]]))
 
 (def d date-time)

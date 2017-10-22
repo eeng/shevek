@@ -15,7 +15,7 @@
 (s/defschema NormalFilter
   {:name s/Str
    :operator (s/enum "include" "exclude" "search" "is")
-   :value (s/cond-pre s/Str #{(s/maybe s/Str)})})
+   :value (s/cond-pre s/Str [(s/maybe s/Str)])})
 
 (def Measure s/Str)
 

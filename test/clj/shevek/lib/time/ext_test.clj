@@ -1,6 +1,6 @@
-(ns shevek.lib.dates-test
+(ns shevek.lib.time.ext-test
   (:require [clojure.test :refer :all]
-            [shevek.lib.dates :refer [plus-period]]))
+            [shevek.lib.time.ext :refer [plus-period]]))
 
 (deftest plus-period-tests
   (is (= "2015-09-01T01:00:00.000Z"

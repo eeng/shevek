@@ -8,7 +8,7 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
             [shevek.lib.dw.dims :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
-            [shevek.lib.dw.time :refer [default-granularity]]
+            [shevek.lib.time.ext :refer [default-granularity]]
             [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside search-input filter-matching]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.filter :refer [filter-operators]]
