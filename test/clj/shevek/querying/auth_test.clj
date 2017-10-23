@@ -1,5 +1,6 @@
 (ns shevek.querying.auth-test
   (:require [clojure.test :refer :all]
+            [shevek.asserts :refer [without?]]
             [shevek.makers :refer [make]]
             [shevek.querying.auth :refer [filter-query]]
             [shevek.schemas.query :refer [Query]]))
@@ -28,4 +29,7 @@
                   :measures (map :name))))
       (is (= []
              (->> (filter-query {:allowed-cubes [{:name "c2" :measures "all"}]} q)
-                  :measures (map :name)))))))
+                  :measures (map :name))))))
+
+  (testing "should not add measures keys if it isn't in the query (raw queries don't have measures)"
+    (is (without? :measures (filter-query {} {})))))

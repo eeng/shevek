@@ -1,7 +1,8 @@
 (ns shevek.querying.expansion-test
   (:require [clojure.test :refer :all]
             [shevek.querying.expansion :refer [expand-query]]
-            [shevek.lib.time :refer [date-time now]]))
+            [shevek.lib.time :refer [date-time now]]
+            [shevek.asserts :refer [without?]]))
 
 (deftest expand-query-test
   (testing "should gather measures information from the schema"
@@ -76,4 +77,8 @@
       (is (= ["2015-01-01T03:00:00.000Z" "2015-01-02T03:00:00.000Z"]
              (->> (expand-query {:filters [{:interval ["2015-01-01" "2015-01-02"]}]
                                  :time-zone "America/Argentina/Buenos_Aires"} {})
-                  :filters first :interval))))))
+                  :filters first :interval)))))
+
+  (testing "raw queries don't have splits nor measures"
+    (is (without? :splits (expand-query {} {})))
+    (is (without? :measures (expand-query {} {})))))

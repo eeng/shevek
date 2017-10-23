@@ -10,15 +10,15 @@
             [shevek.schemas.query :refer [Query RawQuery]]
             [schema.core :as s]))
 
-(s/defn query [{:keys [user]} {:keys [cube] :as q} :- Query]
+(defn- do-query [user {:keys [cube] :as q} q-fn]
   (->> (find-cube db cube)
        (merge {:max-time (max-time nil cube)}) ; TODO remove
        (expand-query q)
        (auth/filter-query user)
-       (agg/query dw)))
+       (q-fn dw)))
 
-(s/defn raw-query [{:keys [user]} {:keys [cube] :as q} :- RawQuery]
-  (->> (find-cube db cube)
-       (expand-query q)
-       (auth/filter-query user)
-       (raw/query dw)))
+(s/defn query [{:keys [user]} q :- Query]
+  (do-query user q agg/query))
+
+(s/defn raw-query [{:keys [user]} q :- RawQuery]
+  (do-query user q raw/query))

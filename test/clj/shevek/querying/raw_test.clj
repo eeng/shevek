@@ -38,4 +38,7 @@
                             {:region "Brasil" :added 2 :__time "2016"}]}
                  (from-druid-results {}
                                      [{:result {:events [{:event {:region "Argentina" :added 1 :timestamp "2015"}}
-                                                         {:event {:region "Brasil" :added 2 :timestamp "2016"}}]}}])))))
+                                                         {:event {:region "Brasil" :added 2 :timestamp "2016"}}]}}]))))
+
+  (testing "when there are no results"
+    (is (= {:results [] :paging {:threshold 3}} (from-druid-results {:paging {:threshold 3}} [])))))

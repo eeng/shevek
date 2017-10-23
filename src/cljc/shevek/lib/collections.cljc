@@ -10,6 +10,13 @@
 (defn find-by [key value coll]
   (detect #(= (get % key) value) coll))
 
+(defn cassoc [m & entries]
+   (reduce (fn [m [key val]]
+             (cond-> m
+                     val (assoc key val)))
+           m
+           (partition 2 entries)))
+
 (defn assoc-if-seq [m & entries]
   (reduce (fn [m [key val]]
             (cond-> m

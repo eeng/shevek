@@ -1,11 +1,10 @@
 (ns shevek.querying.expansion
   (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension?]]
-            [shevek.lib.collections :refer [reverse-merge]]
             [shevek.lib.period :refer [effective-interval]]
             [shevek.lib.time :as t]
-            [com.rpl.specter :refer [transform ALL]]))
+            [com.rpl.specter :refer [transform must ALL]]))
 
-(defn- relative-to-absolute-time [{:keys [time-zone] :as q} max-time]
+(defn- relative-to-absolute-time [max-time {:keys [time-zone] :as q}]
   (let [calculate-interval #(t/with-time-zone time-zone
                               (map t/to-iso8601 (effective-interval % max-time)))]
     (transform [:filters ALL time-dimension?]
@@ -24,10 +23,10 @@
 (defn expand-query
   "Take a query and the corresponding cube schema and expands it with some schema information necessary to execute the query"
   [q {:keys [measures dimensions default-time-zone max-time]}]
-  (-> q
-      (update :measures (partial map #(expand-dim % (conj measures row-count) [:expression])))
-      (update :filters (partial map #(expand-dim % dimensions [:column :extraction])))
-      (update :splits (partial map #(cond-> (expand-dim % dimensions [:column :extraction])
-                                            (:sort-by %) (update :sort-by expand-dim (concat dimensions measures) [:type :expression]))))
-      (reverse-merge {:time-zone (or default-time-zone (t/system-time-zone))})
-      (relative-to-absolute-time max-time)))
+  (->> q
+       (transform [(must :measures) ALL] #(expand-dim % (conj measures row-count) [:expression]))
+       (transform [:filters ALL] #(expand-dim % dimensions [:column :extraction]))
+       (transform [(must :splits) ALL] #(expand-dim % dimensions [:column :extraction]))
+       (transform [(must :splits) ALL (must :sort-by)] #(expand-dim % (concat dimensions measures) [:type :expression]))
+       (merge {:time-zone (or default-time-zone (t/system-time-zone))})
+       (relative-to-absolute-time max-time)))

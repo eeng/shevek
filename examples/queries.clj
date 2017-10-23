@@ -1,4 +1,4 @@
-(require '[shevek.querying.api :refer [query]] :reload)
+(require '[shevek.querying.api :refer [query raw-query]] :reload)
 (def request {})
 
 ; Totals query
@@ -125,3 +125,19 @@
                     {:name "year" :operator "include" :value #{"2015"}}]
           :measures ["count"]
           :totals true})
+
+; Raw query
+#_(raw-query request
+             {:cube "wikiticker"
+              :filters [{:period "latest-day"}]
+              :paging {:threshold 10}})
+
+; Getting the second page
+#_(let [result (raw-query shevek.dw/dw
+                          {:cube "wikiticker"
+                           :filters [{:interval ["2015" "2016"]}]
+                           :paging {:threshold 3}})]
+    (raw-query shevek.dw/dw
+               {:cube "wikiticker"
+                :filters [{:interval ["2015" "2016"]}]
+                :paging (:paging result)}))
