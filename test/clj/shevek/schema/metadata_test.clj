@@ -1,6 +1,7 @@
 (ns shevek.schema.metadata-test
   (:require [clojure.test :refer :all]
             [shevek.lib.druid-driver :refer [datasources send-query]]
+            [shevek.lib.time :refer [parse-time]]
             [shevek.schema.metadata :as m]))
 
 (deftest engine-test
@@ -11,7 +12,7 @@
                                   ["wikiticker" "another"])]
         (is (= ["wikiticker" "another"] (m/cubes fake-dw))))))
 
-  (testing "dimensions-and-measures should return a pair of vectors, first the dimensions and second the measures"
+  (testing "cube-metadata should return the measures, dimensiones and time boundary"
     (with-redefs [send-query
                   (fn [_ {:keys [queryType dataSource]}]
                     (case [queryType dataSource]
@@ -21,6 +22,8 @@
                       ["segmentMetadata" "wikiticker"]
                       [{:columns {:region {:type "STRING"} :city {:type "STRING"} :added {:type "LONG"}}
                         :aggregators {:added {:type "longSum"}}}]))]
-      (is (= [[{:name "region" :type "STRING"} {:name "city" :type "STRING"}]
-              [{:name "added" :type "longSum"}]]
-             (m/dimensions-and-measures nil "wikiticker"))))))
+      (is (= {:dimensions [{:name "region" :type "STRING"} {:name "city" :type "STRING"}]
+              :measures [{:name "added" :type "longSum"}]
+              :max-time (parse-time "2015-09-12T23:59:59.200Z")
+              :min-time nil}
+             (m/cube-metadata nil "wikiticker"))))))

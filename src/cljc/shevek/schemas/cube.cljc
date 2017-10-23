@@ -29,4 +29,6 @@
          (s/optional-key :id) s/Str
          (s/optional-key :default-time-zone) s/Str
          (s/optional-key :created-at) s/Any
-         (s/optional-key :updated-at) s/Any))
+         (s/optional-key :updated-at) s/Any
+         (s/optional-key :min-time) s/Any
+         (s/optional-key :max-time) s/Any))

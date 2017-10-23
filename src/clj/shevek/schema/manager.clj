@@ -1,5 +1,5 @@
 (ns shevek.schema.manager
-  (:require [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
+  (:require [shevek.schema.metadata :refer [cubes cube-metadata]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
             [cuerdas.core :as str]
@@ -7,8 +7,7 @@
 
 (defn- discover-cubes [dw]
   (for [cube-name (cubes dw)]
-    (let [[dimensions measures] (dimensions-and-measures dw cube-name)]
-      {:name cube-name :dimensions dimensions :measures measures})))
+    (merge {:name cube-name} (cube-metadata dw cube-name))))
 
 (defn- same-name? [{n1 :name} {n2 :name}]
   (= n1 n2))

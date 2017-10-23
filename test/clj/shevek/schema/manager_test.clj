@@ -4,7 +4,7 @@
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
             [shevek.schema.manager :refer [discover! update-cubes calculate-expression]]
-            [shevek.schema.metadata :refer [cubes dimensions-and-measures]]
+            [shevek.schema.metadata :refer [cubes cube-metadata]]
             [shevek.schema.repository :refer [find-cubes]]
             [shevek.schemas.cube :refer [Cube]]
             [shevek.db :refer [db]]
@@ -13,13 +13,13 @@
 (deftest discover-tests
   (it "initial descovery should save all cubes with their dimensions and metrics"
     (with-redefs [cubes (constantly ["wikiticker" "vtol_stats"])
-                  dimensions-and-measures
+                  cube-metadata
                   (fn [_ cube]
                     (case cube
-                      "wikiticker" [[{:name "region" :type "STRING"}]
-                                    [{:name "added" :type "longSum"}]]
-                      "vtol_stats" [[{:name "path" :type "LONG"}]
-                                    [{:name "requests" :type "hyperUnique"}]]))]
+                      "wikiticker" {:dimensions [{:name "region" :type "STRING"}]
+                                    :measures [{:name "added" :type "longSum"}]}
+                      "vtol_stats" {:dimensions [{:name "path" :type "LONG"}]
+                                    :measures [{:name "requests" :type "hyperUnique"}]}))]
       (let [cubes (do (discover! nil db) (find-cubes db))]
         (is (submaps? [{:name "wikiticker"} {:name "vtol_stats"}] cubes))
         (is (submaps? [{:name "region" :type "STRING"}
