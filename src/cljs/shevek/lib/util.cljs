@@ -10,7 +10,7 @@
         (reset! timeout (js/setTimeout later wait))))))
 
 (defn debounce
-  "Calls f after 'wait' milliseconds, but if another call is made before that timeout it will be recreate the timeout"
+  "Calls f after 'wait' milliseconds, but if another call is made before that timeout it will recreate the timeout"
   [f wait]
   (partial (variable-debounce f) wait))
 

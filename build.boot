@@ -36,7 +36,7 @@
                     [clj-time "0.14.0"]
                     [com.andrewmcveigh/cljs-time "0.5.1"]
                     [com.taoensso/timbre "4.8.0"]
-                    [com.rpl/specter "1.0.2"]
+                    [com.rpl/specter "1.0.4"]
                     [prismatic/schema "1.1.6"]
                     [metosin/schema-tools "0.9.0"]
                     [prismatic/schema-generators "0.1.0"]
