@@ -12,13 +12,9 @@
        (map #(select-keys % [:id :name :title :description :measures]))
        (sort-by :title)))
 
-(defn max-time [_ cube-name]
-  (:max-time (m/time-boundary dw cube-name)))
-
 (defn cube [{:keys [user] :as req} name]
   (-> (r/find-cube db name)
-      (auth/filter-cube user)
-      (assoc :max-time (max-time req name))))
+      (auth/filter-cube user)))
 
 (defn save-cube [_ cube]
   (r/save-cube db cube))

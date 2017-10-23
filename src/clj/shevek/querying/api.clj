@@ -6,13 +6,23 @@
             [shevek.querying.raw :as raw]
             [shevek.querying.auth :as auth]
             [shevek.querying.expansion :refer [expand-query]]
-            [shevek.schema.api :refer [max-time]]
             [shevek.schemas.query :refer [Query RawQuery]]
+            [shevek.schema.metadata :refer [time-boundary]]
+            [com.rpl.specter :refer [selected-any? must ALL]]
+            [cuerdas.core :as str]
             [schema.core :as s]))
+
+(defn- latest-period-query? [q]
+  (selected-any? [:filters ALL :period #(str/starts-with? % "latest")] q))
+
+; TODO throtlelear time-boundary
+(defn- update-max-time [q {:keys [name] :as cube}]
+  (cond-> cube
+          (latest-period-query? q) (assoc :max-time (:max-time (time-boundary dw name)))))
 
 (defn- do-query [user {:keys [cube] :as q} q-fn]
   (->> (find-cube db cube)
-       (merge {:max-time (max-time nil cube)}) ; TODO remove
+       (update-max-time q)
        (expand-query q)
        (auth/filter-query user)
        (q-fn dw)))
