@@ -3,7 +3,6 @@
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.navigation :refer [current-page? navigate]]
-            [shevek.lib.dw.cubes :refer [set-cube-defaults]]
             [shevek.lib.time :refer [parse-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name cube-authorized?]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
@@ -28,8 +27,7 @@
     :else (build-new-viewer cube)))
 
 (defn cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
-  (let [cube (set-cube-defaults cube)
-        viewer (init-viewer cube viewer current-report)]
+  (let [viewer (init-viewer cube viewer current-report)]
     (if (cube-authorized? viewer)
       (-> (assoc db :viewer viewer)
           (send-main-query)

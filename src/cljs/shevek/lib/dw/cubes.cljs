@@ -1,13 +1,7 @@
 (ns shevek.lib.dw.cubes
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
-            [shevek.reflow.db :as db]
-            [shevek.lib.time :refer [parse-time]]))
-
-; TODO no deberia ser necesario parsear aca si se envia listo desde el server
-(defn set-cube-defaults [{:keys [max-time] :as cube}]
-  (cond-> cube
-          max-time (update :max-time parse-time)))
+            [shevek.reflow.db :as db]))
 
 (defn- cube-names-as-keys [db cubes]
   (assoc db :cubes (zipmap (map :name cubes) cubes)))

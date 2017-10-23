@@ -4,7 +4,6 @@
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.lib.react :refer [rmap]]
-            [shevek.lib.dw.cubes :refer [set-cube-defaults]]
             [shevek.schemas.conversion :refer [report->viewer]]
             [shevek.components.text :refer [page-title warning loader]]
             [shevek.viewer.visualization :refer [visualization]]
@@ -26,7 +25,7 @@
   [:dashboard :reports id :visualization])
 
 (defn- cube-arrived [db cube report]
-  (let [viewer (report->viewer report (set-cube-defaults cube))]
+  (let [viewer (report->viewer report cube)]
     (if (cube-authorized? viewer)
       (send-visualization-query db viewer (vis-key report))
       (rpc/loaded db (vis-key report)))))
