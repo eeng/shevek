@@ -2,7 +2,7 @@
   (:require [monger.collection :refer [purge-many]]
             [shevek.app :refer [start start-db]]
             [mount.core :as mount]
-            [shevek.schema.refresher :refer [refresher]]
+            [shevek.scheduler :refer [scheduler]]
             [shevek.db :refer [db init-db]]
             [clojure.test :refer [deftest testing]]
             [cuerdas.core :as str]
@@ -12,7 +12,7 @@
   (start-db))
 
 (defn init-acceptance-tests []
-  (mount/start-without #'refresher))
+  (mount/start-without #'scheduler))
 
 (defmacro it [description & body]
   `(testing ~description

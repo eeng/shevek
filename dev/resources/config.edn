@@ -1,4 +1,3 @@
 {:env :development
  :druid-uri "http://10.0.1.13:8082"
  :datasources-refresh-interval 0}
- 

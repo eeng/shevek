@@ -5,7 +5,7 @@
             [shevek.nrepl :refer [nrepl]]
             [shevek.db :refer [db]]
             [shevek.dw]
-            [shevek.schema.refresher :refer [refresher]]
+            [shevek.scheduler :refer [scheduler]]
             [shevek.schema.seed :refer [seed!]])
   (:gen-class))
 
@@ -13,7 +13,7 @@
   (mount/start-without #'nrepl))
 
 (defn start-db []
-  (mount/start-without #'nrepl #'web-server #'refresher))
+  (mount/start-without #'nrepl #'web-server #'scheduler))
 
 (defn start []
   (mount/start))
