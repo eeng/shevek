@@ -25,9 +25,10 @@
 (defn- resolve-col-splits [dw {:keys [splits filters] :as q} grand-total]
   (let [[dim & dims] (filter col-split? splits)
         nested-query #(assoc q :splits %1 :filters (add-filter-for-dim filters dim %2))
-        posible-values (->> grand-total (mapcat :child-cols) (map (partial dim-value dim)) distinct)
+        posible-values (when-not (time-dimension? dim)
+                         (->> grand-total (mapcat :child-cols) (map (partial dim-value dim)) distinct))
         this-q (cond-> (assoc q :dimension dim)
-                       (seq grand-total) (update :filters conj (assoc dim :operator "include" :value posible-values)))]
+                       (and posible-values (seq grand-total)) (update :filters conj (assoc dim :operator "include" :value posible-values)))]
     (when dim
       (->> (send-query dw this-q)
            (pmap #(assoc-if-seq % :child-cols (resolve-col-splits dw (nested-query dims %) (mapcat :child-cols grand-total))))))))
