@@ -15,18 +15,24 @@
       (error e))))
 
 (defn- refresh-schema []
-  (seed/users db)
   (m/discover! dw db)
   (seed/cubes db))
 
-; TODO si esta en cero el refresh-interval, no me convence hacer el discovery. Eso no permitiria configurar totalmente el schema en la config. Si los users deberiamos seedearlos la primera vez siempre
+(defn- initial-schema-discovery [dri]
+  (if (pos? dri)
+    (do
+      (info "Starting auto discovery process, will execute every" dri "msecs")
+      (refresh-schema))
+    (do
+      (info "Auto discovery disabled")
+      (seed/cubes db))))
+
 (defn start! []
   (let [sch (hs/scheduler {})
         dri (config :datasources-refresh-interval)]
-    (if (pos? dri)
-      (info "Starting auto discovery process, will execute every" dri "msecs")
-      (info "Auto discovery disabled, executing once"))
-    (future (wrap-error refresh-schema))
+    (future (wrap-error (fn []
+                          (seed/users db)
+                          (initial-schema-discovery dri))))
 
     (when (pos? dri)
       (hs/add-task sch :refresh-schema {:handler #(wrap-error refresh-schema)

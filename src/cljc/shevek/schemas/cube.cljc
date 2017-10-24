@@ -22,9 +22,12 @@
          (s/optional-key :format) s/Str
          (s/optional-key :favorite) s/Bool))
 
+(defn- at-least-one-time-dim? [dims]
+  (some #(= (:name %) "__time") dims))
+
 (s/defschema Cube
   (assoc NTD
-         :dimensions [Dimension]
+         :dimensions (s/constrained [Dimension] at-least-one-time-dim?)
          :measures [Measure]
          (s/optional-key :id) s/Str
          (s/optional-key :default-time-zone) s/Str

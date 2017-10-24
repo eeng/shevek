@@ -15,9 +15,11 @@
              Report save-report
              Dashboard save-dashboard})
 
+(def default-fields {Cube {:dimensions [{:name "__time"}]}})
+
 (defn make
   ([schema] (make schema {}))
-  ([schema args] (c/complete args schema)))
+  ([schema args] (c/complete (merge (default-fields schema) args) schema)))
 
 (defn make!
   ([schema] (make! schema {}))

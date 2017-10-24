@@ -22,7 +22,9 @@
                                     :measures [{:name "requests" :type "hyperUnique"}]}))]
       (let [cubes (do (discover! nil db) (find-cubes db))]
         (is (submaps? [{:name "wikiticker"} {:name "vtol_stats"}] cubes))
-        (is (submaps? [{:name "region" :type "STRING"}
+        (is (submaps? [{:name "__time"}
+                       {:name "region" :type "STRING"}
+                       {:name "__time"}
                        {:name "path" :type "LONG"}]
                       (mapcat :dimensions cubes)))
         (is (submaps? [{:name "added" :expression "(sum $added)"}
@@ -34,7 +36,7 @@
   (testing "discovery use cases"
     (it "discovery of a new cube"
       (let [c1 (make! Cube {:name "c1"
-                            :dimensions [{:name "d1" :type "STRING"}]
+                            :dimensions [{:name "__time"} {:name "d1" :type "STRING"}]
                             :measures [{:name "m1" :type "count"}]})]
         (update-cubes db [(dissoc c1 :id)
                           {:name "c2"
@@ -43,12 +45,12 @@
         (let [cubes (find-cubes db)]
           (is (= ["c1" "c2"] (map :name cubes)))
           (is (= (:id c1) (:id (first cubes))))
-          (is (= ["d1" "d2"] (select [ALL :dimensions ALL :name] cubes)))
+          (is (= ["__time" "d1" "__time" "d2"] (select [ALL :dimensions ALL :name] cubes)))
           (is (= ["m1" "m2"] (select [ALL :measures ALL :name] cubes))))))
 
     (it "existing cube with a new dimension (d2), a deleted one (d1) and a changed measure type"
       (let [c1 (make! Cube {:name "c1" :title "C1"
-                            :dimensions [{:name "d1" :type "STRING" :title "D1"}]
+                            :dimensions [{:name "__time" :title "T"} {:name "d1" :type "STRING" :title "D1"}]
                             :measures [{:name "m1" :type "count" :title "M1"}]})]
         (update-cubes db [{:name "c1"
                            :dimensions [{:name "d2" :type "STRING"}]
@@ -56,7 +58,7 @@
         (let [cubes (find-cubes db)]
           (is (= [["c1" "C1"]] (map (juxt :name :title) cubes)))
           (is (= (:id c1) (:id (first cubes))))
-          (is (= [["d1" "D1"] ["d2" "D2"]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
+          (is (= [["__time" "T"] ["d1" "D1"] ["d2" "D2"]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
           (is (= [["m1" "M1" "longSum"]] (map (juxt :name :title :type) (select [ALL :measures ALL] cubes))))))))
 
   (testing "seed use cases"
@@ -78,15 +80,15 @@
       (is (submaps? [{:name "amount" :expression "(/ (sum $amount) 100)"}] (-> (find-cubes db) first :measures))))
 
     (it "adding new derived dimension"
-      (make! Cube {:name "sales" :dimensions []})
+      (make! Cube {:name "sales" :dimensions [{:name "__time"}]})
       (update-cubes db [{:name "sales" :dimensions [{:name "year" :extraction [{:type "timeFormat" :format "Y"}]}]}])
-      (is (submaps? [{:name "year" :extraction [{:type "timeFormat" :format "Y"}] :type "STRING"}]
+      (is (submaps? [{:name "__time"} {:name "year" :extraction [{:type "timeFormat" :format "Y"}] :type "STRING"}]
                     (-> (find-cubes db) first :dimensions))))
 
     (it "a hidden dimension should be deleted"
-      (make! Cube {:name "sales" :dimensions [{:name "year"}]})
+      (make! Cube {:name "sales" :dimensions [{:name "__time"} {:name "year"}]})
       (update-cubes db [{:name "sales" :dimensions [{:name "year" :hidden true}]}])
-      (is (= [] (-> (find-cubes db) first :dimensions))))))
+      (is (submaps? [{:name "__time"}] (-> (find-cubes db) first :dimensions))))))
 
 (deftest calculate-expression-tests
   (are [x y] (= x (calculate-expression y))

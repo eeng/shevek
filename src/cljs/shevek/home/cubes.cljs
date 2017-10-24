@@ -23,7 +23,7 @@
         [:div.column
          [:h2.ui.app.header (t :cubes/title)]
          [search-input search {:on-enter #(trigger "click" ".cube.card")}]
-         (if cubes
+         (if (db/get :cubes)
            (let [cubes (filter-matching @search (by :title :description) cubes)]
              (if (seq cubes)
                [:div.cards (rmap cube-card :name cubes)]

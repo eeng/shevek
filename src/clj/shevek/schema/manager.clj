@@ -2,6 +2,7 @@
   (:require [shevek.schema.metadata :refer [cubes cube-metadata time-boundary]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
+            [shevek.lib.dw.dims :refer [time-dimension]]
             [cuerdas.core :as str]
             [taoensso.timbre :refer [debug]]))
 
@@ -37,16 +38,21 @@
 (defn- set-default-type [dimension]
   (merge {:type "STRING"} dimension))
 
-(defn set-default-titles [{:keys [dimensions measures] :as cube}]
+(defn set-defaults [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
       (assoc :dimensions (mapv (comp set-default-type set-default-title) dimensions))
       (assoc :measures (mapv (comp set-default-expression set-default-title) measures))))
+
+(defn- add-time-dimension [{:keys [dimensions] :as cube}]
+  (cond-> cube
+          (not (time-dimension dimensions)) (update :dimensions conj {:name "__time"})))
 
 (defn- update-cube [old new]
   (-> (merge old (dissoc new :dimensions :measures))
       (assoc :dimensions (merge-dimensions (:dimensions old) (:dimensions new)))
       (assoc :measures (merge-dimensions (:measures old) (:measures new)))
-      set-default-titles))
+      add-time-dimension
+      set-defaults))
 
 (defn update-cubes [db new-cubes]
   (let [existing-cubes (find-cubes db)]
