@@ -4,7 +4,7 @@
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
-            [shevek.logging :refer [wrap-request-logging]]
+            [shevek.web.logging :refer [wrap-request-logging]]
             [shevek.lib.transit-handlers :as th]
             [shevek.lib.rpc :as rpc]
             [shevek.lib.auth :as auth :refer [wrap-current-user]]

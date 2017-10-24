@@ -1,7 +1,7 @@
 (ns shevek.lib.druid-driver
   (:require [clj-http.client :as http]
             [taoensso.timbre :as log]
-            [shevek.logging :refer [pp-str]]
+            [shevek.lib.logging :refer [pp-str]]
             [cheshire.core :refer [parse-string]]))
 
 (defprotocol DruidDriver

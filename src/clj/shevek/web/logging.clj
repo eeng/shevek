@@ -1,8 +1,5 @@
-(ns shevek.logging
+(ns shevek.web.logging
   (:require [taoensso.timbre :as log]))
-
-(defn pp-str [& args]
-  (with-out-str (apply clojure.pprint/pprint args)))
 
 (defn- filtered-params [params to-filter]
   (reduce
@@ -12,7 +9,7 @@
     params
     to-filter))
 
-(defn user-field [{:keys [username]}]
+(defn- user-field [{:keys [username]}]
   (format "[%s]" (or username "guest")))
 
 (defn wrap-request-logging [handler]
