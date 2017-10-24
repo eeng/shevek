@@ -18,7 +18,7 @@
     (if (seq dashboards)
       [:div.ui.relaxed.middle.aligned.selection.list
        (rmap dashboard-item :id dashboards)]
-      [:div (t :errors/no-results)])))
+      [:div (t :dashboards/missing)])))
 
 (defn dashboards-menu []
   (when-not (current-page? :home) ; No need to fetch the dashboards again when we are on the home page

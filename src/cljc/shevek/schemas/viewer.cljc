@@ -45,9 +45,7 @@
    (s/optional-key :dimensions) [Dimension]
    (s/optional-key :measures) [Measure]
    (s/optional-key :max-time) s/Any
-   (s/optional-key :default-time-zone) s/Str
-   (s/optional-key :created-at) s/Any
-   (s/optional-key :updated-at) s/Any})
+   (s/optional-key :default-time-zone) s/Str})
 
 ; A visualization is build when viewer results arrived, represents all the necessary data to render the visualization component. It maintains a copy of the split and measures so the component doesn't get rendered while executing query.
 (s/defschema Visualization

@@ -15,7 +15,7 @@
 (defn cube [{:keys [user] :as req} name]
   (-> (r/find-cube db name)
       (auth/filter-cube user)
-      (dissoc :min-time)))
+      (dissoc :min-time :updated-at :created-at)))
 
 (defn save-cube [_ cube]
   (r/save-cube db cube))

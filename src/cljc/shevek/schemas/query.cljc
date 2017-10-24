@@ -17,6 +17,9 @@
    :operator (s/enum "include" "exclude" "search" "is")
    :value (s/cond-pre s/Str [(s/maybe s/Str)])})
 
+(s/defschema Filters
+  [(s/one TimeFilter "tf") NormalFilter])
+
 (def Measure s/Str)
 
 (s/defschema SortBy
@@ -26,12 +29,9 @@
 (s/defschema Split
   {:name s/Str
    (s/optional-key :on) (s/enum "rows" "columns")
-   (s/optional-key :limit) s/Int
+   (s/optional-key :limit) s/Num
    (s/optional-key :sort-by) SortBy
    (s/optional-key :granularity) s/Str})
-
-(s/defschema Filters
-  [(s/one TimeFilter "tf") NormalFilter])
 
 (s/defschema Query
   {:cube s/Str

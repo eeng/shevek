@@ -2,8 +2,9 @@
   (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension]]
             [shevek.lib.time :refer [to-iso8601 parse-time end-of-day]]
             [shevek.schemas.query :refer [Query RawQuery]]
+            [shevek.schemas.app-db :refer [CurrentReport]]
             [schema-tools.core :as st]
-            [com.rpl.specter :refer [setval ALL]]))
+            [com.rpl.specter :refer [transform must ALL]]))
 
 (defn- build-time-filter [{:keys [dimensions] :as cube}]
   (assoc (time-dimension dimensions) :period "latest-day"))
@@ -22,12 +23,12 @@
      :measures measures
      :pinboard {:measure (first measures) :dimensions []}}))
 
-(defn- report-dim->viewer [{:keys [name period interval sort-by value] :as dim}
+(defn- report-dim->viewer [{:keys [name sort-by] :as dim}
                            {:keys [dimensions measures]}]
-  (cond-> (merge dim (find-dimension name dimensions))
-          interval (update :interval (partial map parse-time))
-          value (update :value set)
-          sort-by (update :sort-by merge (find-dimension (:name sort-by) (concat dimensions measures)))))
+  (->> (merge dim (find-dimension name dimensions))
+       (transform [(must :interval) ALL] parse-time)
+       (transform (must :value) set)
+       (transform (must :sort-by) #(merge % (find-dimension (:name sort-by) (concat dimensions measures))))))
 
 (defn- report-dims->viewer [coll cube]
   (mapv #(report-dim->viewer % cube) coll))
@@ -42,28 +43,23 @@
                            (first (default-measures cube)))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
-(defn- viewer-dim->report [{:keys [period interval value sort-by] :as dim}]
-  (cond-> (select-keys dim [:name :period :interval :value :sort-by :descending :on :granularity :limit :operator :value])
-          interval (update :interval #(map to-iso8601 [(first %) (end-of-day (last %))]))
-          value (update :value vec)
-          sort-by (update :sort-by viewer-dim->report)))
+(defn- simplify-viewer [viewer]
+  (->> viewer
+       (transform :cube :name)
+       (transform [:measures ALL] :name)
+       (transform [:filters ALL (must :interval)] #(map to-iso8601 [(first %) (end-of-day (last %))]))
+       (transform [:filters ALL (must :value)] vec)))
 
-(defn viewer->report [{:keys [cube measures filters splits pinboard viztype]}]
-  {:cube (:name cube)
-   :viztype (when viztype (name viztype))
-   :measures (map :name measures)
-   :filters (map viewer-dim->report filters)
-   :splits (map viewer-dim->report splits)
-   :pinboard {:measure (-> pinboard :measure :name)
-              :dimensions (map viewer-dim->report (:dimensions pinboard))}})
+(defn viewer->report [viewer]
+  (as-> (simplify-viewer viewer) q
+        (transform :viztype name q)
+        (transform [:pinboard :measure] :name q)
+        (st/select-schema q CurrentReport)))
 
-(defn viewer->query
-  ([viewer] (viewer->query viewer Query))
-  ([{:keys [cube] :as viewer} schema]
-   (-> (assoc viewer :cube (cube :name))
-       (update :measures (partial map :name))
-       (update :filters (partial map viewer-dim->report)) ; TODO Sólo se usa para convertir el interval a string, pero ahora la conversion a query va a ser muy parecida a la de report, refactorizar.
-       (st/select-schema schema))))
+(defn viewer->query [viewer]
+  (-> (simplify-viewer viewer)
+      (st/select-schema Query)))
 
 (defn viewer->raw-query [viewer]
-  (viewer->query viewer RawQuery))
+  (-> (simplify-viewer viewer)
+      (st/select-schema RawQuery)))

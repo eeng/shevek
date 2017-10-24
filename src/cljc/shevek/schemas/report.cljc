@@ -1,23 +1,6 @@
 (ns shevek.schemas.report
-  (:require [schema.core :as s]))
-
-(s/defschema SortBy
-  {:name s/Str
-   :descending s/Bool})
-
-(s/defschema Split
-  {:name s/Str
-   :limit s/Num
-   (s/optional-key :on) s/Str
-   (s/optional-key :sort-by) SortBy
-   (s/optional-key :granularity) s/Str})
-
-(s/defschema Filter
-  {:name s/Str
-   (s/optional-key :period) s/Str
-   (s/optional-key :interval) [s/Str]
-   (s/optional-key :operator) s/Str
-   (s/optional-key :value) [(s/maybe s/Str)]})
+  (:require [schema.core :as s]
+            [shevek.schemas.query :refer [Filters Split]]))
 
 (s/defschema Pinboard
   {:measure s/Str :dimensions [Split]})
@@ -29,8 +12,8 @@
    :cube s/Str
    :viztype s/Str
    :measures [s/Str]
-   :filters [Filter]
-   :splits [Split]
+   :filters Filters
+   (s/optional-key :splits) [Split]
    :pinboard Pinboard
    :user-id s/Str
    (s/optional-key :dashboards-ids) [s/Str]

@@ -5,7 +5,7 @@
             [shevek.lib.dw.dims :refer [time-dimension? partition-splits row-split? col-split?]]
             [shevek.lib.collections :refer [detect]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
-            [com.rpl.specter :refer [setval ALL]]))
+            [com.rpl.specter :refer [setval must ALL]]))
 
 (defn- send-query [dw q]
   (let [dq (to-druid-query q)
@@ -18,7 +18,7 @@
 (defn- add-filter-for-dim [filters {:keys [granularity] :as dim} result]
   (let [value (dim-value dim result)]
     (if (time-dimension? dim)
-      (setval [ALL #(:interval %) :interval]
+      (setval [ALL (must :interval)]
               [value (plus-period value granularity)] filters)
       (conj filters (assoc dim :operator "is" :value value)))))
 

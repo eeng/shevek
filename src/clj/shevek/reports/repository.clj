@@ -19,7 +19,7 @@
                {$push {:reports {:report-id rid}}}
                {:multi true})))
 
-(s/defn save-report [db {:keys [dashboards-ids] :as report :- Report}]
+(s/defn save-report [db {:keys [dashboards-ids] :as report} :- Report]
   (let [r (m/save db "reports" report)
         rid (m/oid (:id r))
         ds-ids (map m/oid dashboards-ids)]

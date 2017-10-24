@@ -84,7 +84,7 @@
        [:div.ui.relaxed.middle.aligned.selection.list
         (for [report reports]
           ^{:key (:id report)} [report-item report form-data])]
-       [:div (t :errors/no-results)])]))
+       [:div (t :reports/missing)])]))
 
 (defn- popup-content []
   (let [form-data (r/atom nil)]
