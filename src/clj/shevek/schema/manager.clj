@@ -1,5 +1,5 @@
 (ns shevek.schema.manager
-  (:require [shevek.schema.metadata :refer [cubes cube-metadata]]
+  (:require [shevek.schema.metadata :refer [cubes cube-metadata time-boundary]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
             [cuerdas.core :as str]
@@ -50,13 +50,21 @@
 
 (defn update-cubes [db new-cubes]
   (let [existing-cubes (find-cubes db)]
-    (doall
-      (for [new-cube new-cubes]
-        (save-cube db (update-cube (corresponding new-cube existing-cubes) new-cube))))))
+    (doseq [new-cube new-cubes]
+      (save-cube db (update-cube (corresponding new-cube existing-cubes) new-cube)))))
 
 (defn discover! [dw db]
   (debug "Discovering cubes...")
   (update-cubes db (discover-cubes dw))
-  (debug "Done."))
+  (debug "Done discovering cubes"))
+
+(defn update-time-boundary! [dw db]
+  (debug "Updating time boundary...")
+  (doseq [{:keys [name] :as cube} (find-cubes db)]
+    (->> (time-boundary dw name)
+         (merge cube)
+         (save-cube db)))
+  (debug "Done updating time boundary"))
 
 #_(discover! shevek.dw/dw shevek.db/db)
+#_(update-time-boundary! shevek.dw/dw shevek.db/db)

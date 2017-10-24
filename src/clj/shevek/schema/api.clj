@@ -20,6 +20,9 @@
 (defn save-cube [_ cube]
   (r/save-cube db cube))
 
+(defn max-time [_ cube-name]
+  (:max-time (m/time-boundary dw cube-name)))
+
 ;; Examples
 
 #_(cubes {:user {:permissions {:allowed-cubes "all"}}})

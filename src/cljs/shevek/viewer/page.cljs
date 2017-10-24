@@ -53,10 +53,9 @@
   (let [{:keys [cube] :as report} (restore-report-from-url encoded-report)]
     (prepare-cube db cube report)))
 
-; TODO no seria necesario parsear el max-time aca si se manda listo desde el server
 (defevh :max-time-arrived [db max-time]
-  (if-let [new-data (> (parse-time max-time) (get-in db [:viewer :cube :max-time]))]
-    (-> (assoc-in db [:viewer :cube :max-time] (parse-time max-time))
+  (if-let [new-data (> max-time (get-in db [:viewer :cube :max-time]))]
+    (-> (assoc-in db [:viewer :cube :max-time] max-time)
         (send-main-query)
         (send-pinboard-queries))))
 
