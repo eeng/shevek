@@ -9,7 +9,7 @@
 (defn cubes [{:keys [user]}]
   (->> (r/find-cubes db)
        (auth/filter-cubes user)
-       (map #(select-keys % [:id :name :title :description :measures]))
+       (map #(select-keys % [:id :name :title :description :measures :min-time :max-time]))
        (sort-by :title)))
 
 (defn cube [{:keys [user] :as req} name]

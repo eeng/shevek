@@ -44,6 +44,7 @@
    (s/optional-key :description) s/Str
    (s/optional-key :dimensions) [Dimension]
    (s/optional-key :measures) [Measure]
+   (s/optional-key :min-time) s/Any
    (s/optional-key :max-time) s/Any
    (s/optional-key :default-time-zone) s/Str})
 
