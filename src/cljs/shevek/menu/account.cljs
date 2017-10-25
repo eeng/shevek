@@ -7,7 +7,7 @@
             [shevek.login :refer [current-user]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.components.text :refer [page-title]]
-            [shevek.admin.users :refer [user-validations]]
+            [shevek.admin.users.form :refer [user-validations]]
             [shevek.notification :refer [notify]]))
 
 (defn account-menu [class]

@@ -3,7 +3,7 @@
   (:require [pjstadig.humane-test-output]
             [shevek.asserts :refer [error-on? no-error-on?]]
             [shevek.lib.validation :as v]
-            [shevek.admin.users :refer [user-validations]]))
+            [shevek.admin.users.form :refer [user-validations]]))
 
 (defn validate-user [user]
   (v/validate user user-validations))
