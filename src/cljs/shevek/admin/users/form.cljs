@@ -3,6 +3,7 @@
             [shevek.i18n :refer [t]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.lib.validation :as v]
+            [shevek.lib.collections :refer [assoc-nil]]
             [shevek.rpc :as rpc]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.util :refer [new-record?]]
@@ -18,10 +19,11 @@
   (let [cube-permission (fn [{:keys [name] :as cube}]
                           (let [allowed-cube (find-by :name name allowed-cubes)
                                 allowed-measures (get allowed-cube :measures "all")]
-                            (assoc cube
-                                   :selected (some? allowed-cube)
-                                   :only-measures-selected (not= "all" allowed-measures)
-                                   :allowed-measures (when (not= "all" allowed-measures) allowed-measures))))]
+                            (-> cube
+                                (assoc :selected (some? allowed-cube)
+                                       :only-measures-selected (not= "all" allowed-measures)
+                                       :allowed-measures (when (not= "all" allowed-measures) allowed-measures))
+                                (assoc-nil :filters []))))]
     (assoc user
            :cubes (mapv cube-permission (cubes-list))
            :only-cubes-selected (not= allowed-cubes "all"))))

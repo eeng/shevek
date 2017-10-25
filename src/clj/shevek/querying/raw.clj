@@ -3,7 +3,7 @@
             [schema.core :as s]
             [shevek.querying.conversion :refer [add-druid-filters]]
             [shevek.lib.druid-driver :refer [send-query]]
-            [shevek.lib.collections :refer [cassoc]]
+            [shevek.lib.collections :refer [assoc-if]]
             [clojure.set :refer [rename-keys]]))
 
 ; fromNext should not be necessary on the next version of Druid
@@ -17,7 +17,7 @@
 (defn from-druid-results [{:keys [paging]} dr]
   (let [{:keys [events pagingIdentifiers]} (-> dr first :result)]
     {:results (map (comp #(rename-keys % {:timestamp :__time}) :event) events)
-     :paging (cassoc paging :pagingIdentifiers pagingIdentifiers)}))
+     :paging (assoc-if paging :pagingIdentifiers pagingIdentifiers)}))
 
 (s/defn query :- RawQueryResults [dw {:keys [cube] :as q} :- RawQuery]
   (let [dq (to-druid-query q)

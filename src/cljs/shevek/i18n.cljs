@@ -112,7 +112,8 @@
                   :all-measures "All measures will be visible"
                   :only-measures-selected "Only the following measures will be visible"
                   :select-measures "Please select the allowed measures"
-                  :no-measures "None"}
+                  :no-measures "None"
+                  :add-filter "Add Filter"}
     :account {:title "Your Account"
               :subtitle "Edit your profile details here"
               :current-password "Current Password"
@@ -140,8 +141,8 @@
               :delete "Delete"
               :close "Close"
               :select "Select"
-              :hold-delete "You must click the button and hold for one second to confirm"}
-    :input {:search "Search"}
+              :hold-delete "You must click the button and hold for one second to confirm"
+              :search "Search"}
     :validation {:required "can't be blank"
                  :regex "doesn't match pattern"
                  :email "is not a valid email address"
@@ -285,8 +286,8 @@
               :delete "Eliminar"
               :close "Cerrar"
               :select "Seleccionar"
-              :hold-delete "Clickee el botón y mantenga presionado por un segundo para confirmar"}
-    :input {:search "Buscar"}
+              :hold-delete "Clickee el botón y mantenga presionado por un segundo para confirmar"
+              :search "Buscar"}
     :validation {:required "este campo es obligatorio"
                  :email "no es una dirección válida"
                  :password "debería tener al menos 7 letras y números (o símbolos)"

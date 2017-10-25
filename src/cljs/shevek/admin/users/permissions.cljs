@@ -1,9 +1,20 @@
 (ns shevek.admin.users.permissions
   (:require [shevek.i18n :refer [t]]
+            [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.lib.string :refer [split]]
-            [shevek.components.form :refer [select]]))
+            [shevek.components.form :refer [select dropdown]]
+            [shevek.lib.dw.dims :refer [includes-dim? find-dimension remove-dimension]]))
 
-(defn- cube-permissions [user {:keys [title description selected measures only-measures-selected allowed-measures] :as cube} i]
+(defn- filter-button [user cube-idx {:keys [title] :as dim}]
+  [:a.ui.label
+   {:on-click #(console.log "open popup")}
+   title
+   [:i.delete.icon {:on-click (without-propagation swap! user update-in [:cubes cube-idx :filters] remove-dimension dim)}]])
+
+(defn- cube-permissions [user {:keys [title description selected
+                                      only-measures-selected measures allowed-measures
+                                      filters dimensions]
+                               :as cube} i]
   [:div.item {:on-click #(swap! user update-in [:cubes i :selected] not)
               :class (when-not selected "hidden")}
    [:i.icon.large.selected {:class (if selected "checkmark" "minus")}]
@@ -11,15 +22,24 @@
     [:div.header title]
     [:div.description [:p description]
      (when selected
-       [:div.measures {:on-click #(.stopPropagation %)}
-        [:a {:on-click #(swap! user update-in [:cubes i :only-measures-selected] not)}
-         (t (if only-measures-selected :permissions/only-measures-selected :permissions/all-measures))]
-        (when only-measures-selected
-          [select (map (juxt :title :name) measures)
-           {:class "multiple fluid search selection"
-            :selected allowed-measures
-            :on-change #(swap! user assoc-in [:cubes i :allowed-measures] (split % #","))
-            :placeholder (t :permissions/select-measures)}])])]]])
+       [:div {:on-click #(.stopPropagation %)}
+        [:div.measures
+         [:p [:a {:on-click #(swap! user update-in [:cubes i :only-measures-selected] not)}
+              (t (if only-measures-selected :permissions/only-measures-selected :permissions/all-measures))]]
+         (when only-measures-selected
+           [select (map (juxt :title :name) measures)
+            {:class "multiple fluid search selection"
+             :selected allowed-measures
+             :on-change #(swap! user assoc-in [:cubes i :allowed-measures] (split % #","))
+             :placeholder (t :permissions/select-measures)}])]
+        [:div.filters
+         [dropdown (map (juxt :title :name) (remove #(includes-dim? filters %) dimensions))
+          {:class "labeled icon top left pointing tiny basic button" :in-menu-search true
+           :on-change #(swap! user update-in [:cubes i :filters] conj (find-dimension % dimensions))}
+          [:i.filter.icon]
+          [:span (if (seq filters) (str (t :viewer/filters) ":") (t :permissions/add-filter))]]
+         (when (seq filters)
+           [:span (rmap (partial filter-button user i) :name filters)])]])]]])
 
 (defn user-permissions [user]
   (let [{:keys [only-cubes-selected cubes]} @user]

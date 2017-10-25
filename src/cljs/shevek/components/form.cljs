@@ -19,17 +19,24 @@
    [:label {:for id} label]])
 
 ; El selected-title es necesario xq semantic muestra la opción seleccionada en el on-change nomás, y en el mount inicial sólo si selected no es nil. En el pinboard measure por ej. el selected arranca en nil y luego cuando llega la metadata se updatea con el selected, pero no se reflejaba en el dropdown xq ya se había ejecutado el $(..).dropdown() antes.
-(defn- dropdown [coll {:keys [placeholder selected class on-change] :or {on-change identity}} & content]
-  (let [bind-events #(when % (-> % r/dom-node js/$ (.dropdown #js {:onChange on-change})))]
+(defn- dropdown [coll {:keys [placeholder selected class on-change in-menu-search] :or {on-change identity}} & content]
+  (let [bind-events #(when % (-> % r/dom-node js/$ (.dropdown #js {:onChange on-change})))
+        menu [:div.menu {:class (when in-menu-search "scrolling")}
+              (for [[title val] coll]
+                ^{:key val} [:div.item {:data-value val} title])]]
     [:div.ui.dropdown {:class class :ref bind-events}
      [:input {:type "hidden" :value (or selected "")}]
      (with-react-keys (if (seq content)
                         content
                         [[:div.text (first (detect #(= selected (second %)) coll))]
                          [:i.dropdown.icon]]))
-     [:div.menu
-      (for [[title val] coll]
-        ^{:key val} [:div.item {:data-value val} title])]]))
+     (if in-menu-search
+       [:div.menu
+        [:div.ui.icon.search.input
+         [:i.search.icon]
+         [:input {:type "text" :placeholder (t :actions/search)}]]
+        menu]
+       menu)]))
 
 (defn select [coll {:keys [placeholder] :as opts}]
   [dropdown coll (merge {:class "selection"} opts)
@@ -130,7 +137,7 @@
         clear #(do (when (seq @search) (change ""))
                  (on-stop))
         wrapper-opts (merge {:ref (kb-shortcuts :enter on-enter :escape clear)} wrapper)
-        input-opts (merge {:type "text" :placeholder (t :input/search) :value @search
+        input-opts (merge {:type "text" :placeholder (t :actions/search) :value @search
                            :on-change #(change (.-target.value %)) :auto-focus true}
                           input)]
      [:div.ui.icon.fluid.input.search wrapper-opts

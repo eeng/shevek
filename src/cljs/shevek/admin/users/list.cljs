@@ -71,7 +71,7 @@
 
 (defn users-section []
   (dispatch :users-requested)
-  (let [edited-user (r/atom nil)]
+  (let [edited-user (r/atom (adapt-for-client {:admin false :allowed-cubes [{:name "eventos_pedidos"}]}))]
     (fn []
       [:section.users
        [:button.ui.button.right.floated
