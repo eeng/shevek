@@ -2,14 +2,24 @@
   (:require [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.lib.string :refer [split]]
+            [shevek.lib.dw.dims :refer [includes-dim? find-dimension remove-dimension time-dimension?]]
+            [shevek.reflow.core :refer-macros [defevh]]
             [shevek.components.form :refer [select dropdown]]
-            [shevek.lib.dw.dims :refer [includes-dim? find-dimension remove-dimension]]))
+            [shevek.viewer.shared :refer [filter-title]]
+            [shevek.viewer.filter :refer [filter-popup]]
+            [shevek.components.popup :refer [show-popup]]))
 
-(defn- filter-button [user cube-idx {:keys [title] :as dim}]
+(defn- filter-button [user cube-idx {:keys [name] :as dim}]
   [:a.ui.label
-   {:on-click #(console.log "open popup")}
-   title
+   {:on-click #(show-popup % ^{:key name} [filter-popup dim {:cube (get-in @user [:cubes cube-idx :name])}]
+                           {:position "right center"})}
+   (filter-title dim)
    [:i.delete.icon {:on-click (without-propagation swap! user update-in [:cubes cube-idx :filters] remove-dimension dim)}]])
+
+(defn- build-filter [dim]
+  (if (time-dimension? dim)
+    (assoc dim :period "latest-day")
+    (assoc dim :operator "include" :value #{})))
 
 (defn- cube-permissions [user {:keys [title description selected
                                       only-measures-selected measures allowed-measures
@@ -35,7 +45,7 @@
         [:div.filters
          [dropdown (map (juxt :title :name) (remove #(includes-dim? filters %) dimensions))
           {:class "labeled icon top left pointing tiny basic button" :in-menu-search true
-           :on-change #(swap! user update-in [:cubes i :filters] conj (find-dimension % dimensions))}
+           :on-change #(swap! user update-in [:cubes i :filters] conj (build-filter (find-dimension % dimensions)))}
           [:i.filter.icon]
           [:span (if (seq filters) (str (t :viewer/filters) ":") (t :permissions/add-filter))]]
          (when (seq filters)

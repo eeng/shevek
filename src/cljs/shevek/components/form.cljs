@@ -7,7 +7,7 @@
             [shevek.i18n :refer [t]]
             [shevek.notification :refer [notify]]))
 
-(defn- classes [& css-classes]
+(defn classes [& css-classes]
   (->> css-classes (filter identity) (str/join " ")))
 
 ;; Basic components

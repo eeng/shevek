@@ -17,7 +17,7 @@
             [shevek.lib.logger :as log]
             [shevek.lib.string :refer [format-bool regex-escape]]))
 
-(defn- viewer [& keys]
+(defn viewer [& keys]
   (db/get-in (into [:viewer] keys)))
 
 (defn current-cube-name []

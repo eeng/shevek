@@ -9,8 +9,10 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.time :refer [parse-time]]
             [shevek.lib.time.ext :refer [format-date]]
-            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value debounce-dispatch highlight current-cube dimension-value send-pinboard-queries filter-title]]
-            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching]]
+            [shevek.lib.util :refer [debounce]]
+            [shevek.rpc :as rpc]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value highlight current-cube dimension-value send-pinboard-queries filter-title]]
+            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching classes]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.components.calendar :refer [build-range-calendar]]
@@ -64,14 +66,6 @@
   {:after [close-popup store-viewer-in-url]}
   (-> (update-in db [:viewer :filters] merge-dimensions (selected-path->filters selected-path operator))
       (send-queries nil)))
-
-(defevh :filter-values-requested [db {:keys [name] :as dim} search]
-  (send-query db {:cube (viewer :cube)
-                  :filters (cond-> [(first (viewer :filters))]
-                                   (seq search) (conj (assoc dim :operator "search" :value search)))
-                  :splits [(assoc dim :limit 50)]
-                  :measures [{:name "rowCount"}]}
-              [:filter name]))
 
 (def available-relative-periods
   {"latest-hour" "1H" "latest-day" "1D" "latest-7days" "7D" "latest-30days" "30D" "latest-90days" "90D"
@@ -139,41 +133,55 @@
          [relative-period-time-filter dim]
          [specific-period-time-filter dim])])))
 
-(defn- dimension-value-item [{:keys [name] :as dim} result filter-opts search]
+(defn- dimension-value-item [{:keys [name] :as dim} result filter search]
   (let [value (dimension-value dim result)
         label (format-dimension dim result)]
     [:div.item.has-checkbox {:on-click toggle-checkbox-inside :title label}
      [checkbox (str "cb-filter-" name "-" (str/slug label)) (highlight label search)
-      {:checked (some #(= value %) (@filter-opts :value))
-       :on-change #(swap! filter-opts update :value (toggle-filter-value %) value)}]]))
+      {:checked (some #(= value %) (@filter :value))
+       :on-change #(swap! filter update :value (toggle-filter-value %) value)}]]))
 
 (defn filter-operators []
   [[(t :viewer.operator/include) "include"]
    [(t :viewer.operator/exclude) "exclude"]])
 
-(defn- operator-selector [opts]
+(defn- operator-selector [filter]
   [dropdown (filter-operators)
    {:class "icon top left pointing basic compact button"
-    :on-change #(swap! opts assoc :operator %)
-    :selected (@opts :operator)}
-   [:i.icon {:class (case (@opts :operator)
+    :on-change #(swap! filter assoc :operator %)
+    :selected (@filter :operator)}
+   [:i.icon {:class (case (@filter :operator)
                       "include" "check square"
                       "exclude" "minus square")}]])
 
-(defn- normal-filter-popup [dim]
-  (let [opts (r/atom (select-keys dim [:operator :value]))
-        search (r/atom "")]
-    (dispatch :filter-values-requested dim "")
+(defn- fetch-dim-values [filter search]
+  (let [{:keys [cube name]} @filter
+        q {:cube cube
+           :filters (cond-> [{:period "latest-30days"}]
+                            (seq search) (conj {:name name :operator "search" :value search}))
+           :splits [{:name name :limit 50}]
+           :measures ["rowCount"]}]
+    (swap! filter assoc :loading? true)
+    (rpc/call "querying/query" :args [q] :handler #(swap! filter assoc :results % :loading? false))))
+
+(defn- normal-filter-popup [dim {:keys [cube] :as config}]
+  (let [filter (-> (select-keys dim [:name :operator :value])
+                   (assoc :cube cube)
+                   r/atom)
+        opts (r/track #(select-keys @filter [:operator :value]))
+        search (r/atom "")
+        fetch-dim-values-deb (debounce #(fetch-dim-values filter %) 500)]
+    (fetch-dim-values filter "")
     (fn [{:keys [name] :as dim}]
       [:div.ui.form.normal-filter
        [:div.top-inputs
-        [operator-selector opts]
-        [search-input search {:on-change #(debounce-dispatch :filter-values-requested dim %) :wrapper {:class "small"}}]]
+        [operator-selector filter]
+        [search-input search {:on-change #(fetch-dim-values-deb %)
+                              :wrapper {:class (classes "small" (when (@filter :loading?) "loading"))}}]]
        [:div.items-container
         (into [:div.items]
-          (map #(dimension-value-item dim % opts @search)
-               (->> (viewer :results :filter name)
-                    (filter-matching @search (partial format-dimension dim)))))]
+          (map #(dimension-value-item dim % filter @search)
+               (filter-matching @search (partial format-dimension dim) (@filter :results))))]
        [:div
         [:button.ui.primary.compact.button
          {:on-click #(do (update-filter-or-remove dim @opts) (close-popup))
@@ -184,10 +192,10 @@
          (t :actions/cancel)]]])))
 
 ; The time filter use the values in the dim and not an internal r/atom to keep state so we need to use the entire dim as a key so the popup gets rerender when the period change
-(defn- filter-popup [dim]
+(defn filter-popup [dim config]
   (if (time-dimension? dim)
     ^{:key (hash dim)} [time-filter-popup dim]
-    ^{:key (:name dim)} [normal-filter-popup dim]))
+    ^{:key (:name dim)} [normal-filter-popup dim config]))
 
 (defevh :filter-popup-closed [{:keys [viewer]} {:keys [name]}]
   (if-let [dim (find-dimension name (:filters viewer))]
@@ -203,7 +211,7 @@
       [:a.ui.green.compact.button.item
        (assoc (draggable dim)
               :class (when-not (time-dimension? dim) "right labeled icon")
-              :on-click (fn [el] (show-popup el ^{:key popup-key} [filter-popup dim]
+              :on-click (fn [el] (show-popup el ^{:key popup-key} [filter-popup dim {:cube (viewer :cube :name)}]
                                              {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
               :ref show-popup-when-added)
        (when-not (time-dimension? dim)
