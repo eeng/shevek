@@ -6,17 +6,14 @@
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
-            [shevek.lib.time.ext :refer [format-time]]
             [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]
             [shevek.components.form :refer [search-input filter-matching by]]))
 
-(defn- cube-card [{:keys [name title description min-time max-time]}]
+(defn- cube-card [{:keys [name title description]}]
   [:a.ui.fluid.cube.card {:on-click #(dispatch :cube-selected name)}
    [:div.content
     [:div.header [:i.cube.icon] title]
-    [:div.description (if (present? description) description (t :errors/no-desc))]]
-   [:div.extra.content
-    [:span (format-time min-time :day) " - " (format-time max-time :day)]]])
+    [:div.description (if (present? description) description (t :errors/no-desc))]]])
 
 (defn cubes-cards []
   (fetch-cubes)
