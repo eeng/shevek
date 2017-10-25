@@ -36,7 +36,7 @@
   (update-in db [:viewer :filters] add-dimension (build-filter dim {:operator "include" :value #{}})))
 
 (defevhi :filter-options-changed [db dim opts]
-  {:after [close-popup store-viewer-in-url]}
+  {:after [store-viewer-in-url]}
   (-> (update-in db [:viewer :filters] replace-dimension (build-filter dim opts))
       (send-queries dim)))
 
@@ -46,7 +46,7 @@
       (send-queries dim)))
 
 (defn update-filter-or-remove [dim opts]
-  (if (empty? (opts :value))
+  (if (and (not (time-dimension? dim)) (empty? (opts :value)))
     (dispatch :dimension-removed-from-filter dim)
     (dispatch :filter-options-changed dim opts)))
 
@@ -72,7 +72,7 @@
    "current-day" "D" "current-week" "W" "current-month" "M" "current-quarter" "Q" "current-year" "Y"
    "previous-day" "D" "previous-week" "W" "previous-month" "M" "previous-quarter" "Q" "previous-year" "Y"})
 
-(defn- period-buttons [dim showed-period header periods]
+(defn- period-buttons [dim showed-period header {:keys [on-filter-change]} periods]
   [:div.periods
    [:h2.ui.sub.header header]
    [:div.ui.five.small.basic.buttons
@@ -80,31 +80,32 @@
            :let [active? (= period (:period dim))]]
        [:button.ui.button {:key period
                            :class (when active? "active")
-                           :on-click #(when-not active?
-                                        (dispatch :filter-options-changed dim {:period period}))
+                           :on-click #(when-not active? (close-popup) (on-filter-change dim {:period period}))
                            :on-mouse-over #(reset! showed-period period)
                            :on-mouse-out #(reset! showed-period (dim :period))}
         (available-relative-periods period)])]])
 
-(defn- relative-period-time-filter [{:keys [period interval] :as dim}]
+(defn- relative-period-time-filter [{:keys [period interval] :as dim} config]
   (let [showed-period (r/atom period)]
     (fn [dim]
       [:div.relative.period-type
-       [period-buttons dim showed-period (t :viewer.period/latest)
+       [period-buttons dim showed-period (t :viewer.period/latest) config
         ["latest-hour" "latest-day" "latest-7days" "latest-30days" "latest-90days"]]
-       [period-buttons dim showed-period (t :viewer.period/current)
+       [period-buttons dim showed-period (t :viewer.period/current) config
         ["current-day" "current-week" "current-month" "current-quarter" "current-year"]]
-       [period-buttons dim showed-period (t :viewer.period/previous)
+       [period-buttons dim showed-period (t :viewer.period/previous) config
         ["previous-day" "previous-week" "previous-month" "previous-quarter" "previous-year"]]
        [:div.ui.label (if @showed-period
                         (format-period @showed-period (current-cube :max-time))
                         (format-interval interval))]])))
 
-(defn- specific-period-time-filter [{:keys [period interval] :as dim}]
+(defn- specific-period-time-filter [{:keys [period interval] :as dim} {:keys [on-filter-change]}]
   (let [interval (or interval (to-interval period (current-cube :max-time)))
         form-interval (r/atom (zipmap [:from :to] (map format-date interval)))
         parse #(map parse-time ((juxt :from :to) %))
-        accept #(dispatch :filter-options-changed dim {:interval (parse @form-interval)})]
+        accept (fn []
+                 (close-popup)
+                 (on-filter-change dim {:interval (parse @form-interval)}))]
     (fn []
       (let [[from to] (parse @form-interval)
             valid? (and from to (<= from to))]
@@ -122,7 +123,7 @@
             :on-click #(reset! period-type period-type-value)}
    (translation :viewer.period (keyword period-type-value))])
 
-(defn- time-filter-popup [{:keys [period] :as dim}]
+(defn- time-filter-popup [{:keys [period] :as dim} config]
   (let [period-type (r/atom (if period :relative :specific))]
     (fn [dim]
       [:div.time-filter
@@ -130,8 +131,8 @@
         [menu-item-for-period-type period-type :relative]
         [menu-item-for-period-type period-type :specific]]
        (if (= @period-type :relative)
-         [relative-period-time-filter dim]
-         [specific-period-time-filter dim])])))
+         [relative-period-time-filter dim config]
+         [specific-period-time-filter dim config])])))
 
 (defn- dimension-value-item [{:keys [name] :as dim} result filter search]
   (let [value (dimension-value dim result)
@@ -164,7 +165,7 @@
     (swap! filter assoc :loading? true)
     (rpc/call "querying/query" :args [q] :handler #(swap! filter assoc :results % :loading? false))))
 
-(defn- normal-filter-popup [dim {:keys [cube] :as config}]
+(defn- normal-filter-popup [dim {:keys [cube on-filter-change] :as config}]
   (let [filter (-> (select-keys dim [:name :operator :value])
                    (assoc :cube cube)
                    r/atom)
@@ -184,7 +185,7 @@
                (filter-matching @search (partial format-dimension dim) (@filter :results))))]
        [:div
         [:button.ui.primary.compact.button
-         {:on-click #(do (update-filter-or-remove dim @opts) (close-popup))
+         {:on-click #(do (on-filter-change dim @opts) (close-popup))
           :class (when (= @opts (select-keys dim [:operator :value])) "disabled")}
          (t :actions/ok)]
         [:button.ui.compact.button
@@ -194,7 +195,7 @@
 ; The time filter use the values in the dim and not an internal r/atom to keep state so we need to use the entire dim as a key so the popup gets rerender when the period change
 (defn filter-popup [dim config]
   (if (time-dimension? dim)
-    ^{:key (hash dim)} [time-filter-popup dim]
+    ^{:key (hash dim)} [time-filter-popup dim config]
     ^{:key (:name dim)} [normal-filter-popup dim config]))
 
 (defevh :filter-popup-closed [{:keys [viewer]} {:keys [name]}]
@@ -211,7 +212,8 @@
       [:a.ui.green.compact.button.item
        (assoc (draggable dim)
               :class (when-not (time-dimension? dim) "right labeled icon")
-              :on-click (fn [el] (show-popup el ^{:key popup-key} [filter-popup dim {:cube (viewer :cube :name)}]
+              :on-click (fn [el] (show-popup el ^{:key popup-key}
+                                             [filter-popup dim {:cube (viewer :cube :name) :on-filter-change update-filter-or-remove}]
                                              {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
               :ref show-popup-when-added)
        (when-not (time-dimension? dim)

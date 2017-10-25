@@ -63,8 +63,7 @@
    (s/optional-key :splits) [Split]
    (s/optional-key :measures) [Measure]
    (s/optional-key :pinboard) Pinboard
-   (s/optional-key :results) {(s/optional-key :filter) {s/Str [Result]}
-                              (s/optional-key :pinboard) {s/Str [Result]}
+   (s/optional-key :results) {(s/optional-key :pinboard) {s/Str [Result]}
                               (s/optional-key :raw) RawQueryResults}
    (s/optional-key :visualization) Visualization
    (s/optional-key :fullscreen) s/Bool})
