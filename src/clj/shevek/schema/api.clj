@@ -5,11 +5,11 @@
             [shevek.dw :refer [dw]]
             [shevek.schema.auth :as auth]))
 
-; The measures are needed to configure user's permissions
+; TODO Measures and dimensions are only needed to configure user's permissions, maybe we should make two methods or parametrice this so the more frecuent use doen't return everything
 (defn cubes [{:keys [user]}]
   (->> (r/find-cubes db)
        (auth/filter-cubes user)
-       (map #(select-keys % [:id :name :title :description :measures :min-time :max-time]))
+       (map #(dissoc % :created-at :updated-at))
        (sort-by :title)))
 
 (defn cube [{:keys [user] :as req} name]

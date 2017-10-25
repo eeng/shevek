@@ -98,10 +98,17 @@
 
   (testing "should stringify the interval"
     (is (= [{:interval ["2018-01-01T03:00:00.000Z" "2019-01-02T02:59:59.999Z"]}]
-           (:filters (viewer->query (viewer {:filters [{:interval [(date-time 2018) (date-time 2019)]}]}))))))
+           (-> {:filters [{:interval [(date-time 2018) (date-time 2019)]}]}
+               viewer viewer->query :filters))))
 
   (testing "should remove unneeded keys from filters and splits"
     (is (= [{:period "latest-day"}
             {:name "d" :operator "include" :value ["v"]}]
-           (:filters (viewer->query (viewer {:filters [{:period "latest-day" :title "Fecha"}
-                                                       {:name "d" :operator "include" :value #{"v"} :title "D"}]})))))))
+           (-> {:filters [{:period "latest-day" :title "Fecha"}
+                          {:name "d" :operator "include" :value #{"v"} :title "D"}]}
+               viewer viewer->query :filters))))
+
+  (testing "filter value should be vectoriced only if is a set"
+    (is (= {:name "d" :operator "search" :value "something"}
+           (-> {:filters [{:period "latest-day"} {:name "d" :operator "search" :value "something"}]}
+               viewer viewer->query :filters last)))))

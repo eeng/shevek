@@ -48,7 +48,7 @@
        (transform :cube :name)
        (transform [:measures ALL] :name)
        (transform [:filters ALL (must :interval)] #(map to-iso8601 [(first %) (end-of-day (last %))]))
-       (transform [:filters ALL (must :value)] vec)))
+       (transform [:filters ALL (must :value) set?] vec)))
 
 (defn viewer->report [viewer]
   (as-> (simplify-viewer viewer) q
