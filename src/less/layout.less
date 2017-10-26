@@ -42,7 +42,7 @@ body {
   }
 }
 
-#reports-popup, #cubes-popup, #settings-popup {
+#reports-popup, #cubes-popup, #dashboards-popup, #settings-popup {
   width: 300px;
   .actions {
     float: right;
@@ -50,11 +50,14 @@ body {
   }
   .ui.header {
     margin-top: 0;
-    margin-bottom: .8em; // when there are no results
+    margin-bottom: 1em;
     &.has-actions { margin-bottom: 2em }
   }
   .ui.list {
-    margin-top: .8em;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0 1em 1em 1em;
+    margin: 0 -1em -1em -1em;
     .item {
       margin: 0 -.5em;
       padding: .5em;
