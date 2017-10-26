@@ -45,8 +45,11 @@
   (-> (update-in db [:viewer :filters] remove-dimension dim)
       (send-queries dim)))
 
+(defn empty-value? [dim]
+  (and (not (time-dimension? dim)) (empty? (:value dim))))
+
 (defn update-filter-or-remove [dim opts]
-  (if (and (not (time-dimension? dim)) (empty? (opts :value)))
+  (if (empty-value? (merge dim opts))
     (dispatch :dimension-removed-from-filter dim)
     (dispatch :filter-options-changed dim opts)))
 
@@ -200,7 +203,7 @@
 
 (defevh :filter-popup-closed [{:keys [viewer]} {:keys [name]}]
   (if-let [dim (find-dimension name (:filters viewer))]
-    (when (and (not (time-dimension? dim)) (empty? (dim :value)))
+    (when (empty-value? dim)
       (dispatch :dimension-removed-from-filter dim))))
 
 (defn- filter-item [{:keys [name]}]
