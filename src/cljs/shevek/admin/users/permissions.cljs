@@ -1,6 +1,8 @@
 (ns shevek.admin.users.permissions
-  (:require [shevek.i18n :refer [t]]
+  (:require [reagent.core :as r]
+            [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap without-propagation]]
+            [shevek.lib.util :refer [trigger-click]]
             [shevek.lib.string :refer [split]]
             [shevek.lib.dw.dims :refer [includes-dim? find-dimension remove-dimension replace-dimension time-dimension?]]
             [shevek.reflow.core :refer-macros [defevh]]
@@ -9,16 +11,24 @@
             [shevek.viewer.filter :refer [filter-popup build-filter]]
             [shevek.components.popup :refer [show-popup]]))
 
-(defn- filter-button [user cube-idx {:keys [name] :as dim}]
+(defn filter-button* [user cube-idx dim]
   (let [cube (get-in @user [:cubes cube-idx :name])
-        update-filter #(swap! user update-in [:cubes cube-idx :filters] replace-dimension (build-filter dim %2))
-        remove-filter #(swap! user update-in [:cubes cube-idx :filters] remove-dimension dim)]
+        remove-filter #(swap! user update-in [:cubes cube-idx :filters] remove-dimension dim)
+        update-filter #(if (seq (:value %2))
+                         (swap! user update-in [:cubes cube-idx :filters] replace-dimension (build-filter dim %2))
+                         (remove-filter))
+        remove-if-empty #(let [new-value (:value (find-dimension (:name dim) (get-in @user [:cubes cube-idx :filters])))]
+                           (when (and (not (time-dimension? dim)) (empty? new-value))
+                             (remove-filter)))]
     [:a.ui.tiny.right.labeled.icon.button
      {:on-click #(show-popup % ^{:key (select-keys dim [:name :added])}
                              [filter-popup dim {:cube cube :on-filter-change update-filter}]
-                             {:position "right center"})}
+                             {:position "bottom center" :on-close remove-if-empty})}
      (filter-title dim)
      [:i.delete.icon {:on-click (without-propagation remove-filter)}]]))
+
+(def filter-button
+  (with-meta filter-button* {:component-did-mount #(-> % r/dom-node trigger-click)}))
 
 (defn- to-filter [dim]
   (let [opts (if (time-dimension? dim)
@@ -54,7 +64,9 @@
           [:i.filter.icon]
           [:span (if (seq filters) (str (t :viewer/filters) ":") (t :permissions/add-filter))]]
          (when (seq filters)
-           [:span (rmap (partial filter-button user i) :name filters)])]])]]])
+           [:span
+            (for [{:keys [name] :as dim} filters]
+              ^{:key name} [filter-button user i dim])])]])]]])
 
 (defn user-permissions [user]
   (let [{:keys [only-cubes-selected cubes]} @user]

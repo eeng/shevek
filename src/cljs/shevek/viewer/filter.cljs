@@ -9,7 +9,7 @@
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.time :refer [parse-time]]
             [shevek.lib.time.ext :refer [format-date]]
-            [shevek.lib.util :refer [debounce]]
+            [shevek.lib.util :refer [debounce trigger-click]]
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value highlight current-cube dimension-value send-pinboard-queries filter-title]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching classes]]
@@ -207,7 +207,7 @@
   (let [popup-key (hash {:name name :timestamp (js/Date.)})
         show-popup-when-added #(when (and % (= name @last-added-filter))
                                  (reset! last-added-filter nil)
-                                 (-> % r/dom-node js/$ (.find "span") .click))]
+                                 (-> % r/dom-node js/$ trigger-click))]
     (fn [dim]
       [:a.ui.green.compact.button.item
        (assoc (draggable dim)

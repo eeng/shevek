@@ -23,3 +23,6 @@
 
 (defn trigger-change [on]
   (trigger "input" on))
+
+(defn trigger-click [on]
+  (trigger "click" on))
