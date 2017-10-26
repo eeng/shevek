@@ -29,12 +29,20 @@
 
 (def last-added-filter (r/atom nil))
 
+(defn set-as-last-added-filter [name]
+  (reset! last-added-filter name))
+
+(defn show-popup-when-added [name node]
+  (when (and node (= name @last-added-filter))
+     (reset! last-added-filter nil)
+     (-> node r/dom-node js/$ trigger-click)))
+
 (defn build-filter [dim opts]
   (merge (clean-dim dim) opts))
 
-(defevhi :dimension-added-to-filter [db {:keys [name] :as dim}]
+(defevhi :dimension-added-to-filter [db dim]
   {:after [store-viewer-in-url]}
-  (reset! last-added-filter name)
+  (set-as-last-added-filter (:name dim))
   (update-in db [:viewer :filters] add-dimension (build-filter dim {:operator "include" :value #{}})))
 
 (defevhi :filter-options-changed [db dim opts]
@@ -209,11 +217,8 @@
     (when (empty-value? dim)
       (dispatch :dimension-removed-from-filter dim))))
 
-(defn- filter-item [{:keys [name]}]
-  (let [popup-key (hash {:name name :timestamp (js/Date.)})
-        show-popup-when-added #(when (and % (= name @last-added-filter))
-                                 (reset! last-added-filter nil)
-                                 (-> % r/dom-node js/$ trigger-click))]
+(defn- filter-item [{:keys [name] :as dim}]
+  (let [popup-key (hash {:name name :timestamp (js/Date.)})]
     (fn [dim]
       [:a.ui.green.compact.button.item
        (assoc (draggable dim)
@@ -224,7 +229,7 @@
                                                          :time-filter (time-dimension (viewer :filters))
                                                          :on-filter-change update-filter-or-remove}]
                                       {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
-              :ref show-popup-when-added)
+              :ref (partial show-popup-when-added name))
        (when-not (time-dimension? dim)
          [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
        (filter-title dim)])))
