@@ -20,7 +20,9 @@
                            (when (empty-value? updated-dim) (remove-filter)))]
     [:a.ui.tiny.right.labeled.icon.button
      {:on-click #(show-popup % ^{:key (select-keys dim [:name :added])}
-                             [filter-popup dim {:cube (:name @cube) :on-filter-change update-filter}]
+                             [filter-popup dim {:cube (:name @cube)
+                                                :on-filter-change update-filter
+                                                :time-filter {:period "latest-30days"}}]
                              {:position "bottom center" :on-close remove-if-empty})}
      (filter-title dim)
      [:i.delete.icon {:on-click (without-propagation remove-filter)}]]))

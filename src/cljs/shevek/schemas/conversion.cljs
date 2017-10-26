@@ -43,11 +43,14 @@
                            (first (default-measures cube)))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
+(defn stringify-interval [[from to]]
+  (map to-iso8601 [from (end-of-day to)]))
+
 (defn- simplify-viewer [viewer]
   (->> viewer
        (transform :cube :name)
        (transform [:measures ALL] :name)
-       (transform [:filters ALL (must :interval)] #(map to-iso8601 [(first %) (end-of-day (last %))]))
+       (transform [:filters ALL (must :interval)] stringify-interval)
        (transform [:filters ALL (must :value) set?] vec)))
 
 (defn viewer->report [viewer]

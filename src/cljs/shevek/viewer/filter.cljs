@@ -16,7 +16,9 @@
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.components.calendar :refer [build-range-calendar]]
-            [shevek.viewer.url :refer [store-viewer-in-url]]))
+            [shevek.viewer.url :refer [store-viewer-in-url]]
+            [shevek.schemas.conversion :refer [stringify-interval]]
+            [com.rpl.specter :refer [transform must]]))
 
 (defn send-queries [db dont-query-pinboard-dim]
   (-> (send-main-query db)
@@ -159,18 +161,19 @@
                       "exclude" "minus square")}]])
 
 (defn- fetch-dim-values [filter search]
-  (let [{:keys [cube name]} @filter
+  (let [{:keys [cube name time-filter]} @filter
+        time-filter (select-keys (transform (must :interval) stringify-interval time-filter) [:period :interval])
         q {:cube cube
-           :filters (cond-> [{:period "latest-30days"}]
+           :filters (cond-> [time-filter]
                             (seq search) (conj {:name name :operator "search" :value search}))
            :splits [{:name name :limit 50}]
            :measures ["rowCount"]}]
     (swap! filter assoc :loading? true)
     (rpc/call "querying/query" :args [q] :handler #(swap! filter assoc :results % :loading? false))))
 
-(defn- normal-filter-popup [dim {:keys [cube on-filter-change] :as config}]
+(defn- normal-filter-popup [dim {:keys [cube time-filter on-filter-change] :as config}]
   (let [filter (-> (select-keys dim [:name :operator :value])
-                   (assoc :cube cube)
+                   (assoc :cube cube :time-filter time-filter)
                    r/atom)
         opts (r/track #(select-keys @filter [:operator :value]))
         search (r/atom "")
@@ -215,9 +218,12 @@
       [:a.ui.green.compact.button.item
        (assoc (draggable dim)
               :class (when-not (time-dimension? dim) "right labeled icon")
-              :on-click (fn [el] (show-popup el ^{:key popup-key}
-                                             [filter-popup dim {:cube (viewer :cube :name) :on-filter-change update-filter-or-remove}]
-                                             {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
+              :on-click (fn [el]
+                          (show-popup el ^{:key popup-key}
+                                      [filter-popup dim {:cube (viewer :cube :name)
+                                                         :time-filter (time-dimension (viewer :filters))
+                                                         :on-filter-change update-filter-or-remove}]
+                                      {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
               :ref show-popup-when-added)
        (when-not (time-dimension? dim)
          [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
