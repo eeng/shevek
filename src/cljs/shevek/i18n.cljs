@@ -254,13 +254,14 @@
             :permissions "Permisos"}
     :permissions {:allowed-cubes "Cubes Visibles"
                   :admin-all-cubes "Administradores pueden ver todo"
-                  :all-cubes "Puede visualizar todos los cubos"
-                  :no-cubes "No puede visualizar ningún cubo"
+                  :all-cubes "Puede ver todos los cubos"
+                  :no-cubes "No puede ver ningún cubo"
                   :only-cubes-selected "Puede ver sólo los siguientes cubos"
                   :all-measures "Todas las métricas serán visibles"
                   :only-measures-selected "Sólo las siguientes métricas serán visibles"
                   :select-measures "Por favor seleccion las métricas permitidas"
-                  :no-measures "Ninguna"}
+                  :no-measures "Ninguna"
+                  :add-filter "Agregar Filtro"}
     :account {:title "Tu Cuenta"
               :subtitle "Aquí puede cambiar los detalles de su perfil"
               :current-password "Password Actual"

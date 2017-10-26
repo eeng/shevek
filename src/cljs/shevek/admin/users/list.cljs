@@ -48,13 +48,11 @@
         (hold-to-confirm #(dispatch :user-deleted original-user))
         (t :actions/delete)]]
       [:div.header fullname]
-      [:div.description
-       [:p (t :users/username) ": " username]
-       (when (seq email) [:p (t :users/email) ": " (mail-to email)])
-       [:p allowed-cubes-text]]
-      (when admin
+      [:div.meta username (when (seq email) [:span " | " (mail-to email)])]
+      (if admin
         [:div.extra
-         [:div.ui.blue.label "Admin"]])]]))
+         [:div.ui.blue.label "Admin"]]
+        [:div.description allowed-cubes-text])]]))
 
 (defn- users-list [edited-user]
   (let [search (r/atom "")]
