@@ -15,10 +15,11 @@
 
 (defn- popup-content []
   (let [dashboards (filter :id (db/get :dashboards))] ; Ignore dashboards that are being created
-    (if (seq dashboards)
-      [:div.ui.relaxed.middle.aligned.selection.list
-       (rmap dashboard-item :id dashboards)]
-      [:div (t :errors/no-results)])))
+    [:div#dashboards-popup
+     (if (seq dashboards)
+       [:div.ui.relaxed.middle.aligned.selection.list
+        (rmap dashboard-item :id dashboards)]
+       [:div (t :errors/no-results)])]))
 
 (defn dashboards-menu []
   (when-not (current-page? :home) ; No need to fetch the dashboards again when we are on the home page

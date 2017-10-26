@@ -41,7 +41,7 @@
    :filters (report-dims->viewer (report :filters) cube)
    :splits (report-dims->viewer (report :splits) cube)
    :measures (filterv some? (map #(find-dimension % (cube :measures)) (report :measures)))
-   :pinboard {:measure (or (find-dimension (:measure pinboard) (cube :measures)) 
+   :pinboard {:measure (or (find-dimension (:measure pinboard) (cube :measures))
                            (first (default-measures cube)))
               :dimensions (report-dims->viewer (-> report :pinboard :dimensions) cube)}})
 
