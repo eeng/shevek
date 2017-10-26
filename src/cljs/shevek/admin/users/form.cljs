@@ -9,28 +9,36 @@
             [shevek.lib.util :refer [new-record?]]
             [shevek.lib.collections :refer [find-by]]
             [shevek.lib.dw.cubes :refer [cubes-list]]
-            [shevek.admin.users.permissions :refer [user-permissions]]))
+            [shevek.admin.users.permissions :refer [user-permissions]]
+            [shevek.schemas.user :refer [CubePermissions]]
+            [schema-tools.core :as st]
+            [com.rpl.specter :refer [transform ALL must]]))
 
 (defevh :user-saved [db]
   (dispatch :users-requested)
   (rpc/loaded db :saving-user))
 
 (defn adapt-for-client [{:keys [allowed-cubes] :or {allowed-cubes "all"} :as user}]
-  (let [cube-permission (fn [{:keys [name] :as cube}]
+  (let [cube-permission (fn [{:keys [name dimensions] :as cube}]
                           (let [allowed-cube (find-by :name name allowed-cubes)
                                 allowed-measures (get allowed-cube :measures "all")]
                             (-> cube
                                 (assoc :selected (some? allowed-cube)
                                        :only-measures-selected (not= "all" allowed-measures)
-                                       :allowed-measures (when (not= "all" allowed-measures) allowed-measures))
-                                (assoc-nil :filters []))))]
+                                       :allowed-measures (when (not= "all" allowed-measures) allowed-measures)
+                                       :filters (->> (:filters allowed-cube)
+                                                     (mapv #(merge (find-by :name (:name %) dimensions) %))
+                                                     (transform [ALL (must :value)] set))))))]
     (assoc user
            :cubes (mapv cube-permission (cubes-list))
            :only-cubes-selected (not= allowed-cubes "all"))))
 
 (defn adapt-for-server [{:keys [only-cubes-selected cubes] :as user}]
-  (let [adapt-cube (fn [{:keys [name allowed-measures only-measures-selected]}]
-                     {:name name :measures (if only-measures-selected allowed-measures "all")})
+  (let [adapt-cube (fn [{:keys [name only-measures-selected allowed-measures filters]}]
+                     (-> {:name name}
+                         (assoc :measures (if only-measures-selected allowed-measures "all")
+                                :filters (transform [ALL (must :value)] vec filters))
+                         (st/select-schema CubePermissions)))
         allowed-cubes (if only-cubes-selected
                         (->> cubes (filter :selected) (map adapt-cube))
                         "all")]

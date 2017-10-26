@@ -17,6 +17,9 @@
    :operator (s/enum "include" "exclude" "search" "is")
    :value (s/cond-pre s/Str [(s/maybe s/Str)])})
 
+(s/defschema Filter
+  (s/if #(or (:period %) (:interval %)) TimeFilter NormalFilter))
+
 (s/defschema Filters
   [(s/one TimeFilter "tf") NormalFilter])
 
