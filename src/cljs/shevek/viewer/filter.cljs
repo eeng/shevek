@@ -11,7 +11,7 @@
             [shevek.lib.time.ext :refer [format-date]]
             [shevek.lib.util :refer [debounce trigger-click]]
             [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value highlight current-cube dimension-value send-pinboard-queries filter-title]]
+            [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value highlight current-cube dimension-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching classes]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
@@ -36,6 +36,20 @@
   (when (and node (= name @last-added-filter))
      (reset! last-added-filter nil)
      (-> node r/dom-node js/$ trigger-click)))
+
+(defn filter-title [{:keys [title period interval operator value] :as dim}]
+  (let [details (if (= (count value) 1)
+                  (-> (first value) (format-dim-value dim) (str/prune 15))
+                  (count value))]
+    (cond
+      period [:span (translation :viewer.period (keyword period))]
+      interval [:span (format-interval interval)]
+      :else [:span title " "
+             (when (seq value)
+               [:span.details (when (= operator "exclude") {:class "striked"})
+                (case operator
+                  ("include" "exclude") (str "(" details ")")
+                  "")])])))
 
 (defn build-filter [dim opts]
   (merge (clean-dim dim) opts))

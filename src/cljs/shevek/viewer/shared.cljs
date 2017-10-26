@@ -118,20 +118,6 @@
 
 (def debounce-dispatch (debounce dispatch 500))
 
-(defn filter-title [{:keys [title period interval operator value] :as dim}]
-  (let [details (if (= (count value) 1)
-                  (-> (first value) (format-dim-value dim) (str/prune 15))
-                  (count value))]
-    (cond
-      period [:span (translation :viewer.period (keyword period))]
-      interval [:span (format-interval interval)]
-      :else [:span title " "
-             (when (seq value)
-               [:span.details {:class (when (= operator "exclude") "striked")}
-                (case operator
-                  ("include" "exclude") (str "(" details ")")
-                  "")])])))
-
 (defn cube-authorized? [{:keys [measures]}]
   (seq measures))
 

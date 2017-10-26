@@ -21,3 +21,6 @@
         (map (fn [parent]
                (->> (js/$ child-selector parent) .toArray
                     (map #(.-textContent %))))))))
+
+(defn text [selector]
+  (apply str (texts selector)))

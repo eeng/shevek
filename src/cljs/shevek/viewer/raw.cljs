@@ -5,8 +5,8 @@
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.components.modal :refer [show-modal]]
-            [shevek.viewer.shared :refer [current-cube dimension-value format-measure viewer filter-title]]
-            [shevek.viewer.filter :refer [selected-path->filters]]
+            [shevek.viewer.shared :refer [current-cube dimension-value format-measure viewer]]
+            [shevek.viewer.filter :refer [selected-path->filters filter-title]]
             [shevek.lib.dw.dims :refer [time-dimension? add-dimension merge-dimensions]]
             [cuerdas.core :as str]
             [shevek.lib.react :refer [rmap]]
@@ -42,10 +42,10 @@
            (for [{:keys [name] :as m} measures]
              [:td.measure {:key name} (format-measure m result)])]))]]))
 
-(defn filters->str [filter]
-  [:span.filter
-   (->> (rmap filter-title :name filter)
-        (interpose ", "))])
+(defn filters->str [filters]
+  (into [:span.filters]
+        (->> (map filter-title filters)
+             (interpose ", "))))
 
 (defn modal-content []
   [:div.subcontent

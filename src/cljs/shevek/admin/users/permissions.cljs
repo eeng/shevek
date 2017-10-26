@@ -6,7 +6,7 @@
             [shevek.lib.dw.dims :refer [includes-dim? find-dimension remove-dimension replace-dimension time-dimension?]]
             [shevek.reflow.core :refer-macros [defevh]]
             [shevek.components.form :refer [select dropdown]]
-            [shevek.viewer.shared :refer [filter-title]]
+            [shevek.viewer.filter :refer [filter-title]]
             [shevek.viewer.filter :refer [filter-popup build-filter empty-value? show-popup-when-added set-as-last-added-filter]]
             [shevek.components.popup :refer [show-popup]]))
 
