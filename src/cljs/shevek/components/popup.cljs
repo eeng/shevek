@@ -51,8 +51,10 @@
                                             (.addEventListener js/document "click" @node-listener true))
                      :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)})))
 
-(defn tooltip [content]
-  (fn [node]
-    (when node
-      (-> node js/$ (.popup #js {:content content :variation "small inverted"
-                                 :position "top center" :prefer "opposite"})))))
+(defn tooltip [content & [{:as opts}]]
+  (let [opts (->> opts
+                  (merge {:content content :variation "small inverted"
+                          :position "top center" :prefer "opposite"})
+                  clj->js)]
+    (fn [node]
+      (when node (-> node js/$ (.popup opts))))))

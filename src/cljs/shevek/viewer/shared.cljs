@@ -10,6 +10,7 @@
             [shevek.lib.dw.dims :refer [dim= add-dimension remove-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
             [shevek.components.form :refer [kb-shortcuts]]
+            [shevek.components.popup :refer [tooltip]]
             [shevek.viewer.url :refer [store-viewer-in-url]]
             [schema.core :as s]
             [goog.string :as gstr]
@@ -123,4 +124,4 @@
 
 (defn description-help-icon [{:keys [description]}]
   (when (seq description)
-    [:i.help.circle.outline.icon {:title description}]))
+    [:i.help.circle.outline.icon {:ref (tooltip description {:position "right center"})}]))
