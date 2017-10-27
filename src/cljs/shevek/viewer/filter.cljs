@@ -13,7 +13,7 @@
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query format-dimension format-dim-value highlight current-cube dimension-value send-pinboard-queries]]
             [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching classes]]
-            [shevek.components.popup :refer [show-popup close-popup]]
+            [shevek.components.popup :refer [show-popup close-popup tooltip]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.components.calendar :refer [build-range-calendar]]
             [shevek.viewer.url :refer [store-viewer-in-url]]
@@ -46,7 +46,9 @@
       interval [:span (format-interval interval)]
       :else [:span title " "
              (when (seq value)
-               [:span.details (when (= operator "exclude") {:class "striked"})
+               [:span.details (cond-> {}
+                                      (= operator "exclude") (assoc :class "striked")
+                                      (> (count value) 1) (assoc :ref (tooltip (str/join ", " value))))
                 (case operator
                   ("include" "exclude") (str "(" details ")")
                   "")])])))

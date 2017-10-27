@@ -50,3 +50,9 @@
                                             (reset! node-listener (partial handle-click-outside container))
                                             (.addEventListener js/document "click" @node-listener true))
                      :component-will-unmount #(.removeEventListener js/document "click" @node-listener true)})))
+
+(defn tooltip [content]
+  (fn [node]
+    (when node
+      (-> node js/$ (.popup #js {:content content :variation "small inverted"
+                                 :position "top center" :prefer "opposite"})))))
