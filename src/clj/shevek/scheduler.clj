@@ -1,7 +1,7 @@
 (ns shevek.scheduler
-  (:require [hara.io.scheduler :as hs]
-            [mount.core :refer [defstate]]
+  (:require [mount.core :refer [defstate]]
             [taoensso.timbre :refer [info error]]
+            [overtone.at-at :as at :refer [mk-pool every stop-and-reset-pool!]]
             [shevek.config :refer [config]]
             [shevek.schema.seed :as seed]
             [shevek.schema.manager :as m]
@@ -20,27 +20,22 @@
 
 (defn- initial-schema-discovery [dri]
   (if (pos? dri)
-    (do
-      (info "Starting auto discovery process, will execute every" dri "msecs")
-      (refresh-schema))
+    (info "Starting auto discovery process, will execute every" dri "msecs")
     (do
       (info "Auto discovery disabled")
       (seed/cubes db))))
 
 (defn start! []
-  (let [sch (hs/scheduler {})
+  (let [pool (at/mk-pool)
         dri (config :datasources-refresh-interval)]
     (future (wrap-error (fn []
                           (seed/users db)
                           (initial-schema-discovery dri))))
-
     (when (pos? dri)
-      (hs/add-task sch :refresh-schema {:handler #(wrap-error refresh-schema)
-                                        :schedule (format "/%d * * * * * *" dri)}))
-    (hs/add-task sch :update-time-boundary {:handler #(wrap-error (partial m/update-time-boundary! dw db))
-                                            :schedule "/30 * * * * * *"})
-    (hs/start! sch)))
+      (every (* dri 1000) #(wrap-error refresh-schema) pool))
+    (every 30000 #(wrap-error (partial m/update-time-boundary! dw db)) pool :initial-delay 10000)
+    pool))
 
 (defstate scheduler
   :start (start!)
-  :stop (hs/stop! scheduler))
+  :stop (stop-and-reset-pool! scheduler))
