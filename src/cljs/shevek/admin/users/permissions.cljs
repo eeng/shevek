@@ -11,27 +11,29 @@
             [shevek.components.popup :refer [show-popup]]))
 
 (defn filter-button [cube {:keys [name] :as dim}]
-  (let [remove-filter #(swap! cube update :filters remove-dimension dim)
-        update-filter #(if (empty-value? %2)
-                         (remove-filter)
-                         (swap! cube update :filters replace-dimension (build-filter dim %2)))
-        remove-if-empty #(let [updated-dim (find-dimension name (:filters @cube))]
-                           (when (empty-value? updated-dim) (remove-filter)))]
-    [:a.ui.tiny.right.labeled.icon.button
-     {:on-click #(show-popup % ^{:key (select-keys dim [:name :added])}
-                             [filter-popup dim {:cube (:name @cube)
-                                                :on-filter-change update-filter
-                                                :time-filter {:period "latest-30days"}}]
-                             {:position "bottom center" :on-close remove-if-empty})
-      :ref (partial show-popup-when-added name)}
-     (filter-title dim)
-     [:i.delete.icon {:on-click (without-propagation remove-filter)}]]))
+  (let [popup-key (hash {:name name :timestamp (js/Date.)})]
+    (fn [cube dim]
+      (let [remove-filter #(swap! cube update :filters remove-dimension dim)
+            update-filter #(if (empty-value? %2)
+                             (remove-filter)
+                             (swap! cube update :filters replace-dimension (build-filter dim %2)))
+            remove-if-empty #(let [updated-dim (find-dimension name (:filters @cube))]
+                               (when (empty-value? updated-dim) (remove-filter)))]
+        [:a.ui.tiny.right.labeled.icon.button
+         {:on-click #(show-popup % ^{:key popup-key}
+                                 [filter-popup dim {:cube (:name @cube)
+                                                    :on-filter-change update-filter
+                                                    :time-filter {:period "latest-30days"}}]
+                                 {:position "bottom center" :on-close remove-if-empty})
+          :ref (partial show-popup-when-added name)}
+         (filter-title dim)
+         [:i.delete.icon {:on-click (without-propagation remove-filter)}]]))))
 
 (defn- to-filter [dim]
   (let [opts (if (time-dimension? dim)
                {:period "latest-day"}
                {:operator "include" :value #{}})]
-    (build-filter dim (assoc opts :added (js/Date.)))))
+    (build-filter dim opts)))
 
 (defn- cube-permissions [user {:keys [dimensions]} i]
   (let [cube (r/cursor user [:cubes i])

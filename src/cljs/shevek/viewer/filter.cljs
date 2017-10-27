@@ -232,7 +232,7 @@
       (dispatch :dimension-removed-from-filter dim))))
 
 (defn- filter-item [{:keys [name] :as dim}]
-  (let [popup-key (hash {:name name :timestamp (js/Date.)})]
+  (let [popup-key (hash {:name name :timestamp (js/Date.)})] ; Without the timestamp if a filter was added, changed, removed and then readded, as the key name is the same it would not remount the popup and the previous options would remain.
     (fn [dim]
       [:a.ui.green.compact.button.item
        (assoc (draggable dim)
