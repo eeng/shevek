@@ -11,8 +11,9 @@
   (filter #(cube-visible? (:name %) user) cubes))
 
 (defn- measure-visible? [measure {:keys [measures] :or {measures "all"}}]
-  (or (= measures "all")
-      (includes? measures (:name measure))))
+  (let [measure (if (string? measure) measure (:name measure))]
+    (or (= measures "all")
+        (includes? measures measure))))
 
 (defn filter-measures [measures cube-name {:keys [allowed-cubes] :as user}]
   (let [allowed-cube (cond

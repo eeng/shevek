@@ -59,7 +59,7 @@
                  :on-change #(swap! cube assoc :allowed-measures (split % #","))
                  :placeholder (t :permissions/select-measures)}])]
             [:div.filters
-             [dropdown (map (juxt :title :name) (remove #(includes-dim? filters %) dimensions))
+             [dropdown (map (juxt :title :name) (remove #(includes-dim? filters %) (sort-by :title dimensions)))
               {:class "labeled icon top left pointing tiny basic button" :in-menu-search true :on-change add-filter}
               [:i.filter.icon]
               [:span (if (seq filters) (str (t :viewer/filters) ":") (t :permissions/add-filter))]]

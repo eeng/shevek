@@ -15,17 +15,17 @@
 (defn- latest-period-query? [q]
   (selected-any? [:filters ALL :period #(str/starts-with? % "latest")] q))
 
-; TODO throtlelear time-boundary
-(defn- update-max-time [q {:keys [name] :as cube}]
+; TODO throtlelear time-boundary?
+(defn- update-max-time [{:keys [name] :as cube} q]
   (cond-> cube
           (latest-period-query? q) (assoc :max-time (:max-time (time-boundary dw name)))))
 
 (defn- do-query [user {:keys [cube] :as q} q-fn]
-  (->> (find-cube db cube)
-       (update-max-time q)
-       (expand-query q)
-       (auth/filter-query user)
-       (q-fn dw)))
+  (let [cube (-> (find-cube db cube)
+                 (update-max-time q))]
+    (as-> (auth/filter-query user q) q
+          (expand-query q cube)
+          (q-fn dw q))))
 
 (s/defn query [{:keys [user]} q :- Query]
   (do-query user q agg/query))
