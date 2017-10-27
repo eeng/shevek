@@ -71,13 +71,22 @@
   (testing "should respect the time-zone for the time calculations if present"
     (with-redefs [now (constantly (date-time 2017 3 15))]
       (is (= ["2017-03-01T03:00:00.000Z" "2017-04-01T02:59:59.999Z"]
-             (->> (expand-query {:filters [{:period "current-month"}]
-                                 :time-zone "America/Argentina/Buenos_Aires"} {})
-                  :filters first :interval)))
+             (-> {:filters [{:period "current-month"}]}
+                 (expand-query {}) :filters first :interval)))
       (is (= ["2015-01-01T03:00:00.000Z" "2015-01-02T03:00:00.000Z"]
-             (->> (expand-query {:filters [{:interval ["2015-01-01" "2015-01-02"]}]
-                                 :time-zone "America/Argentina/Buenos_Aires"} {})
-                  :filters first :interval)))))
+             (-> {:filters [{:interval ["2015-01-01" "2015-01-02"]}]}
+                 (expand-query {}) :filters first :interval)))))
+
+  (testing "if there are several time filters, should return the intersection interval"
+    (is (= [{:interval ["2015-01-03T03:00:00.000Z" "2015-01-05T03:00:00.000Z"]}]
+           (-> {:filters [{:interval ["2015-01-01" "2015-01-05"]}
+                          {:interval ["2015-01-02" "2015-01-31"]}
+                          {:interval ["2015-01-03" "2015-01-10"]}]}
+               (expand-query {}) :filters)))
+    (is (= [{:interval ["2015-01-09T03:01:00.000Z" "2015-01-10T03:01:00.000Z"]}]
+           (-> {:filters [{:period "latest-7days"}
+                          {:period "latest-day"}]}
+               (expand-query {:max-time "2015-01-10T03:00Z"}) :filters))))
 
   (testing "raw queries don't have splits nor measures"
     (is (without? :splits (expand-query {} {})))

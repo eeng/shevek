@@ -51,6 +51,8 @@
 (def days t/days)
 (def hours t/hours)
 (def minus t/minus)
+(def earliest t/earliest)
+(def latest t/latest)
 
 (defn yesterday []
   (t/minus (now) (days 1)))
