@@ -5,7 +5,7 @@
             [shevek.rpc :as rpc]
             [shevek.lib.local-storage :as local-storage]
             [shevek.components.form :refer [select]]
-            [shevek.components.popup :refer [show-popup]]
+            [shevek.components.popup :refer [show-popup tooltip]]
             [shevek.navigation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
             [shevek.login :refer [logged-in?]]
@@ -66,5 +66,5 @@
 
 (defn- settings-menu []
   [:a.icon.item {:on-click #(show-popup % popup-content {:position "bottom right"})
-                 :title (t :settings/menu)}
+                 :ref (tooltip (t :settings/menu))}
    [:i.setting.icon]])
