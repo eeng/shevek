@@ -175,5 +175,5 @@
         (aot :namespace #{'shevek.app})
         (uber)
         (jar :file "shevek.jar" :main 'shevek.app)
-        (sift :include #{#"shevek.jar" #"config.edn"})
+        (sift :include #{#"shevek.jar"})
         (target :dir #{"dist"})))

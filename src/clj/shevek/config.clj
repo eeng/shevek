@@ -13,7 +13,7 @@
    (get-in cfg (wrap-coll key) default-value)))
 
 (defn env []
-  (config :env :development))
+  (config :env :production))
 
 (defn env? [env-kw]
   (= (env) env-kw))

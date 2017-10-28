@@ -1,2 +1,158 @@
 {:env :development
- :druid-uri "http://10.0.1.13:8082"}
+
+ :cubes
+ [{:name "facturacion"
+   :title "Ventas"
+   :description "Ventas calculadas a partir de los comprobantes de facturación de VTOL"
+   :dimensions [{:name "__time" :title "Fecha de Emisión"}
+                {:name "fecha_pedido" :title "Fecha de Pedido"}
+                {:name "año" :column "__time"
+                 :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
+                {:name "mes" :column "__time"
+                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "semestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
+                {:name "cuatrimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'C' + (Math.floor(new Date(d).getMonth() / 4) + 1) }"}]}
+                {:name "trimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
+                {:name "dia_semana" :title "Día de Semana" :column "__time"
+                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "tipo_comprobante" :title "Tipo de Comprobante"}
+                {:name "grupo_item" :title "Grupo de Item"}
+                {:name "tipo_item" :title "Tipo de Item"}
+                {:name "descripcion" :title "Descripción Amplia"}
+                {:name "descripcion_reducida" :title "Descripción Reducida"}
+                {:name "oficina_emision" :title "Oficina de Emisión"}
+                {:name "cuit_cliente" :title "CUIT Cliente"}
+                {:name "provincia_cliente" :title "Provincia del Cliente"}
+                {:name "localidad_cliente" :title "Localidad del Cliente"}
+                {:name "tipo_cuenta" :title "Tipo de Cuenta"}
+                {:name "punto_venta" :title "Punto de Venta"}
+                {:name "jurisdiccion" :title "Jurisdicción Percepción"}
+                {:name "rubro_marca" :title "Marca"}
+                {:name "rubro_material" :title "Material del Lente"}
+                {:name "rubro_clase" :title "Clase de Lente"}
+                {:name "rubro_tags" :title "Tag"}
+                {:name "tasa_iva" :title "Tasa de IVA"}
+                {:name "condicion_iva" :title "Condición IVA"}
+                {:name "despacho_preferencial" :title "Despacho Preferencial" :type "BOOL"}
+                {:name "esferico" :title "Esférico" :type "FLOAT"}
+                {:name "cilindrico" :title "Cilíndrico" :type "FLOAT"}
+                {:name "eje_cilindrico" :title "Eje Cilíndrico" :type "FLOAT"}
+                {:name "adicion" :title "Adición" :type "FLOAT"}]
+   :measures [{:name "importe" :title "Importe Total" :format "$0.00a"
+               :expression "(/ (sum $importe) 100)"}
+              {:name "importe_productos" :format "$0.00a" :favorite true
+               :expression "(/ (where {$grupo_item \"Productos\"} (sum $importe)) 100)"}
+              {:name "importe_impuestos" :format "$0.00a"
+               :expression "(/ (where {$grupo_item \"Impuestos\"} (sum $importe)) 100)"}
+              {:name "ultimo_nro_cbte" :title "Último Cbte" :format "0,0"}
+              {:name "unidades_precios" :title "Unidades"
+               :expression "(where {$tipo_item \"Precio\"} (sum $unidades))"
+               :favorite true}
+              {:name "unidades_descargos"
+               :expression "(where (not= $tipo_item \"Precio\") (sum $unidades))"}
+              {:name "unidades" :hidden true}]}
+
+  {:name "eventos_pedidos"
+   :title "Eventos de Pedidos"
+   :description "Métricas de eventos producidos sobre pedidos cargados en VTOL"
+   :dimensions [{:name "__time" :title "Fecha"}
+                {:name "año" :column "__time"
+                 :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
+                {:name "mes" :column "__time"
+                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "semestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
+                {:name "cuatrimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'C' + (Math.floor(new Date(d).getMonth() / 4) + 1) }"}]}
+                {:name "trimestre" :column "__time"
+                 :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
+                {:name "dia_semana" :title "Día de Semana" :column "__time"
+                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "tipo_pedido" :title "Tipo de Pedido"}
+                {:name "condicion_ruteo" :title "Condición de Ruteo"}]
+   :measures [{:name "facturado" :hidden true}
+              {:name "pedidos" :title "Pedidos" :favorite true
+               :description "Cantidad aproximada de pedidos distintos"}
+              {:name "pedidos_finalizados_en_tiempo"
+               :expression "(where {$estado_generado \"Finalizado\" $condicion_ruteo \"En Tiempo\"} (sum $eventos))"}
+              {:name "pedidos_finalizados"
+               :expression "(where {$estado_generado \"Finalizado\"} (sum $eventos))"}
+              {:name "ins" :title "INS" :format "0%"  :favorite true
+               :expression "(/ (where {$estado_generado \"Finalizado\" $condicion_ruteo \"En Tiempo\"} (sum $eventos)) (where {$estado_generado \"Finalizado\"} (sum $eventos)))"}]}
+
+  {:name "repeticiones"
+   :title "Repeticiones"
+   :description "Seguimiento de lentes repetidas vs procesadas"
+   :dimensions [{:name "__time" :title "Fecha"}
+                {:name "año" :column "__time"
+                 :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
+                {:name "mes" :column "__time"
+                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "dia_semana" :title "Día de Semana" :column "__time"
+                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "material" :title "Material"}
+                {:name "clase" :title "Clase de Lente"}
+                {:name "seccion" :title "Sección"}
+                {:name "fabricacion" :title "Fabricación"}
+                {:name "tipo_tallado" :title "Tipo de Tallado"}]
+   :measures [{:name "lentes_procesadas"
+               :description "Tener presente que una misma lente puede ser procesada varias veces (en distintas secciones por ejemplo)"}
+              {:name "lentes_repetidas" :title "Repeticiones" :favorite true
+               :description "Lentes Repetidas"}
+              {:name "lentes_facturadas" :description "Lentes procesadas en la sección Vitolen (calculadas a partir de eventos de facturación)"
+               :expression "(where {$seccion \"Vitolen\"} (sum $lentes_procesadas))"}
+              {:name "indicador_general" :title "R/LP"
+               :description "Indicador Global: Si LF = 0 entonces Indicador = R/LP; sino Indicador = R/LF"
+               :type "javascript" :format "0.0%" :favorite true
+               :expression "(js [(sum $lentes_repetidas)
+                                 (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))
+                                 (sum $lentes_procesadas)]
+                                \"function(r, lf, lp) { return r / (lf == 0 ? lp : lf) }\")"}
+              {:name "indicador_procesos" :title "R/(LP+R)"
+               :description "Indicador Procesos: Si LF = 0 entonces Indicador = R/(LP+R); sino Indicador = R/(LF+R)"
+               :type "javascript" :format "0.0%"
+               :expression "(js [(sum $lentes_repetidas)
+                                 (where {$seccion \"Vitolen\"} (sum $lentes_procesadas))
+                                 (sum $lentes_procesadas)]
+                                \"function(r, lf, lp) { return r / (lf == 0 ? lp + r : lf + r) }\")"}
+              {:name "promedio_pedidos_repetidos" :title "Pedidos Repetidos"
+               :description "Promedio de pedidos repetidos. Se contabiliza la repetición entera (si se repiten ambos ojos se cuenta una sola vez) y podría haber varias repeticiones por pedido. Dato aproximado." :format "0.0%"
+               :expression "(/ (where {$evento \"Repetición\"} (count-distinct $pedidos))
+                               (count-distinct $pedidos))"}]}
+
+  {:name "vtol_stats"
+   :title "VTOL Stats"
+   :description "Estadísticas de utilización del sistema VTOL"
+   :measures [{:name "db_runtime"
+               :title "DB Runtime (ms)"
+               :expression "(/ (sum $db_runtime) (sum $requests))"
+               :format "0"}
+              {:name "view_runtime"
+               :title "View Runtime (ms)"
+               :expression "(/ (sum $view_runtime) (sum $requests))"
+               :format "0"}
+              {:name "duration"
+               :title "Duration (ms)"
+               :expression "(/ (sum $duration) (sum $requests))"
+               :format "0"}]}
+
+  {:name "wikiticker"
+   :description "Druid quickstart sample of Wikipedia edits"
+   :dimensions [{:name "isMinor" :type "BOOL"}
+                {:name "isUnpatrolled" :type "BOOL"}
+                {:name "isAnonymous" :type "BOOL"}
+                {:name "isRobot" :type "BOOL" :description "Indicates whether a computer or a human being made this edit"}
+                {:name "isNew" :type "BOOL"}
+                {:name "regionIsoCode" :title "Region ISO Code"}
+                {:name "countryIsoCode" :title "Country ISO Code"}
+                {:name "year" :column "__time" :extraction [{:type "timeFormat" :format "Y"}]}]
+   :measures [{:name "count" :description "Character count"}]}]}
