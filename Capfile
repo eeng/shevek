@@ -1,3 +1,6 @@
+set :deploy_config_path, 'cap/deploy.rb'
+set :stage_config_path, 'cap/stages'
+
 # Load DSL and set up stages
 require "capistrano/setup"
 
