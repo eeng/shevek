@@ -5,6 +5,7 @@
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
             [shevek.web.logging :refer [wrap-request-logging]]
+            [shevek.web.error :refer [wrap-error]]
             [shevek.lib.transit-handlers :as th]
             [shevek.lib.rpc :as rpc]
             [shevek.lib.auth :as auth :refer [wrap-current-user]]
@@ -32,6 +33,7 @@
 (defn app []
   (let [backend (backends/jws {:secret (config :jwt-secret) :unauthorized-handler not-authorized})]
     (-> app-routes
+        (wrap-error)
         (wrap-request-logging)
         (wrap-current-user)
         (wrap-authentication backend)

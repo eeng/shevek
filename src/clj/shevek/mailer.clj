@@ -2,11 +2,9 @@
   (:require [postal.core :refer [send-message]]
             [shevek.config :refer [config]]
             [shevek.lib.collections :refer [assoc-nil]]
-            [cuerdas.core :as str]
-            [taoensso.timbre :as log]))
+            [cuerdas.core :as str]))
 
-(defn notify-error [exception & [{:as data}]]
-  (log/error exception)
+(defn notify-error [exception & [data]]
   (future
    (when (seq (config [:notifications :errors :to]))
      (let [{:keys [server errors]} (config :notifications)
@@ -24,4 +22,4 @@
        (send-message server msg)))))
 
 #_(let [exc (try (throw (Exception. "Foo")) (catch Exception e e))]
-    @(notify-error exc))
+    @(notify-error exc "prueba"))
