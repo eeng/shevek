@@ -2,7 +2,7 @@
   (:require [shevek.users.repository :as users]
             [shevek.schema.manager :refer [update-cubes]]
             [taoensso.timbre :refer [debug]]
-            [cprop.core :refer [load-config]]))
+            [shevek.config :refer [config]]))
 
 (defn users [db]
   (when-not (users/find-by db {:admin true})
@@ -11,8 +11,7 @@
 
 (defn cubes [db]
   (debug "Seeding schema.")
-  (let [{:keys [cubes]} (load-config)]
-    (update-cubes db cubes)))
+  (update-cubes db (config :cubes)))
 
 (defn seed! [db]
   (users db)

@@ -14,4 +14,6 @@
 
  :notifications
  {:server {:host "" :user "" :pass ""}
-  :errors {:to ""}}}
+  :errors {:to ""}}
+
+ :cubes []}
