@@ -2,7 +2,7 @@
   (:require [mount.core :refer [defstate]]
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as appenders]
-            [shevek.config :refer [env? env]]
+            [shevek.config :refer [env? env config]]
             [schema.core :as s]))
 
 (defstate initializer :start
@@ -13,4 +13,5 @@
                                              :spit (appenders/spit-appender {:fname "log/test.log"})})))
     (s/set-fn-validation! true)
     (log/info "Starting app in" (env) "environment")
+    (log/info "Error notification config:" (config [:notifications :errors] {}))
     :done))
