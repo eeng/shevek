@@ -12,6 +12,6 @@
  ; Set to 0 to disable auto discovery (in seconds)
  :datasources-refresh-interval 60
 
-  :notifications
-  {:server {:host "" :user "" :pass ""}
-   :errors {:to ""}}}
+ :notifications
+ {:server {:host "" :user "" :pass ""}
+  :errors {:to ""}}}
