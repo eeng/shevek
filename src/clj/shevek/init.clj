@@ -13,5 +13,5 @@
                                              :spit (appenders/spit-appender {:fname "log/test.log"})})))
     (s/set-fn-validation! true)
     (log/info "Starting app in" (env) "environment")
-    (log/info "Error notification config:" (config [:notifications :errors] {}))
+    (log/info "Error notification config:" (config [:notifications :errors]))
     :done))

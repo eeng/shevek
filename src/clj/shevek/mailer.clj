@@ -8,10 +8,11 @@
 (defn notify-error [exception & [{:as data}]]
   (log/error exception)
   (future
-   (when (config [:notifications :errors] false)
+   (when (seq (config [:notifications :errors :to]))
      (let [{:keys [server errors]} (config :notifications)
            hostname (.getHostName (java.net.InetAddress/getLocalHost))
            from (format "Shevek <shevek@%s>" hostname)
+           to (str/split (:to errors) ",")
            subject (str "[ERROR] " (.getMessage exception))
            stacktrace (apply str (interpose "\n" (.getStackTrace exception)))
            body (->>
@@ -19,7 +20,7 @@
                   (when stacktrace (str "STACKTRACE:\n" stacktrace))]
                  (remove nil?)
                  (str/join "\n\n"))
-           msg (assoc-nil errors :from from :subject subject :body body)]
+           msg {:from from :to to :subject subject :body body}]
        (send-message server msg)))))
 
 #_(let [exc (try (throw (Exception. "Foo")) (catch Exception e e))]
