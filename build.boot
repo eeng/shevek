@@ -54,7 +54,8 @@
                     [cljsjs/react-with-addons "15.6.1-0"]
                     [cljs-react-test "0.1.4-SNAPSHOT" :scope "test"]
                     [cljsjs/jquery "3.2.1-0" :scope "test"] ; Only needed for reagent tests as in the app we use the extern, otherwise there were dep issues
-                    [overtone/at-at "1.2.0"]])
+                    [overtone/at-at "1.2.0"]
+                    [com.draines/postal "2.0.2"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
