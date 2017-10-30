@@ -18,22 +18,27 @@
   (m/discover! dw db)
   (seed/cubes db))
 
-(defn- initial-schema-discovery [dri]
-  (if (pos? dri)
-    (info "Starting auto discovery process, will execute every" dri "msecs")
-    (do
-      (info "Auto discovery disabled")
-      (seed/cubes db))))
+(defn- configure-datasources-discovery-task [pool]
+  (let [interval (config :datasources-discovery-interval)]
+    (if (pos? interval)
+      (do
+        (info "Starting auto discovery task, will execute every" interval "secs")
+        (every (* interval 1000) #(wrap-error refresh-schema) pool))
+      (do
+        (info "Auto discovery disabled")
+        (seed/cubes db)))))
+
+(defn- configure-time-boundary-updating-task [pool]
+  (let [interval (config :time-boundary-update-interval)]
+    (when (pos? interval)
+      (info "Starting time boundary update task, will execute every" interval "secs")
+      (every (* interval 1000) #(wrap-error (partial m/update-time-boundary! dw db)) pool :initial-delay (* interval 1000)))))
 
 (defn start! []
-  (let [pool (at/mk-pool)
-        dri (config :datasources-refresh-interval)]
-    (future (wrap-error (fn []
-                          (seed/users db)
-                          (initial-schema-discovery dri))))
-    (when (pos? dri)
-      (every (* dri 1000) #(wrap-error refresh-schema) pool))
-    (every 30000 #(wrap-error (partial m/update-time-boundary! dw db)) pool :initial-delay 10000)
+  (let [pool (at/mk-pool)]
+    (seed/users db)
+    (configure-datasources-discovery-task pool)
+    (configure-time-boundary-updating-task pool)
     pool))
 
 (defstate scheduler
