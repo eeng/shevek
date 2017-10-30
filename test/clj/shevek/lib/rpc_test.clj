@@ -8,4 +8,5 @@
     (is (= [] (rpc/call-fn {:params {:fn "schema/cubes"}}))))
 
   (testing "only apis namespaces are allowed"
-    (is (thrown? AssertionError (rpc/call-fn {:params {:fn "println"}})))))
+    (is (thrown? AssertionError (rpc/call-fn {:params {:fn "println"}})))
+    (is (thrown? AssertionError (rpc/call-fn {:params {:fn "log/info"}})))))

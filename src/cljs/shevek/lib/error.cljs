@@ -4,7 +4,8 @@
             [shevek.i18n :refer [t translation]]
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
-            [shevek.notification :refer [notify]]))
+            [shevek.notification :refer [notify]]
+            [ajax.core :refer [POST]]))
 
 (defn handle-app-error [{:keys [status status-text response]}]
   (show-modal {:class "small basic app-error"
@@ -35,3 +36,11 @@
   (notify error :type :error :timeout 5000)
   (navigate "/")
   (rpc/loaded db))
+
+(defn- uncaught-error-handler [e]
+  (POST "/error" {:params {:message (.. e -error -message) :stacktrace (.. e -error -stack)}
+                  :headers (rpc/auth-header)}))
+
+(defonce uncaught-error-event-listener
+  (do (.addEventListener js/window "error" uncaught-error-handler)
+    :done))

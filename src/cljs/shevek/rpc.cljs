@@ -16,12 +16,15 @@
   ([db] (assoc db :loading {}))
   ([db key] (update db :loading dissoc key)))
 
+(defn auth-header []
+  {"Authorization" (str "Token " (session-storage/get-item "shevek.access-token"))})
+
 (defn call [fid & {:keys [args handler] :or {args []}}]
   {:pre [(vector? args)]}
   (POST "/rpc" {:params {:fn fid :args args}
                 :handler handler
                 :error-handler #(dispatch :server-error %)
-                :headers {"Authorization" (str "Token " (session-storage/get-item "shevek.access-token"))}}))
+                :headers (auth-header)}))
 
 (defevh :data-arrived [db db-key data db-handler]
   (let [db-handler (or db-handler #(assoc % db-key data))]

@@ -5,7 +5,7 @@
             [compojure.route :refer [resources not-found]]
             [clojure.java.io :as io]
             [shevek.web.logging :refer [wrap-request-logging]]
-            [shevek.web.error :refer [wrap-error]]
+            [shevek.web.error :refer [wrap-server-error client-error]]
             [shevek.lib.transit-handlers :as th]
             [shevek.lib.rpc :as rpc]
             [shevek.lib.auth :as auth :refer [wrap-current-user]]
@@ -27,13 +27,14 @@
   (resources "/public")
   (GET "/*" [] (-> "public/index.html" io/resource slurp))
   (POST "/login" [] auth/controller)
-  (POST "/rpc" [] (restrict rpc/controller {:handler should-be-authenticated :on-error not-authenticated})))
+  (POST "/rpc" [] (restrict rpc/controller {:handler should-be-authenticated :on-error not-authenticated}))
+  (POST "/error" [] (restrict client-error {:handler should-be-authenticated :on-error not-authenticated})))
 
 ; This needs to be a defn a not a def because of the config which will only be available after mount/start
 (defn app []
   (let [backend (backends/jws {:secret (config :jwt-secret) :unauthorized-handler not-authorized})]
     (-> app-routes
-        (wrap-error)
+        (wrap-server-error)
         (wrap-request-logging)
         (wrap-current-user)
         (wrap-authentication backend)
