@@ -1,13 +1,29 @@
 (ns shevek.lib.logging
   (:require [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as appenders]
-            [shevek.config :refer [env? config]]))
+            [shevek.config :refer [env? config]]
+            [shevek.lib.collections :refer [assoc-if]]
+            [clojure.string :as str])
+  (:import java.util.TimeZone))
+
+(defn output-fn [data]
+  (let [{:keys [level ?err #_vargs msg_ ?ns-str ?file timestamp_ ?line]} data]
+    (str
+     (force timestamp_) " "
+     (str/upper-case (name level))  " "
+     "[" (or ?ns-str ?file "?") ":" (or ?line "?") "] - "
+     (force msg_)
+     (when-let [err ?err]
+       (str "\n" (log/stacktrace err nil))))))
 
 (defn configure-logging! []
   (log/merge-config!
-   (cond-> (assoc (config :log) :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS"}) ; By default msecs are missing
-           (env? :test) (assoc :appenders {:println {:enabled? false}
-                                           :spit (appenders/spit-appender {:fname "log/test.log"})}))))
+   (assoc-if (config :log)
+             :output-fn output-fn ; Don't need to log the hostname
+             :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS" :timezone (TimeZone/getDefault)} ; By default msecs are missing and uses UTC
+             :appenders (when (env? :test)
+                          {:println {:enabled? false} :spit (appenders/spit-appender {:fname "log/test.log"})}))))
+
 (defn pp-str [& args]
   (with-out-str (apply clojure.pprint/pprint args)))
 
