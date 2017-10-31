@@ -20,7 +20,7 @@
             body (->> (dissoc data :message)
                       (map (fn [[k v]] (str (str/upper (name k)) ":\n" v)))
                       (str/join "\n\n"))
-            msg {:from from :to to :subject subject :body body}]
+            msg {:from from :to to :subject subject :body [{:type "text/plain; charset=utf-8" :content body}]}]
         (send-message server msg))))))
 
 #_(let [exc (try (throw (Exception. "Foo")) (catch Exception e e))]
