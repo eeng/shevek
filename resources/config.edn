@@ -14,6 +14,10 @@
 
  :time-boundary-update-interval 30
 
+ ; Set to :debug to log queries sent to Druid
+ :log {:level :info}
+
+ ; For now it's used only to notify errors to the system admin
  :notifications
  {:server {:host "" :user "" :pass ""}
   :errors {:to ""}}
