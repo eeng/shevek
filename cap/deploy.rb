@@ -2,7 +2,7 @@ lock "3.9.0"
 
 set :application, "shevek"
 set :deploy_to, "/var/apps/#{fetch :application}"
-set :repo_url, "ssh://dev@test.vitolen.com:14000/git/#{fetch :application}.git"
+set :repo_url, "ssh://dev@git.vitolen.com:14000/git/#{fetch :application}.git"
 set :pty, true
 
 namespace :deploy do
