@@ -1,5 +1,6 @@
 (ns shevek.web.logging
-  (:require [taoensso.timbre :as log]))
+  (:require [taoensso.timbre :as log]
+            [clojure.string :as str]))
 
 (defn- filtered-params [params to-filter]
   (reduce
@@ -12,10 +13,17 @@
 (defn- user-field [{:keys [username]}]
   (format "[%s]" (or username "guest")))
 
+(defn client-ip [req]
+  (if-let [ips (get-in req [:headers "x-forwarded-for"])]
+    (-> ips (str/split #",") first)
+    (:remote-addr req)))
+
 (defn wrap-request-logging [handler]
   (fn [{:keys [request-method uri query-string params identity] :as req}]
-    (let [ps (filtered-params params [:password :password-confirmation :current-password :stacktrace])]
-      (log/info (user-field identity) "Started" request-method uri (str query-string))
+    (let [ps (filtered-params params [:password :password-confirmation :current-password :stacktrace])
+          method (-> request-method name str/upper-case)
+          full-uri (str uri (when query-string (str "?" query-string)))]
+      (log/info (user-field identity) "Started" method full-uri "for" (client-ip req))
       (when (seq ps)
         (log/info (user-field identity) :params ps))
       (let [start (System/currentTimeMillis)
