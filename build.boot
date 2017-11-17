@@ -155,8 +155,9 @@
   "Run all tests."
   []
   (comp (test-clj)
-        (alt-test-cljs :exit? true)
-        (test-acceptance)))
+        (alt-test-cljs :exit? true)))
+        ; TODO reactivate acceptance
+        ; (test-acceptance)))
 
 (deftask seed
   "Seeds the application data."
