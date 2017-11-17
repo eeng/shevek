@@ -30,4 +30,4 @@
 (defmacro benchmark [str & body]
   `(let [start# (System/nanoTime)]
      ~@body
-     (log/debug (format ~str (/ (- (System/nanoTime) start#) 1e6)))))
+     (log/info (format ~str (/ (- (System/nanoTime) start#) 1e6)))))
