@@ -76,7 +76,8 @@
                  :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "tipo_pedido" :title "Tipo de Pedido"}
-                {:name "condicion_ruteo" :title "Condición de Ruteo"}]
+                {:name "condicion_ruteo" :title "Condición de Ruteo"}
+                {:name "year" :hidden true}]
    :measures [{:name "facturado" :hidden true}
               {:name "pedidos" :title "Pedidos" :favorite true
                :description "Cantidad aproximada de pedidos distintos"}

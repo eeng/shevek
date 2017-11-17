@@ -1,2 +1,2 @@
-server "druid"
+server "gandalf"
 set :branch, "master"
