@@ -3,7 +3,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
-            [shevek.lib.session-storage :as session-storage]))
+            [shevek.lib.local-storage :as local-storage]))
 
 (defn loading?
   ([] (seq (db/get :loading)))
@@ -17,7 +17,7 @@
   ([db key] (update db :loading dissoc key)))
 
 (defn auth-header []
-  {"Authorization" (str "Token " (session-storage/get-item "shevek.access-token"))})
+  {"Authorization" (str "Token " (local-storage/get-item "shevek.access-token"))})
 
 (defn call [fid & {:keys [args handler] :or {args []}}]
   {:pre [(vector? args)]}
