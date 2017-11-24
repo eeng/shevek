@@ -33,11 +33,11 @@
       :invalid-credentials {:username "john" :password ""}
       nil {:username "john" :password "secret123"}))
 
-  (it "tokens are valid for one day"
+  (it "tokens are valid for one week"
     (make! User {:username "john" :password "secret123"})
     (let [{:keys [token]} (authenticate-and-generate-token db {:username "john" :password "secret123"})]
       (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Token is expired"
-           (jwt/unsign token (config :jwt-secret) {:now (t/plus (t/now) (t/hours 25))})))))
+           (jwt/unsign token (config :jwt-secret) {:now (t/plus (t/now) (t/days 8))})))))
 
   (it "on successful login should update previous-sign-in-at with last-sign-in-at and last-sign-in-at field with now"
     (let [{:keys [updated-at] :as u} (make! User {:username "john" :password "secret123"})

@@ -7,7 +7,7 @@
             [bcrypt-clj.auth :refer [check-password]]
             [clj-time.core :as t]))
 
-(def token-expiration (t/days 1))
+(def token-expiration (t/days 7))
 
 (defn generate-token [{:keys [id] :as user}]
   (let [token (-> (select-keys user [:id :username :fullname :admin :email])
