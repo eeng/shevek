@@ -49,7 +49,7 @@
   (delete-dashboards db id))
 
 (defn update-sign-in-timestamps [db {:keys [id last-sign-in-at] :as user}]
-  (save-user db {:id id :previous-sign-in-at last-sign-in-at :last-sign-in-at (now)})
+  (m/update-by-id db "users" id {:previous-sign-in-at last-sign-in-at :last-sign-in-at (now)})
   user)
 
 ;; Examples

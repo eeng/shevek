@@ -2,6 +2,7 @@
   (:require [monger.joda-time] ; Necessary for automatic joda time objects persistance in monger
             [monger.query :as mq]
             [monger.collection :as mc]
+            [monger.operators :refer [$set]]
             [clj-time.core :refer [now]]
             [clojure.string :refer [ends-with?]]
             [com.rpl.specter :refer [transform ALL]])
@@ -78,3 +79,6 @@
 (defn delete-by [db collection condition]
   (mc/remove db collection (wrap-oids condition))
   true)
+
+(defn update-by-id [db collection id fields]
+  (mc/update db collection {:_id (oid id)} {$set fields}))
