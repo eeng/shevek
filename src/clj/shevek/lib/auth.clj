@@ -21,7 +21,7 @@
 
 (defn authenticate-and-generate-token [db {:keys [username password]}]
   (if-let [user (authenticate db username password)]
-    {:token (generate-token user)}
+    {:token (->> user (users/update-sign-in-timestamps db) (generate-token))}
     {:error :invalid-credentials}))
 
 (defn controller [{:keys [params]}]

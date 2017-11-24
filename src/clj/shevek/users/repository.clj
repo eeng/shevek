@@ -4,7 +4,8 @@
             [bcrypt-clj.auth :refer [crypt-password]]
             [shevek.schemas.user :refer [User]]
             [shevek.reports.repository :refer [delete-reports]]
-            [shevek.dashboards.repository :refer [delete-dashboards]]))
+            [shevek.dashboards.repository :refer [delete-dashboards]]
+            [clj-time.core :refer [now]]))
 
 (defn find-users [db]
   (m/find-all db "users" :fields [:username :fullname :email :admin :allowed-cubes] :sort {:username 1}))
@@ -46,6 +47,10 @@
   (m/delete-by-id db "users" id)
   (delete-reports db id)
   (delete-dashboards db id))
+
+(defn update-sign-in-timestamps [db {:keys [id last-sign-in-at] :as user}]
+  (save-user db {:id id :previous-sign-in-at last-sign-in-at :last-sign-in-at (now)})
+  user)
 
 ;; Examples
 

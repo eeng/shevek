@@ -16,7 +16,9 @@
    (s/optional-key :email) s/Str
    (s/optional-key :allowed-cubes) (s/cond-pre (s/eq "all") [CubePermissions])
    (s/optional-key :created-at) s/Any
-   (s/optional-key :updated-at) s/Any})
+   (s/optional-key :updated-at) s/Any
+   (s/optional-key :last-sign-in-at) s/Any
+   (s/optional-key :previous-sign-in-at) s/Any})
 
 (defn admin? [user]
   (:admin user))

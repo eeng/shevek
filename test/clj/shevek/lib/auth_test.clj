@@ -7,6 +7,7 @@
             [shevek.makers :refer [make!]]
             [shevek.schemas.user :refer [User]]
             [shevek.db :refer [db]]
+            [shevek.users.repository :refer [reload]]
             [buddy.sign.jwt :as jwt]
             [clj-time.core :as t]))
 
@@ -36,4 +37,19 @@
     (make! User {:username "john" :password "secret123"})
     (let [{:keys [token]} (authenticate-and-generate-token db {:username "john" :password "secret123"})]
       (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Token is expired"
-           (jwt/unsign token (config :jwt-secret) {:now (t/plus (t/now) (t/hours 25))}))))))
+           (jwt/unsign token (config :jwt-secret) {:now (t/plus (t/now) (t/hours 25))})))))
+
+  (it "on successful login should update previous-sign-in-at with last-sign-in-at and last-sign-in-at field with now"
+    (let [u (make! User {:username "john" :password "secret123"})
+          t1 (t/date-time 2017)
+          t2 (t/date-time 2018)]
+      (with-redefs [t/now (constantly t1)]
+        (is (contains? (authenticate-and-generate-token db {:username "john" :password "secret123"}) :token))
+        (is (submap? {:previous-sign-in-at nil
+                      :last-sign-in-at (t/to-time-zone t1 (t/default-time-zone))}
+                     (reload db u))))
+      (with-redefs [t/now (constantly t2)]
+        (is (contains? (authenticate-and-generate-token db {:username "john" :password "secret123"}) :token))
+        (is (submap? {:previous-sign-in-at (t/to-time-zone t1 (t/default-time-zone))
+                      :last-sign-in-at (t/to-time-zone t2 (t/default-time-zone))}
+                     (reload db u)))))))
