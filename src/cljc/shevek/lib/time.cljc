@@ -50,9 +50,11 @@
 
 (def days t/days)
 (def hours t/hours)
+(def plus t/plus)
 (def minus t/minus)
 (def earliest t/earliest)
 (def latest t/latest)
+(def millis t/millis)
 
 (defn yesterday []
   (t/minus (now) (days 1)))
@@ -103,3 +105,6 @@
   (f/unparse (:date-time f/formatters)
     #?(:clj (t/to-time-zone time t/utc)
        :cljs (t/to-utc-time-zone time))))
+
+(defn before-or-equal? [dt1 dt2]
+  (or (t/before? dt1 dt2) (t/equal? dt1 dt2)))

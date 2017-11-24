@@ -77,7 +77,7 @@
              (-> {:filters [{:interval ["2015-01-01" "2015-01-02"]}]}
                  (expand-query {}) :filters first :interval)))))
 
-  (testing "if there are several time filters, should return the intersection interval"
+  (testing "if there are several time filters and they overlap, should return the intersection interval"
     (is (= [{:interval ["2015-01-03T03:00:00.000Z" "2015-01-05T03:00:00.000Z"]}]
            (-> {:filters [{:interval ["2015-01-01" "2015-01-05"]}
                           {:interval ["2015-01-02" "2015-01-31"]}
@@ -87,6 +87,14 @@
            (-> {:filters [{:period "latest-7days"}
                           {:period "latest-day"}]}
                (expand-query {:max-time "2015-01-10T03:00Z"}) :filters))))
+
+  ; Although there is a chance that there is data in this milisecond it's simpler to implement this way.
+  ; Also, Druid did return data if we use same datetime for both ends of the interval, looks like a bug.
+  (testing "if there are serveral time filters and do not overlap, should return a minimal interval"
+    (is (= [{:interval ["2015-01-05T03:00:00.000Z" "2015-01-05T03:00:00.001Z"]}]
+           (-> {:filters [{:interval ["2015-01-01" "2015-01-03"]}
+                          {:interval ["2015-01-05" "2015-01-07"]}]}
+               (expand-query {}) :filters))))
 
   (testing "raw queries don't have splits nor measures"
     (is (without? :splits (expand-query {} {})))

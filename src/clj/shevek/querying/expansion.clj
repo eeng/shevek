@@ -21,7 +21,11 @@
         (merge dim))))
 
 (defn- interval-intersection [[from1 to1] [from2 to2]]
-  [(t/latest from1 from2) (t/earliest to1 to2)])
+  (let [from (t/latest from1 from2)
+        to (t/earliest to1 to2)]
+    (if (t/before-or-equal? from to)
+      [from to]
+      [from (t/plus from (t/millis 1))])))
 
 (defn- merge-intervals [time-filters]
   (let [intervals (map :interval time-filters)
