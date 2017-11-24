@@ -2,9 +2,10 @@
   (:require [cljs.test :refer-macros [deftest testing is]]
             [pjstadig.humane-test-output]
             [shevek.asserts :refer [error-on? no-error-on?]]
-            [shevek.lib.validation :as v]
             [shevek.admin.users.form :refer [user-validations adapt-for-client adapt-for-server]]
-            [shevek.lib.dw.cubes :refer [cubes-list]]))
+            [shevek.lib.validation :as v]
+            [shevek.lib.dw.cubes :refer [cubes-list]]
+            [shevek.lib.time :refer [date-time]]))
 
 (defn validate-user [user]
   (v/validate user user-validations))
@@ -75,9 +76,11 @@
 
   (testing "should simplify the filters"
     (is (= [{:name "d" :operator "include" :value ["v"]}
-            {:name "t" :period "latest-day"}]
+            {:name "t" :period "latest-day"}
+            {:name "a" :interval ["2018-04-04T03:00:00.000Z" "2018-04-06T02:59:59.999Z"]}]
            (-> (adapt-for-server {:only-cubes-selected true
                                   :cubes [{:name "c1" :selected true
                                            :filters [{:name "d" :operator "include" :value #{"v"} :title "D" :type "..."}
-                                                     {:name "t" :title "T" :period "latest-day"}]}]})
+                                                     {:name "t" :title "T" :period "latest-day"}
+                                                     {:name "a" :title "A" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}]}]})
                :allowed-cubes first :filters)))))

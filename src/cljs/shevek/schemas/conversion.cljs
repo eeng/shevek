@@ -30,7 +30,7 @@
        (transform (must :value) set)
        (transform (must :sort-by) #(merge % (find-dimension (:name sort-by) (concat dimensions measures))))))
 
-(defn- report-dims->viewer [coll cube]
+(defn report-dims->viewer [coll cube]
   (mapv #(report-dim->viewer % cube) coll))
 
 (defn report->viewer [{:keys [pinboard viztype] :as report} cube]
@@ -46,12 +46,16 @@
 (defn stringify-interval [[from to]]
   (map to-iso8601 [from (end-of-day to)]))
 
+(defn unparse-filters [filters]
+  (->> filters
+       (transform [ALL (must :interval)] stringify-interval)
+       (transform [ALL (must :value) set?] vec)))
+
 (defn- simplify-viewer [viewer]
   (->> viewer
        (transform :cube :name)
        (transform [:measures ALL] :name)
-       (transform [:filters ALL (must :interval)] stringify-interval)
-       (transform [:filters ALL (must :value) set?] vec)))
+       (transform :filters unparse-filters)))
 
 (defn viewer->report [viewer]
   (as-> (simplify-viewer viewer) q

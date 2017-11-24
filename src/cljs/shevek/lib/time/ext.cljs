@@ -38,17 +38,16 @@
      (when time (-> time parse-time (format-time formatter-i18n-key))))))
 
 (defn format-interval
-  ([interval] (format-interval interval (formatter :day)))
-  ([interval formatter]
+  ([interval] (format-interval interval :day))
+  ([interval formatter-key]
    (->> interval
-        (map #(f/unparse formatter %))
+        (map #(format-time % formatter-key))
         distinct
         (str/join " - "))))
 
 (defn format-period [period max-time]
-  (let [formatter (formatter
-                   (if (str/starts-with? period "latest") :minute :day))]
-    (format-interval (to-interval period max-time) formatter)))
+  (let [formatter-key (if (str/starts-with? period "latest") :minute :day)]
+    (format-interval (to-interval period max-time) formatter-key)))
 
 (defn default-granularity [{:keys [filters cube]}]
   (let [[from to] (effective-interval (time-dimension filters) (:max-time cube))
