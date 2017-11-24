@@ -8,7 +8,8 @@
             [shevek.lib.local-storage :as local-storage]
             [ajax.core :refer [POST]]
             [shevek.navigation :refer [navigate]]
-            [cljsjs.jwt-decode]))
+            [cljsjs.jwt-decode]
+            [shevek.notification :refer [notify]]))
 
 (defn current-user []
   (db/get :current-user))
@@ -25,20 +26,17 @@
       (js->clj (js/jwt_decode token) :keywordize-keys true)
       (catch js/Error _ {}))))
 
-(defonce error (r/atom nil))
-
 (defevh :login-successful [db {:keys [token]}]
   (local-storage/set-item! "shevek.access-token" token)
   (-> (assoc db :current-user (extract-user token))
       (rpc/loaded :logging-in)))
 
 (defevh :login-failed [db]
-  (reset! error :users/invalid-credentials)
+  (notify (t :users/invalid-credentials) :type :error)
   (js/setTimeout #(-> (js/$ "#form-container") (.transition "shake" #js {:duration ".6s" :queue false})) 10)
   (rpc/loaded db :logging-in))
 
 (defevh :login [db user]
-  (reset! error nil)
   (POST "/login" {:params @user
                   :handler #(dispatch :login-successful %)
                   :error-handler (fn [{:keys [status] :as response}]
@@ -53,7 +51,7 @@
   (select-keys db [:settings :page]))
 
 (defevh :session-expired [db]
-  (reset! error :users/session-expired)
+  (notify (t :users/session-expired) :type :info)
   (dispatch :logout))
 
 (defevh :user-restored [db]
@@ -64,11 +62,9 @@
         login #(dispatch :login user)
         shortcuts (kb-shortcuts :enter login)]
     (fn []
-      [:div.ui.form {:ref shortcuts :class (when @error "error")}
+      [:div.ui.form {:ref shortcuts}
        [input-field user :username {:placeholder (t :users/username) :auto-focus true :icon "user"}]
        [input-field user :password {:placeholder (t :users/password) :type "password" :icon "lock"}]
-       (when @error
-         [:div.ui.error.message (t @error)])
        [:button.ui.fluid.large.blue.primary.button {:on-click login} "Login"]])))
 
 (defn page []
