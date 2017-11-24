@@ -88,7 +88,7 @@
                :update-now "Update Now"
                :auto-refresh "Auto Update"
                :auto-refresh-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 10 minutes" 600] ["Every 30 minutes" 1800]])}
-    :admin {:menu "Manage"
+    :admin {:menu "Manage Users"
             :title "Management"
             :subtitle "Configure the users who will be using the system and their permissions"
             :users "Users"}
@@ -238,7 +238,7 @@
                :update-now "Actualizar Ahora"
                :auto-refresh "Refrescar Automáticamente"
                :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])}
-    :admin {:menu "Configurar"
+    :admin {:menu "Configurar Usuarios"
             :title "Administración"
             :subtitle "Configure los usuarios que podrán acceder al sistema y sus permisos"
             :users "Usuarios"}
