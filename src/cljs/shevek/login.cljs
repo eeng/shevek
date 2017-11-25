@@ -33,7 +33,7 @@
 
 (defevh :login-failed [db]
   (notify (t :users/invalid-credentials) :type :error)
-  (js/setTimeout #(-> (js/$ "#form-container") (.transition "shake" #js {:duration ".6s" :queue false})) 10)
+  (-> (js/$ "#form-container") (.transition "shake" #js {:duration ".6s" :queue false}))
   (rpc/loaded db :logging-in))
 
 (defevh :login [db user]
@@ -74,5 +74,6 @@
      [:img {:src "public/images/logo.png"}]
      [:div.content "Shevek"
       [:div.sub.header "Data Warehouse Visualization System"]]]
-    [:div#form-container.ui.segment (rpc/loading-class :logging-in)
-     [login-form]]]])
+    [:div#form-container
+     [:div.ui.segment (rpc/loading-class :logging-in)
+      [login-form]]]]])
