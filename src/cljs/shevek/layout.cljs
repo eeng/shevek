@@ -50,7 +50,9 @@
      [:i.sign.out.icon] (t :menu/logout)]]])
 
 (defn layout []
-  (let [page (if (logged-in?) (current-page) :login)]
+  (when-let [page (cond
+                    (logged-in?) (current-page)
+                    (db/get :user-restored) :login)]
     [:div
      (when (logged-in?) [menu])
      [:div.page

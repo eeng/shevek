@@ -48,14 +48,14 @@
 (defevh :logout [db]
   (local-storage/remove-item! "shevek.access-token")
   (navigate "/")
-  (select-keys db [:settings :page]))
+  (select-keys db [:settings :page :user-restored]))
 
 (defevh :session-expired [db]
   (notify (t :users/session-expired) :type :info)
   (dispatch :logout))
 
 (defevh :user-restored [db]
-  (assoc db :current-user (extract-user (local-storage/get-item "shevek.access-token"))))
+  (assoc db :current-user (extract-user (local-storage/get-item "shevek.access-token")) :user-restored true))
 
 (defn- login-form []
   (let [user (r/atom {})
