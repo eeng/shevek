@@ -1,11 +1,11 @@
 (ns shevek.menu.settings
-  (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
+  (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.lib.local-storage :as local-storage]
             [shevek.components.form :refer [select]]
-            [shevek.components.popup :refer [show-popup tooltip]]
+            [shevek.components.popup :refer [show-popup close-popup tooltip]]
             [shevek.navigation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
             [shevek.login :refer [logged-in?]]
@@ -41,7 +41,8 @@
     (set-auto-refresh-interval! auto-refresh)
     (assoc db :settings (merge default-settings settings))))
 
-(defevh :settings-saved [db new-settings]
+(defevhi :settings-saved [db new-settings]
+  {:after [close-popup]}
   (-> db (update :settings merge new-settings) save-settings!))
 
 (defn- popup-content []
