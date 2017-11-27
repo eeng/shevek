@@ -5,16 +5,16 @@
             [shevek.support.viewer :refer [make-wikiticker-cube go-to-viewer]]))
 
 (deftest reports
-  (it "creating new report" page
+  (it "creating new report"
     (with-fake-druid
       {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
        (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
-      (go-to-viewer page)
-      (click page {:id "cb-measure-added"})
-      (is (has-css? page ".statistic" :count 2))
-      (click-link page "Reports")
-      (click-link page "Save")
-      (fill-multi page {{:name "name"} "The Amazing Report"
+      (go-to-viewer)
+      (click {:id "cb-measure-added"})
+      (is (has-css? ".statistic" :count 2))
+      (click-link "Reports")
+      (click-link "Save")
+      (fill-multi {{:name "name"} "The Amazing Report"
                         {:name "description"} "Something"})
-      (click-link page "Save")
-      (is (has-css? page "#notification" :text "Report 'The Amazing Report' saved!")))))
+      (click-link "Save")
+      (is (has-css? "#notification" :text "Report 'The Amazing Report' saved!")))))

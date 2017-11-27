@@ -1,5 +1,5 @@
 (ns shevek.acceptance.test-helper
-  (:require [etaoin.api :as e :refer [wait-predicate wait-visible wait-exists query query-all get-element-text-el go with-chrome with-postmortem exists?]]
+  (:require [etaoin.api :as e]
             [etaoin.keys :as k]
             [clojure.test :refer [testing]]
             [monger.db :refer [drop-db]]
@@ -7,82 +7,96 @@
             [shevek.config :refer [config]]
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
-            [clojure.string :as str]))
+            [shevek.users.repository :as users]
+            [clojure.string :as str]
+            [mount.core :refer [defstate]]))
+
+(defstate page
+  :start (e/chrome)
+  :stop (e/quit page))
 
 ; Por defecto etaoin espera 20 segs
-(alter-var-root #'e/default-timeout (constantly 5))
+(alter-var-root #'e/default-timeout (constantly 3))
 
-(defmacro it [description page & body]
+(defmacro it [description & body]
   `(testing ~description
-     (with-chrome {} ~page
-       (with-postmortem ~page {:dir "/tmp"}
-         (drop-db db)
-         (init-db db)
-         ~@body))))
+     (e/with-postmortem page {:dir "/tmp"}
+       (drop-db db)
+       (init-db db)
+       ~@body)))
 
 (defmacro pending [& args]
   (let [message (str "\n" name " is pending !!")]
     `(testing ~name (println ~message))))
 
-(defn visit [page path]
-  (go page (str "http://localhost:" (config :port) path)))
+(defn visit [path]
+  (e/go page (str "http://localhost:" (config :port) path)))
 
 (defn- waiting [pred]
   (try
-    (wait-predicate pred)
+    (e/wait-predicate pred)
     true
     (catch clojure.lang.ExceptionInfo _
       false)))
 
-(defn- element-text [page selector]
-  (->> (query-all page {:css selector})
-       (map #(get-element-text-el page %))
+(defn- element-text [selector]
+  (->> (e/query-all page {:css selector})
+       (map #(e/get-element-text-el page %))
        (str/join "")))
 
 (defn has-css?
-  ([page selector]
-   (waiting #(exists? page {:css selector})))
-  ([page selector attribute value]
+  ([selector]
+   (waiting #(e/exists? page {:css selector})))
+  ([selector attribute value]
    (case attribute
-     :text (waiting #(.contains (or (element-text page selector) "") value))
-     :count (waiting #(= (count (query-all page {:css selector})) value)))))
+     :text (waiting #(.contains (or (element-text selector) "") value))
+     :count (waiting #(= (count (e/query-all page {:css selector})) value)))))
 
-(defn has-title? [page title]
-  (has-css? page "h1.header" :text title))
+(defn has-title? [title]
+  (has-css? "h1.header" :text title))
 
-(defn has-text? [page text]
+(defn has-text? [text]
   (waiting #(e/has-text? page text)))
 
-(defn has-no-text? [page text]
+(defn has-no-text? [text]
   (waiting #(not (e/has-text? page text))))
 
-(defn click [page q]
-  (wait-exists page q)
+(defn click [q]
+  (e/wait-exists page q)
   (e/click page q))
 
-(defn select [page q option]
-  (click page q)
-  (click page {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
+(defn select [q option]
+  (click q)
+  (click {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
 
-(defn click-link [page text]
-  (click page {:xpath (str/join "|"
-                                [(format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)
-                                 (format "//*[(self::a or self::button) and contains(@title,'%s')]" text)])}))
+(defn click-link [text]
+  (click {:xpath (str/join "|"
+                           [(format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)
+                            (format "//*[(self::a or self::button) and contains(@title,'%s')]" text)])}))
 
-(defn fill [page field & values]
-  (wait-visible page field)
+(defn fill [field & values]
+  (e/wait-visible page field)
   (apply e/fill page field values))
 
-(defn fill-multi [page fields]
-  (wait-visible page (-> fields keys first))
+(defn fill-multi [fields]
+  (e/wait-visible page (-> fields keys first))
   (e/fill-multi page fields))
 
+(defn refresh []
+  (e/refresh page))
+
 (defn login
-  ([page] (login page {:username "max" :fullname "Max" :password "secret123"}))
-  ([page {:keys [username password] :as user}]
-   (make! User user)
-   (when-not (exists? page {:css "#login"})
-     (visit page "/"))
-   (fill page {:name "username"} username)
-   (fill page {:name "password"} password k/enter)
-   (has-css? page ".menu")))
+  ([] (login {:username "user" :fullname "User" :password "secret666"}))
+  ([{:keys [username password] :as user}]
+   (when-not (users/find-by-username db username)
+     (make! User user))
+   (cond
+     (e/exists? page {:css "i.sign.out"}) (e/click page {:css "i.sign.out"})
+     (not (e/exists? page {:css "#login"})) (visit "/"))
+   (e/clear page {:name "username"} {:name "password"})
+   (fill {:name "username"} username)
+   (fill {:name "password"} password k/enter)
+   (has-css? ".menu")))
+
+(defn login-admin []
+  (login {:username "adm" :fullname "Admin" :password "secret666" :admin true}))

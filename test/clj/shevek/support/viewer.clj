@@ -57,8 +57,8 @@
                  :type "hyperUnique",
                  :title "User Unique"}]}))
 
-(defn go-to-viewer [page]
+(defn go-to-viewer []
   (make-wikiticker-cube)
-  (login page)
-  (click page {:css "#cubes-menu"})
-  (click-link page "Wikiticker"))
+  (login)
+  (click {:css "#cubes-menu"})
+  (click-link "Wikiticker"))

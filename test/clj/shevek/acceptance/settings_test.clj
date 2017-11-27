@@ -1,16 +1,18 @@
 (ns shevek.acceptance.settings-test
   (:require [clojure.test :refer :all]
-            [shevek.acceptance.test-helper :refer :all]
-            [etaoin.api :refer [refresh]]))
+            [shevek.acceptance.test-helper :refer :all]))
 
 (deftest settings
-  (it "allows to change language" page
-    (login page)
-    (is (has-text? page "Cube"))
-    (is (has-no-text? page "Cubos"))
-    (click-link page "Settings")
-    (select page {:id "lang-dropdown"} "Español")
-    (is (has-text? page "Cubos"))
-    (is (has-no-text? page "Cube"))
-    (refresh page)
-    (is (has-text? page "Cubos"))))
+  (it "allows to change language"
+    (login)
+    (is (has-text? "Cubes"))
+    (is (has-no-text? "Cubos"))
+    (click {:css "i.setting"})
+    (select {:id "lang-dropdown"} "Español")
+    (is (has-text? "Cubos"))
+    (is (has-no-text? "Cubes"))
+    (refresh)
+    (is (has-text? "Cubos"))
+    (click {:css "i.setting"})
+    (select {:id "lang-dropdown"} "English")
+    (is (has-text? "Cubes"))))

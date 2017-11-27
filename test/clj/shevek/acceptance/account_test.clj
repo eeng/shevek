@@ -4,20 +4,20 @@
             [etaoin.keys :as k]))
 
 (deftest account
-  (it "the current password mast match" page
-    (login page {:username "max" :fullname "Max" :password "secret123"})
-    (click-link page "Max")
-    (is (has-text? page "Your Account"))
-    (click-link page "Modify")
-    (fill page {:name "email"} "max@acme.com")
-    (fill page {:name "current-password"} "nop" k/enter)
-    (is (has-css? page ".red.label" :text "is incorrect")))
+  (it "the current password mast match"
+    (login {:username "max" :fullname "Max" :password "secret999"})
+    (click-link "Max")
+    (is (has-text? "Your Account"))
+    (click-link "Modify")
+    (fill {:name "email"} "max@acme.com")
+    (fill {:name "current-password"} "nop" k/enter)
+    (is (has-css? ".red.label" :text "is incorrect")))
 
-  (it "changing the email" page
-    (login page {:username "max" :fullname "Max" :password "secret123"})
-    (click-link page "Max")
-    (click-link page "Modify")
-    (fill page {:name "email"} "max@acme.com")
-    (fill page {:name "current-password"} "secret123" k/enter)
-    (is (has-css? page "#notification" :text "Your account has been saved"))
-    (is (has-css? page ".segment .item" :text "max@acme.com"))))
+  (it "changing the email"
+    (login {:username "max" :fullname "Max" :password "secret999"})
+    (click-link "Max")
+    (click-link "Modify")
+    (fill {:name "email"} "max@acme.com")
+    (fill {:name "current-password"} "secret999" k/enter)
+    (is (has-css? "#notification" :text "Your account has been saved"))
+    (is (has-css? ".segment .item" :text "max@acme.com"))))

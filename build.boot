@@ -16,7 +16,7 @@
                     [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
                     [doo "0.1.7" :scope "test"] ; Needed by boot-cljs-test
                     [pjstadig/humane-test-output "0.8.1" :scope "test"]
-                    [etaoin "0.1.6" :scope "test"]
+                    [etaoin "0.2.1" :scope "test"]
                     [proto-repl "0.3.1"]
                     [reagent "0.7.0" :exclusions [cljsjs/react]]
                     [clj-http "2.3.0"]
@@ -143,21 +143,34 @@
         (alt-test-cljs)))
 
 (deftask test-acceptance
-  "Run the acceptance tests."
+  "Run the acceptance tests once, for CI use. Can be used with watch but it can be slow as it executes all tests on start so to create tests it's easier to use manual-test-acceptance and run tests from the repl."
   []
   (comp (test-config)
         (build-dev-frontend)
         ; Hay que levantar la app (con nrepl) desde el on-start y no desde boot porque sino el test al correr en un pod no ve los mount states.
         (alt-test :test-matcher #".*acceptance\.(?!test\-helper).*"
-                  :on-start 'shevek.test-helper/init-acceptance-tests)))
+                  :on-start 'shevek.test-helper/init-acceptance-tests
+                  :on-end 'shevek.test-helper/stop-tests)))
+
+(deftask manual-test-acceptance
+  "Start the app in test mode with a running browser ready to launch some acceptance test manually"
+  []
+  (comp (test-config)
+        (watch)
+        (notify :visual true :title "App (Testing)")
+        (refresh)
+        (reload)
+        (cljs-repl)
+        (cljs-devtools)
+        (build-dev-frontend)
+        (run :namespace "shevek.test-helper" :function "init-acceptance-tests")))
 
 (deftask test-all
   "Run all tests."
   []
   (comp (test-clj)
-        (alt-test-cljs :exit? true)))
-        ; TODO reactivate acceptance
-        ; (test-acceptance)))
+        (alt-test-cljs :exit? true)
+        (test-acceptance)))
 
 (deftask seed
   "Seeds the application data."

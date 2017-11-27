@@ -1,7 +1,6 @@
 (ns shevek.acceptance.auth-test
   (:require [clojure.test :refer :all]
             [shevek.acceptance.test-helper :refer :all]
-            [etaoin.api :as e :refer [refresh]]
             [etaoin.keys :as k]
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
@@ -9,27 +8,27 @@
             [clj-time.core :as t]))
 
 (deftest authentication
-  (it "invalid credentials" page
+  (it "invalid credentials"
     (make! User {:username "max" :password "payne"})
-    (visit page "/")
-    (click-link page "Login")
-    (is (has-text? page "Invalid username"))
-    (fill page {:name "username"} "max" k/enter)
-    (is (has-text? page "Invalid username"))
-    (fill page {:name "password"} "nop" k/enter)
-    (is (has-text? page "Invalid username")))
+    (visit "/")
+    (click-link "Login")
+    (is (has-text? "Invalid username"))
+    (fill {:name "username"} "max" k/enter)
+    (is (has-text? "Invalid username"))
+    (fill {:name "password"} "nop" k/enter)
+    (is (has-text? "Invalid username")))
 
-  (it "logout" page
-    (login page)
-    (click-link page "Logout")
-    (is (has-css? page "#login"))
-    (is (has-no-text? page "Logout")))
+  (it "logout"
+    (login)
+    (click-link "Logout")
+    (is (has-css? "#login"))
+    (is (has-no-text? "Logout")))
 
-  (it "session expired" page
+  (it "session expired"
     (with-redefs [token-expiration (t/seconds 1)]
-      (login page))
+      (login-admin))
     (Thread/sleep 1100)
-    (when (e/has-text? page "Dashboard")
-      (click-link page "Manage"))
-    (is (has-text? page "Session expired"))
-    (is (has-css? page "#login"))))
+    (when (has-text? "Dashboard")
+      (click {:css "i.users"}))
+    (is (has-text? "Session expired"))
+    (is (has-css? "#login"))))

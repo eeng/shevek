@@ -15,7 +15,7 @@
      (if (seq cubes)
        [:div.ui.relaxed.middle.aligned.selection.list
         (doall
-          (for [{:keys [name title description] :or {description (t :cubes/no-desc)}} cubes
+          (for [{:keys [name title description] :or {description (t :errors/no-desc)}} cubes
                 :let [selected? (and (current-page? :viewer) (= name (current-cube-name)))]]
             [:div.item {:key name :on-click #(select-cube name)}
              [:i.large.middle.aligned.cube.icon {:class (when selected? "orange")}]

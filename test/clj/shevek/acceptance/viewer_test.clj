@@ -1,57 +1,48 @@
 (ns shevek.acceptance.viewer-test
   (:require [clojure.test :refer :all]
             [shevek.acceptance.test-helper :refer :all]
-            [etaoin.api :refer [refresh]]
             [shevek.support.druid :refer [with-fake-druid query-req-matching druid-res]]
             [shevek.support.viewer :refer [make-wikiticker-cube go-to-viewer]]))
 
 (deftest viewer
-  (it "shows dimensions, measures and basic stats on page entry" page
+  (it "shows dimensions, measures and basic stats on entry"
     (with-fake-druid
       {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
        (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
-      (go-to-viewer page)
-      (is (has-css? page ".statistic" :count 3))
-      (is (has-css? page ".statistics" :text "394298"))
-      (is (has-css? page ".dimensions" :text "Region Name"))
-      (is (has-css? page ".measures" :text "User Unique"))))
+      (go-to-viewer)
+      (is (has-css? ".statistic" :count 3))
+      (is (has-css? ".statistics" :text "394298"))
+      (is (has-css? ".dimensions" :text "Region Name"))
+      (is (has-css? ".measures" :text "User Unique"))))
 
   (testing "viewer restoration"
-    (it "should restore viewer after page refresh" page
+    (it "should restore viewer after refresh"
       (with-fake-druid
         {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
          (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
-        (go-to-viewer page)
-        (is (has-css? page ".statistic" :count 3))
-        (click page {:id "cb-measure-delta"})
-        (is (has-css? page ".statistic" :count 4))
-        (refresh page)
-        (is (has-css? page ".statistic" :count 4))))
+        (go-to-viewer)
+        (is (has-css? ".statistic" :count 3))
+        (click {:id "cb-measure-delta"})
+        (is (has-css? ".statistic" :count 4))
+        (refresh)
+        (is (has-css? ".statistic" :count 4))))
 
-    (it "if the user paste the viewer URL when being unauthenticated, it should restore the viewer after login" page
+    (it "if the URL has been tampered, should navigate to home"
       (with-fake-druid
         {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
          (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
-        (make-wikiticker-cube)
-        (visit page "/viewer/ezpjdWJlICJ3aWtpdGlja2VyIiwgOnZpenR5cGUgInRvdGFscyIsIDptZWFzdXJlcyAoImFkZGVkIiAiY291bnQiKSwgOmZpbHRlciAoezpuYW1lICJfX3RpbWUiLCA6cGVyaW9kICJsYXRlc3QtZGF5In0pLCA6c3BsaXQgKCksIDpwaW5ib2FyZCB7Om1lYXN1cmUgImRlbGV0ZWQiLCA6ZGltZW5zaW9ucyAoKX19")
-        (login page)
-        (is (has-css? page ".statistic" :count 2))))
+        (login)
+        (visit "/viewer/CHANGEDezpjdWJlICJ3aWtpdGlja2VyIiwgOm1lYXN1cmVzICgiZGVsZXRlZCIgImNvdW50IiksIDpmaWx0ZXIgKHs6bmFtZSAiX190aW1lIiwgOnBlcmlvZCAibGF0ZXN0LWRheSJ9KSwgOnNwbGl0ICgpLCA6cGluYm9hcmQgezptZWFzdXJlICJkZWxldGVkIiwgOmRpbWVuc2lvbnMgKCl9fQ==")
+        (is (has-title? "Welcome")))))
 
-    (it "if the URL has been tampered, should navigate to home page" page
-      (with-fake-druid
-        {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
-         (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
-        (login page)
-        (visit page "/viewer/CHANGEDezpjdWJlICJ3aWtpdGlja2VyIiwgOm1lYXN1cmVzICgiZGVsZXRlZCIgImNvdW50IiksIDpmaWx0ZXIgKHs6bmFtZSAiX190aW1lIiwgOnBlcmlvZCAibGF0ZXN0LWRheSJ9KSwgOnNwbGl0ICgpLCA6cGluYm9hcmQgezptZWFzdXJlICJkZWxldGVkIiwgOmRpbWVuc2lvbnMgKCl9fQ==")
-        (is (has-title? page "Welcome")))))
-
-  (it "raw data modal" page
+  (it "raw data modal"
     (with-fake-druid
       {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
        (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")
        (query-req-matching #"queryType.*select") (druid-res "acceptance/select")}
-      (go-to-viewer page)
-      (click-link page "Share")
-      (click-link page "View raw data")
-      (is (has-css? page ".raw-data" :text "Showing the first 100 events matching: Latest Day"))
-      (is (has-css? page ".raw-data tbody tr" :count 2)))))
+      (go-to-viewer)
+      (click-link "Share")
+      (click-link "View raw data")
+      (is (has-css? ".raw-data" :text "Showing the first 100 events matching: Latest Day"))
+      (is (has-css? ".raw-data tbody tr" :count 2))
+      (visit "/"))))

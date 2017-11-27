@@ -1,18 +1,24 @@
 (ns shevek.test-helper
   (:require [monger.collection :refer [purge-many]]
-            [shevek.app :refer [start start-db]]
+            [shevek.app :refer [start]]
             [mount.core :as mount]
-            [shevek.scheduler :refer [scheduler]]
             [shevek.db :refer [db init-db]]
+            [shevek.acceptance.test-helper]
             [clojure.test :refer [deftest testing]]
             [cuerdas.core :as str]
             [spyscope.core]))
 
 (defn init-unit-tests []
-  (start-db))
+  (mount/start-without #'shevek.nrepl/nrepl
+                       #'shevek.web.server/web-server
+                       #'shevek.scheduler/scheduler
+                       #'shevek.acceptance.test-helper/page))
 
 (defn init-acceptance-tests []
-  (mount/start-without #'scheduler))
+  (mount/start-without #'shevek.nrepl/nrepl
+                       #'shevek.scheduler/scheduler))
+
+(def stop-tests mount/stop)
 
 (defmacro it [description & body]
   `(testing ~description

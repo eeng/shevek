@@ -5,17 +5,17 @@
             [shevek.makers :refer [make!]]))
 
 (deftest home
-  (it "shows the available cubes" page
+  (it "shows the available cubes"
     (make! Cube {:title "Sales"})
     (make! Cube {:title "Inventory"})
-    (login page)
-    (is (has-title? page "Welcome"))
-    (is (has-css? page ".cube.card:nth-child(1)" :text "Inventory"))
-    (is (has-css? page ".cube.card:nth-child(2)" :text "Sales")))
+    (login)
+    (is (has-title? "Welcome"))
+    (is (has-css? ".cube.card:nth-child(1)" :text "Inventory"))
+    (is (has-css? ".cube.card:nth-child(2)" :text "Sales")))
 
-  (it "the cubes are displayed also on the menu" page
+  (it "the cubes are displayed also on the menu"
     (make! Cube {:title "Sales"})
     (make! Cube {:title "Inventory"})
-    (login page)
-    (click page {:css "#cubes-menu"})
-    (is (has-css? page "#cubes-popup .item" :count 2))))
+    (login)
+    (click {:css "#cubes-menu"})
+    (is (has-css? "#cubes-popup .item" :count 2))))
