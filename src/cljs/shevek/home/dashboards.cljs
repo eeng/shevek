@@ -5,6 +5,7 @@
             [shevek.i18n :refer [t]]
             [shevek.rpc :as rpc]
             [shevek.components.form :refer [search-input filter-matching by input-field kb-shortcuts hold-to-confirm]]
+            [shevek.components.popup :refer [tooltip]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.time :refer [now]]
             [shevek.lib.time.ext :refer [format-time]]
@@ -57,7 +58,8 @@
    [:div.extra.content
     [:i.line.chart.icon]
     (t :dashboards/report-count (count reports))
-    [:span.right.floated (format-time updated-at :day)]]])
+    [:span.right.floated {:ref (tooltip (t :reports/updated-at))}
+     (format-time updated-at :day)]]])
 
 (defn- form-card [{:keys [name] :as dashboard} form-data]
   (let [cancel (fn [_]

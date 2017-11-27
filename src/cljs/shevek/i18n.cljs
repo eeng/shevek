@@ -10,7 +10,8 @@
            :subtitle "What would you like to see today?"}
     :cubes {:title "Data Cubes"
             :menu "Cubes"
-            :missing "There aren't any data cubes defined"}
+            :missing "There aren't any data cubes defined"
+            :data-range "Available data range"}
     :dashboards {:title "Dashboards"
                  :missing "There aren't any dashboards created"
                  :saved "Dashboard '{1}' saved!"
@@ -19,7 +20,8 @@
                                   (zero? %) "No reports"
                                   (= 1 %) "1 report"
                                   :else "{1} reports")
-                 :no-reports "This dashboard has no reports"}
+                 :no-reports "This dashboard has no reports"
+                 :updated-at "Last updated"}
     :reports {:title "Reports"
               :missing "There aren't any reports created"
               :name "Name"
@@ -162,7 +164,8 @@
            :subtitle "Qué le gustaría analizar hoy?"}
     :cubes {:title "Cubos de Datos"
             :menu "Cubos"
-            :missing "No hay cubos definidos"}
+            :missing "No hay cubos definidos"
+            :data-range "Rango de datos disponibles"}
     :dashboards {:title "Dashboards"
                  :missing "No se ha creado ningún dashboard todavía"
                  :saved "Dashboard '{1}' guardado correctamente"
@@ -171,7 +174,8 @@
                                   (zero? %) "Sin reportes"
                                   (= 1 %) "1 reporte"
                                   :else "{1} reportes")
-                 :no-reports "Este dashboard no tiene reportes"}
+                 :no-reports "Este dashboard no tiene reportes"
+                 :updated-at "Última actualización"}
     :reports {:title "Reportes"
               :missing "No se ha guardado ningún reporte todavía"
               :name "Nombre"

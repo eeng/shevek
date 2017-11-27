@@ -11,7 +11,8 @@
             [shevek.notification :refer [notify]]
             [shevek.home.dashboards :refer [fetch-dashboards]]
             [shevek.menu.reports :refer [fetch-reports save-report-form]]
-            [shevek.components.form :refer [search-input filter-matching by hold-to-confirm]]))
+            [shevek.components.form :refer [search-input filter-matching by hold-to-confirm]]
+            [shevek.components.popup :refer [tooltip]]))
 
 (defevh :delete-report [db {:keys [name] :as report}]
   (rpc/call "reports/delete-report" :args [report]
@@ -41,7 +42,8 @@
          [:div.extra.content
           [:i.cube.icon]
           (db/get-in [:cubes cube :title])
-          [:span.right.floated (format-time updated-at :day)]]]))))
+          [:span.right.floated {:ref (tooltip (t :reports/updated-at))}
+           (format-time updated-at :day)]]]))))
 
 (defn reports-cards []
   (fetch-reports)
