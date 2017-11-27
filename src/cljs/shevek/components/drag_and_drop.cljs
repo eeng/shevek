@@ -4,6 +4,7 @@
 
 (defn drag-start [event transfer-data]
   (reset! drag-data transfer-data)
+  (.. event -dataTransfer (setData "text/plain" "only needed for firefox"))
   (let [drag-image (-> (js/$ "<div class='drag-image'/>")
                        (.text (.. event -target -innerText))
                        (.appendTo "body")
@@ -13,11 +14,10 @@
 (defn drag-end [_]
   (.remove (js/$ ".drag-image")))
 
-(defn handle-drop [handler]
-  (fn [event]
-    (handler @drag-data)
-    (.preventDefault event)
-    (.stopPropagation event)))
+(defn handle-drop [event handler]
+  (handler @drag-data)
+  (.preventDefault event)
+  (.stopPropagation event))
 
 (defn drag-over [event]
   (.preventDefault event))
@@ -29,4 +29,4 @@
 
 (defn droppable [handler]
   {:on-drag-over drag-over
-   :on-drop (handle-drop handler)})
+   :on-drop #(handle-drop % handler)})
