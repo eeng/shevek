@@ -239,12 +239,14 @@
       [:a.ui.green.compact.button.item
        (assoc (draggable dim)
               :class (when-not (time-dimension? dim) "right labeled icon")
-              :on-click (fn [el]
-                          (show-popup el ^{:key popup-key}
+              :on-click (fn [ev]
+                          (show-popup ev ^{:key popup-key}
                                       [filter-popup dim {:cube (viewer :cube :name)
                                                          :time-filter (time-dimension (viewer :filters))
                                                          :on-filter-change update-filter-or-remove}]
-                                      {:position "bottom center" :on-close #(dispatch :filter-popup-closed dim)}))
+                                      {:position "bottom center"
+                                       :on-close #(dispatch :filter-popup-closed dim)
+                                       :onVisible #(.focus (js/$ ".normal-filter .search input"))}))
               :ref (partial show-popup-when-added name))
        (when-not (time-dimension? dim)
          [:i.close.icon {:on-click (without-propagation dispatch :dimension-removed-from-filter dim)}])
