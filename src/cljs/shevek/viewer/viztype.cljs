@@ -11,7 +11,7 @@
       (assoc-in [:viewer :viztype] viztype)
       (assoc-in [:viewer :visualization :viztype] viztype)
       (cond->
-       (= viztype :totals) (assoc-in [:viewer :split] []))))
+       (= viztype :totals) (assoc-in [:viewer :splits] []))))
 
 (def viztype-icons {:totals "slack"
                     :table "table"
