@@ -32,13 +32,14 @@
                 {:name "cuit_cliente" :title "CUIT Cliente"}
                 {:name "provincia_cliente" :title "Provincia del Cliente"}
                 {:name "localidad_cliente" :title "Localidad del Cliente"}
+                {:name "promotores" :title "Promotor" :description "Promotores asociados a la zona del cliente (multivalor)"}
                 {:name "tipo_cuenta" :title "Tipo de Cuenta"}
                 {:name "punto_venta" :title "Punto de Venta"}
                 {:name "jurisdiccion" :title "Jurisdicción Percepción"}
                 {:name "rubro_marca" :title "Marca"}
                 {:name "rubro_material" :title "Material del Lente"}
                 {:name "rubro_clase" :title "Clase de Lente"}
-                {:name "rubro_tags" :title "Tag"}
+                {:name "rubro_tags" :title "Tag" :description "Tags asociados al rubro (multivalor)"}
                 {:name "tasa_iva" :title "Tasa de IVA"}
                 {:name "condicion_iva" :title "Condición IVA"}
                 {:name "despacho_preferencial" :title "Despacho Preferencial" :type "BOOL"}
