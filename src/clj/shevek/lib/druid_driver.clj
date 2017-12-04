@@ -1,7 +1,7 @@
 (ns shevek.lib.druid-driver
   (:require [clj-http.client :as http]
             [taoensso.timbre :as log]
-            [cheshire.core :refer [parse-string]]))
+            [cheshire.core :refer [parse-string generate-string]]))
 
 (defprotocol DruidDriver
   (datasources [this])
@@ -16,7 +16,7 @@
     (:body (http/get (str uri "/druid/v2/datasources") {:as :json :conn-timeout 10000})))
 
   (send-query [_ dq]
-    (log/debug "Sending query to Druid:" dq)
+    (log/debug "Sending query to Druid:" (generate-string dq))
     (try
       (:body (http/post (str uri "/druid/v2") {:content-type :json :form-params dq :as :json}))
       (catch clojure.lang.ExceptionInfo e

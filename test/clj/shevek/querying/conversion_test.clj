@@ -170,6 +170,17 @@
                                   :time-zone "Europe/Berlin"})
                  (get-in [:dimension :extractionFn]))))))
 
+  (testing "multi-value dimensions"
+    (testing "should use a listFiltered dimensionSpec when filtered that dimension with operator include"
+      (is (= {:type "listFiltered" :delegate "tags" :values ["t1"]}
+             (:dimension (to-druid-query {:dimension {:name "tags" :multi-value true}
+                                          :filters [{:name "tags" :operator "include" :value ["t1"]}]})))))
+
+    (testing "should use the default dimensionSpec when not filtered by that dimension or when filtered with exclude"
+      (is (= "tags" (:dimension (to-druid-query {:dimension {:name "tags" :multi-value true}}))))
+      (is (= "tags" (:dimension (to-druid-query {:dimension {:name "tags" :multi-value true}
+                                                 :filters [{:name "tags" :operator "exclude" :value ["t1"]}]}))))))
+
   (testing "timeout"
     (is (= 30000 (get-in (to-druid-query {}) [:context :timeout])))))
 

@@ -13,7 +13,8 @@
   (assoc NTD
          :type s/Str
          (s/optional-key :column) s/Str
-         (s/optional-key :extraction) [ExtractionFn]))
+         (s/optional-key :extraction) [ExtractionFn]
+         (s/optional-key :multi-value) s/Bool))
 
 (s/defschema Measure
   (assoc NTD

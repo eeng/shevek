@@ -38,7 +38,7 @@
   (->> q
        (transform [(must :measures) ALL] #(expand-dim % (conj measures row-count) [:expression]))
        (transform [:filters ALL] #(expand-dim % dimensions [:column :extraction]))
-       (transform [(must :splits) ALL] #(expand-dim % dimensions [:column :extraction]))
+       (transform [(must :splits) ALL] #(expand-dim % dimensions [:column :extraction :multi-value]))
        (transform [(must :splits) ALL (must :sort-by)] #(expand-dim % (concat dimensions measures) [:type :expression]))
        (merge {:time-zone (or default-time-zone (t/system-time-zone))})
        (relative-to-absolute-time max-time)

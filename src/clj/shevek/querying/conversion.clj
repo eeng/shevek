@@ -3,7 +3,7 @@
             [clj-time.core :as t]
             [shevek.lib.collections :refer [assoc-if-seq]]
             [shevek.querying.expression :refer [measure->druid]]
-            [shevek.lib.dw.dims :refer [time-dimension? includes-dim? numeric-dim?]]))
+            [shevek.lib.dw.dims :refer [time-dimension? includes-dim? numeric-dim? find-dimension]]))
 
 (defn make-tig
   "tig = Temporary ID Generator, counter for generating temporary field names used in aggregations that are later refered in post-aggregations"
@@ -59,10 +59,18 @@
       field
       {:type "inverted" :metric field})))
 
+(defn- list-filtered-values [{:keys [multi-value name]} {:keys [filters]}]
+  (when multi-value
+    (let [filter (find-dimension name filters)]
+      (when (-> filter :operator (= "include"))
+        (:value filter)))))
+
 (defn- dimension-spec [{:keys [name extraction] :as dim} q]
-  (if extraction
-    (assoc (dimension-and-extraction dim q) :type "extraction" :outputName name)
-    name))
+  (let [lfv (list-filtered-values dim q)]
+    (cond
+      extraction (assoc (dimension-and-extraction dim q) :type "extraction" :outputName name)
+      lfv {:type "listFiltered" :delegate name :values lfv}
+      :else name)))
 
 (defn- add-query-type-dependant-fields [{:keys [queryType] :as dq}
                                         {:keys [dimension measures] :as q}]
