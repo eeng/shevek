@@ -6,11 +6,11 @@
             [shevek.lib.collections :refer [includes?]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.i18n :refer [t]]
-            [shevek.rpc :refer [loading-class]]
             [shevek.lib.dw.dims :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
             [shevek.lib.time.ext :refer [default-granularity]]
             [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside search-input filter-matching]]
             [shevek.components.drag-and-drop :refer [droppable]]
+            [shevek.components.text :refer [loader]]
             [shevek.viewer.filter :refer [filter-operators]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension search-button highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries]]
             [shevek.viewer.url :refer [store-viewer-in-url]]))
@@ -104,8 +104,8 @@
             filter-dim (or (find-dimension name (viewer :filters))
                            (assoc (clean-dim dim) :operator @unfiltered-operator))]
         [:div.dimension.panel.ui.basic.segment
-         (merge {:ref #(when % (adjust-max-height %))}
-                (when-not @searching (loading-class [:viewer :results :pinboard name])))
+         (merge {:ref #(when % (adjust-max-height %))})
+         (when-not @searching [loader [:viewer :results :pinboard name]])
          [panel-header (str title " " (title-according-to-dim-type dim))
           (when-not (time-dimension? dim) [filter-operators-button filter-dim unfiltered-operator])
           (when-not (time-dimension? dim) [search-button searching])

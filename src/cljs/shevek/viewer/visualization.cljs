@@ -3,7 +3,7 @@
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t translation]]
-            [shevek.components.text :refer [warning]]
+            [shevek.components.text :refer [warning loader]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.visualizations.totals :refer [totals-visualization]]
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]
@@ -30,6 +30,6 @@
 
 (defn visualization-panel []
   [:div.visualization-container.ui.basic.segment
-   (merge (droppable #(dispatch :split-replaced %))
-          (rpc/loading-class [:viewer :visualization]))
+   (merge (droppable #(dispatch :split-replaced %)))
+   [loader [:viewer :visualization]]
    [visualization (db/get-in [:viewer :visualization])]])

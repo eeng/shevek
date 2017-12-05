@@ -11,9 +11,9 @@
   (when (seq address)
     [:a {:href (str "mailto:" address)} address]))
 
-(defn loader [loading-key]
-  (when (loading? loading-key)
-    [:div.ui.active.inverted.dimmer [:div.ui.loader]]))
+(defn loader [loading-key & [{:as opts}]]
+  [:div.ui.inverted.dimmer {:class (when (loading? loading-key) "active")}
+   [:div.ui.loader opts]])
 
 (defn warning [text]
   [:div.icon-hint

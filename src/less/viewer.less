@@ -73,8 +73,7 @@
     display: flex;
     flex-direction: column;
 
-    &.loading { color: inherit !important; } // Semantic le pone un color transparent y hace que no se vea el texto que queda debajo del loading
-    &.loading:before { background-color: rgba(255, 255, 255, 0.4); } // Tiene 0.8 de transparencia en Semantic
+    .inverted.dimmer { background-color: rgba(255,255,255,.4) }
 
     .search.input {
       margin: 0 (@panel-horizontal-padding - 1px) .7em;
