@@ -59,7 +59,7 @@
         (send-main-query)
         (send-pinboard-queries))))
 
-(defevh :viewer-refresh [db]
+(defevh :viewer/refresh [db]
   (when-not (rpc/loading?)
     (rpc/call "schema/max-time" :args [(current-cube-name)] :handler #(dispatch :max-time-arrived %))))
 

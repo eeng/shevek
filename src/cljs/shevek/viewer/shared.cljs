@@ -16,7 +16,8 @@
             [goog.string :as gstr]
             [cuerdas.core :as str]
             [shevek.lib.logger :as log]
-            [shevek.lib.string :refer [format-bool regex-escape]]))
+            [shevek.lib.string :refer [format-bool regex-escape]]
+            [shevek.menu.settings :refer [restart-auto-refresh!]]))
 
 (defn viewer [& keys]
   (db/get-in (into [:viewer] keys)))
@@ -40,6 +41,7 @@
     (rpc/loading db results-keys)))
 
 (defevh :visualization/query-executed [db results results-keys viewer]
+  (restart-auto-refresh!)
   (let [viz (-> (select-keys viewer [:viztype :splits :measures])
                 (assoc :results results))]
     (-> (assoc-in db results-keys viz)

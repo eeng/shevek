@@ -18,7 +18,7 @@
 
 (defn refresh-page []
   (let [refresh-events {:dashboard :dashboard/refresh
-                        :viewer :viewer-refresh}
+                        :viewer :viewer/refresh}
         event (refresh-events (current-page))]
     (when (and event (logged-in?)) (dispatch event))))
 
@@ -28,6 +28,9 @@
   (js/clearTimeout @auto-refresh-interval)
   (when (and every (pos? every))
     (reset! auto-refresh-interval (js/setInterval refresh-page (* 1000 every)))))
+
+(defn restart-auto-refresh! []
+  (set-auto-refresh-interval! (db/get-in [:settings :auto-refresh])))
 
 (defn- try-parse [settings]
   (try
