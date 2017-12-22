@@ -23,12 +23,11 @@
       (is (= [{:name "T" :interval ["2018" "2019"]} {:name "F2" :value "f2a"} {:name "F2" :value "f2b"}]
              (:filters (filter-query user q2))))))
 
-  (testing "should filter not allowed measures"
+  (testing "should filter not allowed measures (rowCount is always allowed)"
     (let [q {:cube "c1" :measures ["m1" "m2"]}]
-      (is (= ["m2"]
-             (:measures (filter-query {:allowed-cubes [{:name "c1" :measures ["m2"]}]} q))))
-      (is (= []
-             (:measures (filter-query {:allowed-cubes [{:name "c2" :measures "all"}]} q))))))
+      (is (= ["m2"] (:measures (filter-query {:allowed-cubes [{:name "c1" :measures ["m2"]}]} q))))
+      (is (= ["rowCount"] (:measures (filter-query {:allowed-cubes [{:name "c1" :measures ["m2"]}]} {:cube "c1" :measures ["rowCount"]}))))
+      (is (= [] (:measures (filter-query {:allowed-cubes [{:name "c2" :measures "all"}]} q))))))
 
   (testing "should not add measures keys if it isn't in the query (raw queries don't have measures)"
     (is (without? :measures (filter-query {} {})))))

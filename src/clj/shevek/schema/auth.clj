@@ -13,7 +13,8 @@
 (defn- measure-visible? [measure {:keys [measures] :or {measures "all"}}]
   (let [measure (if (string? measure) measure (:name measure))]
     (or (= measures "all")
-        (includes? measures measure))))
+        (includes? measures measure)
+        (= measure "rowCount"))))
 
 (defn filter-measures [measures cube-name {:keys [allowed-cubes] :as user}]
   (let [allowed-cube (cond
