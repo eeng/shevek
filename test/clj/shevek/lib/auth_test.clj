@@ -37,7 +37,7 @@
     (make! User {:username "john" :password "secret123"})
     (let [{:keys [token]} (authenticate-and-generate-token db {:username "john" :password "secret123"})]
       (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Token is expired"
-           (jwt/unsign token (config :jwt-secret) {:now (t/plus (t/now) (t/days 8))})))))
+           (jwt/unsign token (config :jwt-secret) {:now (t/plus (t/now) (t/days 32))})))))
 
   (it "on successful login should update previous-sign-in-at with last-sign-in-at and last-sign-in-at field with now"
     (let [{:keys [updated-at] :as u} (make! User {:username "john" :password "secret123"})

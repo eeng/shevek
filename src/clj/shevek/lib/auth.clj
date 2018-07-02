@@ -7,7 +7,7 @@
             [bcrypt-clj.auth :refer [check-password]]
             [clj-time.core :as t]))
 
-(def token-expiration (t/days 7))
+(def token-expiration (t/days 30))
 
 (defn generate-token [{:keys [id] :as user}]
   (let [token (-> (select-keys user [:id :username :fullname :admin :email])
@@ -40,5 +40,5 @@
   (when-not authorized?
     (throw-unauthorized)))
 
-#_(def token (:token (authenticate db {:username "emma" :password "asdf654"})))
+#_(def token (:token (authenticate-and-generate-token db {:username "admin" :password "asdf654"})))
 #_(jwt/unsign token (config :jwt-secret))
