@@ -89,7 +89,9 @@
                :lang "Language"
                :update-now "Update Now"
                :auto-refresh "Auto Update"
-               :auto-refresh-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 10 minutes" 600] ["Every 30 minutes" 1800]])}
+               :auto-refresh-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 10 minutes" 600] ["Every 30 minutes" 1800]])
+               :abbreviations "Number Abbreviations"
+               :abbreviations-opts (fn [] [["Use default settings" "default"] ["Don't use abbreviations" "no"] ["Use abbreviations" "yes"]])}
     :admin {:menu "Manage Users"
             :title "Management"
             :subtitle "Configure the users who will be using the system and their permissions"
@@ -241,7 +243,9 @@
                :lang "Lenguaje"
                :update-now "Actualizar Ahora"
                :auto-refresh "Refrescar Automáticamente"
-               :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])}
+               :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])
+               :abbreviations "Abreviaturas de Números"
+               :abbreviations-opts (fn [] [["User formato por defecto" "default"] ["No abreviar nada" "no"] ["Abreviar todo" "yes"]])}
     :admin {:menu "Configurar Usuarios"
             :title "Administración"
             :subtitle "Configure los usuarios que podrán acceder al sistema y sus permisos"

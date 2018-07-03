@@ -8,7 +8,8 @@
 
 (s/defschema Settings
   {(s/optional-key :lang) s/Str
-   (s/optional-key :auto-refresh) s/Int})
+   (s/optional-key :auto-refresh) s/Int
+   (s/optional-key :abbreviations) s/Str})
 
 (s/defschema CurrentReport
   (st/assoc Report (s/optional-key :user-id) s/Str))

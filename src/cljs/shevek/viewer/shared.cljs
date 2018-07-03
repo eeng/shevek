@@ -81,10 +81,17 @@
 
 (def measure-value dimension-value)
 
+(defn- personalize-abbreviations [format]
+  (let [abbreviations (db/get-in [:settings :abbreviations])]
+    (case abbreviations
+      "yes" (str/replace format #"0$" "0a")
+      "no" (str/replace format "a" "")
+      format)))
+
 (defn format-measure [{:keys [type format] :as dim} result]
   (when-let [value (measure-value dim result)]
     (if format
-      (num/format value format)
+      (num/format value (personalize-abbreviations format))
       (condp = type
         "doubleSum" (gstr/format "%.2f" value)
         "hyperUnique" (gstr/format "%.0f" value)
