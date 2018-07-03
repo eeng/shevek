@@ -40,11 +40,12 @@
 (def default-settings {:lang "en" :auto-refresh 60 :abbreviations "default"})
 
 (defevh :settings-loaded [db]
-  (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "shevek.menu.settings"))]
+  (let [{:keys [auto-refresh] :as settings} (try-parse (local-storage/retrieve "settings"))]
     (set-auto-refresh-interval! auto-refresh)
     (assoc db :settings (merge default-settings settings))))
 
-(defevh :settings-saved [db new-settings]
+(defevhi :settings-saved [db new-settings]
+  {:after [close-popup]}
   (-> db (update :settings merge new-settings) save-settings!))
 
 (defn- popup-content []
@@ -65,7 +66,7 @@
     [:label (t :settings/lang)]
     [select [["English" "en"] ["Español" "es"]]
       {:selected (db/get-in [:settings :lang])
-       :on-change #(do (close-popup) (dispatch :settings-saved {:lang %}))}]]
+       :on-change #(dispatch :settings-saved {:lang %})}]]
    [:div.field
     [:label (t :settings/abbreviations)]
     [select (t :settings/abbreviations-opts)
