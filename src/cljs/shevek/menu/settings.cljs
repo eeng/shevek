@@ -5,7 +5,7 @@
             [shevek.rpc :as rpc]
             [shevek.lib.local-storage :as local-storage]
             [shevek.components.form :refer [select]]
-            [shevek.components.popup :refer [show-popup close-popup tooltip]]
+            [shevek.components.popup :refer [show-popup tooltip]]
             [shevek.navigation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
             [shevek.login :refer [logged-in?]]
@@ -44,8 +44,7 @@
     (set-auto-refresh-interval! auto-refresh)
     (assoc db :settings (merge default-settings settings))))
 
-(defevhi :settings-saved [db new-settings]
-  {:after [close-popup]}
+(defevh :settings-saved [db new-settings]
   (-> db (update :settings merge new-settings) save-settings!))
 
 (defn- popup-content []
@@ -74,6 +73,5 @@
        :on-change #(dispatch :settings-saved {:abbreviations %})}]]])
 
 (defn- settings-menu []
-  [:a.icon.item {:on-click #(show-popup % popup-content {:position "bottom right"})
-                 :ref (tooltip (t :settings/menu))}
+  [:a.icon.item {:on-click #(show-popup % popup-content {:position "bottom right"})}
    [:i.setting.icon]])
