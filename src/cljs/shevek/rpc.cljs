@@ -17,7 +17,7 @@
   ([db key] (update db :loading dissoc key)))
 
 (defn auth-header []
-  {"Authorization" (str "Token " (local-storage/get-item "shevek.access-token"))})
+  {"Authorization" (str "Token " (local-storage/get-item "access-token"))})
 
 (defn call [fid & {:keys [args handler] :or {args []}}]
   {:pre [(vector? args)]}

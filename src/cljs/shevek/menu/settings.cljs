@@ -13,7 +13,7 @@
             [cuerdas.core :as str]))
 
 (defn save-settings! [db]
-  (local-storage/store! "shevek.menu.settings" (db :settings))
+  (local-storage/store! "settings" (db :settings))
   db)
 
 (defn refresh-page []
