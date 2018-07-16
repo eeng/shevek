@@ -5,8 +5,7 @@
             [shevek.db :refer [db init-db]]
             [shevek.acceptance.test-helper]
             [clojure.test :refer [deftest testing]]
-            [cuerdas.core :as str]
-            [spyscope.core]))
+            [cuerdas.core :as str]))
 
 (defn init-unit-tests []
   (mount/start-without #'shevek.nrepl/nrepl

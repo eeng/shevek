@@ -1,12 +1,58 @@
 (set-env!
   :source-paths   #{"src/clj" "src/cljc" "src/cljs" "src/less"}
   :resource-paths #{"resources"}
-  :dependencies   '[[org.clojure/clojurescript "1.9.671"]
+  :dependencies   '[; Backend
+                    [mount "0.1.11"]
+                    [cprop "0.1.11"]
+                    [http-kit "2.2.0"]
+                    [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
+                    [ring/ring-defaults "0.2.3"]
+                    [ring-middleware-format "0.7.2"]
+                    [buddy/buddy-sign "1.5.0"]
+                    [buddy/buddy-auth "1.4.1"]
+                    [bcrypt-clj "0.3.3"]
+                    [clj-time "0.14.0"]
+                    [com.taoensso/timbre "4.8.0"]
+                    [compojure "1.5.2"]
+                    [overtone/at-at "1.2.0"]
+                    [com.draines/postal "2.0.2"]
+                    [com.novemberain/monger "3.1.0" :exclusions [com.google.guava/guava]] ; La exclusión es xq ClojureScript depende de una versión mas nueva que la que usa monger
+                    [org.clojure/tools.nrepl "0.2.12"]
+                    [clj-http "2.3.0"]
+                    [org.clojure/core.match "0.3.0-alpha4"]
+                    [etaoin "0.2.1" :scope "test"]
+                    [se.haleby/stub-http "0.2.1" :scope "test"]
+
+                    ; Frontend
+                    [org.clojure/clojurescript "1.9.671"]
+                    [reagent "0.7.0" :exclusions [cljsjs/react]]
+                    [cljsjs/react-with-addons "15.6.1-0"]
+                    [cljs-ajax "0.5.8"]
+                    [secretary "1.2.3"]
+                    [kibu/pushy "0.3.8"]
+                    [tongue "0.1.4"]
+                    [com.andrewmcveigh/cljs-time "0.5.1"]
+                    [cljsjs/numeral "2.0.6-0"]
+                    [cljsjs/jwt-decode "2.1.0-0"]
+                    [cljsjs/clipboard "1.6.1-1"]
+                    [cljsjs/chartjs "2.6.0-0"]
+                    [pjstadig/humane-test-output "0.8.1" :scope "test"]
+                    [cljs-react-test "0.1.4-SNAPSHOT" :scope "test"]
+                    [cljsjs/jquery "3.2.1-0" :scope "test"] ; Only needed for reagent tests as in the app we use the extern, otherwise there were dep issues
+
+                    ; Shared
+                    [funcool/cuerdas "2.0.3"]
+                    [com.rpl/specter "1.0.4"]
+                    [prismatic/schema "1.1.7"]
+                    [metosin/schema-tools "0.9.1"]
+                    [prismatic/schema-generators "0.1.0"]
+                    [proto-repl "0.3.1"]
+
+                    ; Boot
                     [adzerk/boot-cljs "2.0.0" :scope "test"]
                     [adzerk/boot-reload "0.5.1" :scope "test"]
                     [com.cemerick/piggieback "0.2.1" :scope "test"] ; Needed by boot-cljs-repl
                     [weasel "0.7.0" :scope "test"] ; Needed by boot-cljs-repl
-                    [org.clojure/tools.nrepl "0.2.12"]
                     [adzerk/boot-cljs-repl "0.3.3"]
                     [deraen/boot-less "0.6.2" :scope "test"]
                     [samestep/boot-refresh "0.1.0" :scope "test"]
@@ -15,47 +61,7 @@
                     [binaryage/devtools "0.9.2" :scope "test"]
                     [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
                     [doo "0.1.7" :scope "test"] ; Needed by boot-cljs-test
-                    [pjstadig/humane-test-output "0.8.1" :scope "test"]
-                    [etaoin "0.2.1" :scope "test"]
-                    [proto-repl "0.3.1"]
-                    [reagent "0.7.0" :exclusions [cljsjs/react]]
-                    [clj-http "2.3.0"]
-                    [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
-                    [tongue "0.1.4"]
-                    [mount "0.1.11"]
-                    [http-kit "2.2.0"]
-                    [cprop "0.1.11"]
-                    [ring/ring-defaults "0.2.3"]
-                    [ring-middleware-format "0.7.2"]
-                    [compojure "1.5.2"]
-                    [se.haleby/stub-http "0.2.1"]
-                    [cljs-ajax "0.5.8"]
-                    [secretary "1.2.3"]
-                    [kibu/pushy "0.3.8"]
-                    [funcool/cuerdas "2.0.3"]
-                    [clj-time "0.14.0"]
-                    [com.andrewmcveigh/cljs-time "0.5.1"]
-                    [com.taoensso/timbre "4.8.0"]
-                    [com.rpl/specter "1.0.4"]
-                    [prismatic/schema "1.1.7"]
-                    [metosin/schema-tools "0.9.1"]
-                    [prismatic/schema-generators "0.1.0"]
-                    [com.novemberain/monger "3.1.0"]
-                    [cljsjs/numeral "2.0.6-0"]
-                    [org.clojure/core.match "0.3.0-alpha4"]
-                    [spyscope "0.1.5"]
-                    [bcrypt-clj "0.3.3"]
-                    [buddy/buddy-sign "1.5.0"]
-                    [buddy/buddy-auth "1.4.1"]
-                    [cljsjs/jwt-decode "2.1.0-0"]
-                    [cljsjs/clipboard "1.6.1-1"]
-                    [cljsjs/chartjs "2.6.0-0"]
-                    [lukesnape/boot-asset-fingerprint "1.5.1" :scope "test"]
-                    [cljsjs/react-with-addons "15.6.1-0"]
-                    [cljs-react-test "0.1.4-SNAPSHOT" :scope "test"]
-                    [cljsjs/jquery "3.2.1-0" :scope "test"] ; Only needed for reagent tests as in the app we use the extern, otherwise there were dep issues
-                    [overtone/at-at "1.2.0"]
-                    [com.draines/postal "2.0.2"]])
+                    [lukesnape/boot-asset-fingerprint "1.5.1" :scope "test"]])
 
 (require
  '[adzerk.boot-cljs :refer [cljs]]
