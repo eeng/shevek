@@ -6,6 +6,7 @@
             [shevek.db :refer [db]]
             [shevek.dw]
             [shevek.scheduler :refer [scheduler]]
+            [shevek.reloader :refer [reloader]]
             [shevek.schema.seed :refer [seed!]])
   (:gen-class))
 
@@ -18,10 +19,13 @@
 (defn start []
   (mount/start))
 
+(defn stop []
+  (mount/stop))
+
 (defn seed []
   (start-db)
   (seed! db))
 
 (defn -main [& args]
   (start)
-  (.addShutdownHook (Runtime/getRuntime) (Thread. mount/stop)))
+  (.addShutdownHook (Runtime/getRuntime) (Thread. stop)))

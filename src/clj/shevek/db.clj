@@ -5,7 +5,7 @@
             [shevek.config :refer [config env?]]
             [shevek.schema.migrator :refer [migrate!]]))
 
-(defstate mongo
+(defstate ^{:on-reload :noop} mongo
   :start (mg/connect-via-uri (config :mongodb-uri))
   :stop (mg/disconnect (mongo :conn)))
 

@@ -1,8 +1,12 @@
-(ns user)
+(ns user
+  (:require [clojure.tools.namespace.repl :as tnr]))
 
 (defn reset
-  "If this function doesn't exists ProtoREPL will try to do his own code reloading, but we are already doing it on boot."
+  "ProtoREPL calls this function when starts and when refreshing namespaces"
   [])
+  ; Previously we used to use this to manually trigger code refreshing with ProtoREPL. Now with the reloader it's no longer needed
+  ; (tnr/refresh))
 
-; Para transformar el REPL en bREPL:
-; (in-ns 'boot.user) (start-repl)
+#_(do
+    (require '[figwheel-sidecar.repl-api :refer [cljs-repl]])
+    (cljs-repl))
