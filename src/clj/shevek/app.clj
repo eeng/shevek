@@ -9,7 +9,7 @@
             [shevek.schema.seed :refer [seed!]])
   (:gen-class))
 
-(defn start-without-nrepl []
+(defn start-for-dev []
   (mount/start-without #'nrepl))
 
 (defn start-db []

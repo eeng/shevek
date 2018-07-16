@@ -72,8 +72,7 @@
  '[samestep.boot-refresh :refer [refresh]]
  '[metosin.boot-alt-test :refer [alt-test]]
  '[crisptrutski.boot-cljs-test :refer [test-cljs] :rename {test-cljs alt-test-cljs}]
- '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]]
- '[shevek.app])
+ '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]])
 
 (deftask run
   "Involke a function in some namespace with arguments."
@@ -99,11 +98,6 @@
         (asset-fingerprint :skip true)
         (target)))
 
-(deftask build-and-start-app-for-dev []
-  (comp (build-dev-frontend)
-        (with-pass-thru _
-          (shevek.app/start-without-nrepl))))
-
 (deftask dev-config []
   (merge-env! :source-paths #{"dev/clj"} :resource-paths #{"dev/resources"})
   (System/setProperty "conf" "dev/resources/config.edn")
@@ -120,14 +114,8 @@
         (reload)
         (cljs-repl)
         (cljs-devtools)
-        (build-and-start-app-for-dev)))
-
-(deftask dev-run
-  "Runs the application in development mode, without REPL and code reloading."
-  []
-  (comp (dev-config)
-        (build-and-start-app-for-dev)
-        (wait)))
+        (build-dev-frontend)
+        (run :namespace "shevek.app" :function "start-for-dev")))
 
 (deftask test-config []
   (merge-env! :source-paths #{"test/clj" "test/cljc" "test/cljs"} :resource-paths #{"test/resources"})
