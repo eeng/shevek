@@ -32,11 +32,6 @@
     (handle-app-error error))
   (rpc/loaded db))
 
-(defevh :client-error [db error]
-  (notify error :type :error :timeout 5000)
-  (navigate "/")
-  (rpc/loaded db))
-
 (defn- uncaught-error-handler [e]
   (POST "/error" {:params {:message (.. e -error -message) :stacktrace (.. e -error -stack)}
                   :headers (rpc/auth-header)}))

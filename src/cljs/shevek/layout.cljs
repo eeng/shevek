@@ -18,7 +18,8 @@
             [shevek.menu.share :refer [share-menu]]
             [shevek.menu.fullscreen :refer [fullscreen-menu]]
             [shevek.menu.settings :refer [settings-menu]]
-            [shevek.menu.account :as account :refer [account-menu]]))
+            [shevek.menu.account :as account :refer [account-menu]]
+            [shevek.pages.error :as error]))
 
 (def pages
   {:login #'login/page
@@ -26,7 +27,8 @@
    :dashboard #'dashboard/page
    :admin #'admin/page
    :viewer #'viewer/page
-   :account #'account/page})
+   :account #'account/page
+   :error #'error/page})
 
 (defn current-page-class [page]
   (when (current-page? page) "active"))

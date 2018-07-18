@@ -33,7 +33,7 @@
           (send-main-query)
           (send-pinboard-queries)
           (store-viewer-in-url)))
-    (dispatch :client-error (t :viewer/unauthorized (:title cube)))))
+    (dispatch :page-error {:message (t :viewer/unauthorized (:title cube))})))
 
 (defevh :viewer-initialized [db]
   (if-let [cube (get-in db [:viewer :cube :name])]

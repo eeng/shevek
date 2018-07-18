@@ -44,5 +44,8 @@
 (defroute "/dashboard/:id" [id]
   (dispatch :dashboard-selected id))
 
+(defroute "/error" []
+  (dispatch :navigate :error))
+
 (defroute "*" []
   (dispatch :navigate :home))
