@@ -40,7 +40,7 @@
   {:cube s/Str
    :filters Filters
    (s/optional-key :splits) [Split]
-   :measures (s/constrained [Measure] seq)
+   :measures [Measure]
    (s/optional-key :totals) s/Bool
    (s/optional-key :time-zone) s/Str})
 

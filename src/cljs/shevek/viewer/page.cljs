@@ -27,13 +27,13 @@
     :else (build-new-viewer cube)))
 
 (defn cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
-  (let [viewer (init-viewer cube viewer current-report)]
-    (if (cube-authorized? viewer)
+  (if (cube-authorized? cube)
+    (let [viewer (init-viewer cube viewer current-report)]
       (-> (assoc db :viewer viewer)
           (send-main-query)
           (send-pinboard-queries)
-          (store-viewer-in-url))
-      (dispatch :client-error (t :viewer/unauthorized (:title cube))))))
+          (store-viewer-in-url)))
+    (dispatch :client-error (t :viewer/unauthorized (:title cube)))))
 
 (defevh :viewer-initialized [db]
   (if-let [cube (get-in db [:viewer :cube :name])]

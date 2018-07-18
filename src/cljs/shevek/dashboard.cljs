@@ -7,7 +7,7 @@
             [shevek.schemas.conversion :refer [report->viewer]]
             [shevek.components.text :refer [page-title warning loader]]
             [shevek.viewer.visualization :refer [visualization]]
-            [shevek.viewer.shared :refer [send-visualization-query cube-authorized?]]))
+            [shevek.viewer.shared :refer [send-visualization-query]]))
 
 (defevh :dashboard/refresh [db]
   (console.log "TODO dashboard refresh")
@@ -26,9 +26,7 @@
 
 (defn- cube-arrived [db cube report]
   (let [viewer (report->viewer report cube)]
-    (if (cube-authorized? viewer)
-      (send-visualization-query db viewer (vis-key report))
-      (rpc/loaded db (vis-key report)))))
+    (send-visualization-query db viewer (vis-key report))))
 
 (defevh :dashboard/cube-requested [db {:keys [cube] :as report}]
   (rpc/fetch db :cube-metadata "schema/cube" :args [cube] :handler #(cube-arrived %1 %2 report)))
@@ -43,9 +41,7 @@
      [:div.content.visualization-container
       [loader (vis-key report)]
       (if-let [vis (db/get-in (vis-key report))]
-        (if (cube-authorized? vis)
-          [visualization vis]
-          [warning (t :reports/unauthorized)]))]]))
+        [visualization vis])]]))
 
 (defn- reports-cards [reports]
   [:div.ui.two.stackable.cards (rmap report-card :id reports)])
