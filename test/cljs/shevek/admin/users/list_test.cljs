@@ -3,7 +3,7 @@
             [pjstadig.humane-test-output]
             [shevek.support.db :refer-macros [with-app-db]]
             [shevek.support.reagent :refer [with-container render-component text]]
-            [shevek.admin.users.list :as l]))
+            [shevek.pages.admin.users.list :as l]))
 
 (defn permissions-text [args]
   (render-component [l/permissions-text args])

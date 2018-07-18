@@ -1,4 +1,4 @@
-(ns shevek.login
+(ns shevek.pages.login
   (:require [reagent.core :as r]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
@@ -9,16 +9,7 @@
             [ajax.core :refer [POST]]
             [shevek.navigation :refer [navigate]]
             [cljsjs.jwt-decode]
-            [shevek.notification :refer [notify]]))
-
-(defn current-user []
-  (db/get :current-user))
-
-(defn logged-in? []
-  (some? (current-user)))
-
-(defn admin? []
-  (:admin (current-user)))
+            [shevek.lib.notification :refer [notify]]))
 
 (defn extract-user [token]
   (when token

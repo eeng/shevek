@@ -1,14 +1,14 @@
-(ns shevek.menu.account
+(ns shevek.pages.account
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t translation]]
             [shevek.rpc :as rpc]
             [shevek.lib.validation :as v]
-            [shevek.login :refer [current-user]]
+            [shevek.lib.auth :refer [current-user]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.components.text :refer [page-title]]
-            [shevek.admin.users.form :refer [user-validations]]
-            [shevek.notification :refer [notify]]))
+            [shevek.pages.admin.users.form :refer [user-validations]]
+            [shevek.lib.notification :refer [notify]]))
 
 (defn account-menu [class]
   [:a.item

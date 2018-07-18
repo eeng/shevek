@@ -43,9 +43,9 @@
                       {:splits [{:name "country"} {:name "city"}]
                        :results [{}
                                  {:country "Argentina" :child-rows [{:added 20 :city "Santa Fe"}
-                                                                  {:added 80 :city "Rafaela"}]}
+                                                                    {:added 80 :city "Rafaela"}]}
                                  {:country "Brasil" :child-rows [{:added 160 :city "Sao Paulo"}
-                                                               {:added 40 :city "Brasilia"}]}]
+                                                                 {:added 40 :city "Brasilia"}]}]
                        :viztype :bar-chart})))))
 
     (testing "two splits with different size of nested results"
@@ -58,7 +58,7 @@
                       {:splits [{:name "country"} {:name "city"}]
                        :results [{}
                                  {:country "Argentina" :child-rows [{:added 30 :city "Santa Fe"}
-                                                                  {:added 80 :city "Rafaela"}
-                                                                  {:added 25 :city "Ceres"}]}
+                                                                    {:added 80 :city "Rafaela"}
+                                                                    {:added 25 :city "Ceres"}]}
                                  {:country "Brasil" :child-rows '({:added 70 :city "Sao Paulo"}
-                                                                {:added 40 :city "Brasilia"})}]})))))))
+                                                                  {:added 40 :city "Brasilia"})}]})))))))

@@ -4,7 +4,7 @@
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap]]
-            [shevek.home.dashboards :refer [fetch-dashboards select-dashboard]]
+            [shevek.pages.home.dashboards :refer [fetch-dashboards select-dashboard]]
             [shevek.navigation :refer [current-page?]]
             [shevek.components.popup :refer [show-popup close-popup]]))
 

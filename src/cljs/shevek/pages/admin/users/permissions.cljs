@@ -1,4 +1,4 @@
-(ns shevek.admin.users.permissions
+(ns shevek.pages.admin.users.permissions
   (:require [reagent.core :as r]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap without-propagation]]

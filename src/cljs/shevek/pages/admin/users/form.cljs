@@ -1,4 +1,4 @@
-(ns shevek.admin.users.form
+(ns shevek.pages.admin.users.form
   (:require [reagent.core :as r]
             [shevek.i18n :refer [t]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
@@ -9,7 +9,7 @@
             [shevek.lib.util :refer [new-record?]]
             [shevek.lib.collections :refer [find-by]]
             [shevek.lib.dw.cubes :refer [cubes-list]]
-            [shevek.admin.users.permissions :refer [user-permissions]]
+            [shevek.pages.admin.users.permissions :refer [user-permissions]]
             [shevek.schemas.conversion :refer [unparse-filters report-dims->viewer]]
             [shevek.schemas.user :refer [CubePermissions]]
             [schema-tools.core :as st]

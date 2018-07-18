@@ -1,4 +1,4 @@
-(ns shevek.home.reports
+(ns shevek.pages.home.reports
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
@@ -8,8 +8,8 @@
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
             [shevek.lib.time.ext :refer [format-time]]
-            [shevek.notification :refer [notify]]
-            [shevek.home.dashboards :refer [fetch-dashboards]]
+            [shevek.lib.notification :refer [notify]]
+            [shevek.pages.home.dashboards :refer [fetch-dashboards]]
             [shevek.menu.reports :refer [fetch-reports save-report-form]]
             [shevek.components.form :refer [search-input filter-matching by hold-to-confirm]]
             [shevek.components.popup :refer [tooltip]]))

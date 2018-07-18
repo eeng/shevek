@@ -1,4 +1,4 @@
-(ns shevek.dashboard
+(ns shevek.pages.dashboard
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]

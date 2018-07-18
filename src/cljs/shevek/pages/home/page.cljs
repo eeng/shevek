@@ -1,9 +1,9 @@
-(ns shevek.home.page
+(ns shevek.pages.home.page
   (:require [shevek.components.text :refer [page-title]]
             [shevek.i18n :refer [t]]
-            [shevek.home.dashboards :refer [dashboards-cards]]
-            [shevek.home.cubes :refer [cubes-cards]]
-            [shevek.home.reports :refer [reports-cards]]))
+            [shevek.pages.home.dashboards :refer [dashboards-cards]]
+            [shevek.pages.home.cubes :refer [cubes-cards]]
+            [shevek.pages.home.reports :refer [reports-cards]]))
 
 (defn page []
   [:div#home.ui.container

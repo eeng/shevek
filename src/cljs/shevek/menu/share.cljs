@@ -3,7 +3,7 @@
             [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.notification :refer [notify]]
+            [shevek.lib.notification :refer [notify]]
             [cljsjs.clipboard]))
 
 (defn clipboard-button [button]

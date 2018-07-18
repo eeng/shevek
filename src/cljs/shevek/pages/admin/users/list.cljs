@@ -1,4 +1,4 @@
-(ns shevek.admin.users.list
+(ns shevek.pages.admin.users.list
   (:require [reagent.core :as r]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
@@ -9,7 +9,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.util :refer [new-record?]]
             [shevek.lib.collections :refer [find-by]]
-            [shevek.admin.users.form :refer [adapt-for-client user-form]]
+            [shevek.pages.admin.users.form :refer [adapt-for-client user-form]]
             [shevek.viewer.raw :refer [filters->str]]))
 
 (defevh :users-requested [db]

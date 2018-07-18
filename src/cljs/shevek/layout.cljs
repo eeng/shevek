@@ -6,11 +6,13 @@
             [shevek.rpc :refer [loading?]]
             [shevek.components.popup :refer [popup tooltip]]
             [shevek.components.modal :refer [modal]]
-            [shevek.login :as login :refer [logged-in? admin?]]
-            [shevek.home.page :as home]
-            [shevek.dashboard :as dashboard]
-            [shevek.admin.page :as admin]
-            [shevek.notification :refer [notification]]
+            [shevek.lib.auth :refer [logged-in? admin?]]
+            [shevek.pages.login :as login]
+            [shevek.pages.home.page :as home]
+            [shevek.pages.error :as error]
+            [shevek.pages.dashboard :as dashboard]
+            [shevek.pages.admin.page :as admin]
+            [shevek.lib.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
             [shevek.menu.cubes :refer [cubes-menu]]
             [shevek.menu.reports :refer [reports-menu]]
@@ -18,8 +20,7 @@
             [shevek.menu.share :refer [share-menu]]
             [shevek.menu.fullscreen :refer [fullscreen-menu]]
             [shevek.menu.settings :refer [settings-menu]]
-            [shevek.menu.account :as account :refer [account-menu]]
-            [shevek.pages.error :as error]))
+            [shevek.pages.account :as account :refer [account-menu]]))
 
 (def pages
   {:login #'login/page

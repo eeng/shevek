@@ -1,4 +1,4 @@
-(ns shevek.home.cubes
+(ns shevek.pages.home.cubes
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]

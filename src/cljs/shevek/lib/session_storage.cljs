@@ -1,4 +1,4 @@
-(ns shevek.lib.session-storage
+(ns shevek.lib.auth-storage
   (:require [cljs.reader :refer [read-string]]))
 
 (defn set-item! [key val]

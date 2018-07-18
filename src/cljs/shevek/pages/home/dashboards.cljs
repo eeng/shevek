@@ -1,4 +1,4 @@
-(ns shevek.home.dashboards
+(ns shevek.pages.home.dashboards
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
@@ -11,7 +11,7 @@
             [shevek.lib.time.ext :refer [format-time]]
             [shevek.lib.string :refer [present?]]
             [shevek.lib.util :refer [new-record? trigger]]
-            [shevek.notification :refer [notify]]
+            [shevek.lib.notification :refer [notify]]
             [shevek.navigation :refer [navigate]]))
 
 (defn fetch-dashboards []

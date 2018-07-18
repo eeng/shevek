@@ -5,7 +5,7 @@
             [shevek.lib.string :refer [regex-escape split]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
-            [shevek.notification :refer [notify]]))
+            [shevek.lib.notification :refer [notify]]))
 
 (defn classes [& css-classes]
   (->> css-classes (filter identity) (str/join " ")))

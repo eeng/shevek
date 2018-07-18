@@ -2,7 +2,7 @@
   (:require [cljs.test :refer-macros [deftest testing is]]
             [pjstadig.humane-test-output]
             [shevek.asserts :refer [error-on? no-error-on?]]
-            [shevek.admin.users.form :refer [user-validations adapt-for-client adapt-for-server]]
+            [shevek.pages.admin.users.form :refer [user-validations adapt-for-client adapt-for-server]]
             [shevek.lib.validation :as v]
             [shevek.lib.dw.cubes :refer [cubes-list]]
             [shevek.lib.time :refer [date-time]]))
