@@ -76,6 +76,7 @@
                 {:name "dia_semana" :title "Día de Semana" :column "__time"
                  :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "hora" :title "Hora del Día" :column "__time" :extraction [{:type "timeFormat" :format "HH 'hs'" :locale "es"}]}
                 {:name "tipo_pedido" :title "Tipo de Pedido"}
                 {:name "condicion_ruteo" :title "Condición de Ruteo"}
                 {:name "year" :hidden true}]
