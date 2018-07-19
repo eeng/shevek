@@ -18,10 +18,10 @@
   (boolean (:user request)))
 
 (defn not-authenticated [request _]
-  {:status 401 :body {:error "Not authenticated"}})
+  {:status 401 :body "Not authenticated"})
 
 (defn not-authorized [request _]
-  {:status 403 :body {:error "Not authorized"}})
+  {:status 403 :body "Not authorized"})
 
 (defroutes app-routes
   (resources "/public")
@@ -31,13 +31,14 @@
   (POST "/error" [] (restrict client-error {:handler should-be-authenticated :on-error not-authenticated})))
 
 ; This needs to be a defn a not a def because of the config which will only be available after mount/start
+; The wrap-authorization needs to be on top of wrap-server-error so it catches the throw-unauthorized which in turn return the not-authorized response and then the wrap-server-error doesn't receive the exception (which would send the email that we don't want in that case)
 (defn app []
   (let [backend (backends/jws {:secret (config :jwt-secret) :unauthorized-handler not-authorized})]
     (-> app-routes
+        (wrap-authorization backend)
         (wrap-server-error)
         (wrap-request-logging)
         (wrap-current-user)
         (wrap-authentication backend)
-        (wrap-authorization backend)
         (wrap-restful-format :response-options {:transit-json {:handlers th/write-handlers}})
         (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false)))))

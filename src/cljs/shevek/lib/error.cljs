@@ -22,14 +22,15 @@
   (handle-app-error error)
   (navigate "/"))
 
-(defevh :server-error [db {:keys [status response] :as error}]
+(defevh :server-error [db {:keys [status status-text response] :as error}]
   (case status
     401 (handle-not-authenticated)
     403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
     502 (handle-app-error (assoc error :response (t :errors/bad-gateway)))
-    599 (let [new-response (or (translation :errors (:error response)) (pr-str response))]
-          (handle-app-error (assoc error :response new-response :status-text (:error response))))
-    (handle-app-error error))
+    (let [found-translation (translation :errors response)
+          new-response (or found-translation response)
+          new-status-text (if found-translation response status-text)]
+      (handle-app-error (assoc error :response new-response :status-text new-status-text))))
   (rpc/loaded db))
 
 (defn- uncaught-error-handler [e]

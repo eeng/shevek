@@ -1,7 +1,5 @@
 (ns shevek.lib.rpc
   (:require [clojure.string :refer [split ends-with?]]
-            [clojure.repl :refer [root-cause]]
-            [taoensso.timbre :as log]
             [shevek.schema.api :as schema]
             [shevek.users.api :as users]
             [shevek.querying.api :as querying]
@@ -20,14 +18,5 @@
     (assert (api-fn? f) "Only api functions are allowed")
     (apply f request args)))
 
-; The query runs within a pmap so if a timeout occours in Druid we will get an ExecutionException with the ExceptionInfo wrapped, hence the root-cause.
 (defn controller [request]
-  (try
-    {:status 200 :body (call-fn request)}
-    (catch clojure.lang.ExceptionInfo e
-      (let [{:keys [type] :as data} (-> e root-cause ex-data)]
-        (if (isa? type :shevek.app/error)
-          (do
-            (log/error e)
-            {:status 599 :body data})
-          (throw e))))))
+  {:status 200 :body (call-fn request)})

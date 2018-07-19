@@ -30,7 +30,7 @@
         (do
           (log/info (user-field identity) "Started" method full-uri "for" (client-ip req))
           (when (seq ps)
-            (log/info (user-field identity) :params ps))
+            (log/info (user-field identity) "  Params" ps))
           (let [start (System/currentTimeMillis)
                 res (handler req)
                 total (- (System/currentTimeMillis) start)]
