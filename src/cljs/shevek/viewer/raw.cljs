@@ -39,8 +39,9 @@
            (doall
              (for [{:keys [name] :as d} dimensions]
                [:td {:key name} (format-dimension d result)]))
-           (for [{:keys [name] :as m} measures]
-             [:td.measure {:key name} (format-measure m result)])]))]]))
+           (doall
+             (for [{:keys [name] :as m} measures]
+               [:td.measure {:key name} (format-measure m result)]))]))]]))
 
 (defn filters->str [filters]
   (into [:span.filters]
