@@ -57,7 +57,6 @@
     (rpc/call "users/save" :args [(adapt-for-server @edited-user)] :handler #(do (dispatch :user-saved) (cancel)))
     (rpc/loading db :saving-user)))
 
-
 (defn- user-fields [user shortcuts]
   (let [new-user? (new-record? @user)]
     [:div
