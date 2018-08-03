@@ -2,7 +2,7 @@
   :source-paths   #{"src/clj" "src/cljc" "src/cljs" "src/less"}
   :resource-paths #{"resources"}
   :dependencies   '[; Backend
-                    [mount "0.1.11"]
+                    [mount "0.1.12"]
                     [cprop "0.1.11"]
                     [http-kit "2.2.0"]
                     [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
