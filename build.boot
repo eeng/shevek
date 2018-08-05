@@ -25,6 +25,7 @@
 
                     ; Frontend
                     [org.clojure/clojurescript "1.9.671"]
+                    [org.clojure/core.async "0.4.474"]
                     [reagent "0.7.0" :exclusions [cljsjs/react]]
                     [cljsjs/react-with-addons "15.6.1-0"]
                     [cljs-ajax "0.5.8"]
@@ -177,7 +178,7 @@
   (comp (cljs :optimizations :advanced
               :compiler-options {:externs ["src/externs/jquery.js" "src/externs/semantic-ui.js" "src/externs/calendar.js"]
                                  :closure-defines {"goog.DEBUG" false}})
-        (less)
+        (less :compression true)
         (sift :move {#"app.css" "public/css/app.css" #"app.main.css.map" "public/css/app.main.css.map"})
         (asset-fingerprint)
         (aot :namespace #{'shevek.app})
