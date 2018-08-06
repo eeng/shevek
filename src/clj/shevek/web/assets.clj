@@ -1,5 +1,5 @@
 (ns shevek.web.assets
-  "This guy is in charge of concatenating, minimizing and fingerprinting assets. NOTE: When upgrading semantic, remember to change the @import for the google fonts otherwise optimus doesn't like it in production."
+  "This guy is in charge of concatenating, minimizing (although we don't needed it) and fingerprinting assets. NOTE: When upgrading semantic, remember to change the @import for the google fonts otherwise optimus doesn't like it with optimizations/all."
   (:require [optimus.prime :as optimus]
             [optimus.assets :as assets]
             [optimus.optimizations :as optimizations]

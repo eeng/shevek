@@ -1,2 +1,2 @@
 server "kitchen"
-set :branch, "master"
+set :branch, "leiningen"
