@@ -11,19 +11,19 @@
   (:gen-class))
 
 (defn start-for-dev []
-  (mount/start-without #'nrepl))
-
-(defn start-db []
-  (mount/start-without #'nrepl #'web-server #'scheduler))
-
-(defn start []
   (mount/start))
 
-(defn stop []
+(defn- start-for-seed []
+  (mount/start-without #'nrepl #'web-server #'scheduler #'reloader))
+
+(defn start []
+  (mount/start-without #'reloader))
+
+(defn- stop []
   (mount/stop))
 
 (defn seed []
-  (start-db)
+  (start-for-seed)
   (seed! db))
 
 (defn -main [& args]

@@ -9,13 +9,15 @@
 
 (defn init-unit-tests []
   (mount/start-without #'shevek.nrepl/nrepl
-                       #'shevek.web.server/web-server
                        #'shevek.scheduler/scheduler
+                       #'shevek.reloader/reloader
+                       #'shevek.web.server/web-server
                        #'shevek.acceptance.test-helper/page))
 
 (defn init-acceptance-tests []
   (mount/start-without #'shevek.nrepl/nrepl
-                       #'shevek.scheduler/scheduler))
+                       #'shevek.scheduler/scheduler
+                       #'shevek.reloader/reloader))
 
 (def stop-tests mount/stop)
 

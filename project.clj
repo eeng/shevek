@@ -69,7 +69,7 @@
                        ["with-profile" "less-uberjar" "less4j" "once"] ; Not very pretty but couldn't find other way to run the less task with compression
                        ["uberjar"]]}
 
-  :cooper {"backend" ["lein" "run"]
+  :cooper {"backend" ["lein" "run" "-m" "shevek.app/start-for-dev"]
            "less" ["lein" "less4j" "auto"]
            "figwheel" ["lein" "figwheel"]}
 
@@ -87,6 +87,8 @@
              :repl false ; So we can start figwheel through cooper
              :nrepl-port 4002
              :nrepl-middleware ["cider.piggieback/wrap-cljs-repl"]}
+
+  :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
