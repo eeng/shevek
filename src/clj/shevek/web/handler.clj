@@ -6,6 +6,8 @@
             [clojure.java.io :as io]
             [shevek.web.logging :refer [wrap-request-logging]]
             [shevek.web.error :refer [wrap-server-error client-error]]
+            [shevek.web.pages :as pages]
+            [shevek.web.assets :refer [wrap-asset-pipeline]]
             [shevek.lib.transit-handlers :as th]
             [shevek.lib.rpc :as rpc]
             [shevek.lib.auth :as auth :refer [wrap-current-user]]
@@ -25,7 +27,7 @@
 
 (defroutes app-routes
   (resources "/public")
-  (GET "/*" [] (-> "public/index.html" io/resource slurp))
+  (GET "/*" [] pages/index)
   (POST "/login" [] auth/controller)
   (POST "/rpc" [] (restrict rpc/controller {:handler should-be-authenticated :on-error not-authenticated}))
   (POST "/error" [] (restrict client-error {:handler should-be-authenticated :on-error not-authenticated})))
@@ -41,4 +43,5 @@
         (wrap-current-user)
         (wrap-authentication backend)
         (wrap-restful-format :response-options {:transit-json {:handlers th/write-handlers}})
+        (wrap-asset-pipeline)
         (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false)))))

@@ -25,6 +25,8 @@
                  [clj-http "2.3.0"]
                  [org.clojure/core.match "0.3.0-alpha4"]
                  [ns-tracker "0.3.1"] ; For the reloader
+                 [hiccup "1.0.5"]
+                 [optimus "0.20.1"]
 
                  ; Frontend
                  [org.clojure/clojurescript "1.10.238"]
@@ -97,7 +99,7 @@
                                 {:figwheel true
                                  :compiler {:main shevek.app
                                             :output-dir "resources/public/js/out"
-                                            :asset-path "js/out"
+                                            :asset-path "/js/out"
                                             :source-map-timestamp true
                                             :preloads [devtools.preload]}}}}}
              :uberjar {:aot :all
