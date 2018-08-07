@@ -55,8 +55,8 @@
             [deraen/lein-less4j "0.6.2"]]
 
   :source-paths ["src/clj" "src/cljc"]
-  :resource-paths ["resources"] ; TODO LEIN mover luego a src asi queda uniforme
-  :test-paths []
+  :resource-paths ["resources"]
+  :test-paths ["test/clj" "test/cljc"]
   :target-path "target/%s"
   :uberjar-name "shevek.jar"
   :main shevek.app
