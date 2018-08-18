@@ -11,7 +11,8 @@
   [data]
   (let [{:keys [level ?err #_vargs msg_ ?ns-str ?file timestamp_ ?line]} data]
     (str
-     (when-not (env? :development) (force timestamp_) " ")
+     (when-not (env? :development)
+       (str (force timestamp_) " "))
      (str/upper-case (first (name level)))  " "
      "[" (or ?ns-str ?file "?") ":" (or ?line "?") "] - "
      (force msg_)
