@@ -7,7 +7,9 @@
             [shevek.lib.auth :refer [token-expiration]]
             [clj-time.core :as t]))
 
-(deftest authentication
+(use-fixtures :once wrap-acceptance-tests)
+
+(deftest ^:acceptance authentication
   (it "invalid credentials"
     (make! User {:username "max" :password "payne"})
     (visit "/")

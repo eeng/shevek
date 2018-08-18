@@ -1,6 +1,6 @@
 (ns shevek.users.repository-test
-  (:require [clojure.test :refer [deftest is]]
-            [shevek.test-helper :refer [it]]
+  (:require [clojure.test :refer :all]
+            [shevek.test-helper :refer :all]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [without? submaps?]]
             [shevek.users.repository :refer [find-users save-user delete-user reload]]
@@ -10,6 +10,8 @@
             [shevek.db :refer [db]]
             [bcrypt-clj.auth :refer [check-password]]
             [monger.collection :as mc]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest save-user-tests
   (it "should throw error if username already exists"

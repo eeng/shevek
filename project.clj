@@ -41,6 +41,7 @@
                  [cljsjs/jwt-decode "2.1.0-0"]
                  [cljsjs/clipboard "1.6.1-1"]
                  [cljsjs/chartjs "2.6.0-0"]
+                 [org.slf4j/slf4j-nop "1.7.12"] ; To disable monger log messages
 
                  ; Shared
                  [funcool/cuerdas "2.0.3"]
@@ -69,6 +70,8 @@
                        ["with-profile" "less-uberjar" "less4j" "once"] ; Not very pretty but couldn't find other way to run the less task with compression
                        ["uberjar"]]}
 
+  :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
+
   :cooper {"backend" ["lein" "run" "-m" "shevek.app/start-for-dev"]
            "less" ["lein" "less4j" "auto"]
            "figwheel" ["lein" "figwheel"]}
@@ -88,14 +91,27 @@
              :nrepl-port 4002
              :nrepl-middleware ["cider.piggieback/wrap-cljs-repl"]}
 
-  :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
+  :test-selectors {:default (complement :acceptance)
+                   :acceptance :acceptance
+                   :all (constantly true)}
+
+  :test-refresh {:quiet true
+                 :changes-only true
+                 :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
+                   :resource-paths ["test/resources"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [proto-repl "0.3.1"]
                                   [binaryage/devtools "0.9.10"]
-                                  [cider/piggieback "0.3.8"]] ; ClojureScript REPL on top of nREPL
+                                  [cider/piggieback "0.3.8"] ; ClojureScript REPL on top of nREPL
+                                  ; testing
+                                  [etaoin "0.2.1"]
+                                  [se.haleby/stub-http "0.2.1"]
+                                  [prismatic/schema-generators "0.1.0"]]
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
+                             [venantius/ultra "0.5.2"]]
                    :cljsbuild {:builds
                                {:app
                                 {:figwheel true

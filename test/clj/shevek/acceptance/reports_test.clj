@@ -4,12 +4,15 @@
             [shevek.support.druid :refer [with-fake-druid query-req-matching druid-res]]
             [shevek.support.viewer :refer [make-wikiticker-cube go-to-viewer]]))
 
-(deftest reports
+(use-fixtures :once wrap-acceptance-tests)
+
+(deftest ^:acceptance reports
   (it "creating new report"
     (with-fake-druid
       {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")
        (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
       (go-to-viewer)
+      (is (has-css? ".statistic" :count 3))
       (click {:id "cb-measure-added"})
       (is (has-css? ".statistic" :count 2))
       (click-link "Reports")

@@ -1,7 +1,7 @@
 (ns shevek.lib.auth-test
   (:require [clojure.test :refer :all]
             [shevek.lib.auth :refer [authenticate-and-generate-token]]
-            [shevek.test-helper :refer [it]]
+            [shevek.test-helper :refer :all]
             [shevek.config :refer [config]]
             [shevek.asserts :refer [submap? without?]]
             [shevek.makers :refer [make!]]
@@ -10,6 +10,8 @@
             [shevek.users.repository :refer [reload]]
             [buddy.sign.jwt :as jwt]
             [clj-time.core :as t]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest authenticate-and-generate-token-tests
   (it "valid credentials should return a JSON Web Token with the user data (except password)"

@@ -1,6 +1,6 @@
 (ns shevek.schema.manager-test
   (:require [clojure.test :refer :all]
-            [shevek.test-helper :refer [it]]
+            [shevek.test-helper :refer :all]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
             [shevek.schema.manager :refer [discover! update-cubes calculate-expression]]
@@ -9,6 +9,8 @@
             [shevek.schemas.cube :refer [Cube]]
             [shevek.db :refer [db]]
             [com.rpl.specter :refer [select ALL]]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest discover-tests
   (it "initial descovery should save all cubes with their dimensions and metrics"

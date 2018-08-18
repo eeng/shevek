@@ -1,11 +1,13 @@
 (ns shevek.dashboards.api-test
   (:require [clojure.test :refer :all]
-            [shevek.test-helper :refer [it]]
+            [shevek.test-helper :refer :all]
             [shevek.asserts :refer [submap?]]
             [shevek.dashboards.api :as api]
             [shevek.makers :refer [make!]]
             [shevek.schemas.user :refer [User]]
             [shevek.schemas.dashboard :refer [Dashboard]]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest authorization-test
   (it "only the author of a dashboard can view it"

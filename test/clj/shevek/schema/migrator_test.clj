@@ -1,10 +1,12 @@
 (ns shevek.schema.migrator-test
   (:require [clojure.test :refer :all]
-            [shevek.test-helper :refer [it]]
+            [shevek.test-helper :refer :all]
             [monger.collection :as mc]
             [shevek.db :refer [db]]
             [shevek.schema.migrator :refer [migrate!]]
             [shevek.schema.test-migrations :refer [test-migrations]]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest migrate-tests
   (it "should run the up function of all migration files in the directory"

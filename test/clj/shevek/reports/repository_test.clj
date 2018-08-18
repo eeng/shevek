@@ -1,6 +1,6 @@
 (ns shevek.reports.repository-test
-  (:require [clojure.test :refer [deftest is]]
-            [shevek.test-helper :refer [it]]
+  (:require [clojure.test :refer :all]
+            [shevek.test-helper :refer :all]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submap? without?]]
             [shevek.schemas.report :refer [Report]]
@@ -9,6 +9,8 @@
             [shevek.reports.repository :refer [save-report delete-report]]
             [shevek.db :refer [db]]
             [shevek.lib.mongodb :as m :refer [oid]]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (defn reload-dashboard [{:keys [id]}]
   (m/find-by-id db "dashboards" id))

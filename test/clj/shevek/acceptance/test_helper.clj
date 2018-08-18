@@ -2,6 +2,7 @@
   (:require [etaoin.api :as e]
             [etaoin.keys :as k]
             [clojure.test :refer [testing]]
+            [mount.core :as mount]
             [monger.db :refer [drop-db]]
             [shevek.db :refer [db init-db]]
             [shevek.config :refer [config]]
@@ -17,6 +18,14 @@
 
 ; Por defecto etaoin espera 20 segs
 (alter-var-root #'e/default-timeout (constantly 3))
+
+(defn wrap-acceptance-tests [f]
+  (System/setProperty "conf" "test/resources/test-config.edn")
+  (mount/start-without #'shevek.nrepl/nrepl
+                       #'shevek.scheduler/scheduler
+                       #'shevek.reloader/reloader)
+  (f)
+  (mount/stop))
 
 (defmacro it [description & body]
   `(testing ~description
