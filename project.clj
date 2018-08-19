@@ -66,10 +66,6 @@
                                     [:cljsbuild :builds :app :compiler :output-to]
                                     :target-path]
 
-  :aliases {"package" ["do"
-                       ["with-profile" "less-uberjar" "less4j" "once"] ; Not very pretty but couldn't find other way to run the less task with compression
-                       ["uberjar"]]}
-
   :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
 
   :cooper {"backend" ["lein" "run" "-m" "shevek.app/start-for-dev"]
@@ -98,6 +94,14 @@
   :test-refresh {:quiet true
                  :changes-only true
                  :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
+
+  :aliases {"package" ["do"
+                       ["with-profile" "less-uberjar" "less4j" "once"] ; Not very pretty but couldn't find other way to run the less task with compression only while packaging
+                       ["uberjar"]]
+            "ci" ["do"
+                  ["with-profile" "less-uberjar" "less4j" "once"]
+                  ["with-profile" "uberjar" "cljsbuild" "once"]
+                  ["test-refresh" ":all" ":run-once"]]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
