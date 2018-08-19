@@ -1,6 +1,6 @@
 (ns shevek.test-helper
   (:require [monger.collection :refer [purge-many]]
-            [shevek.app :refer [start]]
+            [shevek.app]
             [mount.core :as mount]
             [shevek.db :refer [db init-db]]
             [clojure.test :refer [deftest testing]]

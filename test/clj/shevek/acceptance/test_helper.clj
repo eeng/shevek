@@ -5,6 +5,7 @@
             [mount.core :as mount]
             [monger.db :refer [drop-db]]
             [shevek.db :refer [db init-db]]
+            [shevek.app]
             [shevek.config :refer [config]]
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]

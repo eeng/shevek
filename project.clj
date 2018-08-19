@@ -101,7 +101,7 @@
             "ci" ["do"
                   ["with-profile" "less-uberjar" "less4j" "once"]
                   ["with-profile" "uberjar" "cljsbuild" "once"]
-                  ["test-refresh" ":all" ":run-once"]]}
+                  ["test" ":all"]]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
