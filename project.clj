@@ -62,8 +62,8 @@
   :uberjar-name "shevek.jar"
   :main shevek.app
 
-  :clean-targets ^{:protect false} [[:cljsbuild :builds :app :compiler :output-dir]
-                                    [:cljsbuild :builds :app :compiler :output-to]
+  :clean-targets ^{:protect false} ["resources/public/js/out" "resources/public/js/app.js"
+                                    "resources/public/css/app.css" "resources/public/css/app.main.css.map"
                                     :target-path]
 
   :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
@@ -75,11 +75,6 @@
   :less {:source-paths ["src/less"]
          :target-path "resources/public/css"
          :source-map true}
-
-  :cljsbuild {:builds
-              {:app
-               {:source-paths ["src/cljs"]
-                :compiler {:output-to "resources/public/js/app.js"}}}}
 
   :figwheel {:css-dirs ["resources/public/css"]
              :server-logfile "log/figwheel.log"
@@ -95,13 +90,11 @@
                  :changes-only true
                  :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
 
-  :aliases {"package" ["do"
-                       ["with-profile" "less-uberjar" "less4j" "once"] ; Not very pretty but couldn't find other way to run the less task with compression only while packaging
-                       ["uberjar"]]
-            "ci" ["do"
-                  ["with-profile" "less-uberjar" "less4j" "once"]
-                  ["with-profile" "uberjar" "cljsbuild" "once"]
-                  ["test" ":all"]]}
+  :aliases {"build-frontend" ["with-profile" "prod" "do"
+                              ["cljsbuild" "once"]
+                              ["less4j" "once"]]
+            "package" ["do" "build-frontend" "uberjar"]
+            "ci" ["do" "build-frontend" ["test" ":all"]]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
@@ -117,21 +110,24 @@
                    :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
                              [venantius/ultra "0.5.2"]]
                    :cljsbuild {:builds
-                               {:app
+                               {:dev
                                 {:figwheel true
+                                 :source-paths ["src/cljs"]
                                  :compiler {:main shevek.app
                                             :output-dir "resources/public/js/out"
+                                            :output-to "resources/public/js/app.js"
                                             :asset-path "/js/out"
                                             :source-map-timestamp true
                                             :preloads [devtools.preload]}}}}}
-             :uberjar {:aot :all
-                       :cljsbuild {:builds
-                                   {:app
-                                    {:compiler {:optimizations :advanced
-                                                :pretty-print false
-                                                :source-map-timestamp false
-                                                :closure-defines {"goog.DEBUG" false}
-                                                :externs ["src/externs/jquery.js" "src/externs/semantic-ui.js" "src/externs/calendar.js"]}}}}
-                       :hooks [leiningen.cljsbuild]}
-             :less-uberjar {:less {:source-map false
-                                   :compression true}}})
+             :prod {:cljsbuild {:builds
+                                {:prod
+                                 {:source-paths ["src/cljs"]
+                                  :compiler {:output-to "resources/public/js/app.js"
+                                             :optimizations :advanced
+                                             :pretty-print false
+                                             :source-map-timestamp false
+                                             :closure-defines {"goog.DEBUG" false}
+                                             :externs ["src/externs/jquery.js" "src/externs/semantic-ui.js" "src/externs/calendar.js"]}}}}
+                    :less {:source-map false
+                           :compression true}}
+             :uberjar {:aot :all}})
