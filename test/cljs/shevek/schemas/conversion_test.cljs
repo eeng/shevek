@@ -1,7 +1,6 @@
 (ns shevek.schemas.conversion-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
-  (:require [pjstadig.humane-test-output]
-            [shevek.asserts :refer [submap? submaps? without?]]
+  (:require [shevek.asserts :refer [submap? submaps? without?]]
             [shevek.schemas.conversion :refer [viewer->report report->viewer viewer->query]]
             [shevek.lib.time :refer [date-time]]))
 

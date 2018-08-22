@@ -6,11 +6,14 @@
             [clojure.string :as str])
   (:import java.util.TimeZone))
 
-(defn output-fn [data]
+(defn output-fn
+  "Customize the default output as we don't need the hostname, nor the timestamp on dev (cooper already provides one)"
+  [data]
   (let [{:keys [level ?err #_vargs msg_ ?ns-str ?file timestamp_ ?line]} data]
     (str
-     (force timestamp_) " "
-     (str/upper-case (name level))  " "
+     (when-not (env? :development)
+       (str (force timestamp_) " "))
+     (str/upper-case (first (name level)))  " "
      "[" (or ?ns-str ?file "?") ":" (or ?line "?") "] - "
      (force msg_)
      (when-let [err ?err]
@@ -19,7 +22,7 @@
 (defn configure-logging! []
   (log/merge-config!
    (assoc-if (config :log)
-             :output-fn output-fn ; Don't need to log the hostname
+             :output-fn output-fn
              :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS" :timezone (TimeZone/getDefault)} ; By default msecs are missing and uses UTC
              :appenders (when (env? :test)
                           {:println {:enabled? false} :spit (appenders/spit-appender {:fname "log/test.log"})}))))

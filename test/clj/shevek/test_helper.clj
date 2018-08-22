@@ -1,23 +1,21 @@
 (ns shevek.test-helper
   (:require [monger.collection :refer [purge-many]]
-            [shevek.app :refer [start]]
+            [shevek.app]
             [mount.core :as mount]
             [shevek.db :refer [db init-db]]
-            [shevek.acceptance.test-helper]
             [clojure.test :refer [deftest testing]]
-            [cuerdas.core :as str]))
+            [cuerdas.core :as str]
+            [shevek.acceptance.test-helper]))
 
-(defn init-unit-tests []
+(defn wrap-unit-tests [f]
+  (System/setProperty "conf" "test/resources/test-config.edn")
   (mount/start-without #'shevek.nrepl/nrepl
-                       #'shevek.web.server/web-server
                        #'shevek.scheduler/scheduler
-                       #'shevek.acceptance.test-helper/page))
-
-(defn init-acceptance-tests []
-  (mount/start-without #'shevek.nrepl/nrepl
-                       #'shevek.scheduler/scheduler))
-
-(def stop-tests mount/stop)
+                       #'shevek.reloader/reloader
+                       #'shevek.web.server/web-server
+                       #'shevek.acceptance.test-helper/page)
+  (f)
+  (mount/stop))
 
 (defmacro it [description & body]
   `(testing ~description

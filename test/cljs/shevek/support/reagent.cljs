@@ -1,14 +1,32 @@
 (ns shevek.support.reagent
-  (:require [cljsjs.jquery]
-            [reagent.core :as r]
-            [cljs-react-test.utils :as tu]))
+  (:require [reagent.core :as r]
+            [cljsjs.jquery]))
 
 (def ^:dynamic container)
 
+(defn- container-div []
+  (let [id (str "container-" (gensym))
+        node (.createElement js/document "div")]
+    (set! (.-id node) id)
+    [node id]))
+
+(defn insert-container! [container]
+  (.appendChild (.-body js/document) container))
+
+(defn new-container! []
+  (let [[n s] (container-div)]
+    (insert-container! n)
+    (.getElementById js/document s)))
+
+(defn unmount!
+  "Unmounts the React Component at a node"
+  [n]
+  (.unmountComponentAtNode js/ReactDOM n))
+
 (defn with-container [test-fn]
-  (binding [container (tu/new-container!)]
+  (binding [container (new-container!)]
     (test-fn)
-    (tu/unmount! container)))
+    (unmount! container)))
 
 (defn render-component [comp]
   (r/render-component comp container))

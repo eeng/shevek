@@ -3,10 +3,15 @@
             [monger.core :as mg]
             [monger.collection :as mc]
             [shevek.config :refer [config env?]]
-            [shevek.schema.migrator :refer [migrate!]]))
+            [shevek.schema.migrator :refer [migrate!]]
+            [taoensso.timbre :as log]))
 
-(defstate mongo
-  :start (mg/connect-via-uri (config :mongodb-uri))
+(defn- connect []
+  (log/info "Establishing connection to" (config :mongodb-uri))
+  (mg/connect-via-uri (config :mongodb-uri)))
+
+(defstate ^{:on-reload :noop} mongo
+  :start (connect)
   :stop (mg/disconnect (mongo :conn)))
 
 (defn init-db [db]

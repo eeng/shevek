@@ -1,12 +1,14 @@
 (ns shevek.dashboards.repository-test
-  (:require [clojure.test :refer [deftest is]]
-            [shevek.test-helper :refer [it]]
+  (:require [clojure.test :refer :all]
+            [shevek.test-helper :refer :all]
             [shevek.makers :refer [make!]]
             [shevek.schemas.report :refer [Report]]
             [shevek.schemas.dashboard :refer [Dashboard]]
             [shevek.dashboards.repository :refer [find-by-id delete-dashboard]]
             [shevek.db :refer [db]]
             [shevek.lib.mongodb :as m]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest find-by-id-tests
   (it "should fetch the reports"

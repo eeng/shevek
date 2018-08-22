@@ -2,8 +2,10 @@
   (:require [etaoin.api :as e]
             [etaoin.keys :as k]
             [clojure.test :refer [testing]]
+            [mount.core :as mount]
             [monger.db :refer [drop-db]]
             [shevek.db :refer [db init-db]]
+            [shevek.app]
             [shevek.config :refer [config]]
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
@@ -17,6 +19,14 @@
 
 ; Por defecto etaoin espera 20 segs
 (alter-var-root #'e/default-timeout (constantly 3))
+
+(defn wrap-acceptance-tests [f]
+  (System/setProperty "conf" "test/resources/test-config.edn")
+  (mount/start-without #'shevek.nrepl/nrepl
+                       #'shevek.scheduler/scheduler
+                       #'shevek.reloader/reloader)
+  (f)
+  (mount/stop))
 
 (defmacro it [description & body]
   `(testing ~description
@@ -93,6 +103,7 @@
    (cond
      (e/exists? page {:css "i.sign.out"}) (e/click page {:css "i.sign.out"})
      (not (e/exists? page {:css "#login"})) (visit "/"))
+   (has-css? "input[name=username]")
    (e/clear page {:name "username"} {:name "password"})
    (fill {:name "username"} username)
    (fill {:name "password"} password k/enter)

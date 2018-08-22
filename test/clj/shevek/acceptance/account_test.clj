@@ -3,7 +3,9 @@
             [shevek.acceptance.test-helper :refer :all]
             [etaoin.keys :as k]))
 
-(deftest account
+(use-fixtures :once wrap-acceptance-tests)
+
+(deftest ^:acceptance account
   (it "the current password mast match"
     (login {:username "max" :fullname "Max" :password "secret999"})
     (click-link "Max")

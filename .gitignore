@@ -7,3 +7,8 @@
 /.nrepl-*
 .DS_Store
 log
+.rebel_readline_history
+resources/public/css/app.*
+resources/public/js/app.js
+resources/public/js/out
+resources/private

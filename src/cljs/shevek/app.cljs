@@ -12,8 +12,11 @@
   (reflow/dispatch :settings-loaded)
   (reflow/dispatch :user-restored))
 
-(defn init []
-  (enable-console-print!)
-  (init-navigation)
-  (init-reflow)
-  (r/render-component [layout] (.getElementById js/document "app")))
+(defn remove-loader []
+  (-> ".preloader" js/$ (.fadeOut "slow")))
+
+(enable-console-print!)
+(remove-loader)
+(init-navigation)
+(init-reflow)
+(r/render-component [layout] (.getElementById js/document "app"))

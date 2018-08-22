@@ -4,7 +4,9 @@
             [shevek.support.druid :refer [with-fake-druid query-req-matching druid-res]]
             [shevek.support.viewer :refer [make-wikiticker-cube go-to-viewer]]))
 
-(deftest viewer
+(use-fixtures :once wrap-acceptance-tests)
+
+(deftest ^:acceptance viewer
   (it "shows dimensions, measures and basic stats on entry"
     (with-fake-druid
       {(query-req-matching #"queryType.*timeBoundary") (druid-res "acceptance/time-boundary")

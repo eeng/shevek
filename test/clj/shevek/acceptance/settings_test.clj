@@ -2,7 +2,9 @@
   (:require [clojure.test :refer :all]
             [shevek.acceptance.test-helper :refer :all]))
 
-(deftest settings
+(use-fixtures :once wrap-acceptance-tests)
+
+(deftest ^:acceptance settings
   (it "allows to change language"
     (login)
     (is (has-text? "Cubes"))

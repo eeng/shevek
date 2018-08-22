@@ -4,7 +4,9 @@
             [shevek.schemas.cube :refer [Cube]]
             [shevek.makers :refer [make!]]))
 
-(deftest home
+(use-fixtures :once wrap-acceptance-tests)
+
+(deftest ^:acceptance home
   (it "shows the available cubes"
     (make! Cube {:title "Sales"})
     (make! Cube {:title "Inventory"})

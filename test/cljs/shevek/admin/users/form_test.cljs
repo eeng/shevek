@@ -1,6 +1,5 @@
 (ns shevek.admin.users.form-test
   (:require [cljs.test :refer-macros [deftest testing is]]
-            [pjstadig.humane-test-output]
             [shevek.asserts :refer [error-on? no-error-on?]]
             [shevek.pages.admin.users.form :refer [user-validations adapt-for-client adapt-for-server]]
             [shevek.lib.validation :as v]
