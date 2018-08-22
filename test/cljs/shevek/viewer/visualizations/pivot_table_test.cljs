@@ -120,11 +120,11 @@
   (testing "dimension formatting"
     (render-component
      [table-visualization {:measures [{:name "amount"}]
-                           :splits [{:name "__time" :granularity "P1D"}]
+                           :splits [{:name "__time" :granularity "P1D" :empty-value "No Value"}]
                            :results [{:__time "2017-08-28T10:00:00.000-03:00" :amount 100}
                                      {:__time nil :amount 200}]}])
     (is (= [["Aug 28, 2017" "100"]
-            ["Ø" "200"]]
+            ["No Value" "200"]]
            (texts ".pivot-table tbody tr" "td")))))
 
 (use-fixtures :each with-container)

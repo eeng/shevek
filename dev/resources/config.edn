@@ -32,7 +32,7 @@
                 {:name "cuit_cliente" :title "CUIT Cliente"}
                 {:name "provincia_cliente" :title "Provincia del Cliente"}
                 {:name "localidad_cliente" :title "Localidad del Cliente"}
-                {:name "promotores" :title "Promotor" :description "Promotores asociados a la zona del cliente (multivalor)" :multi-value true :hidden true}
+                {:name "promotor_bonificado" :empty-value "Sin Promotor Asignado"}
                 {:name "tipo_cuenta" :title "Tipo de Cuenta"}
                 {:name "punto_venta" :title "Punto de Venta"}
                 {:name "jurisdiccion" :title "Jurisdicción Percepción"}
@@ -159,5 +159,6 @@
                 {:name "isNew" :type "BOOL"}
                 {:name "regionIsoCode" :title "Region ISO Code"}
                 {:name "countryIsoCode" :title "Country ISO Code"}
+                {:name "countryName" :empty-value "Country Not Available"}
                 {:name "year" :column "__time" :extraction [{:type "timeFormat" :format "Y"}]}]
    :measures [{:name "count" :description "Character count"}]}]}

@@ -100,9 +100,9 @@
 (defn totals-result? [result dim]
   (not (contains? result (-> dim :name keyword))))
 
-(defn format-dim-value [value {:keys [granularity name type] :as dim}]
+(defn format-dim-value [value {:keys [granularity name type empty-value] :or {empty-value "Ø"} :as dim}]
   (cond
-    (nil? value) "Ø"
+    (nil? value) empty-value
     (time-dimension? dim) (format-time-according-to-period value granularity)
     (= "BOOL" type) (format-bool value)
     :else value))
