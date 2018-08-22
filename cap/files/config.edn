@@ -1,4 +1,5 @@
 {:env :production
+ :log {:timestamp false}
 
  :cubes
  [{:name "facturacion"

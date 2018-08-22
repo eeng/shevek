@@ -15,6 +15,6 @@
    :jwt-secret s/Str
    :datasources-discovery-interval s/Int
    :time-boundary-update-interval s/Int
-   :log {:level s/Keyword}
+   :log {:level s/Keyword :timestamp s/Bool :to s/Str}
    :notifications NotificationsConfig
    :cubes s/Any}) ; They will be validated on the repository

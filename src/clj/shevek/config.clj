@@ -11,8 +11,7 @@
 
 (defn config
   ([key]
-   (or (config key nil)
-       (throw (Exception. (str "Configuration error, property missing: " key)))))
+   (config key nil))
   ([key default-value]
    (get-in cfg (wrap-coll key) default-value)))
 

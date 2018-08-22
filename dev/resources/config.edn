@@ -1,7 +1,7 @@
 {:env :development
  :datasources-discovery-interval 600
  :time-boundary-update-interval 300
- :log {:level :debug}
+ :log {:level :debug :timestamp false}
 
  :cubes
  [{:name "facturacion"

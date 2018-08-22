@@ -14,8 +14,9 @@
 
  :time-boundary-update-interval 30
 
- ; Set to :debug to log queries sent to Druid
- :log {:level :info}
+ :log {:to "stdout"     ; Use a path to log to file
+       :level :info     ; Set to :debug to log queries sent to Druid
+       :timestamp true}
 
  ; For now it's used only to notify errors to the system admin
  :notifications

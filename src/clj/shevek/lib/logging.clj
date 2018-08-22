@@ -11,7 +11,7 @@
   [data]
   (let [{:keys [level ?err #_vargs msg_ ?ns-str ?file timestamp_ ?line]} data]
     (str
-     (when-not (env? :development)
+     (when (config [:log :timestamp])
        (str (force timestamp_) " "))
      (str/upper-case (first (name level)))  " "
      "[" (or ?ns-str ?file "?") ":" (or ?line "?") "] - "
@@ -21,11 +21,11 @@
 
 (defn configure-logging! []
   (log/merge-config!
-   (assoc-if (config :log)
+   (assoc-if {:level (config [:log :level])}
              :output-fn output-fn
              :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS" :timezone (TimeZone/getDefault)} ; By default msecs are missing and uses UTC
-             :appenders (when (env? :test)
-                          {:println {:enabled? false} :spit (appenders/spit-appender {:fname "log/test.log"})}))))
+             :appenders (when (not= "stdout" (config [:log :to]))
+                          {:println {:enabled? false} :spit (appenders/spit-appender {:fname (config [:log :to])})}))))
 
 (defn pp-str [& args]
   (with-out-str (apply clojure.pprint/pprint args)))
