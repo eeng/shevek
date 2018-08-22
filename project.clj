@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [; Backend
+  :dependencies [;; Backend
                  [org.clojure/clojure "1.8.0"]
                  [mount "0.1.12"]
                  [cprop "0.1.11"]
@@ -28,10 +28,11 @@
                  [hiccup "1.0.5"]
                  [optimus "0.20.1"]
 
-                 ; Frontend
+                 ;; Frontend
                  [org.clojure/clojurescript "1.10.238"]
                  [org.clojure/core.async "0.4.474"]
-                 [reagent "0.8.1"]
+                 [reagent "0.7.0" :exclusions [cljsjs/react]] ; Have to use 0.7 with the exclusion and react-with-addons otherwise the frontend unit test don't work because the latest reagent use a newer react with ES6 features, that aren't supported on phantom as of today
+                 [cljsjs/react-with-addons "15.6.1-0"]
                  [cljs-ajax "0.7.4"]
                  [secretary "1.2.3"]
                  [kibu/pushy "0.3.8"]
@@ -43,8 +44,8 @@
                  [cljsjs/chartjs "2.6.0-0"]
                  [org.slf4j/slf4j-nop "1.7.12"] ; To disable monger log messages
 
-                 ; Shared
-                 [funcool/cuerdas "2.0.3"]
+                 ;; Shared
+                 [funcool/cuerdas "2.0.5"]
                  [com.rpl/specter "1.0.4"]
                  [prismatic/schema "1.1.7"]
                  [metosin/schema-tools "0.9.1"]]
@@ -64,6 +65,7 @@
 
   :clean-targets ^{:protect false} ["resources/public/js/out" "resources/public/js/app.js"
                                     "resources/public/css/app.css" "resources/public/css/app.main.css.map"
+                                    "resources/private"
                                     :target-path]
 
   :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
@@ -90,11 +92,9 @@
                  :changes-only true
                  :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
 
-  :aliases {"build-frontend" ["with-profile" "prod" "do"
-                              ["cljsbuild" "once"]
-                              ["less4j" "once"]]
+  :aliases {"build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
             "package" ["do" "build-frontend" "uberjar"]
-            "ci" ["do" "build-frontend" ["test" ":all"]]}
+            "ci" ["do" "test" ["doo" "phantom" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
@@ -103,12 +103,17 @@
                                   [proto-repl "0.3.1"]
                                   [binaryage/devtools "0.9.10"]
                                   [cider/piggieback "0.3.8"] ; ClojureScript REPL on top of nREPL
-                                  ; testing
+                                  ;; Testing clj
                                   [etaoin "0.2.1"]
                                   [se.haleby/stub-http "0.2.1"]
-                                  [prismatic/schema-generators "0.1.0"]]
+                                  [prismatic/schema-generators "0.1.0"]
+                                  ;; Testing cljs
+                                  [pjstadig/humane-test-output "0.8.3"]
+                                  [cljsjs/jquery "3.2.1-0"]]
+                   :injections [(require 'pjstadig.humane-test-output) ; Would be nice to use ultra for test output coloring but lein-doo wouldn't work with it
+                                (pjstadig.humane-test-output/activate!)]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
-                             [venantius/ultra "0.5.2"]]
+                             [lein-doo "0.1.10"]]
                    :cljsbuild {:builds
                                {:dev
                                 {:figwheel true
@@ -118,7 +123,14 @@
                                             :output-to "resources/public/js/app.js"
                                             :asset-path "/js/out"
                                             :source-map-timestamp true
-                                            :preloads [devtools.preload]}}}}}
+                                            :preloads [devtools.preload]}}
+                                :test
+                                {:source-paths ["src/cljs" "test/cljs"]
+                                 :compiler {:output-to "resources/private/js/unit-test.js"
+                                            :main shevek.runner
+                                            :optimizations :whitespace
+                                            :verbose false
+                                            :pretty-print true}}}}}
              :prod {:cljsbuild {:builds
                                 {:prod
                                  {:source-paths ["src/cljs"]

@@ -1,7 +1,6 @@
 (ns shevek.lib.validation-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
-  (:require [pjstadig.humane-test-output]
-            [shevek.lib.validation :refer [validate pred required regex email confirmation]]))
+  (:require [shevek.lib.validation :refer [validate pred required regex email confirmation]]))
 
 (deftest validation-tests
   (testing "general rules"

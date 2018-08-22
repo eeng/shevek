@@ -1,7 +1,6 @@
 (ns shevek.viewer.visualizations.chart-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
-  (:require [pjstadig.humane-test-output]
-            [shevek.asserts :refer [submap? submaps?]]
+  (:require [shevek.asserts :refer [submap? submaps?]]
             [shevek.viewer.visualizations.chart :refer [build-chart-data]]))
 
 (deftest build-chart-data-tests

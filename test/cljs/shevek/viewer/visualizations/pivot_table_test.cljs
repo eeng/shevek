@@ -1,6 +1,5 @@
 (ns shevek.viewer.visualizations.pivot-table-test
   (:require [cljs.test :refer [deftest testing is use-fixtures]]
-            [pjstadig.humane-test-output]
             [shevek.support.reagent :refer [with-container render-component texts]]
             [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]))
 
