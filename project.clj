@@ -92,8 +92,10 @@
                  :changes-only true
                  :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
 
-  :aliases {"build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
-            "package" ["do" "build-frontend" "uberjar"]
+  :aliases {"frontend-testing" ["doo" "phantom" "test" "auto"]
+            "backend-testing" "test-refresh"
+            "build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
+            "package" ["do" ["clean"] "build-frontend" "uberjar"]
             "ci" ["do" "test" ["doo" "phantom" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
@@ -142,4 +144,5 @@
                                              :externs ["src/externs/jquery.js" "src/externs/semantic-ui.js" "src/externs/calendar.js"]}}}}
                     :less {:source-map false
                            :compression true}}
-             :uberjar {:aot :all}})
+             :uberjar {:aot :all
+                       :auto-clean false}})

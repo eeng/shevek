@@ -9,7 +9,7 @@ namespace :deploy do
   desc "Generates the jar file"
   task :package do
     on roles(:all) do |host|
-      execute "cd #{release_path} && lein package && ([ -d dist ] || mkdir dist) && cp target/uberjar/shevek.jar dist"
+      execute "cd #{release_path} && lein package && ([ -d dist ] || mkdir dist) && mv target/uberjar/shevek.jar dist"
     end
   end
   after :updated, :package
