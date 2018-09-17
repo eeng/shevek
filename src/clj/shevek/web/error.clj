@@ -10,10 +10,10 @@
       (handler req)
       (catch Exception e
         (log/error e)
-        (notify-error e {:request (dissoc req :user)})
+        (notify-error e {:request (dissoc req :user :optimus-assets)})
         (let [message (or (-> e root-cause ex-data :error) (.getMessage e))]
           {:status 500 :body message})))))
 
 (defn client-error [{:keys [params] :as req}]
-  (notify-error (merge params {:request (dissoc req :params :body-params)}))
+  (notify-error (merge params {:request (dissoc req :params :body-params :optimus-assets)}))
   {:status 200})
