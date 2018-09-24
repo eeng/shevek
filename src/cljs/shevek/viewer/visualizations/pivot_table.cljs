@@ -140,7 +140,10 @@
 (defn- table-headers [[dim & next-col-splits] results rows viz]
   (if dim
     (let [new-rows (col-split-headers dim next-col-splits results viz)
-          next-results (mapcat #(if (or (:grand-total? %) (empty? next-col-splits)) [%] (self-and-children %)) results)]
+          next-results (mapcat #(if (or (:grand-total? %) (empty? next-col-splits))
+                                  [%]
+                                  (self-and-children %))
+                               results)]
       (table-headers next-col-splits next-results (into rows new-rows) viz))
     (if (multiple-measures-layout? viz)
       (conj rows (measure-headers viz results))
@@ -151,5 +154,9 @@
         [row-splits col-splits] (partition-splits splits)
         viz (assoc viz :max-values max-values :row-splits row-splits :col-splits col-splits)]
     [:table.ui.very.basic.compact.table.pivot-table
-     (into [:thead] (table-headers col-splits (self-and-children (assoc (first results) :grand-total? true)) [] viz))
+     (into [:thead]
+           (table-headers col-splits
+                          (self-and-children (assoc (first results) :grand-total? true))
+                          []
+                          viz))
      [:tbody (doall (table-rows viz))]]))

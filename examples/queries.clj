@@ -104,15 +104,15 @@
                    {:name "isUnpatrolled" :limit 2 :on "columns"}]
           :measures ["count"]
           :filters [{:period "latest-day"}
-                    {:name "countryName" :operator "exclude" :value #{nil}}
-                    {:name "cityName" :operator "exclude" :value #{nil}}]
+                    {:name "countryName" :operator "exclude" :value [nil]}
+                    {:name "cityName" :operator "exclude" :value [nil]}]
           :totals true})
 
 ; Different child-cols values for different parents
 #_(query request
          {:cube "wikiticker"
           :filters [{:name "__time" :interval ["2015" "2016"]}
-                    {:name "countryName" :operator "include" :value #{"Italy" "United States" "Russia"}}]
+                    {:name "countryName" :operator "include" :value ["Italy" "United States" "Russia"]}]
           :splits [{:name "countryName" :on "rows"}
                    {:name "isUnpatrolled" :on "columns"}]
           :measures ["count"]
@@ -122,7 +122,7 @@
 #_(query request
          {:cube "wikiticker"
           :filters [{:period "latest-day"}
-                    {:name "year" :operator "include" :value #{"2015"}}]
+                    {:name "year" :operator "include" :value ["2015"]}]
           :measures ["count"]
           :totals true})
 
