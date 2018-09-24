@@ -27,7 +27,8 @@
              :updated-at "Última actualización"
              :saved "Reporte '{1}' guardado correctamente"
              :deleted "Reporte '{1}' eliminado correctamente"
-             :unauthorized "Oops! Este reporte ya no está disponible."}
+             :unauthorized "Oops! Este reporte ya no está disponible."
+             :export-as-xls "Exportar a XLS"}
    :viewer {:dimensions "Dimensiones"
             :measures "Métricas"
             :filters "Filtros"

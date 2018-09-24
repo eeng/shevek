@@ -1,10 +1,14 @@
 (ns shevek.menu.share
   (:require [reagent.core :as r]
+            [cljsjs.clipboard]
             [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.notification :refer [notify]]
-            [cljsjs.clipboard]))
+            [shevek.rpc :as rpc]))
+
+(defevh :viewer/export-as-xls [db]
+  (rpc/call "querying/export-as-xls" :args [(get-in db [:viewer :visualization])] :handler #(println "Listo")))
 
 (defn clipboard-button [button]
   (let [clipboard-atom (atom nil)
@@ -19,6 +23,9 @@
 
 (defn- popup-content []
   [:div.ui.relaxed.middle.aligned.selection.list
+   [:a.item {:on-click #(do (dispatch :viewer/export-as-xls) (close-popup))}
+    [:i.file.excel.outline.icon]
+    [:div.content (t :reports/export-as-xls)]]
    [clipboard-button
     [:a.item {:on-click #(do (notify (t :share/copied)) (close-popup))}
      [:i.copy.icon]

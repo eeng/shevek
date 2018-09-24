@@ -27,6 +27,7 @@
                  [ns-tracker "0.3.1"] ; For the reloader
                  [hiccup "1.0.5"]
                  [optimus "0.20.1"]
+                 [org.clojure/data.csv "0.1.4"]
 
                  ;; Frontend
                  [org.clojure/clojurescript "1.10.238"]

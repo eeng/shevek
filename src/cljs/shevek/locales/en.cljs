@@ -27,7 +27,8 @@
              :updated-at "Last updated"
              :saved "Report '{1}' saved!"
              :deleted "Report '{1}' deleted!"
-             :unauthorized "Oops! This report is no longer available."}
+             :unauthorized "Oops! This report is no longer available."
+             :export-as-xls "Export as XLS"}
    :viewer {:dimensions "Dimensions"
             :measures "Measures"
             :filters "Filters"
