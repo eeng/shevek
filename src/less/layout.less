@@ -1,8 +1,8 @@
 @background-color: #F7F7F7;
+@menu-height: 40px;
 
 body {
   background-color: @background-color;
-  overflow-y: hidden;
 }
 
 .preloader {
@@ -17,14 +17,7 @@ body {
 }
 
 .page {
-  overflow-x: hidden;
-  overflow-y: auto;
-  position: absolute;
-  top: 40px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding-bottom: 60px;
+  padding-top: @menu-height;
 
   > .ui.container {
     padding-top: 30px;

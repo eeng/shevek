@@ -2,12 +2,12 @@
 @panel-horizontal-padding: 14px;
 
 #viewer {
+  display: flex;
   position: absolute;
-  top: 0;
+  top: @menu-height;
   bottom: 0;
   left: 0;
   right: 0;
-  display: flex;
 
   @gutter: 10px;
 
@@ -135,7 +135,7 @@
       &.no-pinned {
         align-items: center;
         justify-content: center;
-        min-height: 250px;
+        min-height: 250px !important;
         padding: @panel-horizontal-padding;
         .icon-hint { margin-top: -1em }
       }
@@ -151,6 +151,10 @@
       }
       &.dimension { flex: 1; }
     }
+  }
+
+  .ui.segment.panel {
+    min-height: 0; // Without this Firefox would extend this panels beyond the window height
   }
 
   .ui.checkbox label { cursor: pointer; }
