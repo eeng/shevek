@@ -8,7 +8,8 @@
               [shevek.lib.validation-test]
               [shevek.schemas.conversion-test]
               [shevek.viewer.visualizations.chart-test]
-              [shevek.viewer.visualizations.pivot-table-test]))
+              [shevek.viewer.visualizations.pivot-table-test]
+              [shevek.domain.exporters.tsv-test]))
 
 (doo-tests 'shevek.admin.users.form-test
            'shevek.admin.users.list-test
@@ -17,4 +18,5 @@
            'shevek.lib.validation-test
            'shevek.schemas.conversion-test
            'shevek.viewer.visualizations.chart-test
-           'shevek.viewer.visualizations.pivot-table-test)
+           'shevek.viewer.visualizations.pivot-table-test
+           'shevek.domain.exporters.tsv-test)

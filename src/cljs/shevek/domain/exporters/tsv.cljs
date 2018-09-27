@@ -1,13 +1,11 @@
-(ns shevek.querying.exporters.tsv
-  (:require [clojure.data.csv :refer [write-csv]]
+(ns shevek.domain.exporters.tsv
+  (:require [testdouble.cljs.csv :refer [write-csv]]
             [clojure.string :as str]
             [shevek.lib.dw.dims :refer [partition-splits]]))
 
 (defn- write-excel-tsv [headers content]
-  (let [out (java.io.StringWriter.)
-        data (concat [headers] content)]
-    (write-csv out data :separator \tab :newline :cr+lf)
-    (.toString out)))
+  (let [data (concat [headers] content)]
+    (write-csv data :newline :cr+lf)))
 
 (defn- result-values [result dims-or-measures]
   (for [{:keys [name]} dims-or-measures]

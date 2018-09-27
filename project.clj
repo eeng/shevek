@@ -27,7 +27,6 @@
                  [ns-tracker "0.3.1"] ; For the reloader
                  [hiccup "1.0.5"]
                  [optimus "0.20.1"]
-                 [org.clojure/data.csv "0.1.4"]
 
                  ;; Frontend
                  [org.clojure/clojurescript "1.10.238"]
@@ -44,6 +43,8 @@
                  [cljsjs/clipboard "1.6.1-1"]
                  [cljsjs/chartjs "2.6.0-0"]
                  [org.slf4j/slf4j-nop "1.7.12"] ; To disable monger log messages
+                 [cljsjs/filesaverjs "1.3.3-0"]
+                 [testdouble/clojurescript.csv "0.3.0"]
 
                  ;; Shared
                  [funcool/cuerdas "2.0.5"]

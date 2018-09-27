@@ -1,14 +1,26 @@
 (ns shevek.menu.share
   (:require [reagent.core :as r]
             [cljsjs.clipboard]
+            [cljsjs.filesaverjs]
             [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.notification :refer [notify]]
-            [shevek.rpc :as rpc]))
+            [shevek.rpc :as rpc]
+            [testdouble.cljs.csv :as csv]))
+
+(defn download [filename content & [mime-type]]
+  (let [mime-type (or mime-type (str "text/plain;charset=" (.-characterSet js/document)))
+        blob (new js/Blob
+                  (clj->js [content])
+                  (clj->js {:type mime-type}))]
+    (js/saveAs blob filename)))
 
 (defevh :viewer/export-as-xls [db]
-  (rpc/call "querying/export-as-xls" :args [(get-in db [:viewer :visualization])] :handler #(println "Listo")))
+  (download "test.csv"
+            (csv/write-csv [[1 2 3] [4 5 7] ["ñoqui" "avión" ""]] :newline :cr+lf)
+            "text/csv; charset=utf-8")
+  db)
 
 (defn clipboard-button [button]
   (let [clipboard-atom (atom nil)

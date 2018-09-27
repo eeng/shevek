@@ -1,11 +1,10 @@
-(ns shevek.querying.exporters.tsv-test
-  (:require [clojure.test :refer :all]
-            [clojure.data.csv :refer [read-csv]]
-            [shevek.querying.exporters.tsv :as tsv]))
+(ns shevek.domain.exporters.tsv-test
+  (:require-macros [cljs.test :refer [deftest testing is are]])
+  (:require [testdouble.cljs.csv :refer [read-csv]]
+            [shevek.domain.exporters.tsv :as tsv]))
 
 (defn read-excel-tsv [tsv]
-  (let [in (java.io.StringReader. tsv)]
-    (read-csv in :separator \tab :newline :cr+lf)))
+  (read-csv tsv :newline :cr+lf))
 
 (defn generate-and-parse [viz]
   (read-excel-tsv (tsv/generate viz)))
