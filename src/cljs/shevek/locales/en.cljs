@@ -28,7 +28,7 @@
              :saved "Report '{1}' saved!"
              :deleted "Report '{1}' deleted!"
              :unauthorized "Oops! This report is no longer available."
-             :export-as-xls "Export as XLS"}
+             :export-as-csv "Export as CSV"}
    :viewer {:dimensions "Dimensions"
             :measures "Measures"
             :filters "Filters"
@@ -126,7 +126,8 @@
                   :minute "MMM d, h:mma"
                   :hour "MMM d, yyyy ha"
                   :day "MMM d, yyyy"
-                  :month "MMM yyyy"}
+                  :month "MMM yyyy"
+                  :file "yyMMdd_HHmm"}
    :calendar {:days ["S" "M" "T" "W" "T" "F" "S"]
               :months ["January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"]
               :monthsShort ["Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]

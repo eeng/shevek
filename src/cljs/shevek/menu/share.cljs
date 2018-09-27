@@ -6,8 +6,10 @@
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.notification :refer [notify]]
+            [shevek.lib.time.ext :refer [format-time]]
+            [shevek.lib.time :refer [now]]
             [shevek.rpc :as rpc]
-            [testdouble.cljs.csv :as csv]))
+            [shevek.domain.exporters.csv :as csv]))
 
 (defn download [filename content & [mime-type]]
   (let [mime-type (or mime-type (str "text/plain;charset=" (.-characterSet js/document)))
@@ -16,9 +18,9 @@
                   (clj->js {:type mime-type}))]
     (js/saveAs blob filename)))
 
-(defevh :viewer/export-as-xls [db]
-  (download "test.csv"
-            (csv/write-csv [[1 2 3] [4 5 7] ["ñoqui" "avión" ""]] :newline :cr+lf)
+(defevh :viewer/export-as-csv [db]
+  (download (str "report_" (format-time (now) :file))
+            (csv/generate (get-in db [:viewer :visualization]))
             "text/csv; charset=utf-8")
   db)
 
@@ -35,9 +37,9 @@
 
 (defn- popup-content []
   [:div.ui.relaxed.middle.aligned.selection.list
-   [:a.item {:on-click #(do (dispatch :viewer/export-as-xls) (close-popup))}
+   [:a.item {:on-click #(do (dispatch :viewer/export-as-csv) (close-popup))}
     [:i.file.excel.outline.icon]
-    [:div.content (t :reports/export-as-xls)]]
+    [:div.content (t :reports/export-as-csv)]]
    [clipboard-button
     [:a.item {:on-click #(do (notify (t :share/copied)) (close-popup))}
      [:i.copy.icon]

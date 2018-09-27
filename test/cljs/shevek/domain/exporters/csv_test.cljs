@@ -1,13 +1,13 @@
-(ns shevek.domain.exporters.tsv-test
+(ns shevek.domain.exporters.csv-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [testdouble.cljs.csv :refer [read-csv]]
-            [shevek.domain.exporters.tsv :as tsv]))
+            [shevek.domain.exporters.csv :as csv]))
 
-(defn read-excel-tsv [tsv]
-  (read-csv tsv :newline :cr+lf))
+(defn read-excel-csv [csv]
+  (read-csv csv :newline :cr+lf))
 
 (defn generate-and-parse [viz]
-  (read-excel-tsv (tsv/generate viz)))
+  (read-excel-csv (csv/generate viz)))
 
 (deftest generate-test
   (testing "totals only"

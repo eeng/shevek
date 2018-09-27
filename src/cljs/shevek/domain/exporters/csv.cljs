@@ -1,9 +1,9 @@
-(ns shevek.domain.exporters.tsv
+(ns shevek.domain.exporters.csv
   (:require [testdouble.cljs.csv :refer [write-csv]]
             [clojure.string :as str]
             [shevek.lib.dw.dims :refer [partition-splits]]))
 
-(defn- write-excel-tsv [headers content]
+(defn- write-excel-csv [headers content]
   (let [data (concat [headers] content)]
     (write-csv data :newline :cr+lf)))
 
@@ -33,6 +33,6 @@
 (defn generate [{:keys [splits results] :as viz}]
   (let [[row-splits col-splits] (partition-splits splits)
         viz (assoc viz :row-splits row-splits :col-splits col-splits)]
-    (write-excel-tsv
+    (write-excel-csv
      (build-headers viz)
      (mapcat (partial build-rows viz) results))))
