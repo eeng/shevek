@@ -18,7 +18,9 @@
   (apply translate (lang) args))
 
 (defn translation [& args]
-  (get-in translations (into [(lang)] args)))
+  (or (get-in translations (into [(lang)] args))
+      (when-not (= (lang) :en)
+        (get-in translations (into [:en] args)))))
 
 (defn translation! [& args]
   (or (apply translation args)

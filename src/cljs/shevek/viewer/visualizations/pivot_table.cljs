@@ -8,7 +8,8 @@
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.viewer.filter :refer [build-filter]]
             [shevek.lib.collections :refer [detect]]
-            [shevek.lib.dw.dims :refer [partition-splits]]))
+            [shevek.lib.dw.dims :refer [partition-splits]]
+            [shevek.domain.pivot-table :refer [multiple-measures-layout? flatten-result child-cols-and-self calculate-col-span]]))
 
 (defn- row-popup [dim result selected-path]
   [:div
@@ -31,15 +32,6 @@
     [:div.bg {:class (when (neg? measure-value) "neg")
               :style {:width width}}]))
 
-(defn- recursive-self-and-children [result grand-total [col-split & col-splits]]
-  (let [corresponding (fn [result coll]
-                        (or (detect #(= (dimension-value col-split %) (dimension-value col-split result)) coll)
-                            {(keyword (:name col-split)) (dimension-value col-split result)}))
-        completed-children (map #(corresponding % (:child-cols result)) (:child-cols grand-total))]
-    (concat (mapcat #(recursive-self-and-children % (corresponding % (:child-cols grand-total)) col-splits)
-                    completed-children)
-            [result])))
-
 (defn- table-row [result dim {:keys [measures max-values results col-splits]} value-result-path]
   (let [totals-row? (totals-result? result dim)
         simplified-path (map (fn [[{:keys [name]} value]] [(if totals-row? "grand-total" name) value]) value-result-path)
@@ -54,7 +46,7 @@
            :key row-key}
       [:td
        [:span {:class (str "depth-" depth)} (format-dimension dim result)]]]
-     (for [result (recursive-self-and-children result (first results) col-splits)
+     (for [result (flatten-result result (first results) col-splits)
            measure measures
            :let [measure-name (-> measure :name keyword)
                  value (measure-value measure result)]]
@@ -78,16 +70,6 @@
             (assoc max-values measure-name (->> results (map measure-name) (map Math/abs) (apply max))))
           {}
           (map (comp keyword :name) measures)))
-
-(defn- self-and-children [{:keys [child-cols] :as result}]
-  (concat child-cols [result]))
-
-(defn- calculate-col-span [{:keys [grand-total?] :as result} col-splits measures]
-  (if (or grand-total? (empty? col-splits))
-    (count measures)
-    (->> (self-and-children result)
-         (map #(calculate-col-span % (rest col-splits) measures))
-         (reduce +))))
 
 (defn- sortable-th [title sorting-mapping opts]
   (if (current-page? :viewer)
@@ -120,13 +102,9 @@
    (for [result results measure measures]
      [measure-header measure viz {:class "right aligned"}])))
 
-(defn- multiple-measures-layout? [{:keys [measures col-splits]}]
-  (or (> (count measures) 1) (empty? col-splits)))
-
-(defn- col-split-headers [dim next-col-splits results
-                          {:keys [measures col-splits row-splits] :as viz}]
-  (let [results (map #(assoc % :col-span (calculate-col-span % next-col-splits measures)) results)
-        full-col-span (->> results (map :col-span results) (reduce +))
+(defn- col-split-headers [dim results {:keys [measures col-splits row-splits] :as viz}]
+  (let [results (map #(assoc % :col-span (calculate-col-span % measures)) results)
+        full-col-span (->> results (map :col-span) (reduce +))
         dim-values (for [result results :let [col-span (:col-span result)]]
                     [:th.right.aligned.dim-value {:col-span (when-not (= 1 col-span) col-span)}
                      (format-dimension dim result)])]
@@ -139,11 +117,8 @@
 
 (defn- table-headers [[dim & next-col-splits] results rows viz]
   (if dim
-    (let [new-rows (col-split-headers dim next-col-splits results viz)
-          next-results (mapcat #(if (or (:grand-total? %) (empty? next-col-splits))
-                                  [%]
-                                  (self-and-children %))
-                               results)]
+    (let [new-rows (col-split-headers dim results viz)
+          next-results (mapcat child-cols-and-self results)]
       (table-headers next-col-splits next-results (into rows new-rows) viz))
     (if (multiple-measures-layout? viz)
       (conj rows (measure-headers viz results))
@@ -156,7 +131,7 @@
     [:table.ui.very.basic.compact.table.pivot-table
      (into [:thead]
            (table-headers col-splits
-                          (self-and-children (assoc (first results) :grand-total? true))
+                          (child-cols-and-self (assoc (first results) :grand-total? true))
                           []
                           viz))
      [:tbody (doall (table-rows viz))]]))

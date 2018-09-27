@@ -1,4 +1,5 @@
 (require '[shevek.querying.api :refer [query raw-query]] :reload)
+(def to-please-joker query)
 (def request {})
 
 ; Totals query
@@ -96,16 +97,14 @@
           :filters [{:period "latest-day"}]
           :totals true})
 
-; Two row splits, one column split and one measure
+; One row split, one column split and one measure
 #_(query request
          {:cube "wikiticker"
           :splits [{:name "countryName" :limit 2 :on "rows"}
-                   {:name "cityName" :limit 2 :on "rows"}
                    {:name "isUnpatrolled" :limit 2 :on "columns"}]
           :measures ["count"]
           :filters [{:period "latest-day"}
-                    {:name "countryName" :operator "exclude" :value [nil]}
-                    {:name "cityName" :operator "exclude" :value [nil]}]
+                    {:name "countryName" :operator "exclude" :value [nil]}]
           :totals true})
 
 ; Different child-cols values for different parents
@@ -116,6 +115,28 @@
           :splits [{:name "countryName" :on "rows"}
                    {:name "isUnpatrolled" :on "columns"}]
           :measures ["count"]
+          :totals true})
+
+; One row split, two column splits, and one measure
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "countryName" :limit 2 :on "rows"}
+                   {:name "isUnpatrolled" :limit 2 :on "columns"}
+                   {:name "isNew" :limit 2 :on "columns"}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}
+                    {:name "countryName" :operator "exclude" :value [nil]}]
+          :totals true})
+
+; Two row splits, one column split, and one measure
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "countryName" :limit 2 :on "rows"}
+                   {:name "isUnpatrolled" :limit 2 :on "rows"}
+                   {:name "isNew" :limit 2 :on "columns"}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}
+                    {:name "countryName" :operator "exclude" :value [nil]}]
           :totals true})
 
 ; Extraction functions
