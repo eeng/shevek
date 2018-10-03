@@ -107,6 +107,7 @@
                                   [proto-repl "0.3.1"]
                                   [binaryage/devtools "0.9.10"]
                                   [cider/piggieback "0.3.8"] ; ClojureScript REPL on top of nREPL
+                                  [figwheel-sidecar "0.5.16"] ; ClojureScript REPL on top of nREPL
                                   ;; Testing clj
                                   [etaoin "0.2.1"]
                                   [se.haleby/stub-http "0.2.1"]
@@ -117,7 +118,8 @@
                    :injections [(require 'pjstadig.humane-test-output) ; Would be nice to use ultra for test output coloring but lein-doo wouldn't work with it
                                 (pjstadig.humane-test-output/activate!)]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
-                             [lein-doo "0.1.10"]]
+                             [lein-doo "0.1.10"]
+                             [cider/cider-nrepl "0.18.0-SNAPSHOT"]] ; For Calva
                    :cljsbuild {:builds
                                {:dev
                                 {:figwheel true
