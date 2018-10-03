@@ -45,7 +45,7 @@
 
   (testing "one row dimension, one column dimension and two measures"
     (is (= [["" "Is New"]
-            ["" "No" "" "Yes" "" "Total" ""]
+            ["" "No" "" "Yes" "" "Grand Total" ""]
             ["Country" "Count" "Added" "Count" "Added" "Count" "Added"]
             ["Grand Total" "7" "77" "3" "33" "9" "99"]
             ["AR" "6" "66" "" "" "8" "88"]]

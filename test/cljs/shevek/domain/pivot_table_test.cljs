@@ -74,7 +74,7 @@
               [(empty-cell)
                (dimension-value-cell country r1)
                (dimension-value-cell country r2)
-               (dimension-value-cell country r)]]
+               (grand-total-cell)]]
              (head t)))
       (is (= [[(grand-total-cell)
                (measure-value-cell sales r1)
@@ -90,21 +90,24 @@
           r1 {:sales 5 :country "AR" :child-cols [r11 r12]}
           r2 {:sales 2 :country "CH" :child-cols [r21]}
           r {:sales 7 :child-cols [r1 r2]}
-          t (generate {:splits [country isNew] :measures [sales] :results [r]})]
-      (is (= [[(measure-cell sales)
-               (splits-cell [country isNew])]
-              [(empty-cell)
-               (dimension-value-cell country r1 :col-span 3)
-               (dimension-value-cell country r2 :col-span 2)
-               (dimension-value-cell country r)]
-              [(empty-cell)
-               (dimension-value-cell isNew r11)
-               (dimension-value-cell isNew r12)
-               (dimension-value-cell isNew r1)
-               (dimension-value-cell isNew r21)
-               (dimension-value-cell isNew r2)
-               (dimension-value-cell isNew r)]]
-             (head t)))
+          t (generate {:splits [country isNew] :measures [sales] :results [r]})
+          the-head (head t)]
+      (is (= [(measure-cell sales)
+              (splits-cell [country isNew])]
+             (nth the-head 0)))
+      (is (= [(empty-cell)
+              (dimension-value-cell country r1 :col-span 3)
+              (dimension-value-cell country r2 :col-span 2)
+              (empty-cell)]
+             (nth the-head 1)))
+      (is (= [(empty-cell)
+              (dimension-value-cell isNew r11)
+              (dimension-value-cell isNew r12)
+              (dimension-value-cell isNew r1)
+              (dimension-value-cell isNew r21)
+              (dimension-value-cell isNew r2)
+              (grand-total-cell)]
+             (nth the-head 2)))
       (is (= [[(grand-total-cell)
                (measure-value-cell sales r11)
                (measure-value-cell sales r12)
@@ -129,7 +132,7 @@
       (is (= [(empty-cell)
               (dimension-value-cell country r1 :col-span 6)
               (dimension-value-cell country r2 :col-span 4)
-              (dimension-value-cell country r :col-span 2)]
+              (empty-cell)]
              (nth the-head 1)))
       (is (= [(empty-cell)
               (dimension-value-cell isNew r11 :col-span 2)
@@ -137,7 +140,7 @@
               (dimension-value-cell isNew r1 :col-span 2)
               (dimension-value-cell isNew r21 :col-span 2)
               (dimension-value-cell isNew r2 :col-span 2)
-              (dimension-value-cell isNew r :col-span 2)]
+              (grand-total-cell isNew r :col-span 2)]
              (nth the-head 2)))
       (is (= [(empty-cell)
               (measure-cell sales) (measure-cell taxes)
@@ -174,7 +177,7 @@
               [(splits-cell [country, city])
                (dimension-value-cell isNew r01)
                (dimension-value-cell isNew r02)
-               (dimension-value-cell isNew r0)]]
+               (grand-total-cell isNew r0)]]
              (head t)))
       (is (= [(grand-total-cell)
               (measure-value-cell sales r01)

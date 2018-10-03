@@ -8,10 +8,9 @@
 (defrecord DimensionValueCell [value text col-span depth])
 (defrecord MeasureValueCell [value text])
 (defrecord EmptyCell [])
-(defrecord GrandTotalCell [])
+(defrecord GrandTotalCell [col-span])
 
 (def empty-cell ->EmptyCell)
-(def grand-total-cell ->GrandTotalCell)
 (def measure-cell ->MeasureCell)
 (def splits-cell ->SplitsCell)
 
@@ -20,6 +19,9 @@
 
 (defn dimension-value-cell [dim result & {:keys [col-span depth] :or {col-span 1 depth 0}}]
   (DimensionValueCell. (dimension-value dim result) (format-dimension dim result) col-span depth))
+
+(defn grand-total-cell [& {:keys [col-span] :or {col-span 1}}]
+  (GrandTotalCell. col-span))
 
 (defn multiple-measures-layout? [{:keys [measures col-splits]}]
   (or (> (count measures) 1) (empty? col-splits)))
@@ -51,9 +53,13 @@
           col-split-cell (splits-cell col-splits)]
       [[measure-cell col-split-cell]])))
 
-(defn- col-dim-value-cell [dim result measures]
+(defn- col-dim-value-cell [[col-split & other-col-splits] {:keys [grand-total?] :as result} measures]
   (let [col-span (calculate-col-span result measures)]
-    (dimension-value-cell dim result :col-span col-span)))
+    (if grand-total?
+      (if (seq other-col-splits)
+        (empty-cell)
+        (grand-total-cell :col-span col-span))
+      (dimension-value-cell col-split result :col-span col-span))))
 
 (defn- measures-cells [measures results]
   (->> (map measure-cell measures)
@@ -61,14 +67,14 @@
        (apply concat)))
 
 (defn- bottom-header-rows
-  [[col-split & col-splits] results rows {:keys [row-splits measures] :as viz}]
+  [[col-split & other-col-splits :as col-splits] results rows {:keys [row-splits measures] :as viz}]
   (if col-split
-    (let [first-cell (if (and (empty? col-splits) (seq row-splits) (not (multiple-measures-layout? viz)))
+    (let [first-cell (if (and (empty? other-col-splits) (seq row-splits) (not (multiple-measures-layout? viz)))
                        (splits-cell row-splits)
                        (empty-cell))
-          this-row (cons first-cell (map #(col-dim-value-cell col-split % measures) results))
+          this-row (cons first-cell (map #(col-dim-value-cell col-splits % measures) results))
           next-results (mapcat child-cols-and-self results)]
-      (bottom-header-rows col-splits next-results (conj rows this-row) viz))
+      (bottom-header-rows other-col-splits next-results (conj rows this-row) viz))
     (if (multiple-measures-layout? viz)
       (let [first-cell (if (empty? row-splits) (empty-cell) (splits-cell row-splits))]
         (conj rows (cons first-cell (measures-cells measures results))))

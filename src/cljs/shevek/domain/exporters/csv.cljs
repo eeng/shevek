@@ -21,9 +21,6 @@
   MeasureCell
   (text [cell] (-> cell :measure :title))
 
-  GrandTotalCell
-  (text [cell] (t :viewer/grand-total))
-
   MeasureValueCell
   (text [cell] (:text cell))
 
@@ -31,7 +28,11 @@
   (text [{:keys [text depth col-span]}]
     (let [indentation (apply str (repeat (* depth 5) " "))
           fill-cells (repeat (dec col-span) "")]
-      (cons (str indentation text) fill-cells))))
+      (cons (str indentation text) fill-cells)))
+
+  GrandTotalCell
+  (text [{:keys [col-span]}]
+    (text (DimensionValueCell. nil (t :viewer/grand-total) col-span 0))))
 
 (defn- texts [cell]
   (wrap-coll (text cell)))
