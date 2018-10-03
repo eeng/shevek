@@ -56,13 +56,12 @@
       (is (= [[(splits-cell [country, city]) (measure-cell sales)]]
              (head t)))
       (is (= [[(grand-total-cell) (measure-value-cell sales r0)]
-              [(dimension-value-cell country r1) (measure-value-cell sales r1)]
-              [(dimension-value-cell city r11) (measure-value-cell sales r11)]
-              [(dimension-value-cell city r12) (measure-value-cell sales r12)]
-              [(dimension-value-cell country r2) (measure-value-cell sales r2)]
-              [(dimension-value-cell city r21) (measure-value-cell sales r21)]]
-             (body t)))
-      (is (= [0 0 1 1 0 1] (->> t :body (map :depth))))))
+              [(dimension-value-cell country r1 :depth 0) (measure-value-cell sales r1)]
+              [(dimension-value-cell city r11 :depth 1) (measure-value-cell sales r11)]
+              [(dimension-value-cell city r12 :depth 1) (measure-value-cell sales r12)]
+              [(dimension-value-cell country r2 :depth 0) (measure-value-cell sales r2)]
+              [(dimension-value-cell city r21 :depth 1) (measure-value-cell sales r21)]]
+             (body t)))))
 
   (testing "one column dimension and one measure"
     (let [country (assoc country :on "columns")
@@ -187,12 +186,12 @@
               (measure-value-cell sales r1c2)
               (measure-value-cell sales r1)]
              (nth the-body 1)))
-      (is (= [(dimension-value-cell city r1r1)
+      (is (= [(dimension-value-cell city r1r1 :depth 1)
               (measure-value-cell sales {:city "cba"})
               (measure-value-cell sales r1r1c2)
               (measure-value-cell sales r1r1)]
              (nth the-body 2)))
-      (is (= [(dimension-value-cell city r1r2)
+      (is (= [(dimension-value-cell city r1r2 :depth 1)
               (measure-value-cell sales r1r2c1)
               (measure-value-cell sales {:city "sfe"})
               (measure-value-cell sales r1r2)]

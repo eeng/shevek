@@ -46,7 +46,8 @@
             :split-required "At least one split is required for the {1} visualization"
             :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"
             :unauthorized "It seems that the {1} cube is no longer available. Please contact the administrator."
-            :toggle-fullscreen "Toggle Fullscreen"}
+            :toggle-fullscreen "Toggle Fullscreen"
+            :grand-total "Grand Total"}
    :viewer.period {:relative "Relative"
                    :specific "Specific"
                    :latest "Latest"
