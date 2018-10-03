@@ -3,7 +3,6 @@
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.navigation :refer [current-page? current-page]]
-            [shevek.rpc :refer [loading?]]
             [shevek.components.popup :refer [popup tooltip]]
             [shevek.components.modal :refer [modal]]
             [shevek.lib.auth :refer [logged-in? admin?]]

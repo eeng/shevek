@@ -3,7 +3,6 @@
             [ring.middleware.format :refer [wrap-restful-format]]
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources not-found]]
-            [clojure.java.io :as io]
             [shevek.web.logging :refer [wrap-request-logging]]
             [shevek.web.error :refer [wrap-server-error client-error]]
             [shevek.web.pages :as pages]

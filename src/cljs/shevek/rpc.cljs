@@ -2,7 +2,6 @@
   (:require [ajax.core :refer [POST]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
-            [shevek.i18n :refer [t]]
             [shevek.lib.local-storage :as local-storage]))
 
 (defn loading?
@@ -34,5 +33,5 @@
   (call fid :args args :handler #(dispatch :data-arrived db-key % handler))
   (loading db db-key))
 
-(defn- loading-class [loading-key]
+(defn loading-class [loading-key]
   {:class (when (loading? loading-key) "loading")})
