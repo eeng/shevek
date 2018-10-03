@@ -81,6 +81,7 @@
                                      {:count 3, :added 33 :isNew "Yes"}]}
                        {:count 8, :added 88 :country "AR"
                         :child-cols [{:count 6, :added 66 :isNew "No"}]}]}))))
+  
   (testing "two column dimensions and one measure"
     (is (= [["Count" "Country, Is New"]
             ["" "AR" "" "" "CH" "" "Total"]
