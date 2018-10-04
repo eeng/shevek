@@ -3,73 +3,13 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.navigation :refer [current-page?]]
-            [shevek.rpc :as rpc]
-            [shevek.viewer.shared :refer [panel-header format-measure format-dimension totals-result? dimension-value measure-value]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
-            [shevek.viewer.filter :refer [build-filter]]
-            [shevek.lib.collections :refer [detect]]
-            [shevek.lib.dw.dims :refer [partition-splits]]
-            [shevek.domain.pivot-table :as pivot-table :refer [multiple-measures-layout? flatten-result child-cols-and-self calculate-col-span]]))
+            [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]))
 
-(defn- row-popup [dim result selected-path]
-  [:div
-   [:div.dimension-value (format-dimension dim result)]
-   [:div.buttons
-    [:button.ui.primary.compact.button
-     {:on-click #(dispatch :pivot-table-row-filtered selected-path "include")}
-     (t :actions/select)]
-    [:button.ui.compact.button
-     {:on-click #(dispatch :pivot-table-row-filtered selected-path "exclude")}
-     (t :viewer.operator/exclude)]
-    [:button.ui.compact.button
-     {:on-click #(do (close-popup) (dispatch :viewer/raw-data-requested selected-path))}
-     (t :raw-data/button)]
-    [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]])
-
-(defn- proportion-bg [measure-value max-value]
-  (let [rate (if (zero? max-value) 0 (/ measure-value max-value))
-        width (str (* (Math/abs rate) 100) "%")]
-    [:div.bg {:class (when (neg? measure-value) "neg")
+(defn- proportion-bg [value proportion]
+  (let [width (str proportion "%")]
+    [:div.bg {:class (when (neg? value) "neg")
               :style {:width width}}]))
-
-(defn- table-row [result dim {:keys [measures max-values results col-splits]} value-result-path]
-  (let [totals-row? (totals-result? result dim)
-        simplified-path (map (fn [[{:keys [name]} value]] [(if totals-row? "grand-total" name) value]) value-result-path)
-        row-key (hash simplified-path)
-        depth (dec (count value-result-path))]
-    (into
-     [:tr {:on-click #(when (and (not totals-row?) (current-page? :viewer))
-                        (show-popup % ^{:key (hash result)} [row-popup dim result value-result-path]
-                                    {:position "top center" :distanceAway 135 :setFluidWidth true
-                                     :class "pivot-table-popup" :id row-key}))
-           :class (if totals-row? "grand-total" (when (popup-opened? row-key) "active"))
-           :key row-key}
-      [:td
-       [:span {:class (str "depth-" depth)} (format-dimension dim result)]]]
-     (for [result (flatten-result result (first results) col-splits)
-           measure measures
-           :let [measure-name (-> measure :name keyword)
-                 value (measure-value measure result)]]
-       [:td.right.aligned
-        (when-not totals-row? [proportion-bg value (max-values measure-name)])
-        [:span {:title value} (format-measure measure result)]]))))
-
-(defn- table-rows
-  ([{:keys [results row-splits] :as viz}]
-   (table-rows results row-splits viz []))
-  ([results [dim & row-splits] viz value-result-path]
-   (mapcat (fn [result]
-             (let [new-path (conj value-result-path [dim (dimension-value dim result)])
-                   parent-row (table-row result dim viz new-path)
-                   child-rows (table-rows (:child-rows result) row-splits viz new-path)]
-               (into [parent-row] child-rows)))
-           results)))
-
-(defn- calculate-max-values [measures [_ & results]]
-  (reduce (fn [max-values measure-name]
-            (assoc max-values measure-name (->> results (map measure-name) (map Math/abs) (apply max))))
-          {}
-          (map (comp keyword :name) measures)))
 
 (defn- sortable-th [title sorting-mapping opts]
   (if (current-page? :viewer)
@@ -87,51 +27,72 @@
        (when icon-after? [:span title])])
     [:th opts title]))
 
-(defn- row-splits-header [{:keys [row-splits]}]
-  [sortable-th (->> row-splits (map :title) (str/join ", ")) (zipmap row-splits row-splits)])
+(defprotocol ReagentCell
+  (as-component [this]))
 
-(defn- col-split-header [{:keys [title] :as dim} opts]
-  [sortable-th title {dim dim} opts])
+(extend-protocol ReagentCell
+  EmptyCell
+  (as-component [cell]
+    [:th])
 
-(defn- measure-header [{:keys [title] :as measure} {:keys [splits]} opts]
-  [sortable-th title (zipmap splits (repeat measure)) opts])
+  SplitsCell
+  (as-component [{:keys [dimensions in-columns col-span]}]
+    [sortable-th
+     (->> dimensions (map :title) (str/join ", "))
+     (zipmap dimensions dimensions)
+     {:class (when in-columns "right aligned") :col-span (when (> col-span 1) col-span)}])
 
-(defn- measure-headers [{:keys [measures] :as viz} results]
-  (into
-   [:tr [row-splits-header viz]]
-   (for [result results measure measures]
-     [measure-header measure viz {:class "right aligned"}])))
+  MeasureCell
+  (as-component [{:keys [measure splits top-left-corner]}]
+    [sortable-th
+     (:title measure)
+     (zipmap splits (repeat measure))
+     (when-not top-left-corner {:class "right aligned"})])
 
-(defn- col-split-headers [dim results {:keys [measures col-splits row-splits] :as viz}]
-  (let [results (map #(assoc % :col-span (calculate-col-span % measures)) results)
-        full-col-span (->> results (map :col-span) (reduce +))
-        dim-values (for [result results :let [col-span (:col-span result)]]
-                    [:th.right.aligned.dim-value {:col-span (when-not (= 1 col-span) col-span)}
-                     (format-dimension dim result)])]
-    (if (multiple-measures-layout? viz)
-      [(into [:tr [col-split-header dim]] dim-values)]
-      [[:tr
-        (if (= dim (first col-splits)) [measure-header (first measures) viz] [:th])
-        [col-split-header dim {:col-span full-col-span :class "right aligned"}]]
-       (into [:tr (if (= dim (last col-splits)) [row-splits-header viz] [:th])] dim-values)])))
+  DimensionValueCell
+  (as-component [{:keys [text depth in-columns col-span]}]
+    [(if in-columns :th.dim-value :td.dim-value)
+     {:class (when in-columns "right aligned") :col-span (when (> col-span 1) col-span)}
+     [:span {:class (str "depth-" depth)} text]])
 
-(defn- table-headers [[dim & next-col-splits] results rows viz]
-  (if dim
-    (let [new-rows (col-split-headers dim results viz)
-          next-results (mapcat child-cols-and-self results)]
-      (table-headers next-col-splits next-results (into rows new-rows) viz))
-    (if (multiple-measures-layout? viz)
-      (conj rows (measure-headers viz results))
-      rows)))
+  MeasureValueCell
+  (as-component [{:keys [value text proportion]}]
+    [:td.right.aligned
+     [proportion-bg value proportion]
+     [:span text]]))
 
-(defn table-visualization [{:keys [measures splits results] :as viz}]
-  (let [max-values (calculate-max-values measures results)
-        [row-splits col-splits] (partition-splits splits)
-        viz (assoc viz :max-values max-values :row-splits row-splits :col-splits col-splits)]
+(defn- row-popup [slice]
+  (let [simplified-slice (map (juxt :dimension :value) slice)]
+    [:div
+     [:div.dimension-value (str/join ", " (map :text slice))]
+     [:div.buttons
+      [:button.ui.primary.compact.button
+       {:on-click #(dispatch :pivot-table-row-filtered simplified-slice "include")}
+       (t :actions/select)]
+      [:button.ui.compact.button
+       {:on-click #(dispatch :pivot-table-row-filtered simplified-slice "exclude")}
+       (t :viewer.operator/exclude)]
+      [:button.ui.compact.button
+       {:on-click #(do (close-popup) (dispatch :viewer/raw-data-requested simplified-slice))}
+       (t :raw-data/button)]
+      [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))
+
+(defn- body-row [{:keys [cells slice grand-total?]}]
+  (let [row-key (hash slice)]
+    (into
+     [:tr {:key row-key
+           :class (if grand-total? "grand-total" (when (popup-opened? row-key) "active"))
+           :on-click (when (and (not grand-total?) (current-page? :viewer))
+                       #(show-popup % ^{:key row-key} [row-popup slice]
+                                    {:position "top center" :distanceAway 135 :setFluidWidth true
+                                     :class "pivot-table-popup" :id row-key}))}]
+     (map as-component cells))))
+
+(defn- head-row [row]
+  (into [:tr] (map as-component row)))
+
+(defn table-visualization [viz]
+  (let [{:keys [head body]} (pivot-table/generate viz)]
     [:table.ui.very.basic.compact.table.pivot-table
-     (into [:thead]
-           (table-headers col-splits
-                          (child-cols-and-self (assoc (first results) :grand-total? true))
-                          []
-                          viz))
-     [:tbody (doall (table-rows viz))]]))
+     (into [:thead] (map head-row head))
+     (into [:tbody] (map body-row body))]))

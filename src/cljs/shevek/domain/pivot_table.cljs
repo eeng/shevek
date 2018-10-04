@@ -1,32 +1,52 @@
 (ns shevek.domain.pivot-table
   (:require [shevek.lib.collections :refer [detect]]
             [shevek.viewer.shared :refer [dimension-value measure-value format-measure format-dimension]]
-            [shevek.lib.dw.dims :refer [partition-splits]]))
+            [shevek.lib.dw.dims :refer [partition-splits]]
+            [shevek.i18n :refer [t]]))
 
-(defrecord SplitsCell [dimensions])
-(defrecord MeasureCell [measure])
-(defrecord DimensionValueCell [value text col-span depth])
+(defrecord SplitsCell [dimensions in-columns col-span])
+(defrecord MeasureCell [measure splits top-left-corner])
+(defrecord DimensionValueCell [value text col-span depth in-columns dimension])
 (defrecord MeasureValueCell [value text proportion])
 (defrecord EmptyCell [])
-(defrecord GrandTotalCell [col-span])
 
-(def empty-cell ->EmptyCell)
-(def measure-cell ->MeasureCell)
-(def splits-cell ->SplitsCell)
+; Constructors
+
+(defn splits-cell [dimensions & {:keys [in-columns col-span] :or {in-columns false col-span 1}}]
+  (SplitsCell. dimensions in-columns col-span))
+
+(defn measure-cell [measure & {:keys [splits top-left-corner]}]
+  (MeasureCell. measure (or splits []) (or top-left-corner false)))
 
 (defn measure-value-cell [measure result & {:keys [max-value] :or {max-value 0}}]
   (let [value (measure-value measure result)
         rate (if (zero? max-value) 0 (/ value max-value))
-        proportion (* (Math/abs rate) 100)]
+        proportion (* (Math/abs rate) 100)
+        proportion (if (> proportion 100) 0 proportion)] ; if is the grand total row we don't show this data
     (MeasureValueCell. value
                        (or (format-measure measure result) "")
                        proportion)))
 
-(defn dimension-value-cell [dim result & {:keys [col-span depth] :or {col-span 1 depth 0}}]
-  (DimensionValueCell. (dimension-value dim result) (format-dimension dim result) col-span depth))
+(defn dimension-value-cell
+  [dim result & {:keys [col-span depth in-columns] :or {col-span 1 depth 0 in-columns false}}]
+  (DimensionValueCell. (dimension-value dim result)
+                       (format-dimension dim result)
+                       col-span
+                       depth
+                       in-columns
+                       dim)) ; Needed for the slice used in the rows popup
 
-(defn grand-total-cell [& {:keys [col-span] :or {col-span 1}}]
-  (GrandTotalCell. col-span))
+(defn grand-total-cell [& {:keys [col-span in-columns] :or {col-span 1 in-columns false}}]
+  (DimensionValueCell. nil
+                       (t :viewer/grand-total)
+                       col-span
+                       0
+                       in-columns
+                       nil))
+
+(def empty-cell ->EmptyCell)
+
+; Generation logic
 
 (defn multiple-measures-layout? [{:keys [measures col-splits]}]
   (or (> (count measures) 1) (empty? col-splits)))
@@ -50,12 +70,13 @@
          (reduce +))
     (count measures)))
 
-(defn- top-header-rows [{:keys [col-splits measures] :as viz}]
+(defn- top-header-rows [{:keys [col-splits measures splits results] :as viz}]
   (when (seq col-splits)
     (let [measure-cell (if (multiple-measures-layout? viz)
                          (empty-cell)
-                         (measure-cell (first measures)))
-          col-split-cell (splits-cell col-splits)]
+                         (measure-cell (first measures) :splits splits :top-left-corner true))
+          col-span (calculate-col-span (first results) measures)
+          col-split-cell (splits-cell col-splits :in-columns true :col-span col-span)]
       [[measure-cell col-split-cell]])))
 
 (defn- col-dim-value-cell [[col-split & other-col-splits] {:keys [grand-total?] :as result} measures]
@@ -63,16 +84,16 @@
     (if grand-total?
       (if (seq other-col-splits)
         (empty-cell)
-        (grand-total-cell :col-span col-span))
-      (dimension-value-cell col-split result :col-span col-span))))
+        (grand-total-cell :col-span col-span :in-columns true))
+      (dimension-value-cell col-split result :col-span col-span :in-columns true))))
 
-(defn- measures-cells [measures results]
-  (->> (map measure-cell measures)
+(defn- measures-cells [measures results splits]
+  (->> (map #(measure-cell % :splits splits) measures)
        (repeat (count results))
        (apply concat)))
 
 (defn- bottom-header-rows
-  [[col-split & other-col-splits :as col-splits] results rows {:keys [row-splits measures] :as viz}]
+  [[col-split & other-col-splits :as col-splits] results rows {:keys [row-splits measures splits] :as viz}]
   (if col-split
     (let [first-cell (if (and (empty? other-col-splits) (seq row-splits) (not (multiple-measures-layout? viz)))
                        (splits-cell row-splits)
@@ -82,7 +103,7 @@
       (bottom-header-rows other-col-splits next-results (conj rows this-row) viz))
     (if (multiple-measures-layout? viz)
       (let [first-cell (if (empty? row-splits) (empty-cell) (splits-cell row-splits))]
-        (conj rows (cons first-cell (measures-cells measures results))))
+        (conj rows (cons first-cell (measures-cells measures results splits))))
       rows)))
 
 (defn- measure-values-cells [result {:keys [results col-splits measures max-values]}]
@@ -90,19 +111,19 @@
         measure measures]
     (measure-value-cell measure result :max-value (-> measure :name keyword max-values))))
 
-(defn- result-row [{:keys [grand-total?] :as result} row-split viz slice]
+(defn- result-row [{:keys [grand-total?] :as result} row-split viz slice-so-far]
   (let [first-cell (if grand-total?
                      (grand-total-cell)
-                     (dimension-value-cell row-split result :depth (dec (count slice))))]
+                     (dimension-value-cell row-split result :depth (count slice-so-far)))]
     {:cells (cons first-cell (measure-values-cells result viz))
-     :slice slice}))
+     :slice (conj slice-so-far first-cell)
+     :grand-total? grand-total?}))
 
 (defn- results-rows
   [{:keys [child-rows] :as result} viz [row-split & row-splits] slice-so-far]
   (when result
-    (let [slice (conj slice-so-far [row-split (dimension-value row-split result)])
-          this-row (result-row result row-split viz slice)
-          next-rows (mapcat #(results-rows % viz row-splits slice) child-rows)]
+    (let [this-row (result-row result row-split viz slice-so-far)
+          next-rows (mapcat #(results-rows % viz row-splits (:slice this-row)) child-rows)]
       (cons this-row next-rows))))
 
 (defn- calculate-max-values [measures [_ & results]]

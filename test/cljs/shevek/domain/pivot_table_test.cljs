@@ -9,13 +9,18 @@
 (def city {:name "city" :title "City"})
 (def isNew {:name "isNew" :title "Is New" :type "BOOL"})
 
-(def head :head)
-
 (defn only-important-fields
   "Allows to write simpler tests without non-essential fields"
-  [{:keys [proportion] :as cell}]
+  [{:keys [proportion splits top-left-corner in-columns] :as cell}]
   (cond-> cell
-          proportion (assoc :proportion 0)))
+          proportion (assoc :proportion 0)
+          splits (assoc :splits [])
+          top-left-corner (assoc :top-left-corner false)
+          in-columns (assoc :in-columns false)))
+
+(defn head [pivot-table]
+  (->> (:head pivot-table)
+       (transform [ALL ALL] only-important-fields)))
 
 (defn body [pivot-table]
   (->> pivot-table
@@ -79,7 +84,7 @@
           r {:sales 7 :child-cols [r1 r2]}
           t (generate {:splits [country] :measures [sales] :results [r]})]
       (is (= [[(measure-cell sales)
-               (splits-cell [country])]
+               (splits-cell [country] :col-span 3)]
               [(empty-cell)
                (dimension-value-cell country r1)
                (dimension-value-cell country r2)
@@ -102,7 +107,7 @@
           t (generate {:splits [country isNew] :measures [sales] :results [r]})
           the-head (head t)]
       (is (= [(measure-cell sales)
-              (splits-cell [country isNew])]
+              (splits-cell [country isNew] :col-span 6)]
              (nth the-head 0)))
       (is (= [(empty-cell)
               (dimension-value-cell country r1 :col-span 3)
@@ -136,7 +141,7 @@
           r {:sales 7 :taxes 77 :child-cols [r1 r2]}
           t (generate {:splits [country isNew] :measures [sales taxes] :results [r]})
           the-head (head t)]
-      (is (= [(empty-cell) (splits-cell [country isNew])]
+      (is (= [(empty-cell) (splits-cell [country isNew] :col-span 12)]
              (nth the-head 0)))
       (is (= [(empty-cell)
               (dimension-value-cell country r1 :col-span 6)
@@ -182,8 +187,8 @@
               :child-rows [r1r1 r1r2]}
           t (generate {:splits [country city isNew] :measures [sales] :results [r0 r1]})
           the-body (body t)]
-      (is (= [[(measure-cell sales) (splits-cell [isNew])]
-              [(splits-cell [country, city])
+      (is (= [[(measure-cell sales) (splits-cell [isNew] :col-span 3)]
+              [(splits-cell [country, city] :col-span 1)
                (dimension-value-cell isNew r01)
                (dimension-value-cell isNew r02)
                (grand-total-cell isNew r0)]]

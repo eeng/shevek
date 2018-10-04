@@ -88,12 +88,12 @@
       (-> (update-in db [:viewer :filters] add-dimension (assoc dim :value #{toggled-value}))
           (send-queries dim)))))
 
-(defn selected-path->filters [selected-path operator]
-  (map #(build-filter (first %) {:operator operator :value #{(second %)}}) selected-path))
+(defn slice->filters [slice operator]
+  (map #(build-filter (first %) {:operator operator :value #{(second %)}}) slice))
 
-(defevhi :pivot-table-row-filtered [db selected-path operator]
+(defevhi :pivot-table-row-filtered [db slice operator]
   {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :filters] merge-dimensions (selected-path->filters selected-path operator))
+  (-> (update-in db [:viewer :filters] merge-dimensions (slice->filters slice operator))
       (send-queries nil)))
 
 (def available-relative-periods
