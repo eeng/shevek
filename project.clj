@@ -48,7 +48,7 @@
 
                  ;; Shared
                  [funcool/cuerdas "2.0.5"]
-                 [com.rpl/specter "1.0.4"]
+                 [com.rpl/specter "1.1.1"]
                  [prismatic/schema "1.1.7"]
                  [metosin/schema-tools "0.9.1"]]
 

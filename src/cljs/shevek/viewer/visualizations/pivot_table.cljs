@@ -9,7 +9,7 @@
             [shevek.viewer.filter :refer [build-filter]]
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.dw.dims :refer [partition-splits]]
-            [shevek.domain.pivot-table :refer [multiple-measures-layout? flatten-result child-cols-and-self calculate-col-span]]))
+            [shevek.domain.pivot-table :as pivot-table :refer [multiple-measures-layout? flatten-result child-cols-and-self calculate-col-span]]))
 
 (defn- row-popup [dim result selected-path]
   [:div

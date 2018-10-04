@@ -1,6 +1,7 @@
 (ns shevek.domain.pivot-table-test
   (:require [cljs.test :refer-macros [deftest testing is use-fixtures]]
-            [shevek.domain.pivot-table :refer [generate empty-cell measure-cell grand-total-cell measure-value-cell dimension-value-cell splits-cell]]))
+            [shevek.domain.pivot-table :refer [generate empty-cell measure-cell grand-total-cell measure-value-cell dimension-value-cell splits-cell]]
+            [com.rpl.specter :refer [transform ALL select]]))
 
 (def sales {:name "sales" :title "Sales"})
 (def taxes {:name "taxes" :title "Taxes"})
@@ -10,8 +11,16 @@
 
 (def head :head)
 
+(defn only-important-fields
+  "Allows to write simpler tests without non-essential fields"
+  [{:keys [proportion] :as cell}]
+  (cond-> cell
+          proportion (assoc :proportion 0)))
+
 (defn body [pivot-table]
-  (->> pivot-table :body (map :cells)))
+  (->> pivot-table
+       (select [:body ALL :cells])
+       (transform [ALL ALL] only-important-fields)))
 
 (deftest pivot-table-test
   (testing "totals only"
