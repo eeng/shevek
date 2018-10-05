@@ -5,7 +5,7 @@
             [shevek.navigation :refer [current-page?]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.viewer.shared :refer [current-cube-name]]
-            [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]))
+            [shevek.domain.cubes :refer [fetch-cubes cubes-list]]))
 
 (defn- popup-content []
   (let [cubes (cubes-list)

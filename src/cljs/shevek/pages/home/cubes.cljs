@@ -6,7 +6,7 @@
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
-            [shevek.lib.dw.cubes :refer [fetch-cubes cubes-list]]
+            [shevek.domain.cubes :refer [fetch-cubes cubes-list]]
             [shevek.lib.time.ext :refer [format-time]]
             [shevek.components.form :refer [search-input filter-matching by]]
             [shevek.components.popup :refer [tooltip]]))

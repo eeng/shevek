@@ -1,4 +1,4 @@
-(ns shevek.lib.dw.cubes
+(ns shevek.domain.cubes
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]))

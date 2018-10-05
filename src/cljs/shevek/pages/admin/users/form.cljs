@@ -8,7 +8,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.util :refer [new-record?]]
             [shevek.lib.collections :refer [find-by]]
-            [shevek.lib.dw.cubes :refer [cubes-list]]
+            [shevek.domain.cubes :refer [cubes-list]]
             [shevek.pages.admin.users.permissions :refer [user-permissions]]
             [shevek.schemas.conversion :refer [unparse-filters report-dims->viewer]]
             [shevek.schemas.user :refer [CubePermissions]]
