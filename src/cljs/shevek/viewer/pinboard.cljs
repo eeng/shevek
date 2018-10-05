@@ -13,6 +13,7 @@
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.viewer.filter :refer [filter-operators]]
             [shevek.viewer.shared :refer [current-cube panel-header viewer format-measure format-dimension search-button highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries]]
+            [shevek.domain.dw :refer [format-measure format-dimension dimension-value]]
             [shevek.viewer.url :refer [store-viewer-in-url]]))
 
 (defn init-pinned-dim [dim viewer]

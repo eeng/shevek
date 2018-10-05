@@ -1,6 +1,6 @@
 (ns shevek.domain.pivot-table
   (:require [shevek.lib.collections :refer [detect]]
-            [shevek.viewer.shared :refer [dimension-value measure-value format-measure format-dimension]]
+            [shevek.domain.dw :refer [dimension-value measure-value format-measure format-dimension]]
             [shevek.lib.dw.dims :refer [partition-splits]]
             [shevek.i18n :refer [t]]))
 

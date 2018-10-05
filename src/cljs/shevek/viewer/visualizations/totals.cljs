@@ -1,5 +1,5 @@
 (ns shevek.viewer.visualizations.totals
-  (:require [shevek.viewer.shared :refer [format-measure measure-value]]))
+  (:require [shevek.domain.dw :refer [format-measure measure-value]]))
 
 (defn totals-visualization [{:keys [results measures]}]
   (let [grand-total (first results)]

@@ -1,6 +1,6 @@
-(ns shevek.lib.dw.dims-test
+(ns shevek.domain.dimension-test
   (:require-macros [cljs.test :refer [deftest testing is]])
-  (:require [shevek.lib.dw.dims :refer [replace-dimension merge-dimensions]]))
+  (:require [shevek.domain.dimension :refer [replace-dimension merge-dimensions]]))
 
 (deftest replace-dimension-test
   (testing "changing a dimension's fields"

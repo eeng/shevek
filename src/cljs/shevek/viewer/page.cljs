@@ -4,7 +4,7 @@
             [shevek.rpc :as rpc]
             [shevek.navigation :refer [current-page? navigate]]
             [shevek.lib.time :refer [parse-time]]
-            [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name cube-authorized?]]
+            [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
             [shevek.viewer.filter :refer [filter-panel]]
@@ -22,9 +22,12 @@
 
 (defn- init-viewer [cube current-viewer current-report]
   (cond
-    (already-build? current-viewer) current-viewer ; Should only happen on dev when boot-reload refresh the page. Without it the viewer would be recreated everytime difficulting development
+    (already-build? current-viewer) current-viewer ; Should only happen on dev when the page is autorefreshed. Without it the viewer would be recreated everytime difficulting development
     current-report (report->viewer current-report cube)
     :else (build-new-viewer cube)))
+
+(defn- cube-authorized? [{:keys [measures]}]
+  (seq measures))
 
 (defn cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
   (if (cube-authorized? cube)

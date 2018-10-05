@@ -1,7 +1,7 @@
 (ns shevek.viewer.visualizations.chart
   (:require [cljsjs.chartjs]
             [reagent.core :as r]
-            [shevek.viewer.shared :refer [format-dimension dimension-value format-measure]]
+            [shevek.domain.dw :refer [format-dimension dimension-value format-measure]]
             [shevek.i18n :refer [t]]))
 
 (def colors
