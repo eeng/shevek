@@ -4,7 +4,8 @@
             [shevek.schemas.interceptor :as schema]
             [shevek.reflow.core :as reflow]
             [shevek.reflow.interceptors :as i]
-            [shevek.navigation :refer [init-navigation]]))
+            [shevek.navigation :refer [init-navigation]]
+            [shevek.lib.error]))
 
 (defn init-reflow []
   (reflow/init (-> (i/router) (i/logger) (schema/checker)))
