@@ -8,7 +8,7 @@
             [shevek.components.popup :refer [show-popup tooltip]]
             [shevek.navigation :refer [current-page]]
             [shevek.schemas.app-db :refer [Settings]]
-            [shevek.lib.auth :refer [logged-in?]]
+            [shevek.domain.auth :refer [logged-in?]]
             [schema-tools.core :as st]
             [cuerdas.core :as str]))
 

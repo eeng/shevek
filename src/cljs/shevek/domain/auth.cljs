@@ -1,4 +1,4 @@
-(ns shevek.lib.auth
+(ns shevek.domain.auth
   (:require [shevek.reflow.db :as db]))
 
 (defn current-user []

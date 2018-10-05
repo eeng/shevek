@@ -4,7 +4,7 @@
             [shevek.i18n :refer [t translation]]
             [shevek.rpc :as rpc]
             [shevek.lib.validation :as v]
-            [shevek.lib.auth :refer [current-user]]
+            [shevek.domain.auth :refer [current-user]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.components.text :refer [page-title]]
             [shevek.pages.admin.users.form :refer [user-validations]]

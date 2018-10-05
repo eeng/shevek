@@ -5,7 +5,7 @@
             [shevek.navigation :refer [current-page? current-page]]
             [shevek.components.popup :refer [popup tooltip]]
             [shevek.components.modal :refer [modal]]
-            [shevek.lib.auth :refer [logged-in? admin?]]
+            [shevek.domain.auth :refer [logged-in? admin?]]
             [shevek.pages.login :as login]
             [shevek.pages.home.page :as home]
             [shevek.pages.error :as error]
