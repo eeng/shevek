@@ -2,7 +2,8 @@
   (:require [shevek.users.repository :as users]
             [shevek.schema.manager :refer [update-cubes]]
             [taoensso.timbre :refer [debug]]
-            [shevek.config :refer [config]]))
+            [shevek.config :refer [config]]
+            [shevek.db :as db]))
 
 (defn users [db]
   (when-not (users/find-by db {:admin true})
@@ -17,4 +18,10 @@
   (users db)
   (cubes db))
 
-#_(seed! shevek.db/db)
+(defn db-reset!
+  "DO NOT use on production!"
+  [db]
+  (db/clean! db)
+  (seed! db))
+
+#_(db-reset! shevek.db/db)

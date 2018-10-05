@@ -1,8 +1,7 @@
 (ns shevek.test-helper
-  (:require [monger.collection :refer [purge-many]]
-            [shevek.app]
+  (:require [shevek.app]
             [mount.core :as mount]
-            [shevek.db :refer [db init-db]]
+            [shevek.db :refer [db init-db clean!]]
             [clojure.test :refer [deftest testing]]
             [cuerdas.core :as str]
             [shevek.acceptance.test-helper]))
@@ -19,7 +18,7 @@
 
 (defmacro it [description & body]
   `(testing ~description
-     (purge-many db ["users" "cubes" "reports" "dashboards"])
+     (clean! db)
      ~@body))
 
 (defmacro pending [name & body]

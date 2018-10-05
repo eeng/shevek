@@ -24,3 +24,6 @@
   db)
 
 (defstate db :start (init-db (mongo :db)))
+
+(defn clean! [db]
+  (mc/purge-many db ["users" "cubes" "reports" "dashboards"]))
