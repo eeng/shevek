@@ -4,7 +4,7 @@
             [shevek.i18n :refer [t translation]]
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
-            [shevek.lib.notification :refer [notify]]
+            [shevek.components.notification :refer [notify]]
             [ajax.core :refer [POST]]))
 
 (defn handle-app-error [{:keys [status status-text response]}]

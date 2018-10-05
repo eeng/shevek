@@ -8,7 +8,7 @@
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
             [shevek.lib.time.ext :refer [format-time]]
-            [shevek.lib.notification :refer [notify]]
+            [shevek.components.notification :refer [notify]]
             [shevek.pages.home.dashboards :refer [fetch-dashboards]]
             [shevek.menu.reports :refer [fetch-reports save-report-form]]
             [shevek.components.form :refer [search-input filter-matching by hold-to-confirm]]

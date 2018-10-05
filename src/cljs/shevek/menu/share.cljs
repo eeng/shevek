@@ -5,7 +5,7 @@
             [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.lib.notification :refer [notify]]
+            [shevek.components.notification :refer [notify]]
             [shevek.lib.time.ext :refer [format-time]]
             [shevek.lib.time :refer [now]]
             [shevek.rpc :as rpc]

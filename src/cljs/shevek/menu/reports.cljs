@@ -7,7 +7,7 @@
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [kb-shortcuts input-field]]
             [shevek.navigation :refer [current-page? navigate]]
-            [shevek.lib.notification :refer [notify]]
+            [shevek.components.notification :refer [notify]]
             [shevek.schemas.conversion :refer [viewer->report]]
             [shevek.viewer.page :as viewer]
             [shevek.lib.util :refer [new-record?]]

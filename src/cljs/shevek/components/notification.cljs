@@ -1,4 +1,4 @@
-(ns shevek.lib.notification
+(ns shevek.components.notification
   (:require [reagent.core :as r]
             [shevek.lib.util :refer [variable-debounce]]))
 

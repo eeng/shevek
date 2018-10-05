@@ -11,7 +11,7 @@
             [shevek.lib.time.ext :refer [format-time]]
             [shevek.lib.string :refer [present?]]
             [shevek.lib.util :refer [new-record? trigger]]
-            [shevek.lib.notification :refer [notify]]
+            [shevek.components.notification :refer [notify]]
             [shevek.navigation :refer [navigate]]))
 
 (defn fetch-dashboards []

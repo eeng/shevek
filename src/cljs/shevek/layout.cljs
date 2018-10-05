@@ -11,7 +11,7 @@
             [shevek.pages.error :as error]
             [shevek.pages.dashboard :as dashboard]
             [shevek.pages.admin.page :as admin]
-            [shevek.lib.notification :refer [notification]]
+            [shevek.components.notification :refer [notification]]
             [shevek.viewer.page :as viewer]
             [shevek.menu.cubes :refer [cubes-menu]]
             [shevek.menu.reports :refer [reports-menu]]

@@ -9,7 +9,7 @@
             [ajax.core :refer [POST]]
             [shevek.navigation :refer [navigate]]
             [cljsjs.jwt-decode]
-            [shevek.lib.notification :refer [notify]]))
+            [shevek.components.notification :refer [notify]]))
 
 (defn extract-user [token]
   (when token
