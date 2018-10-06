@@ -14,12 +14,17 @@
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform ALL]]))
 
-(defn- init-splitted-dim [{:keys [limit sort-by granularity] :as dim} {:keys [viewer]}]
-  (let [first-measure (or (-> viewer :measures first) (-> viewer :cube :measures first))]
+(defn- init-splitted-dim [{:keys [limit sort-by granularity default-sort-by] :as dim} {:keys [viewer]}]
+  (let [first-measure (or (-> viewer :measures first)
+                          (-> viewer :cube :measures first))
+        default-sort-by (find-dimension default-sort-by (-> viewer :cube :dimensions))
+        initial-sort-by (or sort-by
+                            (and default-sort-by (assoc default-sort-by :descending false))
+                            (assoc first-measure :descending (not (time-dimension? dim))))]
     (cond-> (assoc (clean-dim dim)
                    :on "rows"
                    :limit (or limit (and (time-dimension? dim) 1000) 50)
-                   :sort-by (or sort-by (assoc first-measure :descending (not (time-dimension? dim)))))
+                   :sort-by initial-sort-by)
             (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer))))))
 
 (defn- adjust-viztype [{:keys [viewer] :as db}]
@@ -70,9 +75,10 @@
 
 (def granularities {"PT5M" "5m", "PT1H" "1H", "P1D" "1D", "P1W" "1W", "P1M" "1M"})
 
-(defn- split-popup [dim]
+(defn- split-popup [{:keys [default-sort-by] :as dim}]
   (let [opts (r/atom (select-keys dim [:on :limit :sort-by :granularity]))
-        posible-sort-bys (conj (current-cube :measures) (clean-dim dim))]
+        posible-sort-bys (cond-> (conj (current-cube :measures) (clean-dim dim))
+                                 default-sort-by (conj (find-dimension default-sort-by (current-cube :dimensions))))]
     (fn [dim]
       (let [desc (get-in @opts [:sort-by :descending])
             {:keys [granularity on]} @opts]

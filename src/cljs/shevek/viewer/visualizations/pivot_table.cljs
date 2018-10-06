@@ -3,17 +3,26 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.navigation :refer [current-page?]]
+            [shevek.lib.dw.dims :refer [find-dimension]]
+            [shevek.viewer.shared :refer [current-cube]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
-            [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]))
+            [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]
+            [com.rpl.specter :refer [transform MAP-VALS]]))
 
 (defn- proportion-bg [value proportion]
   (let [width (str proportion "%")]
     [:div.bg {:class (when (neg? value) "neg")
               :style {:width width}}]))
 
+(defn- translate-to-default-sort-by [{:keys [default-sort-by] :as dim}]
+  (if default-sort-by
+    (find-dimension default-sort-by (current-cube :dimensions))
+    dim))
+
 (defn- sortable-th [title sorting-mapping opts]
   (if (current-page? :viewer)
-    (let [requested-sort-bys (map :name (vals sorting-mapping))
+    (let [sorting-mapping (transform [MAP-VALS] translate-to-default-sort-by sorting-mapping)
+          requested-sort-bys (map :name (vals sorting-mapping))
           current-sort-bys (map (comp :name :sort-by) (keys sorting-mapping))
           descendings (->> (keys sorting-mapping) (map (comp :descending :sort-by)) distinct)
           show-icon? (and (= current-sort-bys requested-sort-bys)
