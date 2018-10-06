@@ -31,6 +31,7 @@
   (with-out-str (apply clojure.pprint/pprint args)))
 
 (defmacro benchmark [str & body]
-  `(let [start# (System/nanoTime)]
-     ~@body
-     (log/info (format ~str (/ (- (System/nanoTime) start#) 1e6)))))
+  `(let [start# (System/nanoTime)
+         result# (do ~@body)]
+     (log/info (format ~str (/ (- (System/nanoTime) start#) 1e6)))
+     result#))
