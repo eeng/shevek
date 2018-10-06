@@ -53,50 +53,6 @@
           :measures ["count"]
           :filters [{:period "latest-day"}]})
 
-; Filtering
-#_(query request
-         {:cube "wikiticker"
-          :splits [{:name "countryName" :limit 5}]
-          :filters [{:interval ["2015" "2016"]}
-                    {:name "countryName" :operator "include" :value ["Italy" "France"]}]
-          :measures ["count"]})
-
-#_(query request
-         {:cube "wikiticker"
-          :splits [{:name "countryName" :limit 5}]
-          :filters [{:period "latest-day"}
-                    {:name "countryName" :operator "search" :value "arg"}]
-          :measures ["count"]})
-
-; Sorting by measure
-#_(query request
-         {:cube "wikiticker"
-          :splits [{:name "page" :limit 5 :sort-by {:name "added" :descending false}}]
-          :measures ["count"]
-          :filters [{:period "latest-day"}]})
-
-; Sorting by the same dimension
-#_(query request
-         {:cube "wikiticker"
-          :splits [{:name "page" :limit 5 :sort-by {:name "page" :descending false}}]
-          :measures ["count"]
-          :filters [{:period "latest-day"}]})
-
-; Sorting by another dimension
-#_(query request
-         {:cube "wikiticker"
-          :splits [{:name "countryName" :limit 5 :sort-by {:name "countryIsoCode" :descending false}}]
-          :measures ["count"]
-          :filters [{:period "latest-day"}]})
-
-; Different time zone
-#_(query request
-         {:cube "wikiticker"
-          :splits [{:name "__time" :granularity "P1D"}]
-          :measures ["count"]
-          :filters [{:period "latest-day"}]
-          :time-zone "Europe/Paris"})
-
 ; One column split and two measures
 #_(query request
          {:cube "wikiticker"
@@ -146,6 +102,57 @@
           :filters [{:period "latest-day"}
                     {:name "countryName" :operator "exclude" :value [nil]}]
           :totals true})
+
+; Filtering
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "countryName" :limit 5}]
+          :filters [{:interval ["2015" "2016"]}
+                    {:name "countryName" :operator "include" :value ["Italy" "France"]}]
+          :measures ["count"]})
+
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "countryName" :limit 5}]
+          :filters [{:period "latest-day"}
+                    {:name "countryName" :operator "search" :value "arg"}]
+          :measures ["count"]})
+
+; Sorting by measure
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "page" :limit 5 :sort-by {:name "added" :descending false}}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}]})
+
+; Sorting by the same dimension
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "page" :limit 5 :sort-by {:name "page" :descending false}}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}]})
+
+; Sorting by another dimension
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "countryName" :limit 10 :sort-by {:name "countryIsoCode" :descending false}}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}]})
+
+; Sorting by another virtual dimension
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "month" :limit 10 :sort-by {:name "monthNum" :descending false}}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}]})
+
+; Different time zone
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "__time" :granularity "P1D"}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}]
+          :time-zone "Europe/Paris"})
 
 ; Extraction functions
 #_(query request

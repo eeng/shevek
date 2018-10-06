@@ -32,10 +32,13 @@
 
   (testing "should gather dimension/measure information from the schema for the sort-by in the splits"
     (is (= [{:name "d" :descending true :type "LONG"}
+            {:name "d2" :column "__time" :extraction [{:type "ext"}]}
             {:name "m" :descending false :expression "(sum $m)"}]
            (->> (expand-query {:splits [{:name "d" :sort-by {:name "d" :descending true}}
+                                        {:name "d2" :sort-by {:name "d2"}}
                                         {:name "e" :sort-by {:name "m" :descending false}}]}
-                              {:dimensions [{:name "d" :type "LONG"}]
+                              {:dimensions [{:name "d" :type "LONG"}
+                                            {:name "d2" :column "__time" :extraction [{:type "ext"}]}]
                                :measures [{:name "m" :expression "(sum $m)"}]})
                 :splits (map :sort-by)))))
 

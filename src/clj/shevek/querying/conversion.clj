@@ -59,10 +59,13 @@
     (sort-by-other-dimension? dimension) "groupBy"
     :else "topN"))
 
+(defn- dimension-order [dim]
+  (if (numeric-dim? dim) "numeric" "lexicographic"))
+
 (defn- generate-metric-field [{:keys [name sort-by] :as dim} measures]
   (let [descending (or (nil? (:descending sort-by)) (:descending sort-by))
         field (if (sort-by-same? dim)
-                {:type "dimension" :ordering (if (numeric-dim? sort-by) "numeric" "lexicographic")}
+                {:type "dimension" :ordering (dimension-order sort-by)}
                 {:type "numeric" :metric (or (:name sort-by) (-> measures first :name))})]
     (if (or (and (sort-by-same? dim) (not descending))
             (and (not (sort-by-same? dim)) descending))
@@ -82,6 +85,8 @@
       lfv {:type "listFiltered" :delegate name :values lfv}
       :else name)))
 
+(def defaultLimit 100)
+
 (defn- add-query-type-dependant-fields [{:keys [queryType] :as dq}
                                         {:keys [dimension measures] :as q}]
   (condp = queryType
@@ -89,7 +94,7 @@
     (assoc dq
            :dimension (dimension-spec dimension q)
            :metric (generate-metric-field dimension measures)
-           :threshold (dimension :limit (or 100))
+           :threshold (dimension :limit (or defaultLimit))
            :granularity "all")
     "timeseries"
     (assoc dq
@@ -100,8 +105,16 @@
            :context {:skipEmptyBuckets true})
     "groupBy"
     (assoc dq
-           :dimensions [(dimension-spec (:sort-by dimension) q) (dimension-spec dimension q)]
-           :granularity "all")))
+           :dimensions [(dimension-spec (:sort-by dimension) q)
+                        (dimension-spec dimension q)]
+           :granularity "all"
+           :limitSpec {:type "default"
+                       :limit (or (dimension :limit) defaultLimit)
+                       :columns [{:dimension (get-in dimension [:sort-by :name])
+                                  :direction (if (get-in dimension [:sort-by :descending] false)
+                                               "descending"
+                                               "ascending")
+                                  :dimensionOrder (dimension-order (get-in dimension [:sort-by]))}]})))
 
 (defn- with-value? [{:keys [operator value]}]
   (or (= "is" operator) (seq value)))

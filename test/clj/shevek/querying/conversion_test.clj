@@ -21,10 +21,9 @@
                     :granularity "all"
                     :dimension "page"
                     :metric {:type "numeric" :metric "count"}
-                    :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}]
-                    :threshold 10}
+                    :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}]}
                    (to-druid-query {:cube "wikiticker"
-                                    :dimension {:name "page" :limit 10}
+                                    :dimension {:name "page"}
                                     :measures [{:name "count" :expression "(sum $count)"}]}))))
 
     (testing "query with one time dimension should generate a timeseries query with the specified granularity, sort order and timezone (default to local)"
@@ -47,7 +46,6 @@
                       :granularity "all"}
                      dq))
         (is (without? :metric dq))
-        (is (without? :threashold dq))
         (is (without? :dimension dq)))))
 
   (testing "filter"
@@ -126,7 +124,18 @@
                                                 :sort-by {:name "aLong" :descending false :type "LONG"}}})))
       (is (submap? {:metric {:type "dimension" :ordering "numeric"}}
                    (to-druid-query {:dimension {:name "aFloat"
-                                                :sort-by {:name "aFloat" :descending false :type "FLOAT"}}})))))
+                                                :sort-by {:name "aFloat" :descending false :type "FLOAT"}}}))))
+
+    (testing "descending by other dimension"
+      (is (submap? {:queryType "groupBy"
+                    :limitSpec {:type "default"
+                                :limit 100
+                                :columns [{:dimension "monthNum"
+                                           :direction "descending"
+                                           :dimensionOrder "numeric"}]}}
+                   (to-druid-query
+                    {:dimension {:name "monthName"
+                                 :sort-by {:name "monthNum" :descending true :type "LONG"}}})))))
 
   (testing "measures"
     (testing "arithmetic expression"
@@ -192,6 +201,19 @@
       (is (= "tags" (:dimension (to-druid-query {:dimension {:name "tags" :multi-value true}}))))
       (is (= "tags" (:dimension (to-druid-query {:dimension {:name "tags" :multi-value true}
                                                  :filters [{:name "tags" :operator "exclude" :value ["t1"]}]}))))))
+
+  (testing "limit"
+    (testing "topN queries add a threshold"
+      (is (submap? {:queryType "topN" :threshold 10}
+                   (to-druid-query {:dimension {:name "page" :limit 10}}))))
+
+    (testing "groupBy queries add a limitSpec"
+      (let [dq (to-druid-query
+                {:dimension {:sort-by {:name "monthNum" :descending false :type "LONG"}
+                             :limit 5}})]
+        (is (submap? {:type "default" :limit 5}
+                     (:limitSpec dq)))
+        (is (without? :threshold dq)))))
 
   (testing "timeout"
     (is (= 30000 (get-in (to-druid-query {}) [:context :timeout])))))
