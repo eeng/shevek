@@ -21,9 +21,10 @@
   (datasources [_]
     (request http/get (str uri "/druid/v2/datasources") {:as :json :conn-timeout 10000}))
 
-  (send-query [_ dq]
-    (log/debug "Sending query to Druid:" (generate-string dq {:pretty true}))
-    (request http/post (str uri "/druid/v2") {:content-type :json :form-params dq :as :json})))
+  (send-query [_ {:keys [query] :as dq}]
+    (let [endpoint (str uri (if query "/druid/v2/sql" "/druid/v2"))]
+      (log/debug "Sending query to Druid:" (generate-string dq {:pretty true}))
+      (request http/post endpoint {:content-type :json :form-params dq :as :json}))))
 
 (defn connect [uri]
   (Druid. uri))
