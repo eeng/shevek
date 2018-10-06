@@ -68,16 +68,24 @@
                     {:name "countryName" :operator "search" :value "arg"}]
           :measures ["count"]})
 
-; Sorting
+; Sorting by measure
 #_(query request
          {:cube "wikiticker"
           :splits [{:name "page" :limit 5 :sort-by {:name "added" :descending false}}]
           :measures ["count"]
           :filters [{:period "latest-day"}]})
 
+; Sorting by the same dimension
 #_(query request
          {:cube "wikiticker"
           :splits [{:name "page" :limit 5 :sort-by {:name "page" :descending false}}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}]})
+
+; Sorting by another dimension
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "countryName" :limit 5 :sort-by {:name "countryIsoCode" :descending false}}]
           :measures ["count"]
           :filters [{:period "latest-day"}]})
 

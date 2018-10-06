@@ -7,7 +7,7 @@
   (testing "query types"
     (testing "totals query"
       (is (submap? {:queryType "timeseries"
-                    :dataSource {:type "table" :name "wikiticker"}
+                    :dataSource "wikiticker"
                     :granularity "all"
                     :intervals "2015/2016"
                     :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}]}
@@ -17,7 +17,7 @@
 
     (testing "query with one atemporal dimension should generate a topN query"
       (is (submap? {:queryType "topN"
-                    :dataSource {:type "table" :name "wikiticker"}
+                    :dataSource "wikiticker"
                     :granularity "all"
                     :dimension "page"
                     :metric {:type "numeric" :metric "count"}
@@ -36,7 +36,19 @@
                                     :dimension {:name "__time" :granularity "P1D" :sort-by {:descending true}}})))
       (is (submap? {:granularity {:type "period" :period "P1D" :timeZone "Europe/Paris"}}
                    (to-druid-query {:dimension {:name "__time" :granularity "P1D"}
-                                    :time-zone "Europe/Paris"})))))
+                                    :time-zone "Europe/Paris"}))))
+
+    (testing "ordering by other dimension should use a groupBy query"
+      (let [dq (to-druid-query
+                {:dimension {:name "monthName"
+                             :sort-by {:name "monthNum" :descending false :type "LONG"}}})]
+        (is (submap? {:queryType "groupBy"
+                      :dimensions ["monthNum", "monthName"]
+                      :granularity "all"}
+                     dq))
+        (is (without? :metric dq))
+        (is (without? :threashold dq))
+        (is (without? :dimension dq)))))
 
   (testing "filter"
     (testing ":is operator"
@@ -80,17 +92,17 @@
                    (to-druid-query {:filters [{:name "countryName" :operator "search" :value "arg"}]})))))
 
   (testing "sorting"
-    (testing "query with one atemporal dimension sorting by other selected metric in ascending order"
+    (testing "query with one dimension sorting by a selected metric in ascending order"
       (is (submap? {:queryType "topN"
                     :metric {:type "inverted" :metric {:type "numeric" :metric "added"}}}
                    (to-druid-query {:cube "wikiticker"
-                                    :dimension {:name "page" :sort-by {:name "added" :descending false}}
+                                    :dimension {:name "page" :sort-by {:name "added" :descending false :expression "(sum $added)"}}
                                     :measures [{:name "count" :expression "(sum $count)"}
                                                {:name "added" :expression "(sum $added)"}]}))))
 
-
-    (testing "query with one atemporal dimension sorting by other non selected metric should add it to the aggregations"
-      (is (submap? {:metric {:type "numeric" :metric "users"}
+    (testing "query with one dimension sorting by a non selected metric should add it to the aggregations"
+      (is (submap? {:queryType "topN"
+                    :metric {:type "numeric" :metric "users"}
                     :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}
                                    {:name "users" :fieldName "users" :type "hyperUnique"}]}
                    (to-druid-query {:dimension {:name "page"
@@ -196,20 +208,29 @@
 
   (testing "timeseries results"
     (is (submaps? [{:__time "2015" :count 1}
-                   {:__time "2016" :count 2}
-                   {:__time "2017" :count 3}]
-                  (from-druid-results
-                   {:dimension {:name "__time"}}
-                   {:queryType "timeseries"}
-                   [{:result {:count 1} :timestamp "2015"}
-                    {:result {:count 2} :timestamp "2016"}
-                    {:result {:count 3} :timestamp "2017"}]))))
-
-  (testing "timeseries with limit should chop results"
-    (is (submaps? [{:count 1} {:count 2}]
+                   {:__time "2016" :count 2}]
                   (from-druid-results
                    {:dimension {:name "__time" :limit 2}}
                    {:queryType "timeseries"}
                    [{:result {:count 1} :timestamp "2015"}
                     {:result {:count 2} :timestamp "2016"}
-                    {:result {:count 3} :timestamp "2017"}])))))
+                    {:result {:count 3} :timestamp "2017"}]))))
+
+  (testing "groupBy"
+    (is (submaps? [{:countryName "Albania" :countryIsoCode "AL" :count 2}
+                   {:countryName "Angola" :countryIsoCode "AO" :count 4}]
+                  (from-druid-results
+                   {:dimension {:name "countryName" :limit 2}}
+                   {:queryType "groupBy"}
+                   [{:version "v1"
+                     :timestamp "2015-09-12T02:00:00.000Z"
+                     :event
+                     {:count 2
+                      :countryName "Albania"
+                      :countryIsoCode "AL"}}
+                    {:version "v1"
+                     :timestamp "2015-09-12T02:00:00.000Z"
+                     :event
+                     {:count 4
+                      :countryName "Angola"
+                      :countryIsoCode "AO"}}])))))

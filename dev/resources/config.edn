@@ -152,13 +152,15 @@
 
   {:name "wikiticker"
    :description "Druid quickstart sample of Wikipedia edits"
-   :dimensions [{:name "isMinor" :type "BOOL"}
-                {:name "isUnpatrolled" :type "BOOL"}
-                {:name "isAnonymous" :type "BOOL"}
-                {:name "isRobot" :type "BOOL" :description "Indicates whether a computer or a human being made this edit"}
-                {:name "isNew" :type "BOOL"}
-                {:name "regionIsoCode" :title "Region ISO Code"}
-                {:name "countryIsoCode" :title "Country ISO Code"}
-                {:name "countryName" :empty-value "Country Not Available"}
-                {:name "year" :column "__time" :extraction [{:type "timeFormat" :format "Y"}]}]
-   :measures [{:name "count" :description "Character count"}]}]}
+   :dimensions
+   [{:name "isMinor" :type "BOOL"}
+    {:name "isUnpatrolled" :type "BOOL"}
+    {:name "isAnonymous" :type "BOOL"}
+    {:name "isRobot" :type "BOOL" :description "Indicates whether a computer or a human being made this edit"}
+    {:name "isNew" :type "BOOL"}
+    {:name "regionIsoCode" :title "Region ISO Code"}
+    {:name "countryIsoCode" :title "Country ISO Code"}
+    {:name "countryName" :empty-value "Country Not Available" :default-sort-by "countryIsoCode"}
+    {:name "year" :column "__time" :extraction [{:type "timeFormat" :format "Y"}]}]
+   :measures
+   [{:name "count" :description "Character count"}]}]}

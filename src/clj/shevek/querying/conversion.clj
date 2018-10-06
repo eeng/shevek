@@ -1,4 +1,5 @@
 (ns shevek.querying.conversion
+  "This guy is in charge of issuing the correct Driud type query for a single dimension or the grand total"
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [shevek.lib.collections :refer [assoc-if-seq]]
@@ -17,6 +18,14 @@
 
 (defn- sort-by-same? [{:keys [name sort-by]}]
   (= name (:name sort-by)))
+
+(defn- measure? [dim-or-measure]
+  (contains? dim-or-measure :expression))
+
+(defn- sort-by-other-dimension? [{:keys [sort-by] :as dim}]
+  (and sort-by
+       (not (sort-by-same? dim))
+       (not (measure? sort-by))))
 
 (defn- time-zone [q]
   (or (:time-zone q) (str (t/default-time-zone))))
@@ -45,9 +54,10 @@
       {:type "and" :fields (map #(to-druid-filter [%] q) filters)})))
 
 (defn- calculate-query-type [{:keys [dimension]}]
-  (if (and dimension (not (time-dimension? dimension)))
-    "topN"
-    "timeseries"))
+  (cond
+    (or (not dimension) (time-dimension? dimension)) "timeseries"
+    (sort-by-other-dimension? dimension) "groupBy"
+    :else "topN"))
 
 (defn- generate-metric-field [{:keys [name sort-by] :as dim} measures]
   (let [descending (or (nil? (:descending sort-by)) (:descending sort-by))
@@ -77,17 +87,21 @@
   (condp = queryType
     "topN"
     (assoc dq
-           :granularity "all"
            :dimension (dimension-spec dimension q)
            :metric (generate-metric-field dimension measures)
-           :threshold (dimension :limit (or 100)))
+           :threshold (dimension :limit (or 100))
+           :granularity "all")
     "timeseries"
     (assoc dq
            :granularity (if dimension
                           {:type "period" :period (:granularity dimension) :timeZone (time-zone q)}
                           "all")
            :descending (get-in dimension [:sort-by :descending] false)
-           :context {:skipEmptyBuckets true})))
+           :context {:skipEmptyBuckets true})
+    "groupBy"
+    (assoc dq
+           :dimensions [(dimension-spec (:sort-by dimension) q) (dimension-spec dimension q)]
+           :granularity "all")))
 
 (defn- with-value? [{:keys [operator value]}]
   (or (= "is" operator) (seq value)))
@@ -95,7 +109,9 @@
 (defn sort-by-derived-measures
   "If we sort by a not selected metric we should send the field as an aggregation, otherwise Druid complains"
   [{:keys [sort-by] :as dim} measures]
-  (if (and (:name sort-by) (not (sort-by-same? dim)) (not (includes-dim? measures sort-by)))
+  (if (and (:name sort-by)
+           (measure? sort-by)
+           (not (includes-dim? measures sort-by)))
     [sort-by]
     []))
 
@@ -116,7 +132,7 @@
 
 (defn to-druid-query [{:keys [cube measures dimension] :as q}]
   (-> {:queryType (calculate-query-type q)
-       :dataSource {:type "table" :name cube}}
+       :dataSource cube}
       (add-druid-filters q)
       (add-druid-measures (concat measures (sort-by-derived-measures dimension measures)))
       (add-query-type-dependant-fields q)
@@ -130,4 +146,5 @@
                           true (map (fn [{:keys [result timestamp]}]
                                      (if dimension
                                        (assoc result (keyword (:name dimension)) timestamp)
-                                       result))))))
+                                       result))))
+    "groupBy" (map :event results)))
