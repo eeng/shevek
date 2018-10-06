@@ -3,7 +3,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t translation]]
-            [shevek.lib.dw.dims :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension merge-dimensions]]
+            [shevek.domain.dimension :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension merge-dimensions]]
             [shevek.lib.time.ext :refer [format-period format-interval]]
             [shevek.lib.period :refer [to-interval]]
             [shevek.lib.react :refer [without-propagation]]

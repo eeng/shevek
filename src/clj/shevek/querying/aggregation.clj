@@ -2,7 +2,7 @@
   (:require [shevek.lib.collections :refer [assoc-if-seq find-by]]
             [shevek.lib.druid-driver :as driver]
             [shevek.lib.time.ext :refer [plus-period]]
-            [shevek.lib.dw.dims :refer [time-dimension? partition-splits row-split? col-split?]]
+            [shevek.domain.dimension :refer [time-dimension? partition-splits row-split? col-split?]]
             [shevek.lib.collections :refer [detect]]
             [shevek.querying.conversion :refer [to-druid-query from-druid-results]]
             [com.rpl.specter :refer [setval must ALL]]))

@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.i18n :refer [t]]
-            [shevek.lib.dw.dims :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim row-split?]]
+            [shevek.domain.dimension :refer [add-dimension remove-dimension dim= time-dimension? replace-dimension find-dimension clean-dim row-split?]]
             [shevek.lib.time.ext :refer [default-granularity]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.collections :refer [includes?]]

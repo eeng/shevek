@@ -1,7 +1,7 @@
 (ns shevek.domain.pivot-table
   (:require [shevek.lib.collections :refer [detect]]
             [shevek.domain.dw :refer [dimension-value measure-value format-measure format-dimension]]
-            [shevek.lib.dw.dims :refer [partition-splits]]
+            [shevek.domain.dimension :refer [partition-splits]]
             [shevek.i18n :refer [t]]))
 
 (defrecord SplitsCell [dimensions in-columns col-span])

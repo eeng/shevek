@@ -3,7 +3,7 @@
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.lib.string :refer [split]]
-            [shevek.lib.dw.dims :refer [includes-dim? find-dimension remove-dimension replace-dimension time-dimension?]]
+            [shevek.domain.dimension :refer [includes-dim? find-dimension remove-dimension replace-dimension time-dimension?]]
             [shevek.reflow.core :refer-macros [defevh]]
             [shevek.components.form :refer [select dropdown]]
             [shevek.viewer.filter :refer [filter-title]]

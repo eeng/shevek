@@ -4,7 +4,7 @@
             [clj-time.core :as t]
             [shevek.lib.collections :refer [assoc-if-seq]]
             [shevek.querying.expression :refer [measure->druid]]
-            [shevek.lib.dw.dims :refer [time-dimension? includes-dim? numeric-dim? find-dimension]]))
+            [shevek.domain.dimension :refer [time-dimension? includes-dim? numeric-dim? find-dimension]]))
 
 (defn make-tig
   "tig = Temporary ID Generator, counter for generating temporary field names used in aggregations that are later refered in post-aggregations"

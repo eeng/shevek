@@ -8,7 +8,7 @@
             [shevek.viewer.shared :refer [current-cube viewer]]
             [shevek.domain.dw :refer [dimension-value format-measure]]
             [shevek.viewer.filter :refer [slice->filters filter-title]]
-            [shevek.lib.dw.dims :refer [time-dimension? add-dimension merge-dimensions]]
+            [shevek.domain.dimension :refer [time-dimension? add-dimension merge-dimensions]]
             [cuerdas.core :as str]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.string :refer [format-bool]]

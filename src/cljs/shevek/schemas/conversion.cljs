@@ -1,5 +1,5 @@
 (ns shevek.schemas.conversion
-  (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension]]
+  (:require [shevek.domain.dimension :refer [find-dimension time-dimension]]
             [shevek.lib.time :refer [to-iso8601 parse-time end-of-day]]
             [shevek.schemas.query :refer [Query RawQuery]]
             [shevek.schemas.app-db :refer [CurrentReport]]

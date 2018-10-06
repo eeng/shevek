@@ -6,7 +6,7 @@
             [shevek.lib.string :refer [regex-escape]]
             [shevek.lib.collections :refer [includes?]]
             [shevek.lib.react :refer [without-propagation]]
-            [shevek.lib.dw.dims :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
+            [shevek.domain.dimension :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
             [shevek.lib.time.ext :refer [default-granularity]]
             [shevek.i18n :refer [t]]
             [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside search-input filter-matching]]

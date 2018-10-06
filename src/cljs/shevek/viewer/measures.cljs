@@ -5,7 +5,7 @@
             [shevek.rpc :refer [loading?]]
             [shevek.rpc :as rpc]
             [shevek.components.form :refer [checkbox toggle-checkbox-inside]]
-            [shevek.lib.dw.dims :refer [add-dimension remove-dimension includes-dim?]]
+            [shevek.domain.dimension :refer [add-dimension remove-dimension includes-dim?]]
             [shevek.viewer.shared :refer [current-cube viewer panel-header send-main-query description-help-icon]]
             [shevek.viewer.url :refer [store-viewer-in-url]]))
 

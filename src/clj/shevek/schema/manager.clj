@@ -3,7 +3,7 @@
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.logging :refer [benchmark]]
-            [shevek.lib.dw.dims :refer [time-dimension]]
+            [shevek.domain.dimension :refer [time-dimension]]
             [cuerdas.core :as str]))
 
 (defn- discover-cubes [dw]

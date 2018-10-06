@@ -3,7 +3,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.navigation :refer [current-page?]]
-            [shevek.lib.dw.dims :refer [find-dimension]]
+            [shevek.domain.dimension :refer [find-dimension]]
             [shevek.viewer.shared :refer [current-cube]]
             [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]

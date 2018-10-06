@@ -1,5 +1,5 @@
 (ns shevek.querying.expansion
-  (:require [shevek.lib.dw.dims :refer [find-dimension time-dimension?]]
+  (:require [shevek.domain.dimension :refer [find-dimension time-dimension?]]
             [shevek.lib.period :refer [effective-interval]]
             [shevek.lib.time :as t]
             [com.rpl.specter :refer [transform must filterer ALL]]))

@@ -2,7 +2,7 @@
   (:require [cljs-time.core :as t]
             [cljs-time.format :as f]
             [cljs-time.extend]
-            [shevek.lib.dw.dims :refer [time-dimension]]
+            [shevek.domain.dimension :refer [time-dimension]]
             [shevek.lib.period :refer [effective-interval to-interval]]
             [shevek.lib.time :refer [to-iso8601 parse-time]]
             [shevek.i18n :refer [translation]]
