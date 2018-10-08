@@ -95,7 +95,7 @@
                  :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
 
   :aliases {"frontend-testing" ["doo" "phantom" "test" "auto"]
-            "backend-testing" "test-refresh"
+            "backend-testing" ["with-profile" "+ultra" "test-refresh"]
             "build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
             "package" ["do" ["clean"] "build-frontend" "uberjar"]
             "ci" ["do" "test" ["doo" "phantom" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
@@ -115,8 +115,6 @@
                                   ;; Testing cljs
                                   [pjstadig/humane-test-output "0.8.3"]
                                   [cljsjs/jquery "3.2.1-0"]]
-                   :injections [(require 'pjstadig.humane-test-output) ; Would be nice to use ultra for test output coloring but lein-doo wouldn't work with it
-                                (pjstadig.humane-test-output/activate!)]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
                              [lein-doo "0.1.10"]
                              [cider/cider-nrepl "0.18.0-SNAPSHOT"]] ; For Calva
@@ -149,4 +147,6 @@
                     :less {:source-map false
                            :compression true}}
              :uberjar {:aot :all
-                       :auto-clean false}})
+                       :auto-clean false}
+             ; Put ultra into a separate profile to active it only during clj testing, otherwise cljs testing throws an error due to this bug: https://github.com/emezeske/lein-cljsbuild/issues/469
+             :ultra {:plugins [[venantius/ultra "0.5.2"]]}})
