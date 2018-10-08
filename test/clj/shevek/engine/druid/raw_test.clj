@@ -1,13 +1,13 @@
-(ns shevek.querying.raw-test
+(ns shevek.engine.druid.raw-test
   (:require [clojure.test :refer :all]
             [shevek.asserts :refer [submap?]]
-            [shevek.querying.raw :refer [to-druid-query from-druid-results]]))
+            [shevek.engine.druid.raw :refer [to-druid-query from-druid-results]]))
 
 (deftest to-druid-query-test
   (testing "only time filter raw query"
     (is (submap? {:queryType "select"
-                  :dataSource {:type "table" :name "wikiticker"}
-                  :granularity {:type "all"}
+                  :dataSource "wikiticker"
+                  :granularity "all"
                   :intervals "2015/2016"}
                  (to-druid-query {:cube "wikiticker"
                                   :filters [{:interval ["2015" "2016"]}]}))))
@@ -17,11 +17,11 @@
                  (to-druid-query {:filters [{:name "isRobot" :operator "is" :value "true"}]}))))
 
   (testing "should pass through the paging spec or use a default with limit 100"
-    (is (submap? {:pagingSpec {:threshold 100 :fromNext true}}
+    (is (submap? {:pagingSpec {:threshold 100}}
                  (to-druid-query {})))
-    (is (submap? {:pagingSpec {:threshold 50 :fromNext true}}
+    (is (submap? {:pagingSpec {:threshold 50}}
                  (to-druid-query {:paging {:threshold 50}})))
-    (is (submap? {:pagingSpec {:threshold 50 :pagingIdentifiers {:a 4} :fromNext true}}
+    (is (submap? {:pagingSpec {:threshold 50 :pagingIdentifiers {:a 4}}}
                  (to-druid-query {:paging {:threshold 50 :pagingIdentifiers {:a 4}}})))))
 
 (deftest from-druid-results-test
@@ -41,4 +41,5 @@
                                                          {:event {:region "Brasil" :added 2 :timestamp "2016"}}]}}]))))
 
   (testing "when there are no results"
-    (is (= {:results [] :paging {:threshold 3}} (from-druid-results {:paging {:threshold 3}} [])))))
+    (is (= {:results [] :paging {:threshold 3}}
+           (from-druid-results {:paging {:threshold 3}} [])))))

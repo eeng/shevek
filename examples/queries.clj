@@ -1,5 +1,4 @@
 (require '[shevek.querying.api :refer [query raw-query]] :reload)
-(def to-please-joker query)
 (def request {})
 
 ; Totals query
@@ -166,7 +165,7 @@
 #_(raw-query request
              {:cube "wikiticker"
               :filters [{:period "latest-day"}]
-              :paging {:threshold 10}})
+              :paging {:threshold 2}})
 
 ; Getting the second page
 #_(let [result (raw-query shevek.dw/dw

@@ -1,11 +1,10 @@
 (ns shevek.schema.api
   (:require [shevek.schema.repository :as r]
-            [shevek.schema.metadata :as m]
             [shevek.db :refer [db]]
-            [shevek.dw :refer [dw]]
+            [shevek.engine.state :refer [dw]]
+            [shevek.engine.protocol :as e]
             [shevek.schema.auth :as auth]))
 
-; TODO Measures and dimensions are only needed to configure user's permissions, maybe we should make two methods or parametrice this so the more frecuent use doen't return everything
 (defn cubes [{:keys [user]}]
   (->> (r/find-cubes db)
        (auth/filter-cubes user)
@@ -21,7 +20,7 @@
   (r/save-cube db cube))
 
 (defn max-time [_ cube-name]
-  (:max-time (m/time-boundary dw cube-name)))
+  (:max-time (e/time-boundary dw cube-name)))
 
 ;; Examples
 

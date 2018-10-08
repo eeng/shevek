@@ -4,7 +4,7 @@
             [shevek.web.server :refer [web-server]]
             [shevek.nrepl :refer [nrepl]]
             [shevek.db :refer [db]]
-            [shevek.dw]
+            [shevek.engine.state]
             [shevek.scheduler :refer [scheduler]]
             [shevek.reloader :refer [reloader]]
             [shevek.schema.seed :refer [seed!]])

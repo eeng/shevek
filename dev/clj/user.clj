@@ -5,5 +5,7 @@
   "ProtoREPL calls this function when starts and when refreshing namespaces"
   [])
 
+#_(clojure.tools.namespace.repl/refresh)
+
 ; To start a ClojureScript REPL connect to the figwheel nREPL (port 4002) and then eval this
 #_(cljs-repl)

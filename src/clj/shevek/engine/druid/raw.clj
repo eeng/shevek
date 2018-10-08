@@ -1,17 +1,17 @@
-(ns shevek.querying.raw
+(ns shevek.engine.druid.raw
   (:require [shevek.schemas.query :refer [RawQuery RawQueryResults]]
             [schema.core :as s]
-            [shevek.querying.conversion :refer [add-druid-filters]]
-            [shevek.lib.druid-driver :refer [send-query]]
+            [shevek.querying.expansion :refer [expand-query]]
+            [shevek.engine.druid.driver :refer [send-query]]
+            [shevek.engine.druid.planner.common :refer [add-druid-filters]]
             [shevek.lib.collections :refer [assoc-if]]
             [clojure.set :refer [rename-keys]]))
 
-; fromNext should not be necessary on the next version of Druid
 (defn to-druid-query [{:keys [cube paging] :or {paging {:threshold 100}} :as q}]
   (-> {:queryType "select"
-       :dataSource {:type "table" :name cube}
-       :granularity {:type "all"}
-       :pagingSpec (assoc paging :fromNext true)}
+       :dataSource cube
+       :granularity "all"
+       :pagingSpec paging}
       (add-druid-filters q)))
 
 (defn from-druid-results [{:keys [paging]} dr]
@@ -19,7 +19,8 @@
     {:results (map (comp #(rename-keys % {:timestamp :__time}) :event) events)
      :paging (assoc-if paging :pagingIdentifiers pagingIdentifiers)}))
 
-(s/defn query :- RawQueryResults [dw {:keys [cube] :as q} :- RawQuery]
-  (let [dq (to-druid-query q)
-        dr (send-query dw dq)]
-    (from-druid-results q dr)))
+(s/defn execute-query :- RawQueryResults [driver query :- RawQuery cube-schema]
+  (->> (expand-query query cube-schema)
+       (to-druid-query)
+       (send-query driver)
+       (from-druid-results query)))

@@ -1,5 +1,5 @@
 (ns shevek.schema.manager
-  (:require [shevek.schema.metadata :refer [cubes cube-metadata time-boundary]]
+  (:require [shevek.engine.protocol :refer [cubes cube-metadata time-boundary]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.logging :refer [benchmark]]

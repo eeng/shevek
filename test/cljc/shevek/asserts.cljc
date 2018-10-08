@@ -1,5 +1,6 @@
 (ns shevek.asserts
-  (:require [shevek.lib.collections :refer [wrap-coll]]))
+  (:require [shevek.lib.collections :refer [wrap-coll]]
+            [clj-fakes.core :as f]))
 
 (defn submap? [sm m]
   {:pre [(map? sm)]}
@@ -21,3 +22,8 @@
    (some #(.contains % msg) (get-in (:errors record) (wrap-coll field)))))
 
 (def no-error-on? (complement error-on?))
+
+; Argument Matchers
+
+(defmacro submap-arg [expected-submap]
+  `(f/arg (partial submap? ~expected-submap)))

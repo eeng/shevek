@@ -1,6 +1,5 @@
 (ns shevek.querying.expression
   (:require [clojure.core.match :refer [match]]
-            [clojure.string :refer [starts-with?]]
             [cuerdas.core :as str]
             [shevek.lib.collections :refer [includes?]]))
 
@@ -11,7 +10,7 @@
 
 (defn- build-aggregator [name agg-fn & [field-ref]]
   (cond-> {:type (aggregator-types agg-fn) :name name}
-          field-ref (assoc :fieldName (field-ref->field field-ref))))
+    field-ref (assoc :fieldName (field-ref->field field-ref))))
 
 (defn- condition->filter [condition]
   (if (map? condition)

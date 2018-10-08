@@ -1,7 +1,7 @@
 (ns shevek.querying.expression-test
   (:require [clojure.test :refer :all]
             [shevek.querying.expression :as e]
-            [shevek.querying.conversion :refer [make-tig]]))
+            [shevek.engine.druid.planner.common :refer [make-tig]]))
 
 (defn measure->druid [m]
   (e/measure->druid m (make-tig)))

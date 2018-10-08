@@ -4,35 +4,37 @@
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
             [shevek.schema.manager :refer [discover! update-cubes calculate-expression]]
-            [shevek.schema.metadata :refer [cubes cube-metadata]]
+            [shevek.engine.protocol :refer [Engine cubes cube-metadata]]
             [shevek.schema.repository :refer [find-cubes]]
             [shevek.schemas.cube :refer [Cube]]
             [shevek.db :refer [db]]
-            [com.rpl.specter :refer [select ALL]]))
+            [com.rpl.specter :refer [select ALL]]
+            [clj-fakes.core :as f]))
 
 (use-fixtures :once wrap-unit-tests)
 
 (deftest discover-tests
   (it "initial descovery should save all cubes with their dimensions and metrics"
-    (with-redefs [cubes (constantly ["wikiticker" "vtol_stats"])
-                  cube-metadata
-                  (fn [_ cube]
-                    (case cube
-                      "wikiticker" {:dimensions [{:name "region" :type "STRING"}]
-                                    :measures [{:name "added" :type "longSum"}]}
-                      "vtol_stats" {:dimensions [{:name "path" :type "LONG"}]
-                                    :measures [{:name "requests" :type "hyperUnique"}]}))]
-      (let [cubes (do (discover! nil db) (find-cubes db))]
-        (is (submaps? [{:name "wikiticker"} {:name "vtol_stats"}] cubes))
-        (is (submaps? [{:name "__time"}
-                       {:name "region" :type "STRING"}
-                       {:name "__time"}
-                       {:name "path" :type "LONG"}]
-                      (mapcat :dimensions cubes)))
-        (is (submaps? [{:name "added" :expression "(sum $added)"}
-                       {:name "requests" :expression "(count-distinct $requests)"}]
-                      (mapcat :measures cubes)))
-        (is (= 2 (->> cubes (map :id) (filter identity) count)))))))
+    (f/with-fakes
+      (let [dw (f/reify-fake Engine
+                 (cubes :fake [[] ["wikiticker" "vtol_stats"]])
+                 (cube-metadata :fake [["wikiticker"]
+                                       {:dimensions [{:name "region" :type "STRING"}]
+                                        :measures [{:name "added" :type "longSum"}]}
+                                       ["vtol_stats"]
+                                       {:dimensions [{:name "path" :type "LONG"}]
+                                        :measures [{:name "requests" :type "hyperUnique"}]}]))]
+        (let [cubes (do (discover! dw db) (find-cubes db))]
+          (is (submaps? [{:name "wikiticker"} {:name "vtol_stats"}] cubes))
+          (is (submaps? [{:name "__time"}
+                         {:name "region" :type "STRING"}
+                         {:name "__time"}
+                         {:name "path" :type "LONG"}]
+                        (mapcat :dimensions cubes)))
+          (is (submaps? [{:name "added" :expression "(sum $added)"}
+                         {:name "requests" :expression "(count-distinct $requests)"}]
+                        (mapcat :measures cubes)))
+          (is (= 2 (->> cubes (map :id) (filter identity) count))))))))
 
 (deftest update-cubes-tests
   (testing "discovery use cases"

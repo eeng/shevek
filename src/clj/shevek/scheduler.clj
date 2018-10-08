@@ -5,7 +5,7 @@
             [shevek.config :refer [config]]
             [shevek.schema.seed :as seed]
             [shevek.schema.manager :as m]
-            [shevek.dw :refer [dw]]
+            [shevek.engine.state :refer [dw]]
             [shevek.db :refer [db]]))
 
 (defn- wrap-error [f]
