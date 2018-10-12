@@ -28,18 +28,22 @@
                              {:type "cascade" :extractionFns extraction}
                              (first extraction))))))
 
-(defn dimension-spec [{:keys [name extraction] :as dim} q]
+(defn virtual-column-name [name]
+  (str name ":v"))
+
+(defn dimension-spec [{:keys [name extraction expression type] :as dim} q]
   (let [lfv (list-filtered-values dim q)]
     (cond
       extraction (assoc (dimension-and-extraction dim q) :type "extraction" :outputName name)
       lfv {:type "listFiltered" :delegate name :values lfv}
+      expression {:type "default" :dimension (virtual-column-name name) :outputName name :outputType type}
       :else name)))
 
 (defn sort-by-same? [{:keys [name sort-by]}]
   (= name (:name sort-by)))
 
 (defn measure? [dim-or-measure]
-  (contains? dim-or-measure :expression))
+  (:measure? dim-or-measure))
 
 (defn sort-by-other-dimension? [{:keys [sort-by] :as dim}]
   (and sort-by
@@ -95,8 +99,20 @@
 (defn add-timeout [dq]
   (assoc-in dq [:context :timeout] 30000))
 
+(defn- generate-virtual-column [{:keys [expression name type]}]
+  (when expression
+    {:type "expression"
+     :name (virtual-column-name name)
+     :expression expression
+     :outputType type}))
+
+(defn add-virtual-columns [dq {:keys [dimension]}]
+  (assoc dq
+        :virtualColumns (remove nil? [(generate-virtual-column dimension)])))
+
 (defn add-common-fields [dq q]
   (-> dq
       (add-druid-filters q)
       (add-druid-measures q)
+      (add-virtual-columns q)
       (add-timeout)))

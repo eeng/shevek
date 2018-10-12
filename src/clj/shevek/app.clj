@@ -22,6 +22,10 @@
 (defn- stop []
   (mount/stop))
 
+(defn restart-for-repl []
+  (mount/stop-except #'nrepl)
+  (mount/start))
+
 (defn seed []
   (start-for-seed)
   (seed! db))

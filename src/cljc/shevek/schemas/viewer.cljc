@@ -9,6 +9,7 @@
 (s/defschema MeasureSortBy
   (assoc Measure :descending s/Bool))
 
+; TODO: this way of differenciating measures from dimensions is no longer valid as both can have expression
 (s/defschema SortBy
   (s/if :expression MeasureSortBy DimensionSortBy))
 

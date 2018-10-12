@@ -145,6 +145,13 @@
           :measures ["count"]
           :filters [{:period "latest-day"}]})
 
+; Expressions
+#_(query request
+         {:cube "wikiticker"
+          :splits [{:name "monthNum2"}]
+          :measures ["count"]
+          :filters [{:period "latest-day"}]})
+
 ; Different time zone
 #_(query request
          {:cube "wikiticker"

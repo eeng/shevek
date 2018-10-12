@@ -24,16 +24,18 @@
 
   (testing "should gather dimensions information from the schema for the splits"
     (is (= [{:name "año" :operator "include" :value #{"2015"} :column "__time"
-             :extraction [{:type "timeFormat" :format "Y"}]}]
+             :extraction [{:type "timeFormat" :format "Y"}]
+             :expression "timestamp_extract()"}]
            (:splits
             (expand-query {:splits [{:name "año" :operator "include" :value #{"2015"}}]}
                           {:dimensions [{:name "año" :column "__time"
-                                         :extraction [{:type "timeFormat" :format "Y"}]}]})))))
+                                         :extraction [{:type "timeFormat" :format "Y"}]
+                                         :expression "timestamp_extract()"}]})))))
 
   (testing "should gather dimension/measure information from the schema for the sort-by in the splits"
     (is (= [{:name "d" :descending true :type "LONG"}
             {:name "d2" :column "__time" :extraction [{:type "ext"}]}
-            {:name "m" :descending false :expression "(sum $m)"}]
+            {:name "m" :descending false :expression "(sum $m)" :measure? true}]
            (->> (expand-query {:splits [{:name "d" :sort-by {:name "d" :descending true}}
                                         {:name "d2" :sort-by {:name "d2"}}
                                         {:name "e" :sort-by {:name "m" :descending false}}]}

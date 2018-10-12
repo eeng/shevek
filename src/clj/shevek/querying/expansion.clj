@@ -35,12 +35,17 @@
 (defn expand-query
   "Take a query and the corresponding cube schema and expands it with some schema information necessary to execute the query"
   [q {:keys [measures dimensions default-time-zone max-time]}]
-  (->> q
-       (transform [(must :measures) ALL] #(expand-dim % (conj measures row-count) [:expression]))
-       (transform [:filters ALL] #(expand-dim % dimensions [:column :extraction]))
-       (transform [(must :splits) ALL] #(expand-dim % dimensions [:column :extraction :multi-value]))
-       (transform [(must :splits) ALL (must :sort-by)] #(expand-dim % (concat dimensions measures) [:type :expression :extraction :column]))
-       (merge {:time-zone (or default-time-zone (t/system-time-zone))})
-       (relative-to-absolute-time max-time)
-       (transform [:filters (filterer time-dimension?)] merge-intervals)
-       (transform [:filters ALL time-dimension? :interval ALL] t/to-iso8601)))
+  (let [measures (map #(assoc % :measure? true) measures)]
+    (->> q
+         (transform [(must :measures) ALL]
+                    #(expand-dim % (conj measures row-count) [:expression]))
+         (transform [:filters ALL]
+                    #(expand-dim % dimensions [:column :extraction]))
+         (transform [(must :splits) ALL]
+                    #(expand-dim % dimensions [:column :extraction :expression :multi-value :type]))
+         (transform [(must :splits) ALL (must :sort-by)]
+                    #(expand-dim % (concat dimensions measures) [:type :expression :extraction :column :measure?]))
+         (merge {:time-zone (or default-time-zone (t/system-time-zone))})
+         (relative-to-absolute-time max-time)
+         (transform [:filters (filterer time-dimension?)] merge-intervals)
+         (transform [:filters ALL time-dimension? :interval ALL] t/to-iso8601))))

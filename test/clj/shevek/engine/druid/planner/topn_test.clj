@@ -34,7 +34,7 @@
                     :aggregations [{:name "count" :fieldName "count" :type "doubleSum"}
                                    {:name "users" :fieldName "users" :type "hyperUnique"}]}
                    (to-druid-query {:dimension {:name "page"
-                                                :sort-by {:name "users" :expression "(count-distinct $users)"}}
+                                                :sort-by {:name "users" :expression "(count-distinct $users)" :measure? true}}
                                     :measures [{:name "count" :expression "(sum $count)"}]}))))
 
     (testing "ascending ordered by the same dimension should use lexicographic sorting"
@@ -56,7 +56,7 @@
                    (to-druid-query {:dimension {:name "aFloat"
                                                 :sort-by {:name "aFloat" :descending false :type "FLOAT"}}})))))
 
-  (testing "extraction functions"
+  (testing "extraction functions",
     (testing "derived dimension with one extraction fn"
       (is (= {:type "extraction" :outputName "year" :dimension "__time"
               :extractionFn {:type "substring" :index 3}}
@@ -79,6 +79,32 @@
                                               :extraction [{:type "timeFormat" :locale "es"}]}
                                   :time-zone "Europe/Berlin"})
                  (get-in [:dimension :extractionFn]))))))
+
+  (testing "expressions"
+    (testing "when an expression is configured, should add it through a virtual column"
+      (let [dq (to-druid-query
+                {:dimension {:name "mes"
+                             :type "LONG"
+                             :expression "timestamp_extract(__time, 'MONTH')"}})]
+        (is (= [{:type "expression"
+                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :outputType "LONG"
+                 :name "mes:v"}]
+               (:virtualColumns dq)))
+        (is (= {:type "default"
+                :dimension "mes:v"
+                :outputName "mes"
+                :outputType "LONG"}
+               (:dimension dq)))))
+
+    (testing "when no expression is configured, virtualColumns should be empty"
+      (is (= [] (:virtualColumns (to-druid-query {:dimension {:name "product"}})))))
+
+    (testing "a dimension with expression in a sort-by should not be confused with a measure"
+      (let [dq (to-druid-query
+                {:dimension {:name "mes" :type "LONG"
+                             :sort-by {:name "mes"
+                                       :expression "timestamp_extract(__time, 'MONTH')"}}})])))
 
   (testing "multi-value dimensions"
     (testing "should use a listFiltered dimensionSpec when filtered that dimension with operator include"

@@ -12,6 +12,7 @@
 (s/defschema Dimension
   (assoc NTD
          :type s/Str
+         (s/optional-key :expression) s/Str
          (s/optional-key :column) s/Str
          (s/optional-key :extraction) [ExtractionFn]
          (s/optional-key :multi-value) s/Bool

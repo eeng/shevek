@@ -165,6 +165,7 @@
     {:name "countryName" :empty-value "Country Not Available" :default-sort-by "countryIsoCode"}
     {:name "year" :column "__time" :extraction [{:type "timeFormat" :format "Y"}]}
     {:name "month" :column "__time" :extraction [{:type "timeFormat" :format "MMMM"}]}
-    {:name "monthNum" :column "__time" :type "LONG" :extraction [{:type "timeFormat" :format "M"}]}]
+    {:name "monthNum" :column "__time" :type "LONG" :extraction [{:type "timeFormat" :format "M"}]}
+    {:name "monthNum2" :type "LONG" :expression "timestamp_extract(__time, 'MONTH')"}]
    :measures
    [{:name "count" :description "Character count"}]}]}
