@@ -11,6 +11,7 @@
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.viewer.url :refer [store-viewer-in-url]]
+            [shevek.schemas.conversion :refer [clean-sort-by]]
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform ALL]]))
 
@@ -24,7 +25,7 @@
     (cond-> (assoc (clean-dim dim)
                    :on "rows"
                    :limit (or limit (and (time-dimension? dim) 1000) 50)
-                   :sort-by initial-sort-by)
+                   :sort-by (clean-sort-by initial-sort-by))
             (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer))))))
 
 (defn- adjust-viztype [{:keys [viewer] :as db}]
@@ -68,8 +69,8 @@
   {:after [store-viewer-in-url]}
   (-> (transform [:viewer :splits ALL (partial includes? (keys sort-bys))]
                  #(assoc % :sort-by (-> (sort-bys %)
-                                        (select-keys [:name :title :type :expression])
-                                        (assoc :descending descending)))
+                                        (assoc :descending descending)
+                                        clean-sort-by))
                  db)
       (send-main-query)))
 

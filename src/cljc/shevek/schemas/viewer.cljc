@@ -1,17 +1,7 @@
 (ns shevek.schemas.viewer
   (:require [schema.core :as s]
             [shevek.schemas.cube :refer [Dimension Measure]]
-            [shevek.schemas.query :refer [Result RawQueryResults]]))
-
-(s/defschema DimensionSortBy
-  (assoc Dimension :descending s/Bool))
-
-(s/defschema MeasureSortBy
-  (assoc Measure :descending s/Bool))
-
-; TODO: this way of differenciating measures from dimensions is no longer valid as both can have expression
-(s/defschema SortBy
-  (s/if :expression MeasureSortBy DimensionSortBy))
+            [shevek.schemas.query :refer [Result RawQueryResults SortBy]]))
 
 (s/defschema Split
   (assoc Dimension

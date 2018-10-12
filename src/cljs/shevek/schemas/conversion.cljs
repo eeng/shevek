@@ -23,12 +23,15 @@
      :measures measures
      :pinboard {:measure (first measures) :dimensions []}}))
 
+(defn clean-sort-by [dim]
+  (select-keys dim [:descending :name]))
+
 (defn- report-dim->viewer [{:keys [name sort-by] :as dim}
                            {:keys [dimensions measures]}]
   (->> (merge dim (find-dimension name dimensions))
        (transform [(must :interval) ALL] parse-time)
        (transform (must :value) set)
-       (transform (must :sort-by) #(merge % (find-dimension (:name sort-by) (concat dimensions measures))))))
+       (transform (must :sort-by) #(clean-sort-by (merge % (find-dimension (:name sort-by) (concat dimensions measures)))))))
 
 (defn report-dims->viewer [coll cube]
   (mapv #(report-dim->viewer % cube) coll))
