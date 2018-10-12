@@ -80,7 +80,7 @@
                                   :time-zone "Europe/Berlin"})
                  (get-in [:dimension :extractionFn]))))))
 
-  (testing "expressions"
+  (testing "dimension expressions"
     (testing "when an expression is configured, should add it through a virtual column"
       (let [dq (to-druid-query
                 {:dimension {:name "mes"

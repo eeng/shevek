@@ -99,20 +99,15 @@
 (defn add-timeout [dq]
   (assoc-in dq [:context :timeout] 30000))
 
-(defn- generate-virtual-column [{:keys [expression name type]}]
+(defn generate-virtual-column [{:keys [expression name type]}]
   (when expression
     {:type "expression"
      :name (virtual-column-name name)
      :expression expression
      :outputType type}))
 
-(defn add-virtual-columns [dq {:keys [dimension]}]
-  (assoc dq
-        :virtualColumns (remove nil? [(generate-virtual-column dimension)])))
-
 (defn add-common-fields [dq q]
   (-> dq
       (add-druid-filters q)
       (add-druid-measures q)
-      (add-virtual-columns q)
       (add-timeout)))

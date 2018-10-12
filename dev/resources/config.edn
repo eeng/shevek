@@ -16,7 +16,6 @@
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "mesNum" :column "__time" :type "LONG"
                  :extraction [{:type "timeFormat" :format "M"}]}
-                {:name "mesNum2" :type "LONG" :expression "timestamp_extract(__time, 'MONTH')"}
                 {:name "semestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
                 {:name "cuatrimestre" :column "__time"

@@ -1,10 +1,13 @@
 (ns shevek.engine.druid.planner.groupby
   (:require [shevek.engine.druid.driver :refer [send-query]]
-            [shevek.engine.druid.planner.common :refer [time-zone dimension-spec dimension-order add-common-fields defaultLimit]]))
+            [shevek.engine.druid.planner.common :refer [time-zone dimension-spec dimension-order add-common-fields
+                                                        defaultLimit generate-virtual-column]]))
 
 (defn to-druid-query [{:keys [cube dimension] :as q}]
   (-> {:queryType "groupBy"
        :dataSource cube
+       :virtualColumns (remove nil? [(generate-virtual-column (:sort-by dimension))
+                                     (generate-virtual-column dimension)])
        :dimensions [(dimension-spec (:sort-by dimension) q)
                     (dimension-spec dimension q)]
        :granularity "all"

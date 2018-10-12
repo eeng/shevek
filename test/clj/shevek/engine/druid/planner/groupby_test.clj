@@ -32,7 +32,20 @@
                                          :dimensionOrder "numeric"}]}}
                  (to-druid-query
                   {:dimension {:name "monthName"
-                               :sort-by {:name "monthNum" :descending true :type "LONG"}}})))))
+                               :sort-by {:name "monthNum" :descending true :type "LONG"}}}))))
+
+  (testing "dimension expressions"
+    (let [dq (to-druid-query
+              {:dimension {:name "monthName"
+                           :sort-by {:name "monthNum" :descending true :type "LONG"
+                                     :expression "timestamp_extract(__time, 'MONTH')"}}})]
+      (is (= [{:type "expression"
+               :expression "timestamp_extract(__time, 'MONTH')"
+               :outputType "LONG"
+               :name "monthNum:v"}]
+             (:virtualColumns dq)))
+      (is (submap? {:dimension "monthNum:v"}
+                   (first (:dimensions dq)))))))
 
 (deftest from-druid-results-test
   (testing "results normalization"

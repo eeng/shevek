@@ -1,7 +1,8 @@
 (ns shevek.engine.druid.planner.topn
   (:require [shevek.engine.druid.driver :refer [send-query]]
             [shevek.engine.druid.planner.common :refer [time-zone dimension-spec sort-by-same? dimension-order
-                                                        add-common-fields defaultLimit virtual-column-name]]))
+                                                        add-common-fields defaultLimit virtual-column-name
+                                                        generate-virtual-column]]))
 
 (defn- generate-metric-field [{:keys [sort-by] :as dim} measures]
   (let [descending (or (nil? (:descending sort-by)) (:descending sort-by))
@@ -16,6 +17,7 @@
 (defn to-druid-query [{:keys [cube dimension measures] :as q}]
   (-> {:queryType "topN"
        :dataSource cube
+       :virtualColumns (remove nil? [(generate-virtual-column dimension)])
        :dimension (dimension-spec dimension q)
        :metric (generate-metric-field dimension measures)
        :threshold (dimension :limit (or defaultLimit))
