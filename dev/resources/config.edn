@@ -15,12 +15,14 @@
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "mesNum" :column "__time" :type "LONG"
                  :extraction [{:type "timeFormat" :format "M"}]}
-                {:name "semestre" :column "__time"
+                {:name "semestre" :description "Uses expression language"
+                 :expression "concat('S', div(timestamp_extract(__time, 'MONTH') - 1, 6) + 1)"}
+                {:name "semestre2" :column "__time" :description "Uses extract functions"
                  :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
-                {:name "cuatrimestre" :column "__time"
-                 :extraction [{:type "javascript" :function "function(d) { return 'C' + (Math.floor(new Date(d).getMonth() / 4) + 1) }"}]}
-                {:name "trimestre" :column "__time"
-                 :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
+                {:name "cuatrimestre"
+                 :expression "concat('C', div(timestamp_extract(__time, 'MONTH') - 1, 4) + 1)"}
+                {:name "trimestre"
+                 :expression "concat('T', div(timestamp_extract(__time, 'MONTH') - 1, 3) + 1)"}
                 {:name "dia_semana" :title "Día de Semana" :column "__time"
                  :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
@@ -135,22 +137,6 @@
                :expression "(/ (where {$evento \"Repetición\"} (count-distinct $pedidos))
                                (count-distinct $pedidos))"}]}
 
-  {:name "vtol_stats"
-   :title "VTOL Stats"
-   :description "Estadísticas de utilización del sistema VTOL"
-   :measures [{:name "db_runtime"
-               :title "DB Runtime (ms)"
-               :expression "(/ (sum $db_runtime) (sum $requests))"
-               :format "0"}
-              {:name "view_runtime"
-               :title "View Runtime (ms)"
-               :expression "(/ (sum $view_runtime) (sum $requests))"
-               :format "0"}
-              {:name "duration"
-               :title "Duration (ms)"
-               :expression "(/ (sum $duration) (sum $requests))"
-               :format "0"}]}
-
   {:name "wikiticker"
    :description "Druid quickstart sample of Wikipedia edits"
    :dimensions
@@ -162,9 +148,13 @@
     {:name "regionIsoCode" :title "Region ISO Code"}
     {:name "countryIsoCode" :title "Country ISO Code"}
     {:name "countryName" :empty-value "Country Not Available" :default-sort-by "countryIsoCode"}
-    {:name "year" :column "__time" :extraction [{:type "timeFormat" :format "Y"}]}
-    {:name "month" :column "__time" :extraction [{:type "timeFormat" :format "MMMM"}]}
-    {:name "monthNum" :column "__time" :type "LONG" :extraction [{:type "timeFormat" :format "M"}]}
-    {:name "monthNum2" :type "LONG" :expression "timestamp_extract(__time, 'MONTH')"}]
+    {:name "year" :expression "timestamp_extract(__time, 'YEAR')"}
+    {:name "month" :expression "timestamp_format(__time, 'MMMM')"}
+    {:name "monthNum" :type "LONG" :expression "timestamp_extract(__time, 'MONTH')"}
+    {:name "monthNum2" :column "__time" :type "LONG" :extraction [{:type "timeFormat" :format "M"}]}
+    {:name "semester"
+     :column "__time"
+     :extraction [{:type "javascript"
+                   :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}]
    :measures
    [{:name "count" :description "Character count"}]}]}

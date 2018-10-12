@@ -14,12 +14,12 @@
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "mesNum" :title "Mes #" :column "__time" :type "LONG"
                  :extraction [{:type "timeFormat" :format "M"}]}
-                {:name "semestre" :column "__time"
-                 :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
-                {:name "cuatrimestre" :column "__time"
-                 :extraction [{:type "javascript" :function "function(d) { return 'C' + (Math.floor(new Date(d).getMonth() / 4) + 1) }"}]}
-                {:name "trimestre" :column "__time"
-                 :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
+                {:name "semestre"
+                 :expression "concat('S', div(timestamp_extract(__time, 'MONTH') - 1, 6) + 1)"}
+                {:name "cuatrimestre"
+                 :expression "concat('C', div(timestamp_extract(__time, 'MONTH') - 1, 4) + 1)"}
+                {:name "trimestre"
+                 :expression "concat('T', div(timestamp_extract(__time, 'MONTH') - 1, 3) + 1)"}
                 {:name "dia_semana" :title "Día de Semana" :column "__time"
                  :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}

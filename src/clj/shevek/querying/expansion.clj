@@ -40,9 +40,9 @@
          (transform [(must :measures) ALL]
                     #(expand-dim % (conj measures row-count) [:expression]))
          (transform [:filters ALL]
-                    #(expand-dim % dimensions [:column :extraction]))
+                    #(expand-dim % dimensions [:column :extraction :expression :type]))
          (transform [(must :splits) ALL]
-                    #(expand-dim % dimensions [:column :extraction :expression :multi-value :type]))
+                    #(expand-dim % dimensions [:column :extraction :expression :type :multi-value]))
          (transform [(must :splits) ALL (must :sort-by)]
                     #(expand-dim % (concat dimensions measures) [:type :expression :extraction :column :measure?]))
          (merge {:time-zone (or default-time-zone (t/system-time-zone))})

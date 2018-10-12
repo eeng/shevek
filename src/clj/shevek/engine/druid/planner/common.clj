@@ -2,7 +2,7 @@
   (:require [clj-time.core :as t]
             [shevek.domain.dimension :refer [find-dimension numeric-dim? time-dimension? includes-dim?]]
             [shevek.querying.expression :refer [measure->druid]]
-            [shevek.lib.collections :refer [assoc-if-seq]]
+            [shevek.lib.collections :refer [assoc-if-seq distinct-by]]
             [clojure.string :as str]))
 
 (def defaultLimit 100)
@@ -20,23 +20,28 @@
   (cond-> extraction-fn
     (= type "timeFormat") (assoc :timeZone (time-zone q))))
 
-(defn- dimension-and-extraction [{:keys [name column extraction]} q]
+(defn virtual-column-name [{:keys [name]}]
+  (str name ":v"))
+
+(defn- dimension-column-name [{:keys [name column expression] :as dim}]
+  (if expression
+    (virtual-column-name dim)
+    (or column name)))
+
+(defn- dimension-and-extraction [{:keys [name column extraction] :as dim} q]
   (let [extraction (map #(add-time-zome-to-extraction-fn % q) extraction)]
-    (cond-> {:dimension (or column name)}
+    (cond-> {:dimension (dimension-column-name dim)}
       (seq extraction)
       (assoc :extractionFn (if (> (count extraction) 1)
                              {:type "cascade" :extractionFns extraction}
                              (first extraction))))))
-
-(defn virtual-column-name [name]
-  (str name ":v"))
 
 (defn dimension-spec [{:keys [name extraction expression type] :as dim} q]
   (let [lfv (list-filtered-values dim q)]
     (cond
       extraction (assoc (dimension-and-extraction dim q) :type "extraction" :outputName name)
       lfv {:type "listFiltered" :delegate name :values lfv}
-      expression {:type "default" :dimension (virtual-column-name name) :outputName name :outputType type}
+      expression {:type "default" :dimension (virtual-column-name dim) :outputName name :outputType type}
       :else name)))
 
 (defn sort-by-same? [{:keys [name sort-by]}]
@@ -99,15 +104,27 @@
 (defn add-timeout [dq]
   (assoc-in dq [:context :timeout] 30000))
 
-(defn generate-virtual-column [{:keys [expression name type]}]
+(defn- generate-virtual-column [{:keys [expression type] :as dim}]
   (when expression
     {:type "expression"
-     :name (virtual-column-name name)
+     :name (virtual-column-name dim)
      :expression expression
      :outputType type}))
 
+(defn generate-virtual-columns [dimensions]
+  (->> dimensions
+       (map generate-virtual-column)
+       (remove nil?)
+       (distinct-by :name)))
+
+; TODO: The sort-by-dim is a hack only needed now because measures have our own expression language
+(defn- add-virtual-columns [dq {:keys [dimension filters]}]
+  (let [sort-by-dim (when-not (measure? (:sort-by dimension)) (:sort-by dimension))]
+    (assoc dq :virtualColumns (generate-virtual-columns (into [dimension sort-by-dim] filters)))))
+
 (defn add-common-fields [dq q]
   (-> dq
+      (add-virtual-columns q)
       (add-druid-filters q)
       (add-druid-measures q)
       (add-timeout)))

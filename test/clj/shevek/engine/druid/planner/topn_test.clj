@@ -101,10 +101,28 @@
       (is (= [] (:virtualColumns (to-druid-query {:dimension {:name "product"}})))))
 
     (testing "a dimension with expression in a sort-by should not be confused with a measure"
+      (is (= "topN"
+             (:queryType
+              (to-druid-query
+               {:dimension {:name "mes" :type "LONG"
+                            :sort-by {:name "mes"
+                                      :expression "timestamp_extract(__time, 'MONTH')"}}})))))
+
+    (testing "when filtering by the same dimension which has an expression"
       (let [dq (to-druid-query
-                {:dimension {:name "mes" :type "LONG"
-                             :sort-by {:name "mes"
-                                       :expression "timestamp_extract(__time, 'MONTH')"}}})])))
+                {:dimension {:name "mes" :expression "timestamp_extract(__time, 'MONTH')" :type "STRING"}
+                 :filters [{:name "mes" :operator "include" :value ["Enero"]
+                            :expression "timestamp_extract(__time, 'MONTH')"}]})]
+        (is (= "mes:v" (-> dq :filter :dimension)))
+        (is (= ["mes:v"] (map :name (:virtualColumns dq))))))
+
+    (testing "when filtering by the other dimension which has an expression"
+      (let [dq (to-druid-query
+                {:dimension {:name "product"}
+                 :filters [{:name "mes" :operator "include" :value ["Enero"]
+                            :expression "timestamp_extract(__time, 'MONTH')"}]})]
+        (is (= "mes:v" (-> dq :filter :dimension)))
+        (is (= ["mes:v"] (map :name (:virtualColumns dq)))))))
 
   (testing "multi-value dimensions"
     (testing "should use a listFiltered dimensionSpec when filtered that dimension with operator include"
