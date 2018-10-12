@@ -9,8 +9,7 @@
    :description "Ventas calculadas a partir de los comprobantes de facturación de VTOL"
    :dimensions [{:name "__time" :title "Fecha de Emisión"}
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
-                {:name "año" :column "__time"
-                 :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
+                {:name "año" :expression "timestamp_extract(__time, 'YEAR')"}
                 {:name "mes" :column "__time" :default-sort-by "mesNum"
                  :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}

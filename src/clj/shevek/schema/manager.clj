@@ -1,5 +1,6 @@
 (ns shevek.schema.manager
   (:require [shevek.engine.protocol :refer [cubes cube-metadata time-boundary]]
+            [shevek.engine.druid.metadata :refer [only-used-keys]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.logging :refer [benchmark]]
@@ -16,8 +17,13 @@
 (defn- corresponding [field coll]
   (detect #(same-name? field %) coll))
 
+(defn- update-dimension [old new]
+  (if new
+    (merge (only-used-keys old) new)
+    old))
+
 (defn- merge-dimensions [old-coll new-coll]
-  (let [old-updated-fields (map #(merge % (corresponding % new-coll)) old-coll)
+  (let [old-updated-fields (map #(update-dimension % (corresponding % new-coll)) old-coll)
         new-fields (remove #(corresponding % old-coll) new-coll)]
     (->> (concat old-updated-fields new-fields)
          (remove :hidden))))
@@ -38,6 +44,10 @@
 (defn- set-default-type [dimension]
   (merge {:type "STRING"} dimension))
 
+; (defn- clean-old-fields [{:keys [expression] :as dimension}]
+;   (cond-> dimension
+;           expression (dissoc :extraction :column)))
+;
 (defn set-defaults [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
       (assoc :dimensions (mapv (comp set-default-type set-default-title) dimensions))

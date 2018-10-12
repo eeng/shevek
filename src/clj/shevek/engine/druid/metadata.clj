@@ -23,9 +23,11 @@
 (defn- measure-column? [{column :name} aggregators]
   (some #{(keyword column)} (keys aggregators)))
 
+(defn only-used-keys [dim]
+  (select-keys dim [:name :type]))
+
 (defn- with-name-inside [[column fields]]
-  (merge (select-keys fields [:type])
-         {:name (name column)}))
+  (only-used-keys (merge fields {:name (name column)})))
 
 (defn cube-metadata [driver cube]
   (let [{:keys [max-time] :as tb} (time-boundary driver cube)

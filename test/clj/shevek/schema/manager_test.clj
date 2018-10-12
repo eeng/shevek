@@ -92,7 +92,18 @@
     (it "a hidden dimension should be deleted"
       (make! Cube {:name "sales" :dimensions [{:name "__time"} {:name "year"}]})
       (update-cubes db [{:name "sales" :dimensions [{:name "year" :hidden true}]}])
-      (is (submaps? [{:name "__time"}] (-> (find-cubes db) first :dimensions))))))
+      (is (submaps? [{:name "__time"}] (-> (find-cubes db) first :dimensions))))
+
+    (it "when a field is removed from the config"
+      (make! Cube {:name "sales"
+                   :dimensions [{:name "__time"}
+                                {:name "year" :column "__time" :title "Año" :type "STRING"
+                                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}]}]})
+      (update-cubes db [{:name "sales"
+                         :dimensions [{:name "__time"}
+                                      {:name "year" :expression "timestamp_extract(...)"}]}])
+      (is (= {:name "year" :expression "timestamp_extract(...)" :title "Year" :type "STRING"}
+             (-> (find-cubes db) first :dimensions last))))))
 
 (deftest calculate-expression-tests
   (are [x y] (= x (calculate-expression y))
