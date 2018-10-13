@@ -117,7 +117,7 @@
        (remove nil?)
        (distinct-by :name)))
 
-; TODO: The sort-by-dim is a hack only needed now because measures have our own expression language
+; The sort-by-dim is a hack needed because measures at this time have our own expression language
 (defn- add-virtual-columns [dq {:keys [dimension filters]}]
   (let [sort-by-dim (when-not (measure? (:sort-by dimension)) (:sort-by dimension))]
     (assoc dq :virtualColumns (generate-virtual-columns (into [dimension sort-by-dim] filters)))))
