@@ -6,13 +6,13 @@
 
 (deftest expand-query-test
   (testing "should gather measures information from the schema"
-    (is (= [{:name "m1" :expression "(avg $m1)"}
-            {:name "m3" :expression "(sum $m3)"}]
+    (is (= [{:name "m1" :expression "(avg $m1)" :measure? true}
+            {:name "m3" :expression "(sum $m3)" :measure? true}]
            (:measures
             (expand-query {:measures ["m1" "m3"]}
-                          {:measures [{:name "m1" :expression "(avg $m1)" :title "..."}
-                                      {:name "m2" :expression "..." :title "..."}
-                                      {:name "m3" :expression "(sum $m3)" :title "..."}]})))))
+                          {:measures [{:name "m1" :expression "(avg $m1)"}
+                                      {:name "m2" :expression "..."}
+                                      {:name "m3" :expression "(sum $m3)"}]})))))
 
   (testing "should gather dimensions information from the schema for the filters"
     (is (= [{:name "año" :operator "include" :value #{"2015"} :column "__time"

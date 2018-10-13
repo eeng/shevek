@@ -14,10 +14,9 @@
 
 (def row-count {:name "rowCount" :expression "(count)"})
 
-(defn- expand-dim [dim dimensions schema-keys-to-keep]
+(defn- expand-dim [dim dimensions]
   (let [dim (if (string? dim) {:name dim} dim)]
     (-> (find-dimension (:name dim) dimensions)
-        (select-keys schema-keys-to-keep)
         (merge dim))))
 
 (defn- interval-intersection [[from1 to1] [from2 to2]]
@@ -37,14 +36,10 @@
   [q {:keys [measures dimensions default-time-zone max-time]}]
   (let [measures (map #(assoc % :measure? true) measures)]
     (->> q
-         (transform [(must :measures) ALL]
-                    #(expand-dim % (conj measures row-count) [:expression]))
-         (transform [:filters ALL]
-                    #(expand-dim % dimensions [:column :extraction :expression :type]))
-         (transform [(must :splits) ALL]
-                    #(expand-dim % dimensions [:column :extraction :expression :type :multi-value]))
-         (transform [(must :splits) ALL (must :sort-by)]
-                    #(expand-dim % (concat dimensions measures) [:type :expression :extraction :column :measure?]))
+         (transform [(must :measures) ALL] #(expand-dim % (conj measures row-count)))
+         (transform [:filters ALL] #(expand-dim % dimensions))
+         (transform [(must :splits) ALL] #(expand-dim % dimensions))
+         (transform [(must :splits) ALL (must :sort-by)] #(expand-dim % (concat dimensions measures)))
          (merge {:time-zone (or default-time-zone (t/system-time-zone))})
          (relative-to-absolute-time max-time)
          (transform [:filters (filterer time-dimension?)] merge-intervals)
