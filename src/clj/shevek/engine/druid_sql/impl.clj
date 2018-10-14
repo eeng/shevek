@@ -2,6 +2,7 @@
   (:require [shevek.engine.protocol :refer [Engine]]
             [shevek.engine.druid-native.metadata :as metadata]
             [shevek.engine.druid-native.raw :as raw]
+            [shevek.engine.default-planner :as default-planner]
             [shevek.driver.druid :as driver]
             [shevek.engine.druid-sql.query :as query]))
 
@@ -18,7 +19,7 @@
     (metadata/cube-metadata driver cube))
 
   (designer-query [_ query cube]
-    (query/execute-query driver query cube))
+    (default-planner/execute-query (partial query/execute-query driver) query cube))
 
   (raw-query [_ query cube]
     (raw/execute-query driver query cube))
