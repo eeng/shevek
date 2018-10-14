@@ -111,6 +111,7 @@
   (let [agg-fn (condp re-find (str type)
                  #"Max" "max"
                  #"Unique" "count-distinct"
+                 #"rowCount" "count"
                  "sum")]
     (str "(" agg-fn " $" name ")")))
 

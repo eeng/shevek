@@ -76,7 +76,10 @@
               (measure->druid {:name "x" :type "hyperUnique"}))))
       (is (= [{:type "doubleMax" :fieldName "x" :name "x"}]
              (:aggregations
-              (measure->druid {:name "x" :type "longMax"}))))))
+              (measure->druid {:name "x" :type "longMax"}))))
+      (is (= [{:type "count" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "rowCount"}))))))
 
   (testing "post-aggregators"
     (testing "arithmetic operation between same measure and a constant"

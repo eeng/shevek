@@ -12,7 +12,7 @@
                     (dissoc :period))
                q)))
 
-(def row-count {:name "rowCount" :expression "(count)"})
+(def row-count {:name "rowCount" :type "rowCount"})
 
 (defn- expand-dim [dim dimensions]
   (let [dim (if (string? dim) {:name dim} dim)]
