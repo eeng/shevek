@@ -1,7 +1,7 @@
-(ns shevek.engine.druid-sql.query-test
+(ns shevek.engine.druid-sql.solver-test
   (:require [clojure.test :refer :all]
             [clojure.string :as str]
-            [shevek.engine.druid-sql.query :refer [to-sql to-ast]]))
+            [shevek.engine.druid-sql.solver :refer [to-sql to-ast]]))
 
 (defn- sql [& args]
   (str/join " " args))

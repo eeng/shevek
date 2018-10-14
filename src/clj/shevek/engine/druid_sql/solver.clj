@@ -1,4 +1,4 @@
-(ns shevek.engine.druid-sql.query
+(ns shevek.engine.druid-sql.solver
   (:require [clojure.string :as str]
             [shevek.driver.druid :as driver]
             [shevek.domain.dimension :refer [time-dimension?]]
@@ -138,11 +138,11 @@
 (defn- send-query [driver sql]
   (driver/send-query driver {:query sql}))
 
-(defn execute-query [driver query]
+(defn resolve-expanded-query [driver query]
   (->> (to-sql query)
        (send-query driver)))
 
-#_(execute-query
+#_(resolve-expanded-query
    (driver/http-druid-driver "http://localhost:8082")
    {:cube "wikiticker"
     :measures [{:name "added" :expression "sum(added)"}

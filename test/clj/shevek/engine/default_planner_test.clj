@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [clj-fakes.core :as f]
             [shevek.engine.default-planner :as default-planner]
-            [shevek.engine.druid-native.planner :as druid-planner]
+            [shevek.engine.druid-native.impl :refer [druid-native-engine]]
             [shevek.driver.druid :refer [DruidDriver send-query]]
             [shevek.asserts :refer [submap-arg submaps?]]))
 
@@ -24,7 +24,7 @@
   {:measures [{:name "count" :expression "(count)"} {:name "added" :expression "(count)"}]})
 
 (defn- execute-query [driver query]
-  (default-planner/execute-query (partial druid-planner/execute-query driver) query cube-metadata))
+  (default-planner/execute (druid-native-engine driver) query cube-metadata))
 
 (deftest execute-query-test
   (testing "only totals should return row with zeros as Druid return an empty list"
