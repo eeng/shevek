@@ -107,7 +107,14 @@
     ([(_ :guard aggregator?) & _] :seq) [[(eval-aggregator name expression)] nil]
     ([(_ :guard post-aggregator?) & _] :seq) (eval-post-aggregator name expression tig)))
 
-(defn measure->druid [{:keys [name expression]} tig]
-  {:pre [(string? expression)]}
-  (let [[aggregators post-aggregator] (eval-expression name (read-string expression) tig)]
+(defn- calculate-default-expression [{:keys [type name] :as measure}]
+  (let [agg-fn (condp re-find (str type)
+                 #"Max" "max"
+                 #"Unique" "count-distinct"
+                 "sum")]
+    (str "(" agg-fn " $" name ")")))
+
+(defn measure->druid [{:keys [name expression] :as dim} tig]
+  (let [expression (or expression (calculate-default-expression dim))
+        [aggregators post-aggregator] (eval-expression name (read-string expression) tig)]
     {:aggregations aggregators :postAggregations (remove nil? [post-aggregator])}))

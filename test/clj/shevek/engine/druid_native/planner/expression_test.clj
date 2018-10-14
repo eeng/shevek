@@ -65,7 +65,18 @@
                               :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
                               :name "amount"}]
               :postAggregations []}
-             (measure->druid {:name "amount" :expression "(where {$x 1 $y 2} (sum $amount))"})))))
+             (measure->druid {:name "amount" :expression "(where {$x 1 $y 2} (sum $amount))"}))))
+
+    (testing "default expressions from type"
+      (is (= [{:type "doubleSum" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "longSum"}))))
+      (is (= [{:type "hyperUnique" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "hyperUnique"}))))
+      (is (= [{:type "doubleMax" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "longMax"}))))))
 
   (testing "post-aggregators"
     (testing "arithmetic operation between same measure and a constant"

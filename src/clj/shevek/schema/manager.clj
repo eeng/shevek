@@ -31,16 +31,6 @@
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
 
-(defn calculate-expression [{:keys [type name] :as measure}]
-  (let [agg-fn (condp re-find (str type)
-                 #"Max" "max"
-                 #"Unique" "count-distinct"
-                 "sum")]
-    (str "(" agg-fn " $" name ")")))
-
-(defn- set-default-expression [measure]
-  (merge {:expression (calculate-expression measure)} measure))
-
 (defn- set-default-type [dimension]
   (merge {:type "STRING"} dimension))
 
@@ -51,7 +41,7 @@
 (defn set-defaults [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
       (assoc :dimensions (mapv (comp set-default-type set-default-title) dimensions))
-      (assoc :measures (mapv (comp set-default-expression set-default-title) measures))))
+      (assoc :measures (mapv set-default-title measures))))
 
 (defn- add-time-dimension [{:keys [dimensions] :as cube}]
   (cond-> cube

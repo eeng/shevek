@@ -148,13 +148,8 @@
     {:name "regionIsoCode" :title "Region ISO Code"}
     {:name "countryIsoCode" :title "Country ISO Code"}
     {:name "countryName" :empty-value "Country Not Available" :default-sort-by "countryIsoCode"}
-    {:name "year" :expression "timestamp_extract(__time, 'YEAR')"}
-    {:name "month" :expression "timestamp_format(__time, 'MMMM')"}
-    {:name "monthNum" :type "LONG" :expression "timestamp_extract(__time, 'MONTH')"}
-    {:name "monthNum2" :column "__time" :type "LONG" :extraction [{:type "timeFormat" :format "M"}]}
-    {:name "semester"
-     :column "__time"
-     :extraction [{:type "javascript"
-                   :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}]
+    {:name "year" :expression "time_extract(__time, 'YEAR')"}
+    {:name "month" :expression "time_format(__time, 'MMMM')"}
+    {:name "monthNum" :type "LONG" :expression "time_extract(__time, 'MONTH')"}]
    :measures
    [{:name "count" :description "Character count"}]}]}
