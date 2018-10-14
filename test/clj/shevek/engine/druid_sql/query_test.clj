@@ -15,6 +15,9 @@
 (defn- group-clause [query]
   (->> query to-ast :group str))
 
+(defn- order-clause [query]
+  (->> query to-ast :order str))
+
 (defn- limit-clause [query]
   (->> query to-ast :limit str))
 
@@ -75,7 +78,7 @@
       (is (= "WHERE page = 'Someone''s house'"
              (where-clause {:filters [{:name "page" :operator "is" :value "Someone's house"}]})))))
 
-  (testing "group by"
+  (testing "grouping"
     (testing "normal dimension should add a SELECT and GROUP expression"
       (let [q {:dimension {:name "country"}}]
         (is (= "SELECT country"
@@ -89,6 +92,17 @@
                (select-clause q)))
         (is (= "GROUP BY 1"
                (group-clause q))))))
+
+  (testing "sorting"
+    (testing "sorting by a dimension"
+      (let [q {:dimension {:name "city" :sort-by {:name "city" :descending false}}}]
+        (is (= "ORDER BY city ASC" (order-clause q))))
+      (let [q {:dimension {:name "city" :sort-by {:name "city" :descending true :expression "upper(city)"}}}]
+        (is (= "ORDER BY upper(city) DESC" (order-clause q)))))
+
+    (testing "sorting by a metric",
+      (let [q {:dimension {:name "city" :sort-by {:name "amount" :expression "sum(amount)" :measure? true}}}]
+        (is (= "ORDER BY sum(amount) ASC" (order-clause q))))))
 
   (testing "limit"
     (testing "default should only be present when a dimension is indicated"
