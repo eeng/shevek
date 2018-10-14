@@ -114,4 +114,9 @@
     (testing "when specified should be used"
       (is (= "LIMIT 9"
              (limit-clause {:dimension {:name "country"}
-                            :limit 9}))))))
+                            :limit 9})))))
+
+  (testing "escaping"
+    (testing "should escape reserved words on aliases and calculated expressions"
+      (is (= "SELECT SUM(\"count\") AS \"count\""
+             (select-clause {:measures [{:name "count" :type "longSum"}]}))))))

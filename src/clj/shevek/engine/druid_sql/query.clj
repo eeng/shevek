@@ -9,22 +9,34 @@
 (defn wrap-strings [list]
   (->> list (map wrap-string) (str/join ", ")))
 
+(def reserved-words
+  #{"COUNT"})
+
+(defn- needs-escape? [s]
+  (contains? reserved-words (str/upper-case s)))
+
+(defn escape-id [s]
+  (if (needs-escape? s)
+    (format "\"%s\"" (str/escape s {\" "\"\""}))
+    s))
+
 (defn- calculate-expression [{:keys [expression name granularity type] :as dim}]
-  (cond
-    expression expression
-    (time-dimension? dim) (format "TIME_FLOOR(%s, %s)" name (wrap-string granularity))
-    (nil? type) name
-    (re-matches #".*Sum" type) (format "SUM(%s)" name)
-    (re-matches #".*Max" type) (format "MAX(%s)" name)
-    (re-matches #".*Min" type) (format "Min(%s)" name)
-    (re-matches #"hyperUnique" type) (format "COUNT(DISTINCT %s)" name)
-    :else name))
+  (let [name (escape-id name)]
+    (cond
+      expression expression
+      (time-dimension? dim) (format "TIME_FLOOR(%s, %s)" name (wrap-string granularity))
+      (nil? type) name
+      (re-matches #".*Sum" type) (format "SUM(%s)" name)
+      (re-matches #".*Max" type) (format "MAX(%s)" name)
+      (re-matches #".*Min" type) (format "Min(%s)" name)
+      (re-matches #"hyperUnique" type) (format "COUNT(DISTINCT %s)" name)
+      :else name)))
 
 (defn- select-expr [{:keys [name expression] :as dim}]
   (let [expr (calculate-expression dim)]
     (if (= expr name)
-      name
-      (str expr " AS " name))))
+      (escape-id name)
+      (str expr " AS " (escape-id name)))))
 
 (defn- filter->sql [{:keys [name interval operator value] :as filter}]
   (cond
@@ -121,7 +133,8 @@
 #_(execute-query
    (driver/http-druid-driver "http://localhost:8082")
    {:cube "wikiticker"
-    :measures [{:name "added" :expression "sum(added)"}]
+    :measures [{:name "added" :expression "sum(added)"}
+               {:name "count" :type "longSum"}]
     :dimension {:name "countryName"}
     :filters [{:name "countryName" :operator "search" :value "Arg"}]
     :limit 10})
