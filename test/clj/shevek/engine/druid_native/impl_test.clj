@@ -1,11 +1,11 @@
-(ns shevek.engine.druid-test
+(ns shevek.engine.druid-native.impl-test
   (:require [clojure.test :refer :all]
             [clj-fakes.core :as f]
             [shevek.asserts :refer [submap-arg]]
             [shevek.lib.time :refer [parse-time]]
             [shevek.engine.protocol :as e]
-            [shevek.engine.druid :refer [druid-engine]]
-            [shevek.engine.druid.driver :refer [DruidDriver]]))
+            [shevek.engine.druid-native.impl :refer [druid-native-engine]]
+            [shevek.driver.druid :refer [DruidDriver]]))
 
 (deftest cubes-test
   (testing "returns a list of all datasources"
@@ -13,7 +13,7 @@
       (let [driver (f/reify-fake DruidDriver
                      (datasources :fake [[] ["sales" "inventory"]]))]
         (is (= ["sales" "inventory"]
-               (e/cubes (druid-engine driver))))))))
+               (e/cubes (druid-native-engine driver))))))))
 
 (deftest cube-metadata-test
   (testing "should issue Druid queries to gatter the dimensions, measures and time boundary"
@@ -32,7 +32,7 @@
                 :measures [{:name "added" :type "longSum"}]
                 :max-time (parse-time "2015-09-12T23:59:59.200Z")
                 :min-time nil}
-               (e/cube-metadata (druid-engine driver) "wikiticker")))))))
+               (e/cube-metadata (druid-native-engine driver) "wikiticker")))))))
 
 (deftest custom-query-testing
   (testing "sends a Druid SQL query"
@@ -41,5 +41,5 @@
                      (send-query :fake [[{:query "SELECT sum(added) from wikiticker"}]
                                         [{:EXPR0 9385573}]]))]
         (is (= [{:EXPR0 9385573}]
-               (e/custom-query (druid-engine driver)
+               (e/custom-query (druid-native-engine driver)
                                "SELECT sum(added) from wikiticker")))))))

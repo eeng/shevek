@@ -1,6 +1,6 @@
-(ns shevek.engine.druid.planner.groupby
-  (:require [shevek.engine.druid.driver :refer [send-query]]
-            [shevek.engine.druid.planner.common :refer [time-zone dimension-spec dimension-order add-common-fields
+(ns shevek.engine.druid-native.planner.groupby
+  (:require [shevek.driver.druid :refer [send-query]]
+            [shevek.engine.druid-native.planner.common :refer [time-zone dimension-spec dimension-order add-common-fields
                                                         defaultLimit]]))
 
 (defn to-druid-query [{:keys [cube dimension] :as q}]

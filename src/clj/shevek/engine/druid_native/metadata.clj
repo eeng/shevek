@@ -1,5 +1,5 @@
-(ns shevek.engine.druid.metadata
-  (:require [shevek.engine.druid.driver :refer [datasources send-query]]
+(ns shevek.engine.druid-native.metadata
+  (:require [shevek.driver.druid :refer [datasources send-query]]
             [shevek.lib.time :refer [parse-time]]
             [shevek.lib.time.ext :refer [minus-period]]))
 
@@ -38,4 +38,4 @@
 
 ; Examples
 
-#_(cubes (shevek.engine.druid.driver/http-druid-driver "http://localhost:8082"))
+#_(cubes (shevek.driver.druid/http-druid-driver "http://localhost:8082"))

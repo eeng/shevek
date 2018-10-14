@@ -1,6 +1,6 @@
 (ns shevek.schema.manager
   (:require [shevek.engine.protocol :refer [cubes cube-metadata time-boundary]]
-            [shevek.engine.druid.metadata :refer [only-used-keys]]
+            [shevek.engine.druid-native.metadata :refer [only-used-keys]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.logging :refer [benchmark]]

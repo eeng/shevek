@@ -1,10 +1,10 @@
-(ns shevek.engine.druid.planner
+(ns shevek.engine.druid-native.planner
   (:require [shevek.querying.expansion :refer [expand-query]]
             [shevek.lib.collections :refer [assoc-if-seq find-by]]
-            [shevek.engine.druid.planner.common :refer [sort-by-other-dimension?]]
-            [shevek.engine.druid.planner.timeseries :refer [timeseries-query]]
-            [shevek.engine.druid.planner.topn :refer [topn-query]]
-            [shevek.engine.druid.planner.groupby :refer [groupby-query]]
+            [shevek.engine.druid-native.planner.common :refer [sort-by-other-dimension?]]
+            [shevek.engine.druid-native.planner.timeseries :refer [timeseries-query]]
+            [shevek.engine.druid-native.planner.topn :refer [topn-query]]
+            [shevek.engine.druid-native.planner.groupby :refer [groupby-query]]
             [shevek.domain.dimension :refer [partition-splits time-dimension? row-split? col-split?]]
             [com.rpl.specter :refer [setval must ALL]]
             [shevek.lib.time.ext :refer [plus-period]]))

@@ -1,9 +1,9 @@
-(ns shevek.engine.druid.raw
+(ns shevek.engine.druid-native.raw
   (:require [shevek.schemas.query :refer [RawQuery RawQueryResults]]
             [schema.core :as s]
             [shevek.querying.expansion :refer [expand-query]]
-            [shevek.engine.druid.driver :refer [send-query]]
-            [shevek.engine.druid.planner.common :refer [add-druid-filters]]
+            [shevek.driver.druid :refer [send-query]]
+            [shevek.engine.druid-native.planner.common :refer [add-druid-filters]]
             [shevek.lib.collections :refer [assoc-if]]
             [clojure.set :refer [rename-keys]]))
 

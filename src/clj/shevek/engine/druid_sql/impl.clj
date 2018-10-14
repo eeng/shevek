@@ -1,8 +1,8 @@
 (ns shevek.engine.druid-sql.impl
   (:require [shevek.engine.protocol :refer [Engine]]
-            [shevek.engine.druid.metadata :as metadata]
-            [shevek.engine.druid.raw :as raw]
-            [shevek.engine.druid.driver :as driver]
+            [shevek.engine.druid-native.metadata :as metadata]
+            [shevek.engine.druid-native.raw :as raw]
+            [shevek.driver.druid :as driver]
             [shevek.engine.druid-sql.query :as query]))
 
 (defrecord DruidSQLEngine [driver]

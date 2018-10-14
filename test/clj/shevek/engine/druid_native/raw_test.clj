@@ -1,7 +1,7 @@
-(ns shevek.engine.druid.raw-test
+(ns shevek.engine.druid-native.raw-test
   (:require [clojure.test :refer :all]
             [shevek.asserts :refer [submap?]]
-            [shevek.engine.druid.raw :refer [to-druid-query from-druid-results]]))
+            [shevek.engine.druid-native.raw :refer [to-druid-query from-druid-results]]))
 
 (deftest to-druid-query-test
   (testing "only time filter raw query"

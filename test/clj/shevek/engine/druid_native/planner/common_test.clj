@@ -1,7 +1,7 @@
-(ns shevek.engine.druid.planner.common-test
+(ns shevek.engine.druid-native.planner.common-test
   (:require [clojure.test :refer :all]
             [shevek.asserts :refer [submap? without? submaps?]]
-            [shevek.engine.druid.planner.timeseries :as timeseries :refer [to-druid-query]]))
+            [shevek.engine.druid-native.planner.timeseries :as timeseries :refer [to-druid-query]]))
 
 (deftest common-fields-to-all-druid-queries
   (testing "filters"

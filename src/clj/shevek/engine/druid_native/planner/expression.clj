@@ -1,4 +1,4 @@
-(ns shevek.querying.expression
+(ns shevek.engine.druid-native.planner.expression
   (:require [clojure.core.match :refer [match]]
             [cuerdas.core :as str]
             [shevek.lib.collections :refer [includes?]]))

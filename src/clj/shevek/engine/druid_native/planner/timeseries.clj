@@ -1,6 +1,6 @@
-(ns shevek.engine.druid.planner.timeseries
-  (:require [shevek.engine.druid.driver :refer [send-query]]
-            [shevek.engine.druid.planner.common :refer [time-zone add-common-fields]]))
+(ns shevek.engine.druid-native.planner.timeseries
+  (:require [shevek.driver.druid :refer [send-query]]
+            [shevek.engine.druid-native.planner.common :refer [time-zone add-common-fields]]))
 
 (defn to-druid-query [{:keys [cube dimension] :as q}]
   (-> {:queryType "timeseries"

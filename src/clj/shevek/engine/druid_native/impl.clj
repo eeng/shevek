@@ -1,11 +1,11 @@
-(ns shevek.engine.druid
+(ns shevek.engine.druid-native.impl
   (:require [shevek.engine.protocol :refer [Engine]]
-            [shevek.engine.druid.metadata :as metadata]
-            [shevek.engine.druid.planner :as planner]
-            [shevek.engine.druid.raw :as raw]
-            [shevek.engine.druid.driver :as driver]))
+            [shevek.engine.druid-native.metadata :as metadata]
+            [shevek.engine.druid-native.planner :as planner]
+            [shevek.engine.druid-native.raw :as raw]
+            [shevek.driver.druid :as driver]))
 
-(defrecord DruidEngine [driver]
+(defrecord DruidNativeEngine [driver]
   Engine
 
   (cubes [_]
@@ -26,5 +26,5 @@
   (custom-query [_ query]
     (driver/send-query driver {:query query})))
 
-(defn druid-engine [driver]
-  (DruidEngine. driver))
+(defn druid-native-engine [driver]
+  (DruidNativeEngine. driver))

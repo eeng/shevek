@@ -1,8 +1,8 @@
-(ns shevek.engine.druid.planner-test
+(ns shevek.engine.druid-native.planner-test
   (:require [clojure.test :refer :all]
             [clj-fakes.core :as f]
-            [shevek.engine.druid.planner :refer [execute-query]]
-            [shevek.engine.druid.driver :refer [DruidDriver send-query]]
+            [shevek.engine.druid-native.planner :refer [execute-query]]
+            [shevek.driver.druid :refer [DruidDriver send-query]]
             [shevek.asserts :refer [submap-arg submaps?]]))
 
 (defn without-concurrency! []

@@ -1,4 +1,4 @@
-(ns shevek.engine.druid.driver
+(ns shevek.driver.druid
   (:require [clj-http.client :as http]
             [taoensso.timbre :as log]
             [cheshire.core :refer [parse-string generate-string]]

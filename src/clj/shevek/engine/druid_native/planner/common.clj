@@ -1,7 +1,7 @@
-(ns shevek.engine.druid.planner.common
+(ns shevek.engine.druid-native.planner.common
   (:require [clj-time.core :as t]
             [shevek.domain.dimension :refer [find-dimension numeric-dim? time-dimension? includes-dim?]]
-            [shevek.querying.expression :refer [measure->druid]]
+            [shevek.engine.druid-native.planner.expression :refer [measure->druid]]
             [shevek.lib.collections :refer [assoc-if-seq distinct-by]]
             [clojure.string :as str]))
 

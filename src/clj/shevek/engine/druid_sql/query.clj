@@ -1,6 +1,6 @@
 (ns shevek.engine.druid-sql.query
   (:require [clojure.string :as str]
-            [shevek.engine.druid.driver :as driver]
+            [shevek.driver.druid :as driver]
             [shevek.domain.dimension :refer [time-dimension?]]))
 
 (defn- wrap-string [s]

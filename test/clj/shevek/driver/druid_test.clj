@@ -1,8 +1,8 @@
-(ns shevek.engine.druid.driver-test
+(ns shevek.driver.druid-test
   (:require [clojure.test :refer :all]
             [stub-http.core :refer :all]
             [shevek.asserts :refer [submaps?]]
-            [shevek.engine.druid.driver :as driver]
+            [shevek.driver.druid :as driver]
             [shevek.support.druid :refer [druid-res]]
             [cheshire.core :refer [generate-string]]))
 
