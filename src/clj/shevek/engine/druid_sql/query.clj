@@ -1,6 +1,7 @@
 (ns shevek.engine.druid-sql.query
   (:require [clojure.string :as str]
-            [shevek.engine.druid.driver :as driver]))
+            [shevek.engine.druid.driver :as driver]
+            [shevek.domain.dimension :refer [time-dimension?]]))
 
 (defn- wrap-string [s]
   (format "'%s'" (str/escape s {\' "''"})))
@@ -8,7 +9,13 @@
 (defn wrap-strings [list]
   (->> list (map wrap-string) (str/join ", ")))
 
-(defn- dimension->sql [{:keys [name expression type]}]
+(defn- dimension->sql [{:keys [name expression granularity] :as dim}]
+  (cond
+    expression (str expression " AS " name)
+    (time-dimension? dim) (format "TIME_FLOOR(%s, %s) AS %s" name (wrap-string granularity) name)
+    :else name))
+
+(defn- measure->sql [{:keys [name expression type]}]
   (cond
     expression (str expression " AS " name)
     (nil? type) name
@@ -18,7 +25,7 @@
     (re-matches #"hyperUnique" type) (format "COUNT(DISTINCT %s) AS %s" name name)
     :else name))
 
-(defn- filters->sql [{:keys [name interval operator value] :as filter}]
+(defn- filter->sql [{:keys [name interval operator value] :as filter}]
   (cond
     interval
     (let [[from to] interval]
@@ -39,26 +46,45 @@
     :else
     (throw (ex-info "Filter not supported" {:filter filter}))))
 
-(defn- to-str [{:keys [select from where group limit]}]
-  (->>
-   [(str "SELECT " (str/join ", " select))
-    (str "FROM " from)
-    (when (seq where)
-      (str "WHERE " (str/join " AND " where)))
-    (when (seq group)
-      (str "GROUP BY " (str/join ", " group)))
-    (when limit
-      (str "LIMIT " limit))]
-   (remove nil?)
-   (str/join " ")))
+(defrecord SelectClause [expressions]
+  Object
+  (toString [_] (str "SELECT " (str/join ", " expressions))))
 
-(defn- to-ast [{:keys [cube dimension measures filters limit] :or {limit 100}}]
+(defrecord FromClause [table]
+  Object
+  (toString [_] (str "FROM " table)))
+
+(defrecord WhereClause [condition]
+  Object
+  (toString [_] (when-not (empty? (str condition))
+                  (str "WHERE " condition))))
+
+(defrecord AndCondition [conditions]
+  Object
+  (toString [_] (str/join " AND " conditions)))
+
+(defrecord GroupClause [expressions]
+  Object
+  (toString [_] (str "GROUP BY " (str/join ", " expressions))))
+
+(defrecord LimitClause [limit]
+  Object
+  (toString [_] (str "LIMIT " limit)))
+
+(defn- to-str [query]
+  (->> (vals query)
+       (map str)
+       (remove empty?)
+       (str/join " ")))
+
+(defn to-ast [{:keys [cube dimension measures filters limit] :or {limit 100}}]
   (let [dimensions (remove nil? [dimension])]
-    {:select (map dimension->sql (concat dimensions measures))
-     :from cube
-     :where (map filters->sql filters)
-     :group (range 1 (inc (count dimensions)))
-     :limit (when dimension limit)}))
+    (array-map
+     :select (SelectClause. (concat (map dimension->sql dimensions) (map measure->sql measures)))
+     :from (FromClause. cube)
+     :where (WhereClause. (AndCondition. (map filter->sql filters)))
+     :group (GroupClause. (range 1 (inc (count dimensions))))
+     :limit (when dimension (LimitClause. limit)))))
 
 (defn to-sql [query]
   (-> query to-ast to-str))

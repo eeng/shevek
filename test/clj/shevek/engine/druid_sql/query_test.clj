@@ -1,19 +1,22 @@
 (ns shevek.engine.druid-sql.query-test
   (:require [clojure.test :refer :all]
             [clojure.string :as str]
-            [shevek.engine.druid-sql.query :refer [to-sql]]))
+            [shevek.engine.druid-sql.query :refer [to-sql to-ast]]))
 
 (defn- sql [& args]
   (str/join " " args))
 
 (defn- select-clause [query]
-  (->> query to-sql (re-find #"(SELECT.*?)($| FROM)") second))
+  (->> query to-ast :select str))
 
 (defn- where-clause [query]
-  (->> query to-sql (re-find #"\s(WHERE.*?)($| GROUP| LIMIT)") second))
+  (->> query to-ast :where str))
+
+(defn- group-clause [query]
+  (->> query to-ast :group str))
 
 (defn- limit-clause [query]
-  (->> query to-sql (re-find #"LIMIT.*$")))
+  (->> query to-ast :limit str))
 
 (deftest to-sql-test
   (testing "general structure"
@@ -72,11 +75,26 @@
       (is (= "WHERE page = 'Someone''s house'"
              (where-clause {:filters [{:name "page" :operator "is" :value "Someone's house"}]})))))
 
+  (testing "group by"
+    (testing "normal dimension should add a SELECT and GROUP expression"
+      (let [q {:dimension {:name "country"}}]
+        (is (= "SELECT country"
+               (select-clause q)))
+        (is (= "GROUP BY 1"
+               (group-clause q)))))
+
+    (testing "time dimension should should use the granularity"
+      (let [q {:dimension {:name "__time" :granularity "P1D"}}]
+        (is (= "SELECT TIME_FLOOR(__time, 'P1D') AS __time"
+               (select-clause q)))
+        (is (= "GROUP BY 1"
+               (group-clause q))))))
+
   (testing "limit"
     (testing "default should only be present when a dimension is indicated"
       (is (= "LIMIT 100"
              (limit-clause {:dimension {:name "country"}})))
-      (is (= nil
+      (is (= ""
              (limit-clause {}))))
 
     (testing "when specified should be used"
