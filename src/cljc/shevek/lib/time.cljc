@@ -98,8 +98,7 @@
   (end-of-month (date-time (t/year time) 12)))
 
 (defn round-to-next-minute [time]
-  (date-time (t/year time) (t/month time) (t/day time)
-             (t/hour time) (mod (inc (t/minute time)) 60) 0))
+  (t/floor (plus time (t/minutes 1)) t/minute))
 
 (defn to-iso8601 [time]
   (f/unparse (:date-time f/formatters)
