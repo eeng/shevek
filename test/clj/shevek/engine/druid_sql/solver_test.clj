@@ -44,7 +44,11 @@
       (is (= "SELECT COUNT(DISTINCT amount) AS amount"
              (select-clause {:measures [{:name "amount" :type "hyperUnique"}]})))
       (is (= "SELECT COUNT(*) AS rowCount"
-             (select-clause {:measures [{:name "rowCount" :type "rowCount"}]})))))
+             (select-clause {:measures [{:name "rowCount" :type "rowCount"}]}))))
+
+    (testing "FLOAT columns should behave as if they have a CAST AS FLOAT expression"
+      (is (= "SELECT CAST(esf AS FLOAT) AS esf"
+             (select-clause {:dimension {:name "esf" :type "FLOAT"}})))))
 
   (testing "filters"
     (testing "WHERE is not added if there is no filter"
@@ -73,7 +77,12 @@
 
     (testing "search operator"
       (is (= "WHERE LOWER(country) LIKE '%arg%'"
-             (where-clause {:filters [{:name "country" :operator "search" :value "Arg"}]})))))
+             (where-clause {:filters [{:name "country" :operator "search" :value "Arg"}]}))))
+
+    (testing "should respect expressions"
+      (is (= "WHERE countryName = 'Argentina'"
+             (where-clause {:filters [{:name "country" :operator "is" :value "Argentina"
+                                       :expression "countryName"}]})))))
 
   (testing "grouping"
     (testing "when no dimension is present should not add the clause"

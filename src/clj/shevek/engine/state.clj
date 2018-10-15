@@ -6,4 +6,4 @@
             [shevek.driver.druid :refer [http-druid-driver]]))
 
 (defstate dw
-  :start (druid-sql-engine (http-druid-driver (config :druid-uri))))
+  :start (druid-native-engine (http-druid-driver (config :druid-uri))))

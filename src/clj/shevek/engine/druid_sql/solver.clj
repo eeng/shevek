@@ -12,7 +12,7 @@
   (->> list (map wrap-string) (str/join ", ")))
 
 (def reserved-words
-  #{"COUNT" "DAY" "MONTH" "YEAR" "WEEK"})
+  #{"COUNT" "EPOCH" "SECOND" "MINUTE" "HOUR" "DAY" "MONTH" "YEAR" "WEEK"})
 
 (defn- needs-escaping? [s]
   (contains? reserved-words (str/upper-case s)))
@@ -31,8 +31,9 @@
       (re-matches #".*Sum" type) (format "SUM(%s)" name)
       (re-matches #".*Max" type) (format "MAX(%s)" name)
       (re-matches #".*Min" type) (format "Min(%s)" name)
-      (re-matches #"hyperUnique" type) (format "COUNT(DISTINCT %s)" name)
-      (re-matches #"rowCount" type) "COUNT(*)"
+      (= "hyperUnique" type) (format "COUNT(DISTINCT %s)" name)
+      (= "rowCount" type) "COUNT(*)"
+      (= "FLOAT" type) (format "CAST(%s AS FLOAT)" name)
       :else name)))
 
 (defn- select-expr [{:keys [name expression] :as dim}]
@@ -44,25 +45,26 @@
 
 (defn- filter->sql [{:keys [name interval operator value] :as filter}]
   {:pre [(string? name)]}
-  (cond
-    interval
-    (let [[from to] interval]
-      (format "%s BETWEEN '%s' AND '%s'" name from to))
+  (let [expr (calculate-expression filter)]
+    (cond
+      interval
+      (let [[from to] interval]
+        (format "%s BETWEEN '%s' AND '%s'" name from to))
 
-    (= operator "is")
-    (format "%s = %s" name (wrap-string value))
+      (= operator "is")
+      (format "%s = %s" expr (wrap-string value))
 
-    (= operator "include")
-    (format "%s IN (%s)" name (wrap-strings value))
+      (= operator "include")
+      (format "%s IN (%s)" expr (wrap-strings value))
 
-    (= operator "exclude")
-    (format "%s NOT IN (%s)" name (wrap-strings value))
+      (= operator "exclude")
+      (format "%s NOT IN (%s)" expr (wrap-strings value))
 
-    (= operator "search")
-    (format "LOWER(%s) LIKE %s" name (wrap-string (str "%" (str/lower-case value) "%")))
+      (= operator "search")
+      (format "LOWER(%s) LIKE %s" expr (wrap-string (str "%" (str/lower-case value) "%")))
 
-    :else
-    (throw (ex-info "Filter not supported" {:filter filter}))))
+      :else
+      (throw (ex-info "Filter not supported" {:filter filter})))))
 
 (defn- self-and-sort-if-is-other-dim [{:keys [sort-by] :as dim}]
   (if (sort-by-other-dimension? dim)
@@ -146,7 +148,7 @@
   (-> query to-ast to-str))
 
 (defn resolve-expanded-query [driver query]
-  (driver/send-query driver {:query (to-sql query) 
+  (driver/send-query driver {:query (to-sql query)
                              :sqlTimeZone (time-zone query)}))
 
 #_(resolve-expanded-query
