@@ -6,27 +6,18 @@
 (defn- sql [& args]
   (str/join " " args))
 
-(defn- select-clause [query]
-  (->> query to-ast :select str))
-
-(defn- where-clause [query]
-  (->> query to-ast :where str))
-
-(defn- group-clause [query]
-  (->> query to-ast :group str))
-
-(defn- order-clause [query]
-  (->> query to-ast :order str))
-
-(defn- limit-clause [query]
-  (->> query to-ast :limit str))
+(def select-clause (comp str :select to-ast))
+(def where-clause (comp str :where to-ast))
+(def group-clause (comp str :group to-ast))
+(def order-clause (comp str :order to-ast))
+(def limit-clause (comp str :limit to-ast))
 
 (deftest to-sql-test
   (testing "general structure"
     (is (= (sql "SELECT country, sum(added) AS added"
                 "FROM wikiticker"
                 "WHERE __time BETWEEN '2015' AND '2019'"
-                "GROUP BY 1"
+                "GROUP BY country"
                 "ORDER BY added DESC"
                 "LIMIT 100")
            (to-sql
@@ -88,14 +79,20 @@
     (testing "normal dimension should add a SELECT and GROUP expression"
       (let [q {:dimension {:name "country"}}]
         (is (= "SELECT country" (select-clause q)))
-        (is (= "GROUP BY 1" (group-clause q)))))
+        (is (= "GROUP BY country" (group-clause q)))))
 
     (testing "time dimension should should use the granularity"
       (let [q {:dimension {:name "__time" :granularity "P1D"}}]
         (is (= "SELECT TIME_FLOOR(__time, 'P1D') AS __time"
                (select-clause q)))
-        (is (= "GROUP BY 1"
+        (is (= "GROUP BY TIME_FLOOR(__time, 'P1D')"
                (group-clause q)))))
+
+    (testing "when sorting by a different dimension, that dimension should be added to the GROUP BY and to the ORDER BY clauses"
+      (let [q {:dimension {:name "country" :sort-by {:name "countryIsoCode" :expression "isoExpr"}}}]
+        (is (= "SELECT isoExpr AS countryIsoCode, country" (select-clause q)))
+        (is (= "GROUP BY isoExpr, country" (group-clause q)))
+        (is (= "ORDER BY countryIsoCode ASC" (order-clause q)))))
 
     (testing "dimension can have an expression"
         (is (= "SELECT upper(...) AS country"
@@ -115,14 +112,16 @@
     (testing "if no sort-by is specified, should sort by the first measure desc"
       (is (= "ORDER BY amount DESC"
              (order-clause {:dimension {:name "city"}
-                            :measures [{:name "amount" :expression "sum(amount)"}]})))))
+                            :measures [{:name "amount" :expression "sum(amount)"}]}))))
+
+    (testing "if no dimension is specified, should not add the clause"
+      (is (= nil (order-clause {:measures [{:name "amount" :expression "sum(amount)"}]})))))
 
   (testing "limit"
     (testing "default should only be present when a dimension is indicated"
       (is (= "LIMIT 100"
              (limit-clause {:dimension {:name "country"}})))
-      (is (= ""
-             (limit-clause {}))))
+      (is (= nil (limit-clause {}))))
 
     (testing "when specified should be used"
       (is (= "LIMIT 9"
@@ -138,4 +137,5 @@
              (select-clause {:measures [{:name "count" :type "longSum"}]})))
 
       (is (= "ORDER BY \"count\" DESC"
-             (order-clause {:measures [{:name "count" :type "longSum"}]}))))))
+             (order-clause {:measures [{:name "count" :type "longSum"}]
+                            :dimension {:name "country"}}))))))

@@ -22,7 +22,7 @@
 (defn- stop []
   (mount/stop))
 
-(defn restart-for-repl []
+(defn reload-config []
   (mount/stop-except #'nrepl)
   (mount/start))
 

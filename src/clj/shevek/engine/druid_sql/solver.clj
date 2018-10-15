@@ -1,7 +1,7 @@
 (ns shevek.engine.druid-sql.solver
   (:require [clojure.string :as str]
             [shevek.driver.druid :as driver]
-            [shevek.domain.dimension :refer [time-dimension?]]
+            [shevek.domain.dimension :refer [time-dimension? sort-by-other-dimension?]]
             [com.rpl.specter :refer [transform ALL]]))
 
 (defn- wrap-string [s]
@@ -63,10 +63,15 @@
     :else
     (throw (ex-info "Filter not supported" {:filter filter}))))
 
+(defn- self-and-sort-if-is-other-dim [{:keys [sort-by] :as dim}]
+  (if (sort-by-other-dimension? dim)
+    [sort-by dim]
+    [dim]))
+
 (defrecord SelectClause [dimensions measures]
   Object
   (toString [_]
-    (let [expressions (map select-expr (concat dimensions measures))]
+    (let [expressions (map select-expr (concat (mapcat self-and-sort-if-is-other-dim dimensions) measures))]
       (str "SELECT " (str/join ", " expressions)))))
 
 (defrecord FromClause [table]
@@ -88,15 +93,17 @@
 (defrecord GroupClause [dimensions]
   Object
   (toString [_]
-    (let [expressions (range 1 (inc (count dimensions)))]
-      (when (seq expressions)
+    (when (seq dimensions)
+      (let [expressions (->> dimensions
+                             (mapcat self-and-sort-if-is-other-dim)
+                             (map calculate-expression))]
         (str "GROUP BY " (str/join ", " expressions))))))
 
 (defn- sort-by->sql [{:keys [name descending]}]
   (str (escape-id name) " " (if descending "DESC" "ASC")))
 
-(defn- add-default-sort-if-none [measures sorts-by]
-  (if (seq sorts-by)
+(defn- add-default-sort-if-none [dimensions measures sorts-by]
+  (if (or (seq sorts-by) (empty? dimensions))
     sorts-by
     [(assoc (first measures) :descending true)]))
 
@@ -106,14 +113,16 @@
     (let [expressions (->> dimensions
                            (map :sort-by)
                            (remove nil?)
-                           (add-default-sort-if-none measures)
+                           (add-default-sort-if-none dimensions measures)
                            (map sort-by->sql))]
       (when (seq expressions)
         (str "ORDER BY " (str/join ", " expressions))))))
 
-(defrecord LimitClause [limit]
+(defrecord LimitClause [dimension]
   Object
-  (toString [_] (str "LIMIT " (or limit 100))))
+  (toString [_]
+    (when dimension
+      (str "LIMIT " (or (:limit dimension) 100)))))
 
 (defn- to-str [query]
   (->> (vals query)
@@ -130,7 +139,7 @@
      :where (WhereClause. (AndCondition. filters))
      :group (GroupClause. dimensions)
      :order (OrderClause. dimensions measures)
-     :limit (when dimension (LimitClause. (:limit dimension))))))
+     :limit (LimitClause. dimension))))
 
 (defn to-sql [query]
   (-> query to-ast to-str))

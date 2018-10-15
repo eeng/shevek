@@ -1,6 +1,6 @@
 (ns shevek.engine.druid-native.planner.common
   (:require [clj-time.core :as t]
-            [shevek.domain.dimension :refer [find-dimension numeric-dim? time-dimension? includes-dim?]]
+            [shevek.domain.dimension :refer [find-dimension numeric-dim? time-dimension? includes-dim? measure? sort-by-other-dimension?]]
             [shevek.engine.druid-native.planner.expression :refer [measure->druid]]
             [shevek.lib.collections :refer [assoc-if-seq distinct-by]]
             [clojure.string :as str]))
@@ -43,17 +43,6 @@
       lfv {:type "listFiltered" :delegate name :values lfv}
       expression {:type "default" :dimension (virtual-column-name dim) :outputName name :outputType type}
       :else name)))
-
-(defn sort-by-same? [{:keys [name sort-by]}]
-  (= name (:name sort-by)))
-
-(defn measure? [dim-or-measure]
-  (:measure? dim-or-measure))
-
-(defn sort-by-other-dimension? [{:keys [sort-by] :as dim}]
-  (and sort-by
-       (not (sort-by-same? dim))
-       (not (measure? sort-by))))
 
 (defn dimension-order [dim]
   (if (numeric-dim? dim) "numeric" "lexicographic"))

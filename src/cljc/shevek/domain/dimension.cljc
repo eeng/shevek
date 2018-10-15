@@ -59,3 +59,14 @@
 
 (defn partition-splits [splits]
   ((juxt filter remove) row-split? splits))
+
+(defn sort-by-same? [{:keys [name sort-by]}]
+  (= name (:name sort-by)))
+
+(defn measure? [dim-or-measure]
+  (:measure? dim-or-measure))
+
+(defn sort-by-other-dimension? [{:keys [sort-by] :as dim}]
+  (and sort-by
+       (not (sort-by-same? dim))
+       (not (measure? sort-by))))
