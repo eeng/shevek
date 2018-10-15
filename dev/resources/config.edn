@@ -9,20 +9,23 @@
    :description "Ventas calculadas a partir de los comprobantes de facturación de VTOL"
    :dimensions [{:name "__time" :title "Fecha de Emisión"}
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
-                {:name "año" :expression "time_extract(__time, 'YEAR')"}
+                {:name "año" :expression "timestamp_extract(__time, 'YEAR')"}
                 {:name "mes" :column "__time" :default-sort-by "mesNum"
                  :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
                               {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "mesNum" :column "__time" :type "LONG"
                  :extraction [{:type "timeFormat" :format "M"}]}
-                {:name "semestre"
-                 :expression "'S' || cast((time_extract(__time, 'MONTH') - 1) / 6 + 1 as varchar)"}
+                {:name "semestre" :description "Uses expression language"
+                 :expression "concat('S', div(timestamp_extract(__time, 'MONTH') - 1, 6) + 1)"}
+                {:name "semestre2" :column "__time" :description "Uses extract functions"
+                 :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
                 {:name "cuatrimestre"
-                 :expression "'C' || cast((time_extract(__time, 'MONTH') - 1) / 4 + 1 as varchar)"}
+                 :expression "concat('C', div(timestamp_extract(__time, 'MONTH') - 1, 4) + 1)"}
                 {:name "trimestre"
-                 :expression "'T' || cast((time_extract(__time, 'MONTH') - 1) / 3 + 1 as varchar)"}
-                {:name "dia_semana" :title "Día de Semana"
-                 :expression "time_format(__time, 'EEEE')"}
+                 :expression "concat('T', div(timestamp_extract(__time, 'MONTH') - 1, 3) + 1)"}
+                {:name "dia_semana" :title "Día de Semana" :column "__time"
+                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
                 {:name "tipo_comprobante" :title "Tipo de Comprobante"}
                 {:name "grupo_item" :title "Grupo de Item"}
                 {:name "tipo_item" :title "Tipo de Item"}
@@ -48,17 +51,17 @@
                 {:name "eje_cilindrico" :title "Eje Cilíndrico" :type "FLOAT"}
                 {:name "adicion" :title "Adición" :type "FLOAT"}]
    :measures [{:name "importe" :title "Importe Total" :format "$0.00a"
-               :expression "sum(importe) / 100.0"}
+               :expression "(/ (sum $importe) 100)"}
               {:name "importe_productos" :format "$0.00a" :favorite true
-               :expression "sum(case grupo_item when 'Productos' then importe else 0 end) / 100.0"}
+               :expression "(/ (where {$grupo_item \"Productos\"} (sum $importe)) 100)"}
               {:name "importe_impuestos" :format "$0.00a"
-               :expression "sum(case grupo_item when 'Impuestos' then importe else 0 end) / 100.0"}
+               :expression "(/ (where {$grupo_item \"Impuestos\"} (sum $importe)) 100)"}
               {:name "ultimo_nro_cbte" :title "Último Cbte" :format "0,0"}
               {:name "unidades_precios" :title "Unidades"
-               :expression "sum(case tipo_item when 'Precio' then unidades else 0 end)"
+               :expression "(where {$tipo_item \"Precio\"} (sum $unidades))"
                :favorite true}
               {:name "unidades_descargos"
-               :expression "sum(case tipo_item when 'Precio' then 0 else unidades end)"}
+               :expression "(where (not= $tipo_item \"Precio\") (sum $unidades))"}
               {:name "unidades" :hidden true}]}
 
   {:name "eventos_pedidos"
@@ -146,8 +149,13 @@
     {:name "regionName" :default-sort-by "regionIsoCode"}
     {:name "countryIsoCode" :title "Country ISO Code"}
     {:name "countryName" :empty-value "Country Not Available"}
-    {:name "year" :expression "time_extract(__time, 'YEAR')"}
-    {:name "month" :expression "time_format(__time, 'MMMM')"}
-    {:name "monthNum" :type "LONG" :expression "time_extract(__time, 'MONTH')"}]
+    {:name "year" :expression "timestamp_extract(__time, 'YEAR')"}
+    {:name "month" :expression "timestamp_format(__time, 'MMMM')"}
+    {:name "monthNum" :type "LONG" :expression "timestamp_extract(__time, 'MONTH')"}
+    {:name "monthNum2" :column "__time" :type "LONG" :extraction [{:type "timeFormat" :format "M"}]}
+    {:name "semester"
+     :column "__time"
+     :extraction [{:type "javascript"
+                   :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}]
    :measures
    [{:name "count" :description "Character count"}]}]}
