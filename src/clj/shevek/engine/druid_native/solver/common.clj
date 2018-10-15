@@ -1,6 +1,6 @@
-(ns shevek.engine.druid-native.planner.common
+(ns shevek.engine.druid-native.solver.common
   (:require [shevek.domain.dimension :refer [find-dimension numeric-dim? time-dimension? includes-dim? measure? sort-by-other-dimension?]]
-            [shevek.engine.druid-native.planner.expression :refer [measure->druid]]
+            [shevek.engine.druid-native.solver.expression :refer [measure->druid]]
             [shevek.engine.utils :refer [time-zone]]
             [shevek.lib.collections :refer [assoc-if-seq distinct-by]]
             [clojure.string :as str]))

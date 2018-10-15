@@ -3,7 +3,7 @@
             [schema.core :as s]
             [shevek.querying.expansion :refer [expand-query]]
             [shevek.driver.druid :refer [send-query]]
-            [shevek.engine.druid-native.planner.common :refer [add-druid-filters]]
+            [shevek.engine.druid-native.solver.common :refer [add-druid-filters]]
             [shevek.lib.collections :refer [assoc-if]]
             [clojure.set :refer [rename-keys]]))
 

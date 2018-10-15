@@ -1,6 +1,6 @@
-(ns shevek.engine.druid-native.planner.topn
+(ns shevek.engine.druid-native.solver.topn
   (:require [shevek.driver.druid :refer [send-query]]
-            [shevek.engine.druid-native.planner.common :refer [dimension-spec dimension-order add-common-fields]]
+            [shevek.engine.druid-native.solver.common :refer [dimension-spec dimension-order add-common-fields]]
             [shevek.engine.utils :refer [time-zone defaultLimit]]
             [shevek.domain.dimension :refer [sort-by-same?]]))
 

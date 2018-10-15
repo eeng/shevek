@@ -1,7 +1,7 @@
-(ns shevek.engine.druid-native.planner.expression-test
+(ns shevek.engine.druid-native.solver.expression-test
   (:require [clojure.test :refer :all]
-            [shevek.engine.druid-native.planner.expression :as e]
-            [shevek.engine.druid-native.planner.common :refer [make-tig]]))
+            [shevek.engine.druid-native.solver.expression :as e]
+            [shevek.engine.druid-native.solver.common :refer [make-tig]]))
 
 (defn measure->druid [m]
   (e/measure->druid m (make-tig)))
