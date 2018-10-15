@@ -13,7 +13,9 @@
 
   (testing "period latest-day"
     (is (= [(d 2017 3 5 17 29) (d 2017 3 6 17 29)]
-           (to-interval "latest-day" (d 2017 3 6 17 28)))))
+           (to-interval "latest-day" (d 2017 3 6 17 28))))
+    (is (= [(d 2017 1 2) (d 2017 1 3)]
+           (to-interval "latest-day" (d 2017 1 2 23 59)))))
 
   (testing "period current-day"
     (with-redefs [now (constantly (d 2017 3 15 18 11))]
