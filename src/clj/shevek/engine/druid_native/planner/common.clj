@@ -1,14 +1,9 @@
 (ns shevek.engine.druid-native.planner.common
-  (:require [clj-time.core :as t]
-            [shevek.domain.dimension :refer [find-dimension numeric-dim? time-dimension? includes-dim? measure? sort-by-other-dimension?]]
+  (:require [shevek.domain.dimension :refer [find-dimension numeric-dim? time-dimension? includes-dim? measure? sort-by-other-dimension?]]
             [shevek.engine.druid-native.planner.expression :refer [measure->druid]]
+            [shevek.engine.utils :refer [time-zone]]
             [shevek.lib.collections :refer [assoc-if-seq distinct-by]]
             [clojure.string :as str]))
-
-(def defaultLimit 100)
-
-(defn time-zone [q]
-  (or (:time-zone q) (str (t/default-time-zone))))
 
 (defn- list-filtered-values [{:keys [multi-value name]} {:keys [filters]}]
   (when multi-value

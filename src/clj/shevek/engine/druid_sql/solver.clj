@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [shevek.driver.druid :as driver]
             [shevek.domain.dimension :refer [time-dimension? sort-by-other-dimension?]]
+            [shevek.engine.utils :refer [time-zone defaultLimit]]
             [com.rpl.specter :refer [transform ALL]]))
 
 (defn- wrap-string [s]
@@ -122,7 +123,7 @@
   Object
   (toString [_]
     (when dimension
-      (str "LIMIT " (or (:limit dimension) 100)))))
+      (str "LIMIT " (or (:limit dimension) defaultLimit)))))
 
 (defn- to-str [query]
   (->> (vals query)
@@ -144,12 +145,9 @@
 (defn to-sql [query]
   (-> query to-ast to-str))
 
-(defn- send-query [driver sql]
-  (driver/send-query driver {:query sql}))
-
 (defn resolve-expanded-query [driver query]
-  (->> (to-sql query)
-       (send-query driver)))
+  (driver/send-query driver {:query (to-sql query) 
+                             :sqlTimeZone (time-zone query)}))
 
 #_(resolve-expanded-query
    (driver/http-druid-driver "http://localhost:8082")

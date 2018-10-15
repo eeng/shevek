@@ -1,6 +1,7 @@
 (ns shevek.engine.druid-native.planner.topn
   (:require [shevek.driver.druid :refer [send-query]]
-            [shevek.engine.druid-native.planner.common :refer [time-zone dimension-spec dimension-order add-common-fields defaultLimit]]
+            [shevek.engine.druid-native.planner.common :refer [dimension-spec dimension-order add-common-fields]]
+            [shevek.engine.utils :refer [time-zone defaultLimit]]
             [shevek.domain.dimension :refer [sort-by-same?]]))
 
 (defn- generate-metric-field [{:keys [sort-by] :as dim} measures]

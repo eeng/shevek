@@ -1,7 +1,10 @@
 (ns shevek.engine.druid-sql.solver-test
   (:require [clojure.test :refer :all]
             [clojure.string :as str]
-            [shevek.engine.druid-sql.solver :refer [to-sql to-ast]]))
+            [clj-fakes.core :as f]
+            [shevek.asserts :refer [submap-arg]]
+            [shevek.engine.druid-sql.solver :refer [to-sql to-ast resolve-expanded-query]]
+            [shevek.driver.druid :refer [DruidDriver send-query]]))
 
 (defn- sql [& args]
   (str/join " " args))
@@ -139,3 +142,14 @@
       (is (= "ORDER BY \"count\" DESC"
              (order-clause {:measures [{:name "count" :type "longSum"}]
                             :dimension {:name "country"}}))))))
+
+(deftest resolve-expanded-query-test
+  (testing "should include the specified time-zone (or the default) in the context"
+    (f/with-fakes
+      (let [driver (f/reify-fake DruidDriver
+                     (send-query :recorded-fake [[f/any] []]))]
+        (resolve-expanded-query
+         driver
+         {:measures [{:name "added"}]
+          :time-zone "Europe/Berlin"})
+        (is (f/method-was-matched-once send-query driver [(submap-arg {:sqlTimeZone "Europe/Berlin"})]))))))
