@@ -23,3 +23,6 @@
     (fill {:name "current-password"} "secret999" k/enter)
     (is (has-css? "#notification" :text "Your account has been saved"))
     (is (has-css? ".segment .item" :text "max@acme.com"))))
+
+#_(start-system)
+#_(stop-system)

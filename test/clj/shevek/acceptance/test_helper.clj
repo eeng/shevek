@@ -20,13 +20,22 @@
 ; Por defecto etaoin espera 20 segs
 (alter-var-root #'e/default-timeout (constantly 3))
 
-(defn wrap-acceptance-tests [f]
+(defn start-system [& [{:keys [swap-states]}]]
   (System/setProperty "conf" "test/resources/test-config.edn")
-  (mount/start-without #'shevek.nrepl/nrepl
-                       #'shevek.scheduler/scheduler
-                       #'shevek.reloader/reloader)
-  (f)
+  (-> (mount/except
+       [#'shevek.nrepl/nrepl
+        #'shevek.scheduler/scheduler
+        #'shevek.reloader/reloader])
+      (mount/swap-states swap-states)
+      (mount/start)))
+
+(defn stop-system []
   (mount/stop))
+
+(defn wrap-acceptance-tests [f]
+  (start-system)
+  (f)
+  (stop-system))
 
 (defmacro it [description & body]
   `(testing ~description
