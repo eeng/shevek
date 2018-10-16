@@ -33,3 +33,7 @@
   (if period
     (to-interval period max-time)
     (normalize-interval interval)))
+
+#_(effective-interval {:period "latest-day"} (t/parse-time "2015-09-12T23:59:59.200Z"))
+#_(t/with-time-zone "America/Argentina/Buenos_Aires"
+    (effective-interval {:period "latest-day"} (t/parse-time "2015-09-12T23:59:59.200Z")))

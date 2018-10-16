@@ -11,4 +11,4 @@
 #_(cljs-repl)
 
 ; Use this to reread the config file
-#_(shevek.app/restart-for-repl)
+#_(shevek.app/reload-config)

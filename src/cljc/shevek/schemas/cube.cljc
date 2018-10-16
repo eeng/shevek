@@ -22,7 +22,7 @@
 (s/defschema Measure
   (assoc NTD
          (s/optional-key :type) s/Str
-         :expression s/Str
+         (s/optional-key :expression) s/Str
          (s/optional-key :format) s/Str
          (s/optional-key :favorite) s/Bool))
 

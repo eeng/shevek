@@ -21,7 +21,8 @@
         default-sort-by (find-dimension default-sort-by (-> viewer :cube :dimensions))
         initial-sort-by (or sort-by
                             (and default-sort-by (assoc default-sort-by :descending false))
-                            (assoc first-measure :descending (not (time-dimension? dim))))]
+                            (and (time-dimension? dim) (assoc dim :descending false))
+                            (assoc first-measure :descending true))]
     (cond-> (assoc (clean-dim dim)
                    :on "rows"
                    :limit (or limit (and (time-dimension? dim) 1000) 50)

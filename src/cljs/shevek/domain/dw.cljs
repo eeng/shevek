@@ -14,7 +14,7 @@
 
 (defn format-dim-value [value {:keys [granularity name type empty-value] :or {empty-value "Ø"} :as dim}]
   (cond
-    (nil? value) empty-value
+    (empty? (str value)) empty-value
     (time-dimension? dim) (format-time-according-to-period value granularity)
     (= "BOOL" type) (format-bool value)
     :else value))

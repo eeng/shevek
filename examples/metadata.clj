@@ -4,4 +4,4 @@
 
 #_(e/cubes dw)
 #_(e/time-boundary dw "wikiticker")
-#_(e/cube-metadata dw "facturacion")
+#_(e/cube-metadata dw "wikiticker")

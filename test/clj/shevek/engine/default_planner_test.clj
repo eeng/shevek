@@ -1,8 +1,9 @@
-(ns shevek.engine.druid.planner-test
+(ns shevek.engine.default-planner-test
   (:require [clojure.test :refer :all]
             [clj-fakes.core :as f]
-            [shevek.engine.druid.planner :refer [execute-query]]
-            [shevek.engine.druid.driver :refer [DruidDriver send-query]]
+            [shevek.engine.default-planner :as default-planner]
+            [shevek.engine.druid-native.impl :refer [druid-native-engine]]
+            [shevek.driver.druid :refer [DruidDriver send-query]]
             [shevek.asserts :refer [submap-arg submaps?]]))
 
 (defn without-concurrency! []
@@ -22,6 +23,9 @@
 (def cube-metadata
   {:measures [{:name "count" :expression "(count)"} {:name "added" :expression "(count)"}]})
 
+(defn- execute-query [driver query]
+  (default-planner/execute (druid-native-engine driver) query cube-metadata))
+
 (deftest execute-query-test
   (testing "only totals should return row with zeros as Druid return an empty list"
     (f/with-fakes
@@ -34,8 +38,7 @@
                  :splits []
                  :measures ["count" "added"]
                  :filters [{:interval ["2015" "2016"]}]
-                 :totals true}
-                cube-metadata))))))
+                 :totals true}))))))
 
   (testing "totals and one row split"
     (f/with-fakes
@@ -47,8 +50,7 @@
           :splits [{:name "page"}]
           :measures ["count"]
           :filters [{:interval ["2015" "2016"]}]
-          :totals true}
-         cube-metadata)
+          :totals true})
         (f/methods-were-called-in-order
          send-query driver [(submap-arg {:queryType "timeseries" :granularity "all"})]
          send-query driver [(submap-arg {:queryType "topN" :dimension "page"})]))))
@@ -76,8 +78,7 @@
               {:cube "wikiticker"
                :splits [{:name "country"} {:name "city"}]
                :measures ["count"]
-               :filters [{:interval ["2015" "2016"]}]}
-              cube-metadata))))))
+               :filters [{:interval ["2015" "2016"]}]}))))))
 
   (testing "one time and one normal dimension on rows"
     (f/with-fakes
@@ -98,8 +99,7 @@
                  :splits [{:name "__time" :granularity "PT12H"} {:name "country"}]
                  :measures ["count"]
                  :filters [{:interval ["2015" "2015"]}
-                           {:name "country" :operator "is" :value "Argentina"}]}
-                cube-metadata)))
+                           {:name "country" :operator "is" :value "Argentina"}]})))
         (f/methods-were-called-in-order
          send-query driver [(submap-arg {:queryType "timeseries"})]
          send-query driver [(submap-arg {:queryType "topN" :dimension "country"
@@ -125,8 +125,7 @@
                  :splits [{:name "dimA" :on "columns"}]
                  :measures ["count"]
                  :filters [{:interval ["2015" "2016"]}]
-                 :totals true}
-                cube-metadata))))))
+                 :totals true}))))))
 
   (testing "one row split, one column split and one measure"
     (f/with-fakes
@@ -161,8 +160,7 @@
                  :splits [{:name "dimA" :on "rows"} {:name "dimB" :on "columns"}]
                  :measures ["count"]
                  :filters [{:interval ["2015" "2016"]}]
-                 :totals true}
-                cube-metadata))))))
+                 :totals true}))))))
 
   (testing "one row split, one column temporal split and one measure"
     (f/with-fakes
@@ -195,8 +193,7 @@
                  :splits [{:name "dimA" :on "rows"} {:name "dimB" :on "columns" :granularity "P1D"}]
                  :measures ["count"]
                  :filters [{:interval ["2001" "2002"]}]
-                 :totals true}
-                cube-metadata))))))
+                 :totals true}))))))
 
   (testing "two column splits and one measure"
     (f/with-fakes
@@ -227,8 +224,7 @@
                  :splits [{:name "dimA" :on "columns"} {:name "dimB" :on "columns"}]
                  :measures ["count"]
                  :filters [{:interval ["2015" "2016"]}]
-                 :totals true}
-                cube-metadata))))))
+                 :totals true}))))))
 
   (testing "two row splits, one column split and one measure"
     (f/with-fakes
@@ -278,5 +274,4 @@
                  :splits [{:name "dimA" :on "rows"} {:name "dimB" :on "rows"} {:name "dimC" :on "columns"}]
                  :measures [{:name "count" :expression "(sum $count)"}]
                  :filters [{:interval ["2015" "2016"]}]
-                 :totals true}
-                cube-metadata)))))))
+                 :totals true})))))))

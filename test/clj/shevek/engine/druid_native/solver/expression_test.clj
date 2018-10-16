@@ -1,7 +1,7 @@
-(ns shevek.querying.expression-test
+(ns shevek.engine.druid-native.solver.expression-test
   (:require [clojure.test :refer :all]
-            [shevek.querying.expression :as e]
-            [shevek.engine.druid.planner.common :refer [make-tig]]))
+            [shevek.engine.druid-native.solver.expression :as e]
+            [shevek.engine.druid-native.solver.common :refer [make-tig]]))
 
 (defn measure->druid [m]
   (e/measure->druid m (make-tig)))
@@ -65,7 +65,21 @@
                               :aggregator {:type "doubleSum" :fieldName "amount" :name "amount"}
                               :name "amount"}]
               :postAggregations []}
-             (measure->druid {:name "amount" :expression "(where {$x 1 $y 2} (sum $amount))"})))))
+             (measure->druid {:name "amount" :expression "(where {$x 1 $y 2} (sum $amount))"}))))
+
+    (testing "default expressions from type"
+      (is (= [{:type "doubleSum" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "longSum"}))))
+      (is (= [{:type "hyperUnique" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "hyperUnique"}))))
+      (is (= [{:type "doubleMax" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "longMax"}))))
+      (is (= [{:type "count" :fieldName "x" :name "x"}]
+             (:aggregations
+              (measure->druid {:name "x" :type "rowCount"}))))))
 
   (testing "post-aggregators"
     (testing "arithmetic operation between same measure and a constant"

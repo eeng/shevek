@@ -86,8 +86,10 @@
        (t :raw-data/button)]
       [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))
 
+; The slice can't be used directly for the hash because it fails when the values are floats, as they are hash as ints and can produce duplicate values
 (defn- body-row [{:keys [cells slice grand-total?]}]
-  (let [row-key (hash slice)]
+  (let [simplified-slice (map (juxt (comp :name :dimension) (comp str :value)) slice)
+        row-key (hash simplified-slice)]
     (into
      [:tr {:key row-key
            :class (if grand-total? "grand-total" (when (popup-opened? row-key) "active"))

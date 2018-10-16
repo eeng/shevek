@@ -1,7 +1,7 @@
-(ns shevek.engine.druid.planner.timeseries-test
+(ns shevek.engine.druid-native.solver.timeseries-test
   (:require [clojure.test :refer :all]
             [shevek.asserts :refer [submap? without? submaps?]]
-            [shevek.engine.druid.planner.timeseries :refer [to-druid-query from-druid-results]]))
+            [shevek.engine.druid-native.solver.timeseries :refer [to-druid-query from-druid-results]]))
 
 (deftest to-druid-query-test
   (testing "general structure"

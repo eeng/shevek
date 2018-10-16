@@ -45,7 +45,7 @@
                 :splits (map :sort-by)))))
 
   (testing "the special measure rowCount should be expanded with the count expression"
-    (is (= {:name "rowCount" :expression "(count)"}
+    (is (= {:name "rowCount" :type "rowCount"}
            (->> (expand-query {:measures ["rowCount"]} {})
                 :measures first))))
 

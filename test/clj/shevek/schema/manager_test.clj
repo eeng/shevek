@@ -3,7 +3,7 @@
             [shevek.test-helper :refer :all]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
-            [shevek.schema.manager :refer [discover! update-cubes calculate-expression]]
+            [shevek.schema.manager :refer [discover! update-cubes]]
             [shevek.engine.protocol :refer [Engine cubes cube-metadata]]
             [shevek.schema.repository :refer [find-cubes]]
             [shevek.schemas.cube :refer [Cube]]
@@ -31,8 +31,8 @@
                          {:name "__time"}
                          {:name "path" :type "LONG"}]
                         (mapcat :dimensions cubes)))
-          (is (submaps? [{:name "added" :expression "(sum $added)"}
-                         {:name "requests" :expression "(count-distinct $requests)"}]
+          (is (submaps? [{:name "added" :type "longSum"}
+                         {:name "requests" :type "hyperUnique"}]
                         (mapcat :measures cubes)))
           (is (= 2 (->> cubes (map :id) (filter identity) count))))))))
 
@@ -104,10 +104,3 @@
                                       {:name "year" :expression "timestamp_extract(...)"}]}])
       (is (= {:name "year" :expression "timestamp_extract(...)" :title "Year" :type "STRING"}
              (-> (find-cubes db) first :dimensions last))))))
-
-(deftest calculate-expression-tests
-  (are [x y] (= x (calculate-expression y))
-    "(sum $amount)" {:name "amount" :type "longSum"}
-    "(sum $amount)" {:name "amount" :type "doubleSum"}
-    "(max $amount)" {:name "amount" :type "longMax"}
-    "(count-distinct $amount)" {:name "amount" :type "hyperUnique"}))

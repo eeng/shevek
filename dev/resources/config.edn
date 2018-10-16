@@ -146,8 +146,9 @@
     {:name "isRobot" :type "BOOL" :description "Indicates whether a computer or a human being made this edit"}
     {:name "isNew" :type "BOOL"}
     {:name "regionIsoCode" :title "Region ISO Code"}
+    {:name "regionName" :default-sort-by "regionIsoCode"}
     {:name "countryIsoCode" :title "Country ISO Code"}
-    {:name "countryName" :empty-value "Country Not Available" :default-sort-by "countryIsoCode"}
+    {:name "countryName" :empty-value "Country Not Available"}
     {:name "year" :expression "timestamp_extract(__time, 'YEAR')"}
     {:name "month" :expression "timestamp_format(__time, 'MMMM')"}
     {:name "monthNum" :type "LONG" :expression "timestamp_extract(__time, 'MONTH')"}
