@@ -4,6 +4,16 @@
             [shevek.lib.logging :refer [pp-str]]
             [cuerdas.core :as str]))
 
+(defn- pretty-print-key-and-value [[k v]]
+  (str (str/upper (name k))
+       ":\n"
+       (if (string? v) v (pp-str v))))
+
+(defn- format-body [record]
+  (->> record
+       (map pretty-print-key-and-value)
+       (str/join "\n\n")))
+
 (defn notify-error
   ([exception data]
    (let [message (.getMessage exception)
@@ -17,9 +27,7 @@
              from (format "Shevek <shevek@%s>" hostname)
              to (str/split (:to errors) ",")
              subject (str "[ERROR] " message)
-             body (->> (dissoc data :message)
-                       (map (fn [[k v]] (str (str/upper (name k)) ":\n" (pp-str v))))
-                       (str/join "\n\n"))
+             body (format-body (dissoc data :message))
              msg {:from from :to to :subject subject :body [{:type "text/plain; charset=utf-8" :content body}]}]
          (send-message server msg))))))
 

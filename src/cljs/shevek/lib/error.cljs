@@ -1,9 +1,11 @@
 (ns shevek.lib.error
   (:require [shevek.components.modal :refer [show-modal]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
+            [shevek.reflow.db :refer [db]]
             [shevek.i18n :refer [t translation]]
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
+            [shevek.lib.transit :refer [transit-request-format]]
             [ajax.core :refer [POST]]
             [clojure.string :as str]))
 
@@ -41,8 +43,10 @@
            (POST "/error" {:params {:message (.-message error)
                                     :stacktrace (->> stacktrace
                                                      (mapv #(.toString %))
-                                                     (str/join "\n "))}
-                           :headers (rpc/auth-header)}))))))
+                                                     (str/join "\n "))
+                                    :app-db (db)}
+                           :headers (rpc/auth-header)
+                           :format transit-request-format}))))))
 
 (defonce uncaught-error-event-listener
   (do

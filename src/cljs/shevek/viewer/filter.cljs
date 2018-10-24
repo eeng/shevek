@@ -4,11 +4,10 @@
             [cuerdas.core :as str]
             [shevek.i18n :refer [t translation]]
             [shevek.domain.dimension :refer [add-dimension remove-dimension replace-dimension time-dimension time-dimension? clean-dim find-dimension merge-dimensions]]
-            [shevek.lib.time.ext :refer [format-period format-interval]]
+            [shevek.lib.time.ext :refer [format-period format-interval format-date]]
             [shevek.lib.period :refer [to-interval]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.time :refer [parse-time]]
-            [shevek.lib.time.ext :refer [format-date]]
             [shevek.lib.util :refer [debounce trigger-click]]
             [shevek.rpc :as rpc]
             [shevek.viewer.shared :refer [panel-header viewer send-main-query send-query highlight current-cube send-pinboard-queries]]
@@ -115,7 +114,7 @@
                            :on-mouse-out #(reset! showed-period (dim :period))}
         (available-relative-periods period)])]])
 
-(defn- relative-period-time-filter [{:keys [period interval] :as dim} config]
+(defn- relative-period-time-filter [{:keys [period interval]} config]
   (let [showed-period (r/atom period)]
     (fn [dim]
       [:div.relative.period-type
@@ -153,7 +152,7 @@
             :on-click #(reset! period-type period-type-value)}
    (translation :viewer.period (keyword period-type-value))])
 
-(defn- time-filter-popup [{:keys [period] :as dim} config]
+(defn- time-filter-popup [{:keys [period]} config]
   (let [period-type (r/atom (if period :relative :specific))]
     (fn [dim]
       [:div.time-filter
@@ -196,7 +195,7 @@
     (swap! filter assoc :loading? true)
     (rpc/call "querying/query" :args [q] :handler #(swap! filter assoc :results % :loading? false))))
 
-(defn- normal-filter-popup [dim {:keys [cube time-filter on-filter-change] :as config}]
+(defn- normal-filter-popup [dim {:keys [cube time-filter on-filter-change]}]
   (let [filter (-> (select-keys dim [:name :operator :value])
                    (assoc :cube cube :time-filter time-filter)
                    r/atom)
@@ -204,7 +203,7 @@
         search (r/atom "")
         fetch-dim-values-deb (debounce #(fetch-dim-values filter %) 500)]
     (fetch-dim-values filter "")
-    (fn [{:keys [name] :as dim}]
+    (fn [dim]
       [:div.ui.form.normal-filter
        [:div.top-inputs
         [operator-selector filter]
@@ -234,7 +233,7 @@
     (when (empty-value? dim)
       (dispatch :dimension-removed-from-filter dim))))
 
-(defn- filter-item [{:keys [name] :as dim}]
+(defn- filter-item [{:keys [name]}]
   (let [popup-key (hash {:name name :timestamp (js/Date.)})] ; Without the timestamp if a filter was added, changed, removed and then readded, as the key name is the same it would not remount the popup and the previous options would remain.
     (fn [dim]
       [:a.ui.green.compact.button.item

@@ -3,7 +3,6 @@
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.navigation :refer [current-page? navigate]]
-            [shevek.lib.time :refer [parse-time]]
             [shevek.viewer.shared :refer [send-main-query send-pinboard-queries current-cube-name]]
             [shevek.viewer.dimensions :refer [dimensions-panel]]
             [shevek.viewer.measures :refer [measures-panel]]
@@ -57,7 +56,7 @@
     (prepare-cube db cube report)))
 
 (defevh :max-time-arrived [db max-time]
-  (if-let [new-data (> max-time (get-in db [:viewer :cube :max-time]))]
+  (if (> max-time (get-in db [:viewer :cube :max-time]))
     (-> (assoc-in db [:viewer :cube :max-time] max-time)
         (send-main-query)
         (send-pinboard-queries))))

@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [cljs.pprint :refer [pprint]]))
 
-(defonce app-db (r/atom {}))
+(defonce ^:private app-db (r/atom {}))
 
 (defn- get-in-db [ks default]
   (clojure.core/get-in @app-db ks default))
@@ -16,3 +16,6 @@
 
 (defn debug []
   [:pre (with-out-str (pprint @app-db))])
+
+(defn db []
+  @app-db)

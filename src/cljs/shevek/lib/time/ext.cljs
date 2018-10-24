@@ -12,7 +12,12 @@
 (extend-protocol IPrintWithWriter
   goog.date.UtcDateTime
   (-pr-writer [obj writer opts]
-    (-write writer "#inst ")
+    (-write writer "#UtcDateTime ")
+    (pr-writer (to-iso8601 obj) writer opts))
+
+  goog.date.Date
+  (-pr-writer [obj writer opts]
+    (-write writer "#Date ")
     (pr-writer (to-iso8601 obj) writer opts)))
 
 (defn formatter [i18n-key]
