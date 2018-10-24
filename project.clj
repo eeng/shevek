@@ -139,12 +139,18 @@
              :prod {:cljsbuild {:builds
                                 {:prod
                                  {:source-paths ["src/cljs"]
-                                  :compiler {:output-to "resources/public/js/app.js"
+                                  :compiler {:output-dir "resources/public/js/out"
+                                             :output-to "resources/public/js/app.js"
+                                             :source-map "resources/public/js/app.js.map"
                                              :optimizations :advanced
                                              :pretty-print false
                                              :source-map-timestamp false
+                                             :infer-externs true
+                                             :closure-warnings {:externs-validation :off :non-standard-jsdoc :off}
                                              :closure-defines {"goog.DEBUG" false}
-                                             :externs ["src/externs/jquery.js" "src/externs/semantic-ui.js" "src/externs/calendar.js"]}}}}
+                                             :externs ["src/externs/jquery.js"
+                                                       "src/externs/semantic-ui.js"
+                                                       "src/externs/calendar.js"]}}}}
                     :less {:source-map false
                            :compression true}}
              :uberjar {:aot :all

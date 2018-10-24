@@ -15,5 +15,6 @@
           {:status 500 :body message})))))
 
 (defn client-error [{:keys [params] :as req}]
+  (log/error "Client Error:" (:message params) "\n" (:stacktrace params))
   (notify-error (merge params {:request (dissoc req :params :body-params :optimus-assets)}))
   {:status 200})

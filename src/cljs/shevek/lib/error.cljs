@@ -4,8 +4,8 @@
             [shevek.i18n :refer [t translation]]
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
-            [shevek.components.notification :refer [notify]]
-            [ajax.core :refer [POST]]))
+            [ajax.core :refer [POST]]
+            [clojure.string :as str]))
 
 (defn handle-app-error [{:keys [status status-text response]}]
   (show-modal {:class "small basic app-error"
@@ -33,10 +33,18 @@
       (handle-app-error (assoc error :response new-response :status-text new-status-text))))
   (rpc/loaded db))
 
-(defn- uncaught-error-handler [e]
-  (POST "/error" {:params {:message (.. e -error -message) :stacktrace (.. e -error -stack)}
-                  :headers (rpc/auth-header)}))
+(defn- uncaught-error-handler [event]
+  (let [error (.-error event)]
+    (-> (js/StackTrace.fromError error)
+        (.then
+         (fn [stacktrace]
+           (POST "/error" {:params {:message (.-message error)
+                                    :stacktrace (->> stacktrace
+                                                     (mapv #(.toString %))
+                                                     (str/join "\n "))}
+                           :headers (rpc/auth-header)}))))))
 
 (defonce uncaught-error-event-listener
-  (do (.addEventListener js/window "error" uncaught-error-handler)
+  (do
+    (.addEventListener js/window "error" uncaught-error-handler)
     :done))
