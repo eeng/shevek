@@ -20,7 +20,6 @@
   (-> assets
       (optimizations/minify-js-assets options)
       (optimizations/minify-css-assets options)
-      (optimizations/inline-css-imports)
       (optimizations/concatenate-bundles)
       (optimizations/add-cache-busted-expires-headers)
       (optimizations/add-last-modified-headers)
@@ -35,7 +34,7 @@
    (assets/load-bundle "public"
                        "libs.js"
                        ["/js/jquery.min.js" ; 3.1.1
-                        "/js/semantic.min.js" ; 2.2.12
+                        "/js/semantic.min.js" ; 2.4.1
                         "/js/calendar.min.js" ; 0.0.8 (https://github.com/mdehoog/Semantic-UI-Calendar)
                         "/js/stacktrace.min.js"]) ; 2.0.0
    (assets/load-bundle "public" "app.css" ["/css/app.css"])
