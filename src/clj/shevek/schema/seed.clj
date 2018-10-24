@@ -1,9 +1,10 @@
 (ns shevek.schema.seed
   (:require [shevek.users.repository :as users]
-            [shevek.schema.manager :refer [update-cubes]]
+            [shevek.schema.manager :as m]
             [taoensso.timbre :refer [debug]]
             [shevek.config :refer [config]]
-            [shevek.db :as db]))
+            [shevek.db :as db]
+            [shevek.engine.state :refer [dw]]))
 
 (defn users [db]
   (when-not (users/find-by db {:admin true})
@@ -12,7 +13,7 @@
 
 (defn cubes [db]
   (debug "Seeding schema.")
-  (update-cubes db (config :cubes)))
+  (m/update-cubes db (config :cubes)))
 
 (defn seed! [db]
   (users db)
@@ -22,6 +23,7 @@
   "DO NOT use on production!"
   [db]
   (db/clean! db)
+  (m/discover! dw db)
   (seed! db))
 
 #_(db-reset! shevek.db/db)
