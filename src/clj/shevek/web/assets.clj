@@ -5,16 +5,29 @@
             [optimus.optimizations :as optimizations]
             [optimus.strategies :as strategies]
             [shevek.config :refer [env?]]
-            [com.rpl.specter :refer [transform select-one! ALL]]))
+            [com.rpl.specter :refer [transform select-one! ALL]]
+            [clojure.string :as str]))
 
-(defn- fix-source-map-path
-  [assets]
-  "Without this, the app.js.map file would appear with a different cache buster hash than the corresponding app.js. They must have the same for StackTrace.JS to found it"
-  (let [js-path (select-one! [ALL :path #(re-matches #"/bundles/\w+/app.js" %)] assets)
-        source-map-path (str js-path ".map")]
-    (transform [ALL :path #(re-matches #"/js/\w+/app.js.map" %)]
-               (constantly source-map-path)
-               assets)))
+(defn- calculate-new-source-map [source-map bundle assets]
+  (let [bundle-pattern (re-pattern (str "/bundles/\\w+/" bundle))
+        bundle-js-path (select-one! [ALL :path #(re-matches bundle-pattern (str %))] assets)]
+    (str/replace bundle-js-path bundle source-map)))
+
+(defn- fix-source-map [assets [source-map bundle]]
+  (transform [ALL #(str/ends-with? (str (:original-path %)) (str "/" source-map)) :path]
+             (fn [_] (calculate-new-source-map source-map bundle assets))
+             assets))
+
+(defn- fix-sources-maps [assets sources-maps-and-bundles]
+  "Without this, the *.js.map would appear with a different cache buster hash than the corresponding *.js. They must have the same for StackTrace.JS to found it"
+  (reduce fix-source-map assets sources-maps-and-bundles))
+
+#_(fix-sources-maps [{:original-path "/stacktrace-js/dist/stacktrace.min.js.map"}
+                     {:path "/bundles/8d942b890803/libs.js" :bundle "libs.js"}
+                     {:path "/js/5f391d6c6b04/app.js.map", :original-path "/js/app.js.map"}
+                     {:path "/bundles/c08fe3ced8f5/app.js" :bundle "app.js"}]
+                    {"app.js.map" "app.js"
+                     "stacktrace.min.js.map" "libs.js"})
 
 (defn- all-optimizations [assets options]
   (-> assets
@@ -23,7 +36,8 @@
       (optimizations/concatenate-bundles)
       (optimizations/add-cache-busted-expires-headers)
       (optimizations/add-last-modified-headers)
-      (fix-source-map-path)))
+      (fix-sources-maps {"app.js.map" "app.js"
+                         "stacktrace.min.js.map" "libs.js"})))
 
 (defn get-assets []
   (concat
@@ -45,5 +59,5 @@
 (defn wrap-asset-pipeline [handler]
   (optimus/wrap handler
                 get-assets
-                (if (env? :development) optimizations/none all-optimizations)
+                (if false optimizations/none all-optimizations)
                 (if (env? :development) strategies/serve-live-assets strategies/serve-frozen-assets)))
