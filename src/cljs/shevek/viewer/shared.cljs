@@ -89,4 +89,4 @@
 
 (defn description-help-icon [{:keys [description]}]
   (when (seq description)
-    [:i.help.circle.outline.icon {:ref (tooltip description {:position "right center"})}]))
+    [:i.question.circle.outline.icon {:ref (tooltip description {:position "right center"})}]))
