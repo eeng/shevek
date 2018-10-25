@@ -87,6 +87,17 @@
              :nrepl-port 4002
              :nrepl-middleware ["cider.piggieback/wrap-cljs-repl"]}
 
+  :cljsbuild {:builds
+              {:app
+               {:source-paths ["src/cljs"]
+                :compiler {:output-dir "resources/public/js/out"
+                           :output-to "resources/public/js/app.js"
+                           :install-deps true
+                           :npm-deps {:semantic-ui-calendar "0.0.8"
+                                      :stacktrace-js "2.0.0"
+                                      :semantic-ui-css "2.4.1"
+                                      :jquery "3.3.1"}}}}}
+
   :test-selectors {:default (complement :acceptance)
                    :acceptance :acceptance
                    :all (constantly true)}
@@ -99,7 +110,7 @@
             "backend-testing" ["with-profile" "+ultra" "test-refresh"]
             "build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
             "package" ["do" ["clean"] "build-frontend" "uberjar"]
-            "ci" ["do" "test" ["doo" "phantom" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
+            "ci" ["do" ["clean"] "test" ["doo" "phantom" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
@@ -120,12 +131,9 @@
                              [lein-doo "0.1.10"]
                              [cider/cider-nrepl "0.18.0-SNAPSHOT"]] ; For Calva
                    :cljsbuild {:builds
-                               {:dev
+                               {:app
                                 {:figwheel true
-                                 :source-paths ["src/cljs"]
                                  :compiler {:main shevek.app
-                                            :output-dir "resources/public/js/out"
-                                            :output-to "resources/public/js/app.js"
                                             :asset-path "/js/out"
                                             :source-map-timestamp true
                                             :preloads [devtools.preload]}}
@@ -137,11 +145,8 @@
                                             :verbose false
                                             :pretty-print true}}}}}
              :prod {:cljsbuild {:builds
-                                {:prod
-                                 {:source-paths ["src/cljs"]
-                                  :compiler {:output-dir "resources/public/js/out"
-                                             :output-to "resources/public/js/app.js"
-                                             :source-map "resources/public/js/app.js.map"
+                                {:app
+                                 {:compiler {:source-map "resources/public/js/app.js.map"
                                              :optimizations :advanced
                                              :pretty-print false
                                              :source-map-timestamp false

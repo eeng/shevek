@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@cljs-oss/module-deps": "^1.1.1",
+    "jquery": "^3.3.1",
+    "semantic-ui-calendar": "0.0.8",
+    "semantic-ui-css": "^2.4.1",
+    "stacktrace-js": "^2.0.0"
+  }
+}

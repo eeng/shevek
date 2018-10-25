@@ -27,16 +27,17 @@
 
 (defn get-assets []
   (concat
-   (assets/load-bundle "public"
+   (assets/load-bundle "node_modules"
                        "libs.css"
-                       ["/css/semantic.min.css"
-                        "/css/calendar.min.css"])
-   (assets/load-bundle "public"
+                       ["/semantic-ui-css/semantic.min.css"
+                        "/semantic-ui-calendar/dist/calendar.min.css"])
+   (assets/load-bundle "node_modules"
                        "libs.js"
-                       ["/js/jquery.min.js" ; 3.1.1
-                        "/js/semantic.min.js" ; 2.4.1
-                        "/js/calendar.min.js" ; 0.0.8 (https://github.com/mdehoog/Semantic-UI-Calendar)
-                        "/js/stacktrace.min.js"]) ; 2.0.0
+                       ["/jquery/dist/jquery.min.js"
+                        "/semantic-ui-css/semantic.min.js"
+                        "/semantic-ui-calendar/dist/calendar.min.js"
+                        "/stacktrace-js/dist/stacktrace.min.js"])
+   (assets/load-assets "node_modules" ["/stacktrace-js/dist/stacktrace.min.js.map"])
    (assets/load-bundle "public" "app.css" ["/css/app.css"])
    (assets/load-bundle "public" "app.js" ["/js/app.js"])
    (assets/load-assets "public" ["/js/app.js.map"])))
