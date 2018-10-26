@@ -95,7 +95,7 @@
            :class (if grand-total? "grand-total" (when (popup-opened? row-key) "active"))
            :on-click (when (and (not grand-total?) (current-page? :viewer))
                        #(show-popup % ^{:key row-key} [row-popup slice]
-                                    {:position "top center" :distanceAway 135 :setFluidWidth true
+                                    {:position "top center" :setFluidWidth true
                                      :class "pivot-table-popup" :id row-key}))}]
      (map as-component cells))))
 
