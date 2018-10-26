@@ -1,11 +1,11 @@
 (ns shevek.viewer.visualizations.totals
-  (:require [shevek.domain.dw :refer [format-measure measure-value]]))
+  (:require [shevek.domain.dw :refer [format-measure]]))
 
 (defn totals-visualization [{:keys [results measures]}]
   (let [grand-total (first results)]
     [:div.ui.statistics
      (doall
        (for [{:keys [name title] :as measure} measures]
-         [:div.statistic {:key name :title (measure-value measure grand-total)}
+         [:div.statistic {:key name}
           [:div.label title]
           [:div.value (format-measure measure grand-total)]]))]))

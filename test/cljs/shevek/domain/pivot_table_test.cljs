@@ -11,9 +11,10 @@
 
 (defn only-important-fields
   "Allows to write simpler tests without non-essential fields"
-  [{:keys [proportion splits top-left-corner in-columns] :as cell}]
+  [{:keys [proportion splits top-left-corner in-columns participation] :as cell}]
   (cond-> cell
           proportion (assoc :proportion 0)
+          participation (assoc :participation 0)
           splits (assoc :splits [])
           top-left-corner (assoc :top-left-corner false)
           in-columns (assoc :in-columns false)))

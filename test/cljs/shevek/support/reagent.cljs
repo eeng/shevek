@@ -1,6 +1,5 @@
 (ns shevek.support.reagent
-  (:require [reagent.core :as r]
-            [cljsjs.jquery]))
+  (:require [reagent.core :as r]))
 
 (def ^:dynamic container)
 

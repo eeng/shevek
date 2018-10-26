@@ -1,8 +1,7 @@
 ### Development
 
-To try the prod cljsbuild do the following on separete tabs:
+To try the production cljsbuild do the following:
 ```
-lein with-profile +prod cljsbuild auto prod
-lein less4j auto
+lein build-frontend
 lein run -m shevek.app/start-for-dev
 ```

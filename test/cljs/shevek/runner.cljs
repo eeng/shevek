@@ -1,6 +1,8 @@
 (ns shevek.runner
   (:require [doo.runner :refer-macros [doo-tests]]
             [pjstadig.humane-test-output]
+            [cljsjs.jquery]
+            [semantic-ui-css]
             [shevek.admin.users.form-test]
             [shevek.admin.users.list-test]
             [shevek.domain.dimension]

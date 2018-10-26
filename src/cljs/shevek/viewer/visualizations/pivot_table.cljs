@@ -5,12 +5,13 @@
             [shevek.navigation :refer [current-page?]]
             [shevek.domain.dimension :refer [find-dimension]]
             [shevek.viewer.shared :refer [current-cube]]
-            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
+            [shevek.components.popup :refer [show-popup close-popup popup-opened? tooltip]]
             [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]
+            [shevek.lib.number :as number]
             [com.rpl.specter :refer [transform MAP-VALS]]))
 
 (defn- proportion-bg [value proportion]
-  (let [width (str proportion "%")]
+  (let [width (str (* proportion 0.98 100) "%")] ; Multiply by a fraction so there is some padding between measures
     [:div.bg {:class (when (neg? value) "neg")
               :style {:width width}}]))
 
@@ -65,10 +66,13 @@
      [:span {:class (str "depth-" depth)} text]])
 
   MeasureValueCell
-  (as-component [{:keys [value text proportion]}]
+  (as-component [{:keys [value text proportion participation]}]
     [:td.right.aligned
      [proportion-bg value proportion]
-     [:span text]]))
+     [:span (when (pos? proportion)
+              {:ref (tooltip (number/format participation "0.00%")
+                             {:delay {:show 500} :position "right center" :distanceAway 5})})
+      text]]))
 
 (defn- row-popup [slice]
   (let [simplified-slice (map (juxt :dimension :value) slice)]

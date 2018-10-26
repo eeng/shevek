@@ -7,7 +7,7 @@
 (defrecord SplitsCell [dimensions in-columns col-span])
 (defrecord MeasureCell [measure splits top-left-corner])
 (defrecord DimensionValueCell [value text col-span depth in-columns dimension])
-(defrecord MeasureValueCell [value text proportion])
+(defrecord MeasureValueCell [value text proportion participation])
 (defrecord EmptyCell [])
 
 ; Constructors
@@ -18,14 +18,16 @@
 (defn measure-cell [measure & {:keys [splits top-left-corner]}]
   (MeasureCell. measure (or splits []) (or top-left-corner false)))
 
-(defn measure-value-cell [measure result & {:keys [max-value] :or {max-value 0}}]
-  (let [value (measure-value measure result)
-        rate (if (zero? max-value) 0 (/ value max-value))
-        proportion (* (Math/abs rate) 100)
-        proportion (if (> proportion 100) 0 proportion)] ; if is the grand total row we don't show this data
+(defn- calculate-rate [value total]
+  (if (zero? total) 0 (/ value total)))
+
+(defn measure-value-cell [measure {:keys [grand-total?] :as result}
+                          & {:keys [max-value grand-total-value] :or {max-value 0 grand-total-value 0}}]
+  (let [value (measure-value measure result)]
     (MeasureValueCell. value
                        (or (format-measure measure result) "")
-                       proportion)))
+                       (if grand-total? 0 (calculate-rate value max-value))
+                       (calculate-rate value grand-total-value))))
 
 (defn dimension-value-cell
   [dim result & {:keys [col-span depth in-columns] :or {col-span 1 depth 0 in-columns false}}]
@@ -108,8 +110,9 @@
 
 (defn- measure-values-cells [result {:keys [results col-splits measures max-values]}]
   (for [result (flatten-result result (first results) col-splits)
-        measure measures]
-    (measure-value-cell measure result :max-value (-> measure :name keyword max-values))))
+        measure measures
+        :let [[grand-total-value max-value] (-> measure :name keyword max-values)]]
+    (measure-value-cell measure result :max-value max-value :grand-total-value grand-total-value)))
 
 (defn- result-row [{:keys [grand-total?] :as result} row-split viz slice-so-far]
   (let [first-cell (if grand-total?
@@ -126,11 +129,13 @@
           next-rows (mapcat #(results-rows % viz row-splits (:slice this-row)) child-rows)]
       (cons this-row next-rows))))
 
-(defn- calculate-max-values [measures [_ & results]]
-  (reduce (fn [max-values measure-name]
-            (assoc max-values measure-name (->> results (map measure-name) (map Math/abs) (apply max))))
-          {}
-          (map (comp keyword :name) measures)))
+(defn- calculate-max-values [measures [grand-total & results]]
+  (->> measures
+       (map (comp keyword :name))
+       (map (fn [measure-name]
+              [measure-name [(-> grand-total measure-name Math/abs)
+                             (->> results (map measure-name) (map Math/abs) (apply max))]]))
+       (into {})))
 
 (defn generate [{:keys [splits results measures] :as viz}]
   (let [grand-total (assoc (first results) :grand-total? true)
