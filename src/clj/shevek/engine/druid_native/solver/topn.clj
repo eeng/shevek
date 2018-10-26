@@ -14,7 +14,7 @@
       field
       {:type "inverted" :metric field})))
 
-(defn to-druid-query [{:keys [cube dimension measures] :as q}]
+(defn to-druid-query [{:keys [cube dimension measures filters] :as q}]
   (-> {:queryType "topN"
        :dataSource cube
        :dimension (dimension-spec dimension q)

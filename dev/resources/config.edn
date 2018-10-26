@@ -10,10 +10,11 @@
    :dimensions [{:name "__time" :title "Fecha de Emisión"}
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
                 {:name "año" :expression "timestamp_extract(__time, 'YEAR')"}
-                {:name "mes" :type "LONG" :default-sort-by "mes"
-                 :expression "timestamp_extract(__time, 'MONTH')"
-                 :lookup [1 "Enero" 2 "Febrero" 3 "Marzo" 4 "Abril" 5 "Mayo" 6 "Junio"
-                          7 "Julio" 8 "Agosto" 9 "Septiembre" 10 "Octubre" 11 "Noviembre" 12 "Diciembre"]}
+                {:name "mes" :column "__time" :default-sort-by "mesNum"
+                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
+                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "mesNum" :column "__time" :type "LONG"
+                 :extraction [{:type "timeFormat" :format "M"}]}
                 {:name "semestre" :description "Uses expression language"
                  :expression "concat('S', div(timestamp_extract(__time, 'MONTH') - 1, 6) + 1)"}
                 {:name "semestre2" :column "__time" :description "Uses extract functions"

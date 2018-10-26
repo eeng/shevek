@@ -1,5 +1,6 @@
 (ns shevek.schemas.config
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [cprop.core :refer [load-config]]))
 
 (s/defschema NotificationsConfig
   {:server {s/Keyword s/Str}

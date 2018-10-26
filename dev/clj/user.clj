@@ -1,6 +1,5 @@
 (ns user
-  (:require [figwheel-sidecar.repl-api :refer [cljs-repl]]
-            [debugger.core])) 
+  (:require [figwheel-sidecar.repl-api :refer [cljs-repl]]))
 
 (defn reset
   "ProtoREPL calls this function when starts and when refreshing namespaces"
