@@ -6,7 +6,7 @@
             [schema-tools.core :as st]
             [com.rpl.specter :refer [transform must ALL]]))
 
-(defn- build-time-filter [{:keys [dimensions] :as cube}]
+(defn- build-time-filter [{:keys [dimensions]}]
   (assoc (time-dimension dimensions) :period "latest-day"))
 
 (defn- default-measures [{:keys [measures]}]

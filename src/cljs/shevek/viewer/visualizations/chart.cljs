@@ -23,7 +23,7 @@
            :line-chart {:borderColor (first colors) :backgroundColor "rgba(66, 165, 245, 0.3)"}
            {:backgroundColor (take (count results) colors)})))
 
-(defn- build-dataset-for-two-splits [{:keys [title] :as measure} results viztype splits ds-idx]
+(defn- build-dataset-for-two-splits [measure results viztype splits ds-idx]
   (let [labels (map #(format-dimension (second splits) %) results)]
     (merge {:label (first labels)
             :nestedLabels labels ; Stored here for later use in tooltip-title
@@ -66,7 +66,7 @@
       (str (get nested-labels idx) " ‧ " (get labels idx))
       (get labels idx))))
 
-(defn- build-chart-opts [{:keys [title] :as measure} {:keys [viztype splits results] :as viz}]
+(defn- build-chart-opts [{:keys [title] :as measure} {:keys [viztype splits results]}]
   (let [chart-title (str title ": " (format-measure measure (first results)))
         show-legend? (or (> (count splits) 1)
                          (= viztype :pie-chart))]
@@ -95,7 +95,6 @@
 
 (defn- set-chart-height [component measures-count]
   (let [chart (-> component r/dom-node js/$)
-        viz-height (-> chart (.closest ".visualization-container") .height)
         margin-bottom 10]
     (.css chart "height" (str "calc(" (/ 100 measures-count) "% - " margin-bottom "px)"))))
 

@@ -59,5 +59,5 @@
 (defn wrap-asset-pipeline [handler]
   (optimus/wrap handler
                 get-assets
-                (if false optimizations/none all-optimizations)
+                (if (env? :development) optimizations/none all-optimizations)
                 (if (env? :development) strategies/serve-live-assets strategies/serve-frozen-assets)))

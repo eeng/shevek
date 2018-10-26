@@ -7,7 +7,6 @@
             [shevek.rpc :as rpc]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.lib.util :refer [new-record?]]
             [shevek.lib.collections :refer [find-by]]
             [shevek.pages.admin.users.form :refer [adapt-for-client user-form]]
             [shevek.viewer.raw :refer [filters->str]]))

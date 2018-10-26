@@ -13,7 +13,6 @@
             [shevek.viewer.pinboard :refer [pinboard-panels]]
             [shevek.schemas.conversion :refer [build-new-viewer report->viewer]]
             [shevek.viewer.url :refer [store-viewer-in-url restore-report-from-url]]
-            [shevek.viewer.raw]
             [shevek.i18n :refer [t]]))
 
 (defn- already-build? [viewer]
@@ -28,7 +27,7 @@
 (defn- cube-authorized? [{:keys [measures]}]
   (seq measures))
 
-(defn cube-arrived [{:keys [viewer current-report] :as db} {:keys [name] :as cube}]
+(defn cube-arrived [{:keys [viewer current-report] :as db} cube]
   (if (cube-authorized? cube)
     (let [viewer (init-viewer cube viewer current-report)]
       (-> (assoc db :viewer viewer)

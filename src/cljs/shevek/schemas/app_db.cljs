@@ -1,7 +1,6 @@
 (ns shevek.schemas.app-db
   (:require [schema.core :as s]
             [schema-tools.core :as st]
-            [shevek.schemas.cube :refer [Dimension Measure]]
             [shevek.schemas.viewer :refer [Viewer Visualization Cube]]
             [shevek.schemas.report :refer [Report]]
             [shevek.schemas.dashboard :refer [Dashboard]]))

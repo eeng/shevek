@@ -1,6 +1,5 @@
 (ns shevek.viewer.visualization
-  (:require [shevek.rpc :as rpc]
-            [shevek.reflow.db :as db]
+  (:require [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t translation]]
             [shevek.components.text :refer [warning loader]]

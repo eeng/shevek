@@ -33,7 +33,7 @@
     (if (map? new-db) new-db db)))
 
 (defn router []
-  (fn [db [eid & ev-data :as event]]
+  (fn [db [eid & ev-data]]
     (let [[handler interceptors] (@event-handlers eid)]
       (assert handler (str "No handler found for event " eid))
       (let [new-db (apply invoke-and-handle-return handler db ev-data)

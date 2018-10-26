@@ -1,16 +1,11 @@
 (ns shevek.viewer.shared
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
-            [reagent.core :as r]
             [shevek.lib.util :refer [debounce]]
-            [shevek.i18n :refer [t translation]]
             [shevek.rpc :as rpc]
             [shevek.domain.dimension :refer [dim= add-dimension remove-dimension time-dimension?]]
             [shevek.schemas.conversion :refer [viewer->query]]
-            [shevek.components.form :refer [kb-shortcuts]]
             [shevek.components.popup :refer [tooltip]]
-            [shevek.viewer.url :refer [store-viewer-in-url]]
-            [schema.core :as s]
             [shevek.lib.logger :as log]
             [shevek.lib.string :refer [regex-escape]]
             [shevek.menu.settings :refer [restart-auto-refresh!]]))
@@ -72,14 +67,14 @@
         (remove-dim-unless-time except-dim)
         (reduce #(send-pinned-dim-query %1 %2) db))))
 
-(defn- panel-header [text & actions]
+(defn panel-header [text & actions]
   [:h2.ui.sub.header text
    (when (seq actions) (into [:div.actions] actions))])
 
-(defn- search-button [searching]
+(defn search-button [searching]
   [:i.search.link.icon {:on-click #(swap! searching not)}])
 
-(defn- highlight [value search]
+(defn highlight [value search]
   (if (seq search)
     (let [[_ pre bold post] (re-find (re-pattern (str "(?i)(.*?)(" (regex-escape search) ")(.*)")) value)]
       [:div.segment-value pre [:span.bold bold] post])

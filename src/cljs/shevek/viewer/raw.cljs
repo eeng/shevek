@@ -10,7 +10,6 @@
             [shevek.viewer.filter :refer [slice->filters filter-title]]
             [shevek.domain.dimension :refer [time-dimension? add-dimension merge-dimensions]]
             [cuerdas.core :as str]
-            [shevek.lib.react :refer [rmap]]
             [shevek.lib.string :refer [format-bool]]
             [shevek.lib.time.ext :refer [format-time]]))
 
