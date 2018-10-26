@@ -120,6 +120,7 @@
                                   [binaryage/devtools "0.9.10"]
                                   [cider/piggieback "0.3.8"] ; ClojureScript REPL on top of nREPL
                                   [figwheel-sidecar "0.5.16"] ; ClojureScript REPL on top of nREPL
+                                  [debugger "0.2.1"]
                                   ;; Testing clj
                                   [etaoin "0.2.1"]
                                   [se.haleby/stub-http "0.2.1"]

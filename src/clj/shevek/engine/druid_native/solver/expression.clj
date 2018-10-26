@@ -107,7 +107,7 @@
     ([(_ :guard aggregator?) & _] :seq) [[(eval-aggregator name expression)] nil]
     ([(_ :guard post-aggregator?) & _] :seq) (eval-post-aggregator name expression tig)))
 
-(defn- calculate-default-expression [{:keys [type name] :as measure}]
+(defn- calculate-default-expression [{:keys [type name]}]
   (let [agg-fn (condp re-find (str type)
                  #"Max" "max"
                  #"Unique" "count-distinct"

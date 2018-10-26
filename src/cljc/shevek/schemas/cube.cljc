@@ -17,7 +17,8 @@
          (s/optional-key :extraction) [ExtractionFn]
          (s/optional-key :multi-value) s/Bool
          (s/optional-key :empty-value) s/Str
-         (s/optional-key :default-sort-by) s/Str))
+         (s/optional-key :default-sort-by) s/Str
+         (s/optional-key :lookup) (s/constrained [s/Any] (comp even? count) "even count")))
 
 (s/defschema Measure
   (assoc NTD

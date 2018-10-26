@@ -23,7 +23,7 @@
     (virtual-column-name dim)
     (or column name)))
 
-(defn- dimension-and-extraction [{:keys [name column extraction] :as dim} q]
+(defn- dimension-and-extraction [{:keys [extraction] :as dim} q]
   (let [extraction (map #(add-time-zome-to-extraction-fn % q) extraction)]
     (cond-> {:dimension (dimension-column-name dim)}
       (seq extraction)

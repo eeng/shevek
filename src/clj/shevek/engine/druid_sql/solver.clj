@@ -36,7 +36,7 @@
       (= "FLOAT" type) (format "CAST(%s AS FLOAT)" name)
       :else name)))
 
-(defn- select-expr [{:keys [name expression] :as dim}]
+(defn- select-expr [{:keys [name] :as dim}]
   {:pre [(string? name)]}
   (let [expr (calculate-expression dim)]
     (if (= expr name)
