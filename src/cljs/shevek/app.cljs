@@ -8,7 +8,7 @@
             [shevek.lib.error]))
 
 (defn init-reflow []
-  (reflow/init (-> (i/router) (i/logger) (schema/checker)))
+  (reflow/init (-> (i/router) (i/recorder) (i/logger) (schema/checker)))
   (reflow/dispatch :settings-loaded)
   (reflow/dispatch :user-restored))
 

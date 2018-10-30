@@ -2,12 +2,15 @@
   (:require [shevek.lib.logger :as log :refer [debug?]]
             [clojure.data :as data]))
 
-(defn logger [interceptor]
+(defn logger [interceptor & {:keys [keys-excluded-from-diff]
+                             :or {keys-excluded-from-diff [:last-events]}}]
   (fn [db event]
     (log/info "Handling event" event "...")
     (if debug?
       (let [new-db (interceptor db event)
-            [only-before only-after] (data/diff db new-db)
+            [only-before only-after] (data/diff
+                                      (apply dissoc db keys-excluded-from-diff)
+                                      (apply dissoc new-db keys-excluded-from-diff))
             db-changed? (or (some? only-before) (some? only-after))]
         (if db-changed?
           (log/info "Finished event with changes: before" only-before "after" only-after)
@@ -15,10 +18,11 @@
         new-db)
       (interceptor db event))))
 
-(defn recorder [interceptor]
+(defn recorder [interceptor & {:keys [events-to-keep] :or {events-to-keep 10}}]
   (fn [db event]
-    (-> (interceptor db event)
-        (update :recorded-events (fnil conj []) event))))
+    (-> db
+        (update :last-events #(->> %1 (cons %2) (take events-to-keep) vec) event)
+        (interceptor event))))
 
 (def ^:private event-handlers (atom {}))
 

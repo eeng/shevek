@@ -36,4 +36,5 @@
    (s/optional-key :reports) [Report]
    (s/optional-key :users) [s/Any]
    (s/optional-key :dashboards) [Dashboard]
-   (s/optional-key :dashboard) CurrentDashboard}) ; The selected dashboard
+   (s/optional-key :dashboard) CurrentDashboard ; The selected dashboard
+   (s/optional-key :last-events) [s/Any]})
