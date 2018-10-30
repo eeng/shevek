@@ -20,9 +20,10 @@
 
 (defn recorder [interceptor & {:keys [events-to-keep] :or {events-to-keep 20}}]
   (fn [db event]
-    (-> db
-        (update :last-events #(->> %1 (cons %2) (take events-to-keep) vec) event)
-        (interceptor event))))
+    (let [recorded-event {:timestamp (js/Date.) :event event}]
+      (-> db
+          (update :last-events #(->> %1 (cons %2) (take events-to-keep) vec) recorded-event)
+          (interceptor event)))))
 
 (def ^:private event-handlers (atom {}))
 
