@@ -18,7 +18,7 @@
         new-db)
       (interceptor db event))))
 
-(defn recorder [interceptor & {:keys [events-to-keep] :or {events-to-keep 10}}]
+(defn recorder [interceptor & {:keys [events-to-keep] :or {events-to-keep 20}}]
   (fn [db event]
     (-> db
         (update :last-events #(->> %1 (cons %2) (take events-to-keep) vec) event)
@@ -39,12 +39,15 @@
 (defn router []
   (fn [db [eid & ev-data]]
     (let [[handler interceptors] (@event-handlers eid)]
-      (assert handler (str "No handler found for event " eid))
-      (let [new-db (apply invoke-and-handle-return handler db ev-data)
-            {:keys [after]} interceptors]
-        (if (seq after)
-          (reduce (fn [db after-fn] (invoke-and-handle-return after-fn db)) new-db after)
-          new-db)))))
+      (if handler
+        (let [new-db (apply invoke-and-handle-return handler db ev-data)
+              {:keys [after]} interceptors]
+          (if (seq after)
+            (reduce (fn [db after-fn] (invoke-and-handle-return after-fn db)) new-db after)
+            new-db))
+        (do
+          (log/error "No handler found for event " eid)
+          db)))))
 
 (defn dev-only [next-interceptor interceptor]
   (if ^boolean goog.DEBUG

@@ -23,7 +23,7 @@
 
 (defn wrap-request-logging [handler]
   (fn [{:keys [request-method uri query-string params identity] :as req}]
-    (let [ps (filtered-params params [:password :password-confirmation :current-password :stacktrace])
+    (let [ps (filtered-params params [:password :password-confirmation :current-password :stacktrace :app-db])
           method (-> request-method name str/upper-case)
           full-uri (str uri (when query-string (str "?" query-string)))]
       (if (log-request? full-uri)

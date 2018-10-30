@@ -6,6 +6,7 @@
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
             [shevek.lib.transit :refer [transit-request-format]]
+            [shevek.lib.logger :as log]
             [ajax.core :refer [POST]]
             [clojure.string :as str]))
 
@@ -35,20 +36,28 @@
       (handle-app-error (assoc error :response new-response :status-text new-status-text))))
   (rpc/loaded db))
 
-(defn- uncaught-error-handler [event]
-  (let [error (.-error event)]
-    (-> (js/StackTrace.fromError error)
-        (.then
-         (fn [stacktrace]
-           (POST "/error" {:params {:message (.-message error)
-                                    :stacktrace (->> stacktrace
-                                                     (mapv #(.toString %))
-                                                     (str/join "\n "))
-                                    :app-db (db)}
-                           :headers (rpc/auth-header)
-                           :format transit-request-format}))))))
+(defn report-error-to-server [message stacktrace app-db]
+  (POST "/error" {:params {:message message
+                           :stacktrace stacktrace
+                           :app-db (log/pp-str app-db)} ; Send a string representation instead of the real object because it could be not serializable
+                  :headers (rpc/auth-header)
+                  :format transit-request-format}))
+
+(defn uncaught-error-handler [error]
+  (-> (js/StackTrace.fromError error)
+      (.then
+       (fn [stacktrace]
+         (report-error-to-server
+          (.-message error)
+          (->> stacktrace (mapv #(.toString %)) (str/join "\n "))
+          (db))))))
 
 (defonce uncaught-error-event-listener
   (do
-    (.addEventListener js/window "error" uncaught-error-handler)
+    (.addEventListener js/window "error" #(uncaught-error-handler (.-error %)))
     :done))
+
+(defevh :reflow/event-handler-error [db error]
+  (log/error error)
+  (uncaught-error-handler error)
+  db)
