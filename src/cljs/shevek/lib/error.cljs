@@ -5,7 +5,6 @@
             [shevek.i18n :refer [t translation]]
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
-            [shevek.lib.transit :refer [transit-request-format]]
             [shevek.lib.logger :as log]
             [ajax.core :refer [POST]]
             [clojure.string :as str]))
@@ -40,8 +39,7 @@
   (POST "/error" {:params {:message message
                            :stacktrace stacktrace
                            :app-db (log/pp-str app-db)} ; Send a string representation instead of the real object because it could be not serializable
-                  :headers (rpc/auth-header)
-                  :format transit-request-format}))
+                  :headers (rpc/auth-header)}))
 
 (defn uncaught-error-handler [error]
   (-> (js/StackTrace.fromError error)

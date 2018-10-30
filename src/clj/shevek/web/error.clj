@@ -17,4 +17,4 @@
 (defn client-error [{:keys [params] :as req}]
   (log/error "Client Error:" (:message params) "\n" (:stacktrace params))
   (notify-error (merge params {:request (dissoc req :params :body-params :optimus-assets)}))
-  {:status 200})
+  {:status 200 :body "Error Received"})
