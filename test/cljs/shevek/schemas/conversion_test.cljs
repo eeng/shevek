@@ -63,6 +63,7 @@
                           {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
                           {:name "page" :operator "exclude" :value [nil]}]}
                (report->viewer {:dimensions [{:name "time" :title "Fecha"}
+                                             {:name "time2"}
                                              {:name "page" :title "Pag"}]})
                :filters))))
 
@@ -74,6 +75,13 @@
                (report->viewer {:dimensions [{:name "otherD" :title "..."} {:name "time" :title "Time"}]
                                 :measures [{:name "otherM" :type "..."} {:name "count" :type "longSum"}]})
                :pinboard))))
+
+  (testing "if a pinboard dimension no longer exist, it should be removed"
+    (is (= []
+           (-> {:pinboard {:dimensions [{:name "oldName"}]}}
+               (report->viewer {:dimensions [{:name "newName" :title "..."}]})
+               :pinboard
+               :dimensions))))
 
   (testing "if the pinboard measure in the report doesn't exist on the cube (because the user shouldn't see it) should use the first available measure"
     (is (= {:measure {:name "count" :type "longSum"} :dimensions []}

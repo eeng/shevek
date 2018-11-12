@@ -28,13 +28,14 @@
 
 (defn- report-dim->viewer [{:keys [name sort-by] :as dim}
                            {:keys [dimensions measures]}]
-  (->> (merge dim (find-dimension name dimensions))
-       (transform [(must :interval) ALL] parse-time)
-       (transform (must :value) set)
-       (transform (must :sort-by) #(clean-sort-by (merge % (find-dimension (:name sort-by) (concat dimensions measures)))))))
+  (when-let [full-dim (find-dimension name dimensions)]
+    (->> (merge dim full-dim)
+         (transform [(must :interval) ALL] parse-time)
+         (transform (must :value) set)
+         (transform (must :sort-by) #(clean-sort-by (merge % (find-dimension (:name sort-by) (concat dimensions measures))))))))
 
 (defn report-dims->viewer [coll cube]
-  (mapv #(report-dim->viewer % cube) coll))
+  (remove nil? (mapv #(report-dim->viewer % cube) coll)))
 
 (defn report->viewer [{:keys [pinboard viztype] :as report} cube]
   {:cube cube
