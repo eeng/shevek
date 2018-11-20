@@ -83,6 +83,10 @@
                :pinboard
                :dimensions))))
 
+  (testing "splits and filters must be vectors"
+    (is (vector? (:splits (report->viewer {} {}))))
+    (is (vector? (:filters (report->viewer {} {})))))
+
   (testing "if the pinboard measure in the report doesn't exist on the cube (because the user shouldn't see it) should use the first available measure"
     (is (= {:measure {:name "count" :type "longSum"} :dimensions []}
            (-> {:pinboard {:measure "secretAmount"}}

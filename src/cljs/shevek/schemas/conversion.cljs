@@ -35,7 +35,7 @@
          (transform (must :sort-by) #(clean-sort-by (merge % (find-dimension (:name sort-by) (concat dimensions measures))))))))
 
 (defn report-dims->viewer [coll cube]
-  (remove nil? (mapv #(report-dim->viewer % cube) coll)))
+  (vec (remove nil? (map #(report-dim->viewer % cube) coll))))
 
 (defn report->viewer [{:keys [pinboard viztype] :as report} cube]
   {:cube cube
