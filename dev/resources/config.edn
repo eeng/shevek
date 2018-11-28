@@ -10,22 +10,22 @@
    :dimensions [{:name "__time" :title "Fecha de Emisión"}
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
                 {:name "año" :expression "timestamp_extract(__time, 'YEAR')"}
-                {:name "mes" :column "__time" :default-sort-by "mesNum"
-                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
-                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
-                {:name "mesNum" :column "__time" :type "LONG"
-                 :extraction [{:type "timeFormat" :format "M"}]}
+                {:name "mes"
+                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :type "LONG"
+                 :format "monthName"
+                 :default-sort-by "mes"}
                 {:name "semestre" :description "Uses expression language"
                  :expression "concat('S', div(timestamp_extract(__time, 'MONTH') - 1, 6) + 1)"}
                 {:name "semestre2" :column "__time" :description "Uses extract functions"
                  :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
-                {:name "cuatrimestre"
-                 :expression "concat('C', div(timestamp_extract(__time, 'MONTH') - 1, 4) + 1)"}
-                {:name "trimestre"
-                 :expression "concat('T', div(timestamp_extract(__time, 'MONTH') - 1, 3) + 1)"}
-                {:name "dia_semana" :title "Día de Semana" :column "__time"
-                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
-                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "cuatrimestre" :expression "concat('C', div(timestamp_extract(__time, 'MONTH') - 1, 4) + 1)"}
+                {:name "trimestre" :expression "concat('T', div(timestamp_extract(__time, 'MONTH') - 1, 3) + 1)"}
+                {:name "dia_semana"
+                 :title "Día de Semana"
+                 :expression "timestamp_extract(__time, 'DOW')"
+                 :format "dayOfWeekName"
+                 :default-sort-by "dia_semana"}
                 {:name "tipo_comprobante" :title "Tipo de Comprobante"}
                 {:name "grupo_item" :title "Grupo de Item"}
                 {:name "tipo_item" :title "Tipo de Item"}
@@ -70,18 +70,22 @@
    :dimensions [{:name "__time" :title "Fecha"}
                 {:name "año" :column "__time"
                  :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
-                {:name "mes" :column "__time"
-                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
-                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "mes"
+                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :type "LONG"
+                 :format "monthName"
+                 :default-sort-by "mes"}
                 {:name "semestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}
                 {:name "cuatrimestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'C' + (Math.floor(new Date(d).getMonth() / 4) + 1) }"}]}
                 {:name "trimestre" :column "__time"
                  :extraction [{:type "javascript" :function "function(d) { return 'T' + (Math.floor(new Date(d).getMonth() / 3) + 1) }"}]}
-                {:name "dia_semana" :title "Día de Semana" :column "__time"
-                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
-                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "dia_semana"
+                 :title "Día de Semana"
+                 :expression "timestamp_extract(__time, 'DOW')"
+                 :format "dayOfWeekName"
+                 :default-sort-by "dia_semana"}
                 {:name "hora" :title "Hora del Día" :column "__time" :extraction [{:type "timeFormat" :format "HH 'hs'" :locale "es"}]}
                 {:name "tipo_pedido" :title "Tipo de Pedido"}
                 {:name "condicion_ruteo" :title "Condición de Ruteo"}]
@@ -101,12 +105,16 @@
    :dimensions [{:name "__time" :title "Fecha"}
                 {:name "año" :column "__time"
                  :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
-                {:name "mes" :column "__time"
-                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}
-                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
-                {:name "dia_semana" :title "Día de Semana" :column "__time"
-                 :extraction [{:type "timeFormat" :format "EEEE" :locale "es"}
-                              {:type "javascript" :function "function(s) { return s[0].toUpperCase() + s.substring(1) }"}]}
+                {:name "mes"
+                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :type "LONG"
+                 :format "monthName"
+                 :default-sort-by "mes"}
+                {:name "dia_semana"
+                 :title "Día de Semana"
+                 :expression "timestamp_extract(__time, 'DOW')"
+                 :format "dayOfWeekName"
+                 :default-sort-by "dia_semana"}
                 {:name "material" :title "Material"}
                 {:name "clase" :title "Clase de Lente"}
                 {:name "seccion" :title "Sección"}

@@ -128,7 +128,8 @@
               :months ["Enero" "Febrero" "Marzo" "Abril" "Mayo" "Junio" "Julio" "Agosto" "Septiembre" "Octubre" "Noviembre" "Diciembre"]
               :monthsShort ["Ene" "Feb" "Mar" "Abr" "May" "Jun" "Jul" "Ago" "Sep" "Oct" "Nov" "Dic"]
               :today "Hoy"
-              :now "Ahora"}
+              :now "Ahora"
+              :dayNames ["Domingo" "Lunes" "Martes" "Miércoles" "Jueves" "Viernes" "Sábado"]}
    :actions {:ok "Aceptar"
              :cancel "Cancelar"
              :edit "Editar"

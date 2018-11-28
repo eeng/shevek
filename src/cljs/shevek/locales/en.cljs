@@ -135,7 +135,8 @@
               :today "Today"
               :now "Now"
               :am "AM"
-              :pm "PM"}
+              :pm "PM"
+              :dayNames ["Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday"]} ; Not used by the calendar but for :format "dow" dimensions
    :actions {:ok "Accept"
              :cancel "Cancel"
              :edit "Modify"

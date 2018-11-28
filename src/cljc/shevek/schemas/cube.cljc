@@ -16,8 +16,9 @@
          (s/optional-key :column) s/Str
          (s/optional-key :extraction) [ExtractionFn]
          (s/optional-key :multi-value) s/Bool
-         (s/optional-key :empty-value) s/Str
-         (s/optional-key :default-sort-by) s/Str))
+         (s/optional-key :default-sort-by) s/Str
+         (s/optional-key :format) s/Str
+         (s/optional-key :empty-value) s/Str))
 
 (s/defschema Measure
   (assoc NTD
