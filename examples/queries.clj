@@ -107,7 +107,7 @@
          {:cube "wikiticker"
           :splits [{:name "countryName" :limit 5}]
           :filters [{:interval ["2015" "2016"]}
-                    {:name "countryName" :operator "include" :value ["Italy" "France"]}]
+                    {:name "countryName" :operator "include" :value ["Italy" "France" 2]}]
           :measures ["count"]})
 
 #_(query request

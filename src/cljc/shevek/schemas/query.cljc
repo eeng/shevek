@@ -12,10 +12,13 @@
 (s/defschema TimeFilter
   (s/if :interval AbsoluteTimeFilter RelativeTimeFilter))
 
+(s/defschema StringOrNumber
+  (s/cond-pre s/Str s/Num))
+
 (s/defschema NormalFilter
   {:name s/Str
    :operator (s/enum "include" "exclude" "search" "is")
-   :value (s/cond-pre s/Str [(s/maybe s/Str)])})
+   :value (s/cond-pre StringOrNumber [(s/maybe StringOrNumber)])})
 
 (s/defschema Filter
   (s/if #(or (:period %) (:interval %)) TimeFilter NormalFilter))

@@ -1,7 +1,7 @@
 (ns shevek.schemas.viewer
   (:require [schema.core :as s]
             [shevek.schemas.cube :refer [Dimension Measure]]
-            [shevek.schemas.query :refer [Result RawQueryResults SortBy]]))
+            [shevek.schemas.query :refer [Result RawQueryResults SortBy StringOrNumber]]))
 
 (s/defschema Split
   (assoc Dimension
@@ -19,7 +19,7 @@
 (s/defschema NormalFilter
   (assoc Dimension
          :operator s/Str
-         (s/optional-key :value) #{(s/maybe s/Str)}))
+         (s/optional-key :value) #{(s/maybe StringOrNumber)}))
 
 (s/defschema Filters
   [(s/one TimeFilter "tf") NormalFilter])
