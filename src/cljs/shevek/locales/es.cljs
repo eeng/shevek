@@ -44,7 +44,8 @@
             :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
             :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"
             :unauthorized "Parece que el cubo {1} ya no está disponible. Por favor, contacte al administrador."
-            :toggle-fullscreen "Mostrar en Pantalla Completa"
+            :maximize "Maximizar panel de resultados"
+            :minimize "Minimizar panel de resultados"
             :grand-total "Total General"}
    :viewer.period {:relative "Relativo"
                    :specific "Específico"

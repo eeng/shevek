@@ -57,4 +57,4 @@
    (s/optional-key :results) {(s/optional-key :pinboard) {s/Str [Result]}
                               (s/optional-key :raw) RawQueryResults}
    (s/optional-key :visualization) Visualization
-   (s/optional-key :fullscreen) s/Bool})
+   (s/optional-key :maximized) s/Bool})
