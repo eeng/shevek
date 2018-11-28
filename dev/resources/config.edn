@@ -11,7 +11,8 @@
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
                 {:name "año" :expression "timestamp_extract(__time, 'YEAR')"}
                 {:name "mes"
-                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :column "__time"
+                 :extraction [{:type "timeFormat" :format "M"}]
                  :type "LONG"
                  :format "monthName"
                  :default-sort-by "mes"}

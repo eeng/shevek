@@ -23,7 +23,7 @@
     (virtual-column-name dim)
     (or column name)))
 
-(defn- dimension-and-extraction [{:keys [name column extraction] :as dim} q]
+(defn- dimension-and-extraction [{:keys [extraction] :as dim} q]
   (let [extraction (map #(add-time-zome-to-extraction-fn % q) extraction)]
     (cond-> {:dimension (dimension-column-name dim)}
       (seq extraction)
@@ -63,7 +63,7 @@
 
 (defn sort-by-derived-measures
   "If we sort by a not selected metric we should send the field as an aggregation, otherwise Druid complains"
-  [{:keys [sort-by] :as dim} measures]
+  [{:keys [sort-by]} measures]
   (if (and (:name sort-by)
            (measure? sort-by)
            (not (includes-dim? measures sort-by)))

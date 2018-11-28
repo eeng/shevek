@@ -10,7 +10,8 @@
                 {:name "año" :column "__time"
                  :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
                 {:name "mes"
-                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :column "__time"
+                 :extraction [{:type "timeFormat" :format "M"}]
                  :type "LONG"
                  :format "monthName"
                  :default-sort-by "mes"}
@@ -71,7 +72,8 @@
                 {:name "año" :column "__time"
                  :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
                 {:name "mes"
-                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :column "__time"
+                 :extraction [{:type "timeFormat" :format "M"}]
                  :type "LONG"
                  :format "monthName"
                  :default-sort-by "mes"}
@@ -106,7 +108,8 @@
                 {:name "año" :column "__time"
                  :extraction [{:type "timeFormat" :format "Y" :locale "es"}]}
                 {:name "mes"
-                 :expression "timestamp_extract(__time, 'MONTH')"
+                 :column "__time"
+                 :extraction [{:type "timeFormat" :format "M"}]
                  :type "LONG"
                  :format "monthName"
                  :default-sort-by "mes"}
