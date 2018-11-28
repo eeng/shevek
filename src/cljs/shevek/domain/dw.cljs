@@ -13,20 +13,26 @@
 
 (def measure-value dimension-value)
 
-(defn format-dim-value [value {:keys [granularity type empty-value format]
+(defn- format-dow [value]
+  (get (translation :calendar :dayNames)
+       (mod (str/parse-int value) 7)
+       "dow not found"))
+
+(defn- format-month [value]
+  (get (translation :calendar :months)
+       (dec (str/parse-int value))
+       "month not found"))
+
+(defn format-dim-value [value {:keys [granularity empty-value format]
                                :or {empty-value "Ø"}
                                :as dim}]
   (cond
     (empty? (str value)) empty-value
     (time-dimension? dim) (format-time-according-to-period value granularity)
-    (= "BOOL" type) (format-bool value)
     :else (case format
-            "dayOfWeekName" (get (translation :calendar :dayNames)
-                                 (mod (str/parse-int value) 7)
-                                 "dow not found")
-            "monthName" (get (translation :calendar :months)
-                             (dec (str/parse-int value))
-                             "month not found")
+            "dayOfWeekName" (format-dow value)
+            "monthName" (format-month value)
+            "boolean" (format-bool value)
             value)))
 
 (defn totals-result? [result dim]

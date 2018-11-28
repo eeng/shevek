@@ -39,9 +39,7 @@
 
     (testing "ascending ordered by the same dimension should use lexicographic sorting"
       (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}}
-                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}})))
-      (is (submap? {:metric {:type "dimension" :ordering "lexicographic"}}
-                   (to-druid-query {:dimension {:name "isNew" :type "BOOL" :sort-by {:name "isNew" :descending false}}}))))
+                   (to-druid-query {:dimension {:name "page" :sort-by {:name "page" :descending false}}}))))
 
     (testing "descending ordered by the same dimension should use lexicographic sorting"
       (is (submap? {:metric {:type "inverted"

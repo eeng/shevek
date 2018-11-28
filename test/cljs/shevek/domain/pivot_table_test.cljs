@@ -7,7 +7,7 @@
 (def taxes {:name "taxes" :title "Taxes"})
 (def country {:name "country" :title "Country"})
 (def city {:name "city" :title "City"})
-(def isNew {:name "isNew" :title "Is New" :type "BOOL"})
+(def isNew {:name "isNew" :title "Is New" :format "boolean"})
 
 (defn only-important-fields
   "Allows to write simpler tests without non-essential fields"

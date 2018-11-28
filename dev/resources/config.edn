@@ -45,7 +45,7 @@
                 {:name "rubro_tags" :title "Tag" :description "Tags asociados al rubro (multivalor)"}
                 {:name "tasa_iva" :title "Tasa de IVA"}
                 {:name "condicion_iva" :title "Condición IVA"}
-                {:name "despacho_preferencial" :title "Despacho Preferencial" :type "BOOL"}
+                {:name "despacho_preferencial" :title "Despacho Preferencial" :format "boolean"}
                 {:name "esferico" :title "Esférico" :type "FLOAT"}
                 {:name "cilindrico" :title "Cilíndrico" :type "FLOAT"}
                 {:name "eje_cilindrico" :title "Eje Cilíndrico" :type "FLOAT"}
@@ -148,11 +148,11 @@
   {:name "wikiticker"
    :description "Druid quickstart sample of Wikipedia edits"
    :dimensions
-   [{:name "isMinor" :type "BOOL"}
-    {:name "isUnpatrolled" :type "BOOL"}
-    {:name "isAnonymous" :type "BOOL"}
-    {:name "isRobot" :type "BOOL" :description "Indicates whether a computer or a human being made this edit"}
-    {:name "isNew" :type "BOOL"}
+   [{:name "isMinor" :format "boolean"}
+    {:name "isUnpatrolled" :format "boolean"}
+    {:name "isAnonymous" :format "boolean"}
+    {:name "isRobot" :format "boolean" :description "Indicates whether a computer or a human being made this edit"}
+    {:name "isNew" :format "boolean"}
     {:name "regionIsoCode" :title "Region ISO Code"}
     {:name "regionName" :default-sort-by "regionIsoCode"}
     {:name "countryIsoCode" :title "Country ISO Code"}

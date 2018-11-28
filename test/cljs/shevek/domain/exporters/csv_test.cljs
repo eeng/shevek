@@ -21,11 +21,19 @@
             ["Ø" "8"]
             ["Yes" "2"]]
            (generate-and-parse
-            {:splits [{:name "isRobot" :title "Is Robot" :type "BOOL"}]
+            {:splits [{:name "isRobot" :title "Is Robot" :format "boolean"}]
              :measures [{:name "count" :title "Count"}]
              :results [{:count 10}
                        {:count 8 :isRobot nil}
-                       {:count 2 :isRobot "true"}]}))))
+                       {:count 2 :isRobot "true"}]})))
+    (is (= [["Mes" "Count"]
+            ["Grand Total" "9"]
+            ["January" "3"]]
+           (generate-and-parse
+            {:splits [{:name "mes" :title "Mes" :format "monthName"}]
+             :measures [{:name "count" :title "Count"}]
+             :results [{:count 9}
+                       {:count 3 :mes "1"}]}))))
 
   (testing "two row dimensions and one measure"
     (is (= [["Country, City" "Count"]

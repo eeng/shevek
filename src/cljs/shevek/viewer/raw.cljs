@@ -10,15 +10,13 @@
             [shevek.viewer.filter :refer [slice->filters filter-title]]
             [shevek.domain.dimension :refer [time-dimension? add-dimension merge-dimensions]]
             [cuerdas.core :as str]
-            [shevek.lib.string :refer [format-bool]]
             [shevek.lib.time.ext :refer [format-time]]))
 
 (def limit 100)
 
-(defn- format-dimension [{:keys [type] :as dim} result]
+(defn- format-dimension [dim result]
   (let [value (dimension-value dim result)]
     (cond
-      (= "BOOL" type) (format-bool value)
       (sequential? value) (str/join ", " value)
       (time-dimension? dim) (format-time value)
       :else value)))
