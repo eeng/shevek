@@ -8,7 +8,8 @@
   (update-in db [:viewer :fullscreen] not))
 
 (defn fullscreen-menu []
-  [:a.icon.item {:on-click #(dispatch :viewer/fullscreen-toggled)
-                 :class (when (db/get-in [:viewer :fullscreen]) "active")
-                 :ref (tooltip (t :viewer/toggle-fullscreen))}
-   [:i.maximize.icon]])
+  (let [fullscreen? (db/get-in [:viewer :fullscreen])]
+    [:a.icon.item {:on-click #(dispatch :viewer/fullscreen-toggled)
+                   :class (when fullscreen? "active")
+                   :ref (tooltip (t :viewer/toggle-fullscreen))}
+     [:i.icon {:class (if fullscreen? "compress" "expand")}]]))
