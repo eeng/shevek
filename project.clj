@@ -66,8 +66,8 @@
   :uberjar-name "shevek.jar"
   :main shevek.app
 
-  :clean-targets ^{:protect false} ["resources/public/js/out" "resources/public/js/app.js"
-                                    "resources/public/css/app.css" "resources/public/css/app.main.css.map"
+  :clean-targets ^{:protect false} ["resources/public/js"
+                                    "resources/public/css"
                                     "resources/private"
                                     :target-path]
 

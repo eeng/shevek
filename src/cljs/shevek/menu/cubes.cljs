@@ -24,7 +24,7 @@
               [:div.description description]]]))]
        [:div (t :errors/no-results)])]))
 
-(defn- cubes-menu []
+(defn cubes-menu []
   (when-not (current-page? :home) ; No need to fetch the cubes again when we are on the home page
     (fetch-cubes))
   (fn []
