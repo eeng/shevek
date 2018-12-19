@@ -159,4 +159,5 @@
    :errors {:no-results "No results where found"
             :no-desc "No description"
             :bad-gateway "The system is not available right now. Please try again later."
+            :unexpected "We're sorry but something went wrong. We've been notified about this issue and we'll take a look at it shortly."
             "Query timeout" "The query is taking longer than expected. Please try with a shorter period."}})

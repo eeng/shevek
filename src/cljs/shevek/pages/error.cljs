@@ -4,7 +4,7 @@
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]))
 
-(defevh :page-error [db error]
+(defevh :errors/show-page [db error]
   (navigate "/error")
   (-> (assoc db :error error)
       (rpc/loaded db)))

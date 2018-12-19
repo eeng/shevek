@@ -18,7 +18,7 @@
   (try
     (swap! app-db handler event)
     (catch js/Error e
-      (dispatch :reflow/event-handler-error e))))
+      (dispatch :errors/unexpected-error e))))
 
 (defn- start-coordinator [app-db handler]
   (go-loop []

@@ -151,4 +151,5 @@
    :errors {:no-results "No se encontraron resultados"
             :no-desc "Sin descripción"
             :bad-gateway "El sistema no está disponible en este momento. Por favor, intente nuevamente más tarde."
+            :unexpected "Lo sentimos pero algo salió mal. Hemos sido notificados y lo estaremos resolviendo a la brevedad."
             "Query timeout" "La consulta está demorando demasiado. Por favor, intente con un período más corto."}})

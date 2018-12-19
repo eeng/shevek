@@ -55,7 +55,7 @@
     (.addEventListener js/window "error" #(uncaught-error-handler (.-error %)))
     :done))
 
-(defevh :reflow/event-handler-error [db error]
+(defevh :errors/unexpected-error [db error]
   (log/error error)
-  (uncaught-error-handler error)
-  db)
+  (js/setTimeout #(uncaught-error-handler error) 500) ; Otherwise StackTrace.JS delays the transition to the error page
+  (dispatch :errors/show-page {:message (t :errors/unexpected)}))

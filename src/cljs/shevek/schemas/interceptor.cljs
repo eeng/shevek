@@ -7,7 +7,8 @@
   (if debug?
     (fn [db [eid :as event]]
       (cond->> (interceptor db event)
-               (not= eid :reflow/event-handler-error) (s/validate AppDB)))
+               ; Don't validate on this events as it would provoke an infinite loop
+               (not (some #{:errors/unexpected-error :errors/show-page} [eid])) (s/validate AppDB)))
     interceptor))
 
 (s/set-fn-validation! debug?)
