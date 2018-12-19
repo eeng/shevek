@@ -5,9 +5,9 @@
 
 (defn checker [interceptor]
   (if debug?
-    (fn [db event]
-      (->> (interceptor db event)
-           (s/validate AppDB)))
+    (fn [db [eid :as event]]
+      (cond->> (interceptor db event)
+               (not= eid :reflow/event-handler-error) (s/validate AppDB)))
     interceptor))
 
 (s/set-fn-validation! debug?)
