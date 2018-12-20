@@ -108,17 +108,18 @@
         (conj rows (cons first-cell (measures-cells measures results splits))))
       rows)))
 
-(defn- measure-values-cells [result {:keys [results col-splits measures max-values]}]
+(defn- measure-values-cells [result grand-total-row? {:keys [results col-splits measures max-values]}]
   (for [result (flatten-result result (first results) col-splits)
         measure measures
-        :let [[grand-total-value max-value] (-> measure :name keyword max-values)]]
+        :let [[grand-total-value max-value] (-> measure :name keyword max-values)
+              result (assoc result :grand-total? grand-total-row?)]] ; Don't want the proportion in the top row cells when there are column splits
     (measure-value-cell measure result :max-value max-value :grand-total-value grand-total-value)))
 
 (defn- result-row [{:keys [grand-total?] :as result} row-split viz slice-so-far]
   (let [first-cell (if grand-total?
                      (grand-total-cell)
                      (dimension-value-cell row-split result :depth (count slice-so-far)))]
-    {:cells (cons first-cell (measure-values-cells result viz))
+    {:cells (cons first-cell (measure-values-cells result grand-total? viz))
      :slice (conj slice-so-far first-cell)
      :grand-total? grand-total?}))
 
