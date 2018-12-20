@@ -1,13 +1,14 @@
 (ns shevek.viewer.visualizations.pivot-table
-  (:require [clojure.string :as str]
+  (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.navigation :refer [current-page?]]
             [shevek.domain.dimension :refer [find-dimension]]
             [shevek.viewer.shared :refer [current-cube]]
-            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]
             [shevek.lib.number :as number]
+            [clojure.string :as str]
             [com.rpl.specter :refer [transform MAP-VALS]]))
 
 (defn- proportion-bg [value proportion]
@@ -90,17 +91,19 @@
       [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))
 
 ; The slice can't be used directly for the hash because it fails when the values are floats, as they are hash as ints and can produce duplicate values
-(defn- body-row [{:keys [cells slice grand-total?]}]
-  (let [simplified-slice (map (juxt (comp :name :dimension) (comp str :value)) slice)
-        row-key (hash simplified-slice)]
-    (into
-     [:tr {:key row-key
-           :class (if grand-total? "grand-total" (when (popup-opened? row-key) "active"))
-           :on-click (when (and (not grand-total?) (current-page? :viewer))
-                       #(show-popup % ^{:key row-key} [row-popup slice]
-                                    {:position "top center" :setFluidWidth true
-                                     :class "pivot-table-popup" :id row-key}))}]
-     (map as-component cells))))
+(defn- body-row []
+  (let [selected (r/atom false)]
+    (fn [{:keys [cells slice grand-total?]} row-key]
+      (into
+       [:tr {:class (if grand-total? "grand-total" (when @selected "active"))
+             :on-click (when (and (not grand-total?) (current-page? :viewer))
+                         (fn [node]
+                           (show-popup node ^{:key row-key} [row-popup slice]
+                                       {:position "top center"
+                                        :setFluidWidth true
+                                        :class "pivot-table-popup"
+                                        :on-toggle #(reset! selected %)})))}]
+       (map as-component cells)))))
 
 (defn- head-row [row]
   (into [:tr] (map as-component row)))
@@ -108,5 +111,10 @@
 (defn table-visualization [viz]
   (let [{:keys [head body]} (pivot-table/generate viz)]
     [:table.ui.very.basic.compact.table.pivot-table
-     (into [:thead] (map head-row head))
-     (into [:tbody] (map body-row body))]))
+     (into [:thead]
+           (for [row head] [head-row row]))
+     (into [:tbody]
+           (for [row body
+                 :let [simplified-slice (map (juxt (comp :name :dimension) (comp str :value)) (:slice row))
+                       row-key (hash simplified-slice)]]
+             ^{:key row-key} [body-row row row-key]))]))

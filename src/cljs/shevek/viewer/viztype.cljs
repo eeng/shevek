@@ -1,5 +1,6 @@
 (ns shevek.viewer.viztype
-  (:require [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
+  (:require [reagent.core :as r]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [translation]]
@@ -31,7 +32,10 @@
       [viztype-button viztype]])])
 
 (defn viztype-selector []
-  (let [viewer (db/get :viewer)]
-    [:div.viztype-selector.panel {:on-click #(show-popup % [viztype-popup] {:position "bottom right" :id :viztype})
-                                  :class (when (popup-opened? :viztype) "active")}
-     [viztype-button (viewer :viztype)]]))
+  (let [opened (r/atom false)]
+    (fn []
+      (let [viewer (db/get :viewer)]
+        [:div.viztype-selector.panel {:on-click #(show-popup % [viztype-popup] {:position "bottom right"
+                                                                                :on-toggle (partial reset! opened)})
+                                      :class (when @opened "active")}
+         [viztype-button (viewer :viztype)]]))))

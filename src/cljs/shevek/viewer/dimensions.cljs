@@ -3,7 +3,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.rpc :refer [loading-class]]
-            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable]]
             [shevek.components.form :refer [search-input filter-matching]]
             [shevek.viewer.shared :refer [current-cube panel-header send-main-query search-button highlight description-help-icon]]))
@@ -22,12 +22,17 @@
     [dimension-popup-button "orange" "plus" :split-dimension-added dim]
     [dimension-popup-button "yellow" "pin" :dimension-pinned dim]]])
 
-(defn- dimension-item [search {:keys [name title] :as dim}]
-  [:div.item (assoc (draggable dim)
-                    :class (when (popup-opened? name) "active")
-                    :on-click #(show-popup % [dimension-popup dim] {:position "right center" :distanceAway -30 :id name}))
-   [:i.icon {:class "radio"}]
-   [:span (highlight title search) [description-help-icon dim]]])
+(defn- dimension-item []
+  (let [selected (r/atom false)]
+    (fn [search {:keys [title] :as dim}]
+      [:div.item (assoc (draggable dim)
+                        :class (when @selected "active")
+                        :on-click #(show-popup % [dimension-popup dim]
+                                               {:on-toggle (partial reset! selected)
+                                                :position "right center"
+                                                :distanceAway -30}))
+       [:i.icon {:class "radio"}]
+       [:span (highlight title search) [description-help-icon dim]]])))
 
 (defn dimensions-panel []
   (let [searching (r/atom false)

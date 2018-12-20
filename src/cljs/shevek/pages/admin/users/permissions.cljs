@@ -4,13 +4,11 @@
             [shevek.lib.react :refer [rmap without-propagation]]
             [shevek.lib.string :refer [split]]
             [shevek.domain.dimension :refer [includes-dim? find-dimension remove-dimension replace-dimension time-dimension?]]
-            [shevek.reflow.core :refer-macros [defevh]]
             [shevek.components.form :refer [select dropdown]]
-            [shevek.viewer.filter :refer [filter-title]]
-            [shevek.viewer.filter :refer [filter-popup build-filter empty-value? show-popup-when-added set-as-last-added-filter]]
+            [shevek.viewer.filter :refer [filter-title filter-popup build-filter empty-value? show-popup-when-added set-as-last-added-filter]]
             [shevek.components.popup :refer [show-popup]]))
 
-(defn filter-button [cube {:keys [name] :as dim}]
+(defn filter-button [cube {:keys [name]}]
   (let [popup-key (hash {:name name :timestamp (js/Date.)})]
     (fn [cube dim]
       (let [remove-filter #(swap! cube update :filters remove-dimension dim)
