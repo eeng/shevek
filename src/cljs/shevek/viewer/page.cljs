@@ -67,21 +67,24 @@
 (defn page []
   (dispatch :viewer-initialized)
   (fn []
-    (let [maximized? (db/get-in [:viewer :maximized])]
-      [:div#viewer
-       (when-not maximized?
-         [:div.left-column
-          [dimensions-panel]
-          [measures-panel]])
-       [:div.center-column
-        (when-not maximized?
-          [:div.top-row
-           [:div.filter-split
-            [filter-panel]
-            [split-panel]]
-           [viztype-selector]])
-        [:div.bottom-row.panel
-         [visualization-panel]]]
-       (when-not maximized?
-         [:div.right-column
-          [pinboard-panels]])])))
+    (let [maximized? (db/get-in [:viewer :maximized])
+          loading-metadata? (nil? (db/get-in [:viewer :cube :dimensions]))]
+      (if loading-metadata?
+        [:div.ui.active.large.loader.preloader]
+        [:div#viewer
+         (when-not maximized?
+           [:div.left-column
+            [dimensions-panel]
+            [measures-panel]])
+         [:div.center-column
+          (when-not maximized?
+            [:div.top-row
+             [:div.filter-split
+              [filter-panel]
+              [split-panel]]
+             [viztype-selector]])
+          [:div.bottom-row.panel
+           [visualization-panel]]]
+         (when-not maximized?
+           [:div.right-column
+            [pinboard-panels]])]))))

@@ -11,7 +11,7 @@
        (map #(dissoc % :created-at :updated-at))
        (sort-by :title)))
 
-(defn cube [{:keys [user] :as req} name]
+(defn cube [{:keys [user]} name]
   (-> (r/find-cube db name)
       (auth/filter-cube user)
       (dissoc :min-time :updated-at :created-at)))
