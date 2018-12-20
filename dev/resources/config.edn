@@ -42,7 +42,7 @@
                 {:name "jurisdiccion" :title "Jurisdicción Percepción"}
                 {:name "rubro_marca" :title "Marca"}
                 {:name "rubro_material" :title "Material del Lente"}
-                {:name "rubro_clase" :title "Clase de Lente"}
+                {:name "rubro_clase" :title "Clase de Lente" :empty-value "Clase N/D"}
                 {:name "rubro_tags" :title "Tag" :description "Tags asociados al rubro (multivalor)"}
                 {:name "tasa_iva" :title "Tasa de IVA"}
                 {:name "condicion_iva" :title "Condición IVA"}

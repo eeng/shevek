@@ -8,6 +8,8 @@ lein cooper
 
 After a while the UI should be accesible through http://localhost:4000.
 
+Also, in the file `dev/clj/user.clj` there are some useful functions used during development.
+
 ### Connecting to the ClojureScript REPL
 
 ```
