@@ -60,11 +60,11 @@
       (save-cube db (update-cube (corresponding new-cube existing-cubes) new-cube)))))
 
 (defn discover! [dw db]
-  (benchmark "Cube discovering done (%.0f ms)"
+  (benchmark {:after "Cube discovering done (%.0f ms)"}
     (update-cubes db (discover-cubes dw))))
 
 (defn update-time-boundary! [dw db]
-  (benchmark "Updated time boundary (%.0f ms)"
+  (benchmark {:after "Updated time boundary (%.0f ms)"}
     (doseq [{:keys [name] :as cube} (find-cubes db)]
       (->> (time-boundary dw name)
            (merge cube)

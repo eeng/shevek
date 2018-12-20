@@ -30,8 +30,12 @@
 (defn pp-str [& args]
   (with-out-str (apply clojure.pprint/pprint args)))
 
-(defmacro benchmark [str & body]
-  `(let [start# (System/nanoTime)
-         result# (do ~@body)]
-     (log/info (format ~str (/ (- (System/nanoTime) start#) 1e6)))
-     result#))
+(defmacro benchmark [{:keys [before after log-level] :or {log-level :info}} & body]
+  (let [log-fn (case log-level
+                 :info 'taoensso.timbre/info
+                 :debug 'taoensso.timbre/debug)]
+    `(let [start# (System/nanoTime)
+           _# (when ~before (~log-fn ~before))
+           result# (do ~@body)]
+       (~log-fn (format ~after (/ (- (System/nanoTime) start#) 1e6)))
+       result#)))

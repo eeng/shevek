@@ -1,6 +1,5 @@
 (ns shevek.driver.druid
   (:require [clj-http.client :as http]
-            [taoensso.timbre :as log]
             [cheshire.core :refer [parse-string generate-string]]
             [shevek.lib.logging :refer [benchmark]]))
 
@@ -24,8 +23,9 @@
 
   (send-query [_ {:keys [query] :as dq}]
     (let [endpoint (str uri (if query "/druid/v2/sql" "/druid/v2"))]
-      (log/debug "Sending query to Druid:" (generate-string dq {:pretty true}))
-      (benchmark "Query finished in %.0f ms"
+      (benchmark {:before (str "Sending query to Druid:" (generate-string dq {:pretty true}))
+                  :after "Query finished in %.0f ms"
+                  :log-level :debug}
         (request http/post endpoint {:content-type :json :form-params dq :as :json})))))
 
 (defn http-druid-driver [uri]

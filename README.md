@@ -21,3 +21,10 @@ user=> (cljs-repl)
 lein build-frontend
 lein run -m shevek.app/start-for-dev
 ```
+
+### Packaging
+
+```
+lein package
+java -Dconf=path/to/config.edn -jar target/uberjar/shevek.jar
+```
