@@ -44,3 +44,5 @@
 (defstate scheduler
   :start (start!)
   :stop (stop-and-reset-pool! scheduler))
+
+#_(refresh-schema)

@@ -3,7 +3,7 @@
             [ring.middleware.format :refer [wrap-restful-format]]
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources not-found]]
-            [shevek.web.logging :refer [wrap-request-logging]]
+            [shevek.web.logging :refer [wrap-request-logging wrap-uuid]]
             [shevek.web.error :refer [wrap-server-error client-error]]
             [shevek.web.pages :as pages]
             [shevek.web.assets :refer [wrap-asset-pipeline]]
@@ -40,6 +40,7 @@
         (wrap-server-error)
         (wrap-request-logging)
         (wrap-current-user)
+        (wrap-uuid)
         (wrap-authentication backend)
         (wrap-restful-format :response-options {:transit-json {:handlers th/write-handlers}})
         (wrap-asset-pipeline)

@@ -10,8 +10,9 @@
     params
     to-filter))
 
-(defn- user-field [{:keys [username]}]
-  (format "[%s]" (or username "guest")))
+(defn- tag [value]
+  (when value
+    (format "[%s]" value)))
 
 (defn client-ip [req]
   (if-let [ips (get-in req [:headers "x-forwarded-for"])]
@@ -22,18 +23,25 @@
   (not (str/starts-with? uri "/public")))
 
 (defn wrap-request-logging [handler]
-  (fn [{:keys [request-method uri query-string params identity] :as req}]
+  (fn [{:keys [request-method uri query-string params identity uuid] :as req}]
     (let [ps (filtered-params params [:password :password-confirmation :current-password :stacktrace :app-db])
           method (-> request-method name str/upper-case)
-          full-uri (str uri (when query-string (str "?" query-string)))]
+          full-uri (str uri (when query-string (str "?" query-string)))
+          req-id (subs uuid 0 8)
+          user (or (:username identity) "guest")
+          prefix (str (tag req-id) " " (tag user))]
       (if (log-request? full-uri)
         (do
-          (log/info (user-field identity) "Started" method full-uri "for" (client-ip req))
+          (log/info prefix "Started" method full-uri "for" (client-ip req))
           (when (seq ps)
-            (log/info (user-field identity) "  Params" ps))
+            (log/info prefix "  Params" ps))
           (let [start (System/currentTimeMillis)
                 res (handler req)
                 total (- (System/currentTimeMillis) start)]
-            (log/info (user-field identity) "Completed" (:status res) "in" (str total "ms"))
+            (log/info prefix "Completed" (:status res) "in" (str total "ms"))
             res))
         (handler req)))))
+
+(defn wrap-uuid [handler]
+  (fn [request]
+    (handler (assoc request :uuid (str (java.util.UUID/randomUUID))))))

@@ -23,7 +23,7 @@
 
   (send-query [_ {:keys [query] :as dq}]
     (let [endpoint (str uri (if query "/druid/v2/sql" "/druid/v2"))]
-      (benchmark {:before (str "Sending query to Druid:" (generate-string dq {:pretty true}))
+      (benchmark {:before (str "Sending query to Druid: " (generate-string dq {:pretty true}))
                   :after "Query finished in %.0f ms"
                   :log-level :debug}
         (request http/post endpoint {:content-type :json :form-params dq :as :json})))))
