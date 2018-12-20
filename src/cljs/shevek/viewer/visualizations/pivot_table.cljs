@@ -5,7 +5,7 @@
             [shevek.navigation :refer [current-page?]]
             [shevek.domain.dimension :refer [find-dimension]]
             [shevek.viewer.shared :refer [current-cube]]
-            [shevek.components.popup :refer [show-popup close-popup popup-opened? tooltip]]
+            [shevek.components.popup :refer [show-popup close-popup popup-opened?]]
             [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]
             [shevek.lib.number :as number]
             [com.rpl.specter :refer [transform MAP-VALS]]))
@@ -70,8 +70,7 @@
     [:td.right.aligned
      [proportion-bg value proportion]
      [:span (when (pos? proportion)
-              {:ref (tooltip (number/format participation "0.00%")
-                             {:delay {:show 500} :position "right center" :distanceAway 5})})
+              {:title (number/format participation "0.0%")})
       text]]))
 
 (defn- row-popup [slice]
