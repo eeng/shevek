@@ -32,8 +32,7 @@
                  ;; Frontend
                  [org.clojure/clojurescript "1.10.238"]
                  [org.clojure/core.async "0.4.474"]
-                 [reagent "0.7.0" :exclusions [cljsjs/react]] ; Have to use 0.7 with the exclusion and react-with-addons otherwise the frontend unit test don't work because the latest reagent use a newer react with ES6 features, that aren't supported on phantom as of today
-                 [cljsjs/react-with-addons "15.6.1-0"]
+                 [reagent "0.8.1"]
                  [cljs-ajax "0.7.4"]
                  [secretary "1.2.3"]
                  [kibu/pushy "0.3.8"]
@@ -87,6 +86,8 @@
              :nrepl-port 4002
              :nrepl-middleware ["cider.piggieback/wrap-cljs-repl"]}
 
+  :doo {:paths {:karma "./node_modules/karma/bin/karma"}}
+
   :cljsbuild {:builds
               {:app
                {:source-paths ["src/cljs"]
@@ -106,11 +107,11 @@
                  :changes-only true
                  :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
 
-  :aliases {"frontend-testing" ["doo" "phantom" "test" "auto"]
+  :aliases {"frontend-testing" ["doo" "chrome-headless" "test" "auto"]
             "backend-testing" ["with-profile" "+ultra" "test-refresh"]
             "build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
             "package" ["do" ["clean"] "build-frontend" "uberjar"]
-            "ci" ["do" ["clean"] "test" ["doo" "phantom" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
+            "ci" ["do" ["clean"] "test" ["doo" "chrome-headless" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
 
   :profiles {:dev {:source-paths ["dev/clj"]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]

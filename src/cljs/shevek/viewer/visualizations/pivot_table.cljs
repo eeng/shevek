@@ -68,11 +68,11 @@
 
   MeasureValueCell
   (as-component [{:keys [value text proportion participation]}]
-    [:td.right.aligned
-     [proportion-bg value proportion]
-     [:span (when (pos? proportion)
-              {:title (number/format participation "0.0%")})
-      text]]))
+    (let [show-proportion? (> proportion 0.01)]
+      [:td.right.aligned
+       (when show-proportion? [proportion-bg value proportion])
+       [:span (when show-proportion? {:title (number/format participation "0.0%")})
+        text]])))
 
 (defn- row-popup [slice]
   (let [simplified-slice (map (juxt :dimension :value) slice)]
@@ -114,7 +114,5 @@
      (into [:thead]
            (for [row head] [head-row row]))
      (into [:tbody]
-           (for [row body
-                 :let [simplified-slice (map (juxt (comp :name :dimension) (comp str :value)) (:slice row))
-                       row-key (hash simplified-slice)]]
-             ^{:key row-key} [body-row row row-key]))]))
+           (for [[i row] (map-indexed vector body)]
+             ^{:key i} [body-row row i]))]))

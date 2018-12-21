@@ -5,5 +5,11 @@
     "semantic-ui-calendar": "0.0.8",
     "semantic-ui-css": "^2.4.1",
     "stacktrace-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "karma": "^3.1.4",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cljs-test": "^0.1.0",
+    "karma-firefox-launcher": "^1.1.0"
   }
 }

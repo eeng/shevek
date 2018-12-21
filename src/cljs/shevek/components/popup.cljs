@@ -18,8 +18,8 @@
 (defn close-popup []
   (swap! popup-data assoc :opened? false)
   (let [{:keys [on-close on-toggle]} @popup-data]
-    (when on-close (on-close))
-    (when on-toggle (on-toggle false))))
+    (on-close)
+    (on-toggle false)))
 
 (defn- popup* []
   (let [{:keys [content class]} @popup-data]
