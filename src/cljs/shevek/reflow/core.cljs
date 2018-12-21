@@ -3,7 +3,7 @@
   (:require [cljs.core.async :refer [chan put! <!]]
             [shevek.reflow.db :refer [app-db]]
             [shevek.lib.logger :as log]
-            [shevek.reflow.interceptors :as i]))
+            [shevek.reflow.router :as router]))
 
 (defonce events (chan))
 (defonce coordinator (atom nil))
@@ -12,7 +12,7 @@
   {:pre [(keyword? eid)]}
   (put! events (into [eid] args)))
 
-(def register-event-handler i/register-event-handler)
+(def register-event-handler router/register-event-handler)
 
 (defn- handle-event [event handler app-db]
   (try

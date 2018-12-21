@@ -3,12 +3,14 @@
             [shevek.layout :refer [layout]]
             [shevek.schemas.interceptor :as schema]
             [shevek.reflow.core :as reflow]
-            [shevek.reflow.interceptors :as i]
+            [shevek.reflow.router :refer [router]]
+            [shevek.reflow.interceptors.logger :refer [logger]]
+            [shevek.reflow.interceptors.recorder :refer [recorder]]
             [shevek.navigation :refer [init-navigation]]
             [shevek.lib.error]))
 
 (defn init-reflow []
-  (reflow/init (-> (i/router) (i/recorder) (i/logger) (schema/checker)))
+  (reflow/init (-> (router) (recorder) (logger) (schema/checker)))
   (reflow/dispatch :settings-loaded)
   (reflow/dispatch :user-restored))
 
