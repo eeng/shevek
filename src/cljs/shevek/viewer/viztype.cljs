@@ -34,8 +34,7 @@
 (defn viztype-selector []
   (let [opened (r/atom false)]
     (fn []
-      (let [viewer (db/get :viewer)]
-        [:div.viztype-selector.panel {:on-click #(show-popup % [viztype-popup] {:position "bottom right"
-                                                                                :on-toggle (partial reset! opened)})
-                                      :class (when @opened "active")}
-         [viztype-button (viewer :viztype)]]))))
+      [:div.viztype-selector.panel {:on-click #(show-popup % [viztype-popup] {:position "bottom right"
+                                                                              :on-toggle (partial reset! opened)})
+                                    :class (when @opened "active")}
+       [viztype-button (db/get-in [:viewer :viztype])]])))
