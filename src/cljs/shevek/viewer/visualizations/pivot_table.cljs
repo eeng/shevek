@@ -97,12 +97,16 @@
       (into
        [:tr {:class (if grand-total? "grand-total" (when @selected "active"))
              :on-click (when (and (not grand-total?) (current-page? :viewer))
-                         (fn [node]
-                           (show-popup node ^{:key row-key} [row-popup slice]
-                                       {:position "top center"
-                                        :setFluidWidth true
-                                        :class "pivot-table-popup"
-                                        :on-toggle #(reset! selected %)})))}]
+                         (fn [event]
+                           (let [tr (-> (.-target event) js/$ (.closest "tr"))
+                                 relative-x-coord (- (.-pageX event) (-> tr .offset .-left))
+                                 offset (- relative-x-coord (/ (.width tr) 2))]
+                             (show-popup event ^{:key row-key} [row-popup slice]
+                                         {:position "top center"
+                                          :offset offset
+                                          :setFluidWidth true
+                                          :class "pivot-table-popup"
+                                          :on-toggle #(reset! selected %)}))))}]
        (map as-component cells)))))
 
 (defn- head-row [row]
