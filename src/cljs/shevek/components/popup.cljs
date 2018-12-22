@@ -3,9 +3,7 @@
 
 (def popup-data (r/atom {:opened? false}))
 
-(defn show-popup [event new-content {:keys [on-close on-toggle class]
-                                     :or {on-close identity on-toggle identity}
-                                     :as popup-opts}]
+(defn show-popup [event new-content {:keys [on-close on-toggle class] :as popup-opts}]
   (reset! popup-data {:opened? true
                       :activator (.-currentTarget event)
                       :content new-content
@@ -13,13 +11,13 @@
                       :on-toggle on-toggle
                       :class class
                       :js-opts (dissoc popup-opts :on-close :on-toggle :class)})
-  (on-toggle true))
+  (when on-toggle (on-toggle true)))
 
 (defn close-popup []
   (swap! popup-data assoc :opened? false)
   (let [{:keys [on-close on-toggle]} @popup-data]
-    (on-close)
-    (on-toggle false)))
+    (when on-close (on-close))
+    (when on-toggle (on-toggle false))))
 
 (defn- popup* []
   (let [{:keys [content class]} @popup-data]
