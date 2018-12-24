@@ -2,8 +2,10 @@
   (:require [shevek.lib.logger :as log :refer [debug?]]
             [clojure.data :as data]))
 
-(defn logger [interceptor & {:keys [keys-excluded-from-diff]
-                             :or {keys-excluded-from-diff [:last-events]}}]
+(defn- clean-for-diff [db]
+  (dissoc db :last-events))
+
+(defn logger [interceptor]
   (fn [db event]
     (log/info "Handling event" event "...")
     (if debug?
@@ -11,9 +13,7 @@
             new-db (interceptor db event)
             end-time (js/Date.)
             elapsed-time (- end-time start-time)
-            [only-before only-after] (data/diff
-                                      (apply dissoc db keys-excluded-from-diff)
-                                      (apply dissoc new-db keys-excluded-from-diff))
+            [only-before only-after] (data/diff (clean-for-diff db) (clean-for-diff new-db))
             diff-time (- (js/Date.) end-time)
             db-changed? (or (some? only-before) (some? only-after))
             changes (if db-changed?
