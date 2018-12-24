@@ -14,17 +14,17 @@
    [:div.description description]])
 
 (defn- popup-content []
-  (let [dashboards (filter :id (db/get :dashboards))] ; Ignore dashboards that are being created
-    [:div#dashboards-popup
-     (if (seq dashboards)
-       [:div.ui.relaxed.middle.aligned.selection.list
-        (rmap dashboard-item :id dashboards)]
-       [:div (t :dashboards/missing)])]))
-
-(defn dashboards-menu []
   (when-not (current-page? :home) ; No need to fetch the dashboards again when we are on the home page
     (fetch-dashboards))
   (fn []
-    [:a.item {:on-click #(show-popup % popup-content {:position "bottom left"})
-              :class (when (current-page? :dashboard) "active")}
-     [:i.block.layout.icon] (t :dashboards/title)]))
+    (let [dashboards (filter :id (db/get :dashboards))] ; Ignore dashboards that are being created
+      [:div#dashboards-popup
+       (if (seq dashboards)
+         [:div.ui.relaxed.middle.aligned.selection.list
+          (rmap dashboard-item :id dashboards)]
+         [:div (t :dashboards/missing)])])))
+
+(defn dashboards-menu []
+  [:a.item {:on-click #(show-popup % popup-content {:position "bottom left"})
+            :class (when (current-page? :dashboard) "active")}
+   [:i.block.layout.icon] (t :dashboards/title)])

@@ -17,8 +17,12 @@
 (defn remove-loader []
   (-> ".preloader" js/$ (.fadeOut "slow")))
 
-(enable-console-print!)
-(remove-loader)
-(init-navigation)
-(init-reflow)
+(defonce init-process
+  (do
+    (enable-console-print!)
+    (remove-loader)
+    (init-navigation)
+    (init-reflow)
+    :done))
+
 (r/render-component [layout] (.getElementById js/document "app"))
