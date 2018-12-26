@@ -5,7 +5,7 @@
             [shevek.i18n :refer [t translation]]
             [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
-            [shevek.lib.logger :as log]
+            [shevek.lib.logger :as log :refer [debug?]]
             [ajax.core :refer [POST]]
             [clojure.string :as str]))
 
@@ -52,7 +52,8 @@
 
 (defonce uncaught-error-event-listener
   (do
-    (.addEventListener js/window "error" #(uncaught-error-handler (.-error %)))
+    (when-not debug?
+      (.addEventListener js/window "error" #(uncaught-error-handler (.-error %))))
     :done))
 
 (defevh :errors/unexpected-error [db error]
