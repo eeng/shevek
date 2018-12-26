@@ -54,7 +54,7 @@
 
   :plugins [[lein-pprint "1.1.2"]
             [lein-cooper "1.2.2"]
-            [lein-figwheel "0.5.16"]
+            [lein-figwheel "0.5.18"]
             [lein-cljsbuild "1.1.7"]
             [deraen/lein-less4j "0.6.2"]]
 
