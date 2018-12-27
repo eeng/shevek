@@ -31,7 +31,7 @@
                                                {:on-toggle (partial reset! selected)
                                                 :position "right center"
                                                 :distanceAway -30}))
-       [:i.icon {:class "radio"}]
+       [:i.icon {:class "genderless"}]
        [:span (highlight title search) [description-help-icon dim]]])))
 
 (defn dimensions-panel []
