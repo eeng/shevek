@@ -10,6 +10,7 @@
             [shevek.lib.transit-handlers :as th]
             [shevek.lib.rpc :as rpc]
             [shevek.lib.auth :as auth :refer [wrap-current-user]]
+            [shevek.monitoring.middleware :refer [wrap-stats]]
             [shevek.config :refer [config]]
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
@@ -38,6 +39,7 @@
     (-> app-routes
         (wrap-authorization backend)
         (wrap-server-error)
+        (wrap-stats)
         (wrap-request-logging)
         (wrap-current-user)
         (wrap-uuid)

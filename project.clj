@@ -28,6 +28,7 @@
                  [hiccup "1.0.5"]
                  [optimus "0.20.1"]
                  [clj-fakes "0.11.0"]
+                 [org.clojure/java.jmx "0.3.4"]
 
                  ;; Frontend
                  [org.clojure/clojurescript "1.10.238"]
@@ -72,7 +73,7 @@
 
   :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
 
-  :cooper {"backend" ["lein" "run" "-m" "shevek.app/start-for-dev"]
+  :cooper {"backend" ["lein" "with-profile" "+jmx" "run" "-m" "shevek.app/start-for-dev"]
            "less" ["lein" "less4j" "auto"]
            "figwheel" ["lein" "figwheel"]}
 
@@ -162,4 +163,8 @@
              :uberjar {:aot :all
                        :auto-clean false}
              ; Put ultra into a separate profile to active it only during clj testing, otherwise cljs testing throws an error due to this bug: https://github.com/emezeske/lein-cljsbuild/issues/469
-             :ultra {:plugins [[venantius/ultra "0.5.2"]]}})
+             :ultra {:plugins [[venantius/ultra "0.5.2"]]}
+             :jmx {:jvm-opts ["-Dcom.sun.management.jmxremote"
+                              "-Dcom.sun.management.jmxremote.port=4003"
+                              "-Dcom.sun.management.jmxremote.authenticate=false"
+                              "-Dcom.sun.management.jmxremote.ssl=false"]}})
