@@ -1,6 +1,11 @@
 {:env :production
  :log {:timestamp false}
 
+ :monitoring {:influx {:uri "http://monitor:8086"
+                       :username "root"
+                       :password "InfluxPass541"
+                       :database "telegraf"}}
+
  :cubes
  [{:name "facturacion"
    :title "Ventas"

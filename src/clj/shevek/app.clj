@@ -6,7 +6,6 @@
             [shevek.db :refer [db]]
             [shevek.engine.state]
             [shevek.scheduler :refer [scheduler]]
-            [shevek.monitoring.jmx]
             [shevek.reloader :refer [reloader]]
             [shevek.schema.seed :refer [seed!]])
   (:gen-class))

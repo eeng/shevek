@@ -23,4 +23,8 @@
  {:server {:host "" :user "" :pass ""}
   :errors {:to ""}}
 
+ ; InfluxDB example:
+ ; :monitoring {:influx {:uri "influxuri" :username "admin" :password "admin" :database "db"}}
+ :monitoring {}
+
  :cubes []}

@@ -35,10 +35,9 @@
           (log/info prefix "Started" method full-uri "for" (client-ip req))
           (when (seq ps)
             (log/info prefix "  Params" ps))
-          (let [start (System/currentTimeMillis)
-                res (handler req)
-                total (- (System/currentTimeMillis) start)]
-            (log/info prefix "Completed" (:status res) "in" (str total "ms"))
+          (let [res (handler req)
+                {:keys [status duration]} res]
+            (log/info prefix "Completed" status "in" (str duration "ms"))
             res))
         (handler req)))))
 

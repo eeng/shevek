@@ -28,7 +28,7 @@
                  [hiccup "1.0.5"]
                  [optimus "0.20.1"]
                  [clj-fakes "0.11.0"]
-                 [org.clojure/java.jmx "0.3.4"]
+                 [influxdb/influxdb-clojure "0.2.0" :exclusions [com.google.guava/guava]]
 
                  ;; Frontend
                  [org.clojure/clojurescript "1.10.238"]
@@ -163,8 +163,4 @@
              :uberjar {:aot :all
                        :auto-clean false}
              ; Put ultra into a separate profile to active it only during clj testing, otherwise cljs testing throws an error due to this bug: https://github.com/emezeske/lein-cljsbuild/issues/469
-             :ultra {:plugins [[venantius/ultra "0.5.2"]]}
-             :jmx {:jvm-opts ["-Dcom.sun.management.jmxremote"
-                              "-Dcom.sun.management.jmxremote.port=4003"
-                              "-Dcom.sun.management.jmxremote.authenticate=false"
-                              "-Dcom.sun.management.jmxremote.ssl=false"]}})
+             :ultra {:plugins [[venantius/ultra "0.5.2"]]}})
