@@ -77,10 +77,10 @@
 
 (def granularities {"PT5M" "5m", "PT1H" "1H", "P1D" "1D", "P1W" "1W", "P1M" "1M"})
 
-(defn- split-popup [{:keys [default-sort-by] :as dim}]
+(defn- split-popup [{:keys [default-sort-by name] :as dim}]
   (let [opts (r/atom (select-keys dim [:on :limit :sort-by :granularity]))
         posible-sort-bys (cond-> (conj (current-cube :measures) (clean-dim dim))
-                                 default-sort-by (conj (find-dimension default-sort-by (current-cube :dimensions))))]
+                                 (and default-sort-by (not= default-sort-by name)) (conj (find-dimension default-sort-by (current-cube :dimensions))))]
     (fn [dim]
       (let [desc (get-in @opts [:sort-by :descending])
             {:keys [granularity on]} @opts]

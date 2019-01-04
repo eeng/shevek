@@ -14,7 +14,9 @@
    :description "Ventas calculadas a partir de los comprobantes de facturación de VTOL"
    :dimensions [{:name "__time" :title "Fecha de Emisión"}
                 {:name "fecha_pedido" :title "Fecha de Pedido"}
-                {:name "año" :expression "timestamp_extract(__time, 'YEAR')"}
+                {:name "año"
+                 :expression "timestamp_extract(__time, 'YEAR')"
+                 :default-sort-by "año"}
                 {:name "mes"
                  :column "__time"
                  :extraction [{:type "timeFormat" :format "M"}]
@@ -32,6 +34,11 @@
                  :expression "timestamp_extract(__time, 'DOW')"
                  :format "dayOfWeekName"
                  :default-sort-by "dia_semana"}
+                {:name "dia_mes"
+                 :title "Día del Mes"
+                 :expression "timestamp_extract(__time, 'DAY')"
+                 :type "LONG"
+                 :default-sort-by "dia_mes"}
                 {:name "tipo_comprobante" :title "Tipo de Comprobante"}
                 {:name "grupo_item" :title "Grupo de Item"}
                 {:name "tipo_item" :title "Tipo de Item"}
