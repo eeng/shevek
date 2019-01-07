@@ -45,6 +45,7 @@
             :no-results "No results were found that match the specified search criteria"
             :split-required "At least one split is required for the {1} visualization"
             :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"
+            :chart-with-second-split-on-rows "The second split must be on the columns to be able to generate the chart"
             :unauthorized "It seems that the {1} cube is no longer available. Please contact the administrator."
             :maximize "Maximize results panel"
             :minimize "Minimize results panel"

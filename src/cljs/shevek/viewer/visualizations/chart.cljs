@@ -40,11 +40,9 @@
 (defn- reorganize-results [{:keys [splits results]}]
   (case (count splits)
     1 [nil [(rest results)]]
-    2 (let [subresults-matrix (map #(or (:child-rows %) (:child-cols %)) (rest results))
+    2 (let [subresults-matrix (map :child-cols (rest results))
             second-split (second splits)
-            second-split-values (if (= (:on second-split) "columns")
-                                  (->> (first results) :child-cols (map #(dimension-value second-split %)))
-                                  (->> subresults-matrix (apply concat) (map #(dimension-value second-split %)) distinct))
+            second-split-values (->> (first results) :child-cols (map #(dimension-value second-split %)))
             filled-subresults (for [results subresults-matrix]
                                 (for [ssv second-split-values]
                                   (detect #(= (dimension-value second-split %) ssv) results)))]
@@ -125,10 +123,18 @@
 ; Chart.js doesn't allow to update the type so we need to remount on viztype change, hence that :key.
 ; Also when split count change because the tooltips title callbacks are installed only on mount
 (defn chart-visualization [{:keys [measures viztype splits] :as viz}]
-  (if (> (count splits) 2)
+  (cond
+    (> (count splits) 2)
     [:div.icon-hint
      [:i.warning.circle.icon]
      [:div.text (t :viewer/too-many-splits-for-chart)]]
+
+    (and (= (count splits) 2) (= (:on (second splits)) "rows")) ; We need the child-cols of the grand-total result to get a list of all second split values, as one dataset is generated for each one
+    [:div.icon-hint
+     [:i.warning.circle.icon]
+     [:div.text (t :viewer/chart-with-second-split-on-rows)]]
+
+    :else
     [:div.charts
      (for [{:keys [name] :as measure} measures]
        [:div.chart-container {:key name :ref #(when % (set-chart-height % (count measures)))}

@@ -43,6 +43,7 @@
             :no-results "No se encontraron resultados que coincidan con los criterios especificados"
             :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
             :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"
+            :chart-with-second-split-on-rows "Debe colocar el segundo split en las columnas para poder generar el gráfico"
             :unauthorized "Parece que el cubo {1} ya no está disponible. Por favor, contacte al administrador."
             :maximize "Maximizar panel de resultados"
             :minimize "Minimizar panel de resultados"

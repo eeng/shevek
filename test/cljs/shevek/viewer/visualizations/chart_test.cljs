@@ -50,18 +50,4 @@
         (is (submaps? [{:label 2016 :data [16 0 36]}
                        {:label 2017 :data [0 27 37]}
                        {:label 2018 :data [18 28 0]}]
-                      (:datasets chart-data)))))
-
-    #_(testing "two splits with equal size of nested results"
-        (is (submaps? [{:data [20 160] :backgroundColor "#42a5f5"}
-                       {:data [80 40] :backgroundColor "#ff7043"}]
-                      (:datasets
-                       (build-chart-data
-                        {:name "added" :title "Added"}
-                        {:splits [{:name "country"} {:name "city"}]
-                         :results [{}
-                                   {:country "Argentina" :child-rows [{:added 20 :city "Santa Fe"}
-                                                                      {:added 80 :city "Rafaela"}]}
-                                   {:country "Brasil" :child-rows [{:added 160 :city "Sao Paulo"}
-                                                                   {:added 40 :city "Brasilia"}]}]
-                         :viztype :bar-chart})))))))
+                      (:datasets chart-data)))))))
