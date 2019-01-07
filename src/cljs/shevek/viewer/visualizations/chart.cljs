@@ -1,54 +1,77 @@
 (ns shevek.viewer.visualizations.chart
   (:require [cljsjs.chartjs]
             [reagent.core :as r]
-            [shevek.domain.dw :refer [format-dimension dimension-value format-measure]]
-            [shevek.i18n :refer [t]]))
+            [shevek.domain.dw :refer [format-dimension measure-value format-measure dimension-value]]
+            [shevek.i18n :refer [t]]
+            [shevek.lib.collections :refer [detect]]))
+
+(defn- transpose-matrix [matrix]
+  (apply map (fn [& args] args) matrix))
 
 (def colors
   (cycle ["#42a5f5" "#ff7043" "#9ccc65" "#ffca28" "#8d6e63" "#5c6bc0" "#ef5350" "#66bb6a" "#ffee58"
           "#ec407a" "#ffa726" "#26a69a" "#ab47bc" "#26c6da" "#d4e157" "#7e57c2" "#78909c" "#81d4fa"]))
 
-(def chart-types {:bar-chart "bar" :line-chart "line" :pie-chart "pie"})
+(def chart-types {:bar-chart {:js-type "bar"
+                              :border-width 2
+                              :background-alpha "AA"
+                              :hover-alpha "DD"}
+                  :line-chart {:js-type "line"
+                               :border-width 2
+                               :background-alpha "33"
+                               :hover-alpha "77"}
+                  :pie-chart {:js-type "pie"
+                              :border-width 1
+                              :background-alpha "CC"
+                              :hover-alpha "EE"}})
 
 (defn- build-data [measure results viztype]
-  (for [result results :let [value (dimension-value measure result)]]
-    (if (and (= :pie-chart viztype) (neg? value))
+  (for [result results :let [value (measure-value measure result)]]
+    (if (or (nil? value)
+            (and (= :pie-chart viztype) (neg? value)))
       0
       value)))
 
-(defn- build-dataset-for-one-split [{:keys [title] :as measure} results viztype]
-  (merge {:label title
-          :data (build-data measure results viztype)}
-         (case viztype
-           :line-chart {:borderColor (first colors) :backgroundColor "rgba(66, 165, 245, 0.3)"}
-           {:backgroundColor (take (count results) colors)})))
+(defn- transparent [color alpha]
+  (if (coll? color)
+    (map #(transparent % alpha) color)
+    (str color alpha)))
 
-(defn- build-dataset-for-two-splits [measure results viztype splits ds-idx]
-  (let [labels (map #(format-dimension (second splits) %) results)]
-    (merge {:label (first labels)
-            :nestedLabels labels ; Stored here for later use in tooltip-title
-            :data (build-data measure results viztype)}
-           (case viztype
-             :line-chart {:borderColor (nth colors ds-idx) :fill false}
-             {:backgroundColor (nth colors ds-idx)}))))
-
-(defn- fill-vector [size coll]
-  (for [i (range size)]
-    (get (vec coll) i)))
-
-(defn- build-datasets [measure {:keys [splits viztype results]}]
+(defn- reorganize-results [{:keys [splits results]}]
   (case (count splits)
-    1 [(build-dataset-for-one-split measure results viztype)]
-    2 (let [subresults (map #(or (:child-rows %) (:child-cols %)) results)
-            biggest-size (->> subresults (map count) (apply max))
-            filled-subresults (map #(fill-vector biggest-size %) subresults)
-            transposed-subresults (apply map (fn [& args] args) filled-subresults)]
-        (map-indexed #(build-dataset-for-two-splits measure %2 viztype splits %1) transposed-subresults))))
+    1 [nil [(rest results)]]
+    2 (let [subresults-matrix (map #(or (:child-rows %) (:child-cols %)) (rest results))
+            second-split (second splits)
+            second-split-values (if (= (:on second-split) "columns")
+                                  (->> (first results) :child-cols (map #(dimension-value second-split %)))
+                                  (->> subresults-matrix (apply concat) (map #(dimension-value second-split %)) distinct))
+            filled-subresults (for [results subresults-matrix]
+                                (for [ssv second-split-values]
+                                  (detect #(= (dimension-value second-split %) ssv) results)))]
+        [second-split-values (transpose-matrix filled-subresults)])))
 
-(defn build-chart-data [measure {:keys [splits] :as viz}]
-  (let [viz (update viz :results rest)] ; We don't need the totals row
-    {:labels (map #(format-dimension (first splits) %) (:results viz))
-     :datasets (build-datasets measure viz)}))
+(defn- build-dataset [measure results {:keys [viztype]} ds-idx ds-labels]
+  (let [data (build-data measure results viztype)
+        color (if (or (= viztype :line-chart) ds-labels)
+                (nth colors ds-idx)
+                (take (count data) colors))
+        {:keys [border-width background-alpha hover-alpha]} (chart-types viztype)]
+    {:data data
+     :label (nth ds-labels ds-idx)
+     :borderColor color
+     :backgroundColor (transparent color background-alpha)
+     :hoverBackgroundColor (transparent color hover-alpha)
+     :borderWidth border-width}))
+
+(defn- build-datasets [measure viz]
+  (let [[ds-labels results-matrix] (reorganize-results viz)]
+    (for [[ds-idx results] (map-indexed vector results-matrix)]
+      (build-dataset measure results viz ds-idx ds-labels))))
+
+(defn build-chart-data [measure {:keys [splits results] :as viz}]
+  (let [labels (map #(format-dimension (first splits) %) (rest results))
+        datasets (build-datasets measure viz)]
+    {:labels labels :datasets datasets}))
 
 ; Necessary to make pie tooltips look like bar tooltips, as the default ones lack the dataset labels (our measures). Also it formats the measure values.
 (defn- tooltip-label [{:keys [name title] :as measure} tooltip-item data]
@@ -56,14 +79,15 @@
         value (get (aget ds "data") (aget tooltip-item "index"))]
     (str " " title ": " (format-measure measure {(keyword name) value}))))
 
+; The default tooltip doesn't add the dataset label
 (defn- tooltip-title [viztype tooltip-items data]
   (let [tooltip-item (first tooltip-items)
         ds (get (aget data "datasets") (aget tooltip-item "datasetIndex"))
         idx (aget tooltip-item "index")
         labels (aget data "labels")
-        nested-labels (aget ds "nestedLabels")]
-    (if nested-labels
-      (str (get nested-labels idx) " ‧ " (get labels idx))
+        ds-label (aget ds "label")]
+    (if ds-label
+      (str (get labels idx) " ‧ " ds-label)
       (get labels idx))))
 
 (defn- build-chart-opts [{:keys [title] :as measure} {:keys [viztype splits results]}]
@@ -77,7 +101,7 @@
             (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))))
 
 (defn- build-chart [canvas measure {:keys [viztype] :as viz}]
-  (js/Chart. canvas (clj->js {:type (chart-types viztype)
+  (js/Chart. canvas (clj->js {:type ((chart-types viztype) :js-type)
                               :data (build-chart-data measure viz)
                               :options (build-chart-opts measure viz)})))
 
