@@ -34,11 +34,11 @@
                  :expression "timestamp_extract(__time, 'DOW')"
                  :format "dayOfWeekName"
                  :default-sort-by "dia_semana"}
-                {:name "dia_mes"
-                 :title "Día del Mes"
-                 :expression "timestamp_extract(__time, 'DAY')"
+                {:name "semana"
+                 :title "Semana"
+                 :expression "timestamp_extract(__time, 'WEEK')"
                  :type "LONG"
-                 :default-sort-by "dia_mes"}
+                 :default-sort-by "semana"}
                 {:name "tipo_comprobante" :title "Tipo de Comprobante"}
                 {:name "grupo_item" :title "Grupo de Item"}
                 {:name "tipo_item" :title "Tipo de Item"}
