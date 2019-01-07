@@ -15,7 +15,8 @@
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform ALL]]))
 
-(defn- init-splitted-dim [{:keys [limit sort-by granularity default-sort-by] :as dim} {:keys [viewer]}]
+(defn- init-splitted-dim [{:keys [on limit sort-by granularity default-sort-by] :or {on "rows"} :as dim}
+                          {:keys [viewer]}]
   (let [first-measure (or (-> viewer :measures first)
                           (-> viewer :cube :measures first))
         default-sort-by (find-dimension default-sort-by (-> viewer :cube :dimensions))
@@ -24,7 +25,7 @@
                             (and (time-dimension? dim) (assoc dim :descending false))
                             (assoc first-measure :descending true))]
     (cond-> (assoc (clean-dim dim)
-                   :on "rows"
+                   :on on
                    :limit (or limit (and (time-dimension? dim) 1000) 50)
                    :sort-by (clean-sort-by initial-sort-by))
             (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer))))))
@@ -79,7 +80,7 @@
 
 (defn- split-popup [{:keys [default-sort-by name] :as dim}]
   (let [opts (r/atom (select-keys dim [:on :limit :sort-by :granularity]))
-        posible-sort-bys (cond-> (conj (current-cube :measures) (clean-dim dim))
+        posible-sort-bys (cond-> (conj (current-cube :measures) dim)
                                  (and default-sort-by (not= default-sort-by name)) (conj (find-dimension default-sort-by (current-cube :dimensions))))]
     (fn [dim]
       (let [desc (get-in @opts [:sort-by :descending])
@@ -108,8 +109,7 @@
            [:div.flex.field
             [select (map (juxt :title :name) posible-sort-bys)
              {:class "fluid selection" :selected (get-in @opts [:sort-by :name])
-              :on-change #(swap! opts assoc :sort-by (assoc (find-dimension % posible-sort-bys)
-                                                            :descending desc))}]
+              :on-change #(swap! opts assoc :sort-by {:name % :descending desc})}]
             [:button.ui.basic.icon.button
              {:on-click #(swap! opts update-in [:sort-by :descending] not)}
              [:i.long.arrow.icon {:class (if desc "down" "up")}]]]]
