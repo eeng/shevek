@@ -24,7 +24,7 @@
                                         :viztype :bar-chart})))))
 
     (testing "one split and viztype line-chart"
-      (is (submaps? [{:data [100 200] :label nil :borderColor "#42a5f5" :backgroundColor "#42a5f533"}]
+      (is (submaps? [{:data [100 200] :label nil :borderColor "#42a5f5" :backgroundColor "#42a5f522"}]
                     (:datasets
                      (build-chart-data {:name "added" :title "Added"}
                                        {:splits [{:name "country"}]

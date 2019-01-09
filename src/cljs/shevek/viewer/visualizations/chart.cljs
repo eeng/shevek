@@ -1,7 +1,7 @@
 (ns shevek.viewer.visualizations.chart
   (:require [cljsjs.chartjs]
             [reagent.core :as r]
-            [shevek.domain.dw :refer [format-dimension measure-value format-measure dimension-value]]
+            [shevek.domain.dw :refer [format-dimension measure-value format-measure]]
             [shevek.i18n :refer [t]]
             [shevek.lib.collections :refer [detect]]))
 
@@ -18,8 +18,7 @@
                               :hover-alpha "DD"}
                   :line-chart {:js-type "line"
                                :border-width 2
-                               :background-alpha "33"
-                               :hover-alpha "77"}
+                               :background-alpha "22"}
                   :pie-chart {:js-type "pie"
                               :border-width 1
                               :background-alpha "CC"
@@ -42,10 +41,10 @@
     1 [nil [(rest results)]]
     2 (let [subresults-matrix (map :child-cols (rest results))
             second-split (second splits)
-            second-split-values (->> (first results) :child-cols (map #(dimension-value second-split %)))
+            second-split-values (->> (first results) :child-cols (map #(format-dimension second-split %)))
             filled-subresults (for [results subresults-matrix]
                                 (for [ssv second-split-values]
-                                  (detect #(= (dimension-value second-split %) ssv) results)))]
+                                  (detect #(= (format-dimension second-split %) ssv) results)))]
         [second-split-values (transpose-matrix filled-subresults)])))
 
 (defn- build-dataset [measure results {:keys [viztype]} ds-idx ds-labels]
