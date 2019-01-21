@@ -6,7 +6,9 @@
             [shevek.lib.collections :refer [detect]]))
 
 (defn- transpose-matrix [matrix]
-  (apply map (fn [& args] args) matrix))
+  (if (seq matrix)
+    (apply map (fn [& args] args) matrix)
+    []))
 
 (def colors
   (cycle ["#42a5f5" "#ff7043" "#9ccc65" "#ffca28" "#8d6e63" "#5c6bc0" "#ef5350" "#66bb6a" "#ffee58"
