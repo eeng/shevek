@@ -15,16 +15,16 @@
           "#ec407a" "#ffa726" "#26a69a" "#ab47bc" "#26c6da" "#d4e157" "#7e57c2" "#78909c" "#81d4fa"]))
 
 (def chart-types {:bar-chart {:js-type "bar"
-                              :border-width 2
                               :background-alpha "AA"
-                              :hover-alpha "DD"}
+                              :hover-alpha "DD"
+                              :js-opts {:borderWidth 2}}
                   :line-chart {:js-type "line"
-                               :border-width 2
-                               :background-alpha "22"}
+                               :background-alpha "22"
+                               :js-opts {:borderWidth 2 :pointRadius 2}}
                   :pie-chart {:js-type "pie"
-                              :border-width 1
                               :background-alpha "CC"
-                              :hover-alpha "EE"}})
+                              :hover-alpha "EE"
+                              :js-opts {:borderWidth 2}}})
 
 (defn- build-data [measure results viztype]
   (for [result results :let [value (measure-value measure result)]]
@@ -54,13 +54,14 @@
         color (if (or (= viztype :line-chart) ds-labels)
                 (nth colors ds-idx)
                 (take (count data) colors))
-        {:keys [border-width background-alpha hover-alpha]} (chart-types viztype)]
-    {:data data
-     :label (nth ds-labels ds-idx)
-     :borderColor color
-     :backgroundColor (transparent color background-alpha)
-     :hoverBackgroundColor (transparent color hover-alpha)
-     :borderWidth border-width}))
+        {:keys [background-alpha hover-alpha js-opts]} (chart-types viztype)]
+    (merge
+      {:data data
+       :label (nth ds-labels ds-idx)
+       :borderColor color
+       :backgroundColor (transparent color background-alpha)
+       :hoverBackgroundColor (transparent color hover-alpha)}
+      js-opts)))
 
 (defn- build-datasets [measure viz]
   (let [[ds-labels results-matrix] (reorganize-results viz)]
