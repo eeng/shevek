@@ -56,6 +56,6 @@
          (if reports
            (let [reports (filter-matching @search (by :name :description) reports)]
              (if (seq reports)
-               [:div.cards (rmap report-card (comp hash (juxt :name :created-at)) reports)]
+               [:div.cards (rmap report-card :id reports)]
                [:div.large.tip (if (seq @search) (t :errors/no-results) (t :reports/missing))]))
            [:div.ui.active.inline.centered.loader])]))))

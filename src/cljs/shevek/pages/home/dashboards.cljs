@@ -61,7 +61,7 @@
     [:span.right.floated {:ref (tooltip (t :reports/updated-at))}
      (format-time updated-at :day)]]])
 
-(defn- form-card [{:keys [name] :as dashboard} form-data]
+(defn- form-card [dashboard form-data]
   (let [cancel (fn [_]
                  (dispatch :dashbard-edition-canceled dashboard)
                  (reset! form-data nil))
@@ -93,12 +93,15 @@
         [:div.column
          [:h2.ui.app.header (t :dashboards/title)]
          [:div.actions
-          [:button.ui.compact.button {:on-click #(dispatch :new-dashboard-started) :tab-index -1}
+          [:button.ui.compact.button
+           {:on-click #(dispatch :new-dashboard-started)
+            :disabled (->> dashboards (map :id) (some nil?))
+            :tab-index -1}
            (t :actions/new)]]
          [search-input search {:on-enter #(trigger "click" ".dashboard.card") :input {:auto-focus false}}]
          (if dashboards
            (let [dashboards (filter-matching @search (by :name :description) dashboards)]
              (if (seq dashboards)
-               [:div.cards (rmap dashboard-card (comp hash (juxt :name :created-at)) dashboards)]
+               [:div.cards (rmap dashboard-card #(get % :id "new") dashboards)]
                [:div.large.tip (if (seq @search) (t :errors/no-results) (t :dashboards/missing))]))
            [:div.ui.active.inline.centered.loader])]))))

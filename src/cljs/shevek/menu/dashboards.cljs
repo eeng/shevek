@@ -1,7 +1,5 @@
 (ns shevek.menu.dashboards
-  (:require [reagent.core :as r]
-            [cuerdas.core :as str]
-            [shevek.reflow.db :as db]
+  (:require [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap]]
             [shevek.pages.home.dashboards :refer [fetch-dashboards select-dashboard]]
