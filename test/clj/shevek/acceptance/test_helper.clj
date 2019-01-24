@@ -2,16 +2,17 @@
   (:require [etaoin.api :as e]
             [etaoin.keys :as k]
             [clojure.test :refer [testing]]
-            [mount.core :as mount]
+            [mount.core :as mount :refer [defstate]]
             [monger.db :refer [drop-db]]
             [shevek.db :refer [db init-db]]
-            [shevek.app]
+            [shevek.nrepl :refer [nrepl]]
+            [shevek.scheduler :refer [scheduler]]
+            [shevek.reloader :refer [reloader]]
             [shevek.config :refer [config]]
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
             [shevek.users.repository :as users]
-            [clojure.string :as str]
-            [mount.core :refer [defstate]]))
+            [clojure.string :as str]))
 
 (defstate page
   :start (e/chrome)
@@ -22,10 +23,7 @@
 
 (defn start-system [& [{:keys [swap-states]}]]
   (System/setProperty "conf" "test/resources/test-config.edn")
-  (-> (mount/except
-       [#'shevek.nrepl/nrepl
-        #'shevek.scheduler/scheduler
-        #'shevek.reloader/reloader])
+  (-> (mount/except [#'nrepl #'scheduler #'reloader])
       (mount/swap-states swap-states)
       (mount/start)))
 

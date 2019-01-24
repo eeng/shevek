@@ -1,6 +1,6 @@
 (ns shevek.acceptance.settings-test
-  (:require [clojure.test :refer :all]
-            [shevek.acceptance.test-helper :refer :all]))
+  (:require [clojure.test :refer [deftest use-fixtures is]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login click click-link visit fill select refresh has-css? has-text? has-no-text?]]))
 
 (use-fixtures :once wrap-acceptance-tests)
 

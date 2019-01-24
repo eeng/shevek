@@ -1,17 +1,30 @@
 #dashboard {
-  .report.card {
-    .content:first-child {
-      flex-grow: 0;
-      cursor: pointer;
+  .panel {
+    height: 100%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+
+    .panel-header {
+      cursor: move;
+      &:hover { background-color: #faffe0 }
     }
-    .visualization-container {
-      height: 393px;
+
+    .panel-content {
       overflow: auto;
-      padding: .9em .7em;
-      position: relative;
-      .ui.statistics { padding: 10px; }
-      th, td { cursor: default !important; }
+      .statistics { padding: 0 }
     }
-    .dimmer { background-color: rgba(255, 255, 255, 0.3); } // Tiene 0.8 de transparencia en Semantic
   }
+
+  .react-draggable {
+    border: 2px solid @background-color;
+    &.react-draggable-dragging, &.resizing { border-color: #ff7f17; }
+  }
+
+  // Removes the initial animation
+  .react-grid-item.cssTransforms { transition-property: none; }
+  .animated .react-grid-item.cssTransforms { transition-property: transform; }
+
+  // By default its on top
+  .react-grid-placeholder { z-index: -1; }
 }

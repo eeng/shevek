@@ -1,6 +1,5 @@
 (ns shevek.pages.home.cubes
   (:require [reagent.core :as r]
-            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap]]
@@ -12,12 +11,12 @@
             [shevek.components.popup :refer [tooltip]]))
 
 (defn- cube-card [{:keys [name title description min-time max-time]}]
-  [:a.ui.fluid.cube.card {:on-click #(dispatch :cube-selected name)}
+  [:a.ui.fluid.cube.card {:href (str "/reports/new/" name)}
    [:div.content
     [:div.header [:i.cube.icon] title]
     [:div.description (if (present? description) description (t :errors/no-desc))]]
    [:div.extra.content
-    [:span.right.floated {:ref (tooltip (t :cubes/data-range))} 
+    [:span.right.floated {:ref (tooltip (t :cubes/data-range))}
      (format-time min-time :day) " - " (format-time max-time :day)]]])
 
 (defn cubes-cards []

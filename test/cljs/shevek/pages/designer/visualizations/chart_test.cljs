@@ -1,7 +1,7 @@
-(ns shevek.viewer.visualizations.chart-test
+(ns shevek.pages.designer.visualizations.chart-test
   (:require-macros [cljs.test :refer [deftest testing is are]])
   (:require [shevek.asserts :refer [submap? submaps?]]
-            [shevek.viewer.visualizations.chart :refer [build-chart-data]]))
+            [shevek.pages.designer.visualizations.chart :refer [build-chart-data]]))
 
 (deftest build-chart-data-tests
   (testing "one split and viztype bar-chart"

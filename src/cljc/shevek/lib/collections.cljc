@@ -1,5 +1,5 @@
 (ns shevek.lib.collections
-  (:require [com.rpl.specter :refer [transform MAP-KEYS]]))
+  (:require [com.rpl.specter :refer [transform setval MAP-KEYS NONE ALL keypath]]))
 
 (defn reverse-merge [m1 m2]
   (merge m2 m1))

@@ -58,6 +58,7 @@
    (s/optional-key :time-zone) s/Str})
 
 (s/defschema Result {s/Keyword s/Any})
+(s/defschema Results [Result])
 
 (s/defschema RawQueryResults
-  {:results [Result] :paging Paging})
+  {:results Results :paging Paging})

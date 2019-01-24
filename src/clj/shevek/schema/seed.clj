@@ -25,5 +25,3 @@
   (db/clean! db)
   (m/discover! dw db)
   (seed! db))
-
-#_(db-reset! shevek.db/db)

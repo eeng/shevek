@@ -1,6 +1,6 @@
 (ns shevek.acceptance.auth-test
-  (:require [clojure.test :refer :all]
-            [shevek.acceptance.test-helper :refer :all]
+  (:require [clojure.test :refer [deftest use-fixtures is]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login login-admin click click-link visit fill has-css? has-title? has-text? has-no-text?]]
             [etaoin.keys :as k]
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]

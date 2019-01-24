@@ -2,7 +2,8 @@
   (:require [secretary.core :as secretary :refer-macros [defroute]]
             [pushy.core :as pushy]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.reflow.db :as db]))
+            [shevek.reflow.db :as db]
+            [shevek.i18n :refer [t]]))
 
 (defonce history
   (pushy/pushy secretary/dispatch!
@@ -24,16 +25,25 @@
 (defn get-url []
   (pushy/get-token history))
 
-(defn set-url [next-url]
+(defn set-url
+  "Changes the URL without dispatching the routes"
+  [next-url]
   (let [current-url (get-url)]
     (when (not= next-url current-url)
       (.pushState js/history {}, nil, next-url))))
 
+(defn url-with-params [url params]
+  (str url
+       (when (seq params) (str "?" (js/URLSearchParams. (clj->js params))))))
+
+(defn current-url-with-params [params]
+  (url-with-params (.-pathname js/location) params))
+
 (defevh :navigate [db page]
   (assoc db :page page))
 
-(defroute "/viewer/:encoded-report" [encoded-report]
-  (dispatch :viewer-restored encoded-report))
+(defroute "/" []
+  (dispatch :navigate :home))
 
 (defroute "/admin" []
   (dispatch :navigate :admin))
@@ -41,11 +51,20 @@
 (defroute "/account" []
   (dispatch :navigate :account))
 
-(defroute "/dashboard/:id" [id]
-  (dispatch :dashboard-selected id))
+(defroute "/reports/new/:cube" [cube]
+  (dispatch :designer/new-report cube))
+
+(defroute "/reports/:id" [id]
+  (dispatch :designer/edit-report id))
+
+(defroute "/dashboards/new" [query-params]
+  (dispatch :dashboards/new query-params))
+
+(defroute "/dashboards/:id" [id query-params]
+  (dispatch :dashboards/show id query-params))
 
 (defroute "/error" []
   (dispatch :navigate :error))
 
 (defroute "*" []
-  (dispatch :navigate :home))
+  (dispatch :errors/show-without-url-change {:message (t :errors/page-not-found)}))

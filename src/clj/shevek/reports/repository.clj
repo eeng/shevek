@@ -1,38 +1,35 @@
 (ns shevek.reports.repository
-  (:require [schema.core :as s]
-            [shevek.schemas.report :refer [Report]]
-            [shevek.lib.mongodb :as m]
+  (:require [shevek.lib.mongodb :as m]
             [monger.collection :as mc]
             [monger.operators :refer :all]))
 
 (defn- remove-report-from-non-selected-dashboards [db rid ds-ids]
   (mc/update db "dashboards"
-             (cond-> {"reports.report-id" rid}
+             (cond-> {"panels.report-id" rid}
                      ds-ids (assoc :_id {$nin ds-ids}))
-             {$pull {:reports {:report-id rid}}}
+             {$pull {:panels {:report-id rid}}}
              {:multi true}))
 
 (defn- add-report-to-selected-dashboards [db rid ds-ids]
   (when (seq ds-ids)
     (mc/update db "dashboards"
-               {:_id {$in ds-ids} "reports.report-id" {$ne rid}}
-               {$push {:reports {:report-id rid}}}
+               {:_id {$in ds-ids} "panels.report-id" {$ne rid}}
+               {$push {:panels {:report-id rid}}}
                {:multi true})))
 
-(s/defn save-report [db {:keys [dashboards-ids] :as report} :- Report]
-  (let [r (m/save db "reports" report)
-        rid (m/oid (:id r))
-        ds-ids (map m/oid dashboards-ids)]
-    (remove-report-from-non-selected-dashboards db rid ds-ids)
-    (add-report-to-selected-dashboards db rid ds-ids)
-    r))
+; TODO DASHBOARD este hacia mas cosas antes, se encargaba de mantener la relacion inversa con los dashboards, revisar
+(defn save-report [db report]
+  (m/save db "reports" report))
 
-(s/defn delete-report [db {:keys [id]}]
+(defn delete-report [db {:keys [id]}]
   (remove-report-from-non-selected-dashboards db (m/oid id) [])
   (m/delete-by-id db "reports" id))
 
 (defn find-reports [db user-id]
   (m/find-all db "reports" :where {:user-id user-id} :sort {:name 1}))
 
-(s/defn delete-reports [db user-id]
+(defn delete-reports [db user-id]
   (m/delete-by db "reports" {:user-id user-id}))
+
+(defn find-by-id [db id]
+  (m/find-by-id db "reports" id))

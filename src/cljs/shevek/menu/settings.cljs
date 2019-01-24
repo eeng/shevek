@@ -18,7 +18,7 @@
 
 (defn refresh-page []
   (let [refresh-events {:dashboard :dashboard/refresh
-                        :viewer :viewer/refresh}
+                        :designer :designer/refresh}
         event (refresh-events (current-page))]
     (when (and event (logged-in?)) (dispatch event))))
 
@@ -58,7 +58,7 @@
                      (set-auto-refresh-interval! auto-refresh)
                      (dispatch :settings-saved {:auto-refresh auto-refresh}))}]
     [:button.ui.fluid.button
-     (assoc (rpc/loading-class [:viewer :results :main])
+     (assoc (rpc/loading-class [:designer :report-results])
             :on-click #(refresh-page))
      (t :settings/update-now)]]
    [:div#lang-dropdown.field

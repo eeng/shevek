@@ -1,10 +1,11 @@
-(ns shevek.viewer.visualizations.pivot-table
+(ns shevek.pages.designer.visualizations.pivot-table
   (:require [reagent.core :as r]
-            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
+            [shevek.reflow.core :refer [dispatch]]
+            [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.navigation :refer [current-page?]]
             [shevek.domain.dimension :refer [find-dimension]]
-            [shevek.viewer.shared :refer [current-cube]]
+            [shevek.pages.designer.helpers :refer [current-cube]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]
             [shevek.lib.number :as number]
@@ -21,8 +22,12 @@
     (find-dimension default-sort-by (current-cube :dimensions))
     dim))
 
+(defn- designer-visible? []
+  (or (current-page? :designer)
+      (db/get-in [:selected-panel :edit])))
+
 (defn- sortable-th [title sorting-mapping opts]
-  (if (current-page? :viewer)
+  (if (designer-visible?)
     (let [sorting-mapping (transform [MAP-VALS] translate-to-default-sort-by sorting-mapping)
           requested-sort-bys (map :name (vals sorting-mapping))
           current-sort-bys (map (comp :name :sort-by) (keys sorting-mapping))
@@ -31,7 +36,7 @@
                           (= (count descendings) 1))
           icon-after? (= (:class opts) "right aligned")
           desc (first descendings)]
-      [:th (assoc opts :on-click #(dispatch :splits-sorted-by sorting-mapping (if show-icon? (not desc) true)))
+      [:th (assoc opts :on-click #(dispatch :designer/splits-sorted-by sorting-mapping (if show-icon? (not desc) true)))
        (when-not icon-after? [:span title])
        (when show-icon?
          [:i.icon.caret {:class (if desc "down" "up")}])
@@ -80,13 +85,13 @@
      [:div.dimension-value (str/join ", " (map :text slice))]
      [:div.buttons
       [:button.ui.primary.compact.button
-       {:on-click #(dispatch :pivot-table-row-filtered simplified-slice "include")}
+       {:on-click #(dispatch :designer/pivot-table-row-filtered simplified-slice "include")}
        (t :actions/select)]
       [:button.ui.compact.button
-       {:on-click #(dispatch :pivot-table-row-filtered simplified-slice "exclude")}
-       (t :viewer.operator/exclude)]
+       {:on-click #(dispatch :designer/pivot-table-row-filtered simplified-slice "exclude")}
+       (t :designer.operator/exclude)]
       [:button.ui.compact.button
-       {:on-click #(do (close-popup) (dispatch :viewer/raw-data-requested simplified-slice))}
+       {:on-click #(do (close-popup) (dispatch :designer/raw-data-requested simplified-slice))}
        (t :raw-data/button)]
       [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))
 
@@ -96,7 +101,7 @@
     (fn [{:keys [cells slice grand-total?]} row-key]
       (into
        [:tr {:class (if grand-total? "grand-total" (when @selected "active"))
-             :on-click (when (and (not grand-total?) (current-page? :viewer))
+             :on-click (when (and (not grand-total?) (designer-visible?))
                          (fn [event]
                            (let [tr (-> (.-target event) js/$ (.closest "tr"))
                                  relative-x-coord (- (.-pageX event) (-> tr .offset .-left))

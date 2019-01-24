@@ -1,14 +1,16 @@
 (ns shevek.schemas.dashboard
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [shevek.schemas.report :refer [Report]]))
 
-(s/defschema DashboardReport
-  {:report-id s/Str})
+(s/defschema Panel
+  {:report Report
+   (s/optional-key :layout) {:x s/Int :y s/Int :h s/Int :w s/Int}})
 
 (s/defschema Dashboard
   {(s/optional-key :id) s/Str
    :name s/Str
    (s/optional-key :description) s/Str
-   (s/optional-key :user-id) s/Str ; When the new dashboard form is displayed we still don't have a user-id
-   (s/optional-key :reports) [DashboardReport]
+   (s/optional-key :user-id) s/Str
+   (s/optional-key :panels) [Panel]
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})

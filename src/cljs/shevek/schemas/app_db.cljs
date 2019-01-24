@@ -1,23 +1,24 @@
 (ns shevek.schemas.app-db
   (:require [schema.core :as s]
             [schema-tools.core :as st]
-            [shevek.schemas.viewer :refer [Viewer Visualization Cube]]
+            [shevek.schemas.cube :refer [Cube]]
+            [shevek.schemas.query :refer [Results]]
+            [shevek.schemas.designer :refer [Designer NewOrSavedReport]]
             [shevek.schemas.report :refer [Report]]
-            [shevek.schemas.dashboard :refer [Dashboard]]))
+            [shevek.schemas.dashboard :refer [Dashboard Panel]]))
 
 (s/defschema Settings
   {(s/optional-key :lang) s/Str
    (s/optional-key :auto-refresh) s/Int
    (s/optional-key :abbreviations) s/Str})
 
-(s/defschema CurrentReport
-  (st/assoc Report (s/optional-key :user-id) s/Str))
-
-(s/defschema DashboardReport
-  (st/assoc Report (s/optional-key :visualization) Visualization))
-
 (s/defschema CurrentDashboard
-  (st/assoc Dashboard :reports {s/Str DashboardReport}))
+  (st/assoc Dashboard
+            :panels [(st/assoc Panel :report NewOrSavedReport :id s/Int)]
+            (s/optional-key :reports-results) {s/Int Results}))
+
+(s/defschema SelectedPanel
+  {:id s/Int :fullscreen s/Bool :edit s/Bool})
 
 (s/defschema Error
   {(s/optional-key :title) s/Str
@@ -31,10 +32,10 @@
    (s/optional-key :error) Error
    (s/optional-key :cubes) {s/Str Cube}
    (s/optional-key :settings) (s/maybe Settings)
-   (s/optional-key :viewer) Viewer
-   (s/optional-key :current-report) (s/maybe CurrentReport)
+   (s/optional-key :designer) Designer
    (s/optional-key :reports) [Report]
    (s/optional-key :users) [s/Any]
    (s/optional-key :dashboards) [Dashboard]
-   (s/optional-key :dashboard) CurrentDashboard ; The selected dashboard
+   (s/optional-key :current-dashboard) CurrentDashboard ; The new/selected dashboard
+   (s/optional-key :selected-panel) (s/maybe SelectedPanel)
    (s/optional-key :last-events) [s/Any]})

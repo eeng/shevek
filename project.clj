@@ -46,12 +46,13 @@
                  [org.slf4j/slf4j-nop "1.7.12"] ; To disable monger log messages
                  [cljsjs/filesaverjs "1.3.3-0"]
                  [testdouble/clojurescript.csv "0.3.0"]
+                 [cljsjs/react-grid-layout "0.16.6-0"]
 
                  ;; Shared
                  [funcool/cuerdas "2.0.5"]
                  [com.rpl/specter "1.1.1"]
-                 [prismatic/schema "1.1.7"]
-                 [metosin/schema-tools "0.9.1"]]
+                 [prismatic/schema "1.1.10"]
+                 [metosin/schema-tools "0.10.5"]]
 
   :plugins [[lein-pprint "1.1.2"]
             [lein-cooper "1.2.2"]
@@ -130,8 +131,7 @@
                                   [pjstadig/humane-test-output "0.8.3"]
                                   [cljsjs/jquery "3.2.1-0"]]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
-                             [lein-doo "0.1.10"]
-                             [cider/cider-nrepl "0.18.0-SNAPSHOT"]] ; For Calva
+                             [lein-doo "0.1.10"]]
                    :cljsbuild {:builds
                                {:app
                                 {:figwheel true

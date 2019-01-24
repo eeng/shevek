@@ -18,5 +18,6 @@
     (assert (api-fn? f) "Only api functions are allowed")
     (apply f request args)))
 
+; I remove the optimus-assets otherwise when a schema validation error occours in any api method it would become very slow when the error middleware logs it
 (defn controller [request]
-  {:status 200 :body (call-fn request)})
+  {:status 200 :body (call-fn (dissoc request :optimus-assets))})

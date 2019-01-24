@@ -1,6 +1,6 @@
 (ns shevek.acceptance.home-test
-  (:require [clojure.test :refer :all]
-            [shevek.acceptance.test-helper :refer :all]
+  (:require [clojure.test :refer [deftest use-fixtures is]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests click click-link has-css? it has-title? login]]
             [shevek.schemas.cube :refer [Cube]]
             [shevek.makers :refer [make!]]))
 

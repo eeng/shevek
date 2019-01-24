@@ -7,7 +7,7 @@
             [shevek.reflow.interceptors.logger :refer [logger]]
             [shevek.reflow.interceptors.recorder :refer [recorder]]
             [shevek.navigation :refer [init-navigation]]
-            [shevek.lib.error]))
+            [shevek.lib.error])) ; So the error handlers are registered
 
 (defn init-reflow []
   (reflow/init (-> (router) (recorder) (logger) (schema/checker)))

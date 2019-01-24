@@ -30,3 +30,16 @@ lein run -m shevek.app/start-for-dev
 lein package
 java -Dconf=path/to/config.edn -jar target/uberjar/shevek.jar
 ```
+
+### Acceptance Testing
+
+To run the whole suite do:
+```
+lein test :acceptance
+```
+
+To run each test one at a time do:
+```
+lein repl :start :port 4101
+```
+Then connect to it, eval the `(ns)` and `(start-system)` forms, and finally eval the test blocks. It should run against the test database and web server.

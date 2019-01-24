@@ -1,4 +1,4 @@
-(ns shevek.viewer.split
+(ns shevek.pages.designer.splits
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.i18n :refer [t]]
@@ -6,20 +6,19 @@
             [shevek.lib.time.ext :refer [default-granularity]]
             [shevek.lib.react :refer [without-propagation]]
             [shevek.lib.collections :refer [includes?]]
-            [shevek.viewer.shared :refer [panel-header current-cube viewer send-main-query]]
+            [shevek.pages.designer.helpers :refer [panel-header current-cube send-designer-query]]
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [select]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
-            [shevek.viewer.url :refer [store-viewer-in-url]]
             [shevek.schemas.conversion :refer [clean-sort-by]]
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform ALL]]))
 
 (defn- init-splitted-dim [{:keys [on limit sort-by granularity default-sort-by] :or {on "rows"} :as dim}
-                          {:keys [viewer]}]
-  (let [first-measure (or (-> viewer :measures first)
-                          (-> viewer :cube :measures first))
-        default-sort-by (find-dimension default-sort-by (-> viewer :cube :dimensions))
+                          {:keys [designer]}]
+  (let [first-measure (or (-> designer :measures first)
+                          (-> designer :cube :measures first))
+        default-sort-by (find-dimension default-sort-by (-> designer :cube :dimensions))
         initial-sort-by (or sort-by
                             (and default-sort-by (assoc default-sort-by :descending false))
                             (and (time-dimension? dim) (assoc dim :descending false))
@@ -28,53 +27,51 @@
                    :on on
                    :limit (or limit (and (time-dimension? dim) 1000) 50)
                    :sort-by (clean-sort-by initial-sort-by))
-            (time-dimension? dim) (assoc :granularity (or granularity (default-granularity viewer))))))
+            (time-dimension? dim) (assoc :granularity (or granularity (default-granularity designer))))))
 
-(defn- adjust-viztype [{:keys [viewer] :as db}]
-  (let [{old-viztype :viztype splits :splits} viewer
+(defn- adjust-viztype [{:keys [designer] :as db}]
+  (let [{old-viztype :viztype splits :splits} designer
         new-viztype (cond
                       (and (= old-viztype :totals) (seq splits)) :table
                       (empty? splits) :totals
                       :else old-viztype)]
-    (assoc-in db [:viewer :viztype] new-viztype)))
+    (assoc-in db [:designer :viztype] new-viztype)))
 
-(defevhi :split-dimension-added [{:keys [viewer] :as db} dim]
-  {:after [store-viewer-in-url]}
-  (let [limit (when (->> viewer :splits (filter row-split?) seq) 5)]
-    (-> (update-in db [:viewer :splits] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
+(defevh :designer/split-dimension-added [{:keys [designer] :as db} dim]
+  (let [limit (when (->> designer :splits (filter row-split?) seq) 5)]
+    (-> (update-in db [:designer :splits] add-dimension (init-splitted-dim (assoc dim :limit limit) db))
         adjust-viztype
-        send-main-query)))
+        send-designer-query)))
 
-(defevhi :split-replaced [db dim]
-  {:after [close-popup store-viewer-in-url]}
-  (-> (assoc-in db [:viewer :splits] [(init-splitted-dim dim db)])
+(defevhi :designer/split-replaced [db dim]
+  {:after [close-popup]}
+  (-> (assoc-in db [:designer :splits] [(init-splitted-dim dim db)])
       adjust-viztype
-      send-main-query))
+      send-designer-query))
 
-(defevhi :split-dimension-replaced [db old-dim new-dim]
-  {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :splits] replace-dimension old-dim (init-splitted-dim new-dim db))
-      send-main-query))
+(defevhi :designer/split-dimension-replaced [db old-dim new-dim]
+  {:after [close-popup]}
+  (-> (update-in db [:designer :splits] replace-dimension old-dim (init-splitted-dim new-dim db))
+      send-designer-query))
 
-(defevhi :split-dimension-removed [db dim]
-  {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :splits] remove-dimension dim)
+(defevhi :designer/split-dimension-removed [db dim]
+  {:after [close-popup]}
+  (-> (update-in db [:designer :splits] remove-dimension dim)
       adjust-viztype
-      send-main-query))
+      send-designer-query))
 
-(defevhi :split-options-changed [db dim opts]
-  {:after [close-popup store-viewer-in-url]}
-  (-> (update-in db [:viewer :splits] replace-dimension (merge dim opts))
-      send-main-query))
+(defevhi :designer/split-options-changed [db dim opts]
+  {:after [close-popup]}
+  (-> (update-in db [:designer :splits] replace-dimension (merge dim opts))
+      send-designer-query))
 
-(defevhi :splits-sorted-by [db sort-bys descending]
-  {:after [store-viewer-in-url]}
-  (-> (transform [:viewer :splits ALL (partial includes? (keys sort-bys))]
+(defevh :designer/splits-sorted-by [db sort-bys descending]
+  (-> (transform [:designer :splits ALL (partial includes? (keys sort-bys))]
                  #(assoc % :sort-by (-> (sort-bys %)
                                         (assoc :descending descending)
                                         clean-sort-by))
                  db)
-      (send-main-query)))
+      send-designer-query))
 
 (def granularities {"PT5M" "5m", "PT1H" "1H", "P1D" "1D", "P1W" "1W", "P1M" "1M"})
 
@@ -88,16 +85,16 @@
         [:div.split.popup
          [:div.ui.form
           [:div.field
-           [:label (t :viewer/split-on)]
+           [:label (t :designer/split-on)]
            [:div.ui.two.small.basic.buttons
-            (for [[split-on title] [["rows" (t :viewer/rows)] ["columns" (t :viewer/columns)]]]
+            (for [[split-on title] [["rows" (t :designer/rows)] ["columns" (t :designer/columns)]]]
               [:button.ui.button {:key split-on
                                   :class (when (= on split-on) "active")
                                   :on-click #(swap! opts assoc :on split-on)}
                title])]]
           (when (time-dimension? dim)
             [:div.field.periods
-             [:label (t :viewer/granularity)]
+             [:label (t :designer/granularity)]
              [:div.ui.five.small.basic.buttons
               (for [[period title] granularities]
                 [:button.ui.button {:key period
@@ -105,7 +102,7 @@
                                     :on-click #(swap! opts assoc :granularity period)}
                  title])]])
           [:div.field
-           [:label (t :viewer/sort-by)]
+           [:label (t :designer/sort-by)]
            [:div.flex.field
             [select (map (juxt :title :name) posible-sort-bys)
              {:class "fluid selection" :selected (get-in @opts [:sort-by :name])
@@ -114,11 +111,11 @@
              {:on-click #(swap! opts update-in [:sort-by :descending] not)}
              [:i.long.arrow.icon {:class (if desc "down" "up")}]]]]
           [:div.field
-           [:label (t :viewer/limit)]
+           [:label (t :designer/limit)]
            [select (map (juxt identity identity) [5 10 25 50 100 1000])
             {:selected (:limit @opts) :on-change #(swap! opts assoc :limit (str/parse-int %))}]]
           [:button.ui.primary.compact.button
-           {:on-click #(dispatch :split-options-changed dim @opts)}
+           {:on-click #(dispatch :designer/split-options-changed dim @opts)}
            (t :actions/ok)]
           [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))))
 
@@ -134,12 +131,12 @@
          (merge {:on-click #(show-popup % ^{:key popup-key} [split-popup dim] {:position "bottom center"})
                  :class (if (= on "columns") "purple" "orange")}
                 (draggable dim)
-                (droppable #(dispatch :split-dimension-replaced dim %)))
-         [:i.close.icon {:on-click (without-propagation dispatch :split-dimension-removed dim)}]
+                (droppable #(dispatch :designer/split-dimension-replaced dim %)))
+         [:i.close.icon {:on-click (without-propagation dispatch :designer/split-dimension-removed dim)}]
          title]))))
 
-(defn split-panel []
-  [:div.split.panel (droppable #(dispatch :split-dimension-added %))
-   [panel-header (t :viewer/splits)]
-   (for [dim (viewer :splits)]
+(defn splits-panel [{:keys [splits]}]
+  [:div.split.panel (droppable #(dispatch :designer/split-dimension-added %))
+   [panel-header (t :designer/splits)]
+   (for [dim splits]
      ^{:key (:name dim)} [split-item dim])])

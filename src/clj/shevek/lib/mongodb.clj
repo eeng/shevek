@@ -4,8 +4,8 @@
             [monger.collection :as mc]
             [monger.operators :refer [$set]]
             [clj-time.core :refer [now]]
-            [clojure.string :refer [ends-with?]]
             [com.rpl.specter :refer [transform ALL]])
+  (:refer-clojure :exclude [count]) 
   (:import [org.bson.types ObjectId]))
 
 (defn oid [str]
@@ -56,6 +56,9 @@
          (mq/find (wrap-oids where))
          (mq/fields fields)
          (mq/sort sort))))
+
+(defn count [db collection]
+  (mc/count db collection))
 
 (defn find-by [db collection condition]
   (unwrap-oids

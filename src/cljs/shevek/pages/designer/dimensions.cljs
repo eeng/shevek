@@ -1,4 +1,4 @@
-(ns shevek.viewer.dimensions
+(ns shevek.pages.designer.dimensions
   (:require [reagent.core :as r]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
@@ -6,7 +6,7 @@
             [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.drag-and-drop :refer [draggable]]
             [shevek.components.form :refer [search-input filter-matching]]
-            [shevek.viewer.shared :refer [current-cube panel-header send-main-query search-button highlight description-help-icon]]))
+            [shevek.pages.designer.helpers :refer [current-cube panel-header search-button highlight description-help-icon]]))
 
 (defn dimension-popup-button [color icon event name]
   [:button.ui.circular.icon.button
@@ -17,10 +17,10 @@
 (defn- dimension-popup [dim]
   [:div.popup-content
    [:div.buttons
-    [dimension-popup-button "green" "filter" :dimension-added-to-filter dim]
-    [dimension-popup-button "orange" "square" :split-replaced dim]
-    [dimension-popup-button "orange" "plus" :split-dimension-added dim]
-    [dimension-popup-button "yellow" "pin" :dimension-pinned dim]]])
+    [dimension-popup-button "green" "filter" :designer/dimension-added-to-filter dim]
+    [dimension-popup-button "orange" "square" :designer/split-replaced dim]
+    [dimension-popup-button "orange" "plus" :designer/split-dimension-added dim]
+    [dimension-popup-button "yellow" "pin" :designer/dimension-pinned dim]]])
 
 (defn- dimension-item []
   (let [selected (r/atom false)]
@@ -43,7 +43,7 @@
                                (sort-by :title))
             search-text @search]
         [:div.dimensions.panel.ui.basic.segment (loading-class :cube-metadata)
-         [panel-header (t :viewer/dimensions) [search-button searching]]
+         [panel-header (t :designer/dimensions) [search-button searching]]
          (when @searching
            [search-input search {:on-stop #(reset! searching false) :wrapper {:class "small"}}])
          [:div.items

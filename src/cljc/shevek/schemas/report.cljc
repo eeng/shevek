@@ -1,6 +1,6 @@
 (ns shevek.schemas.report
   (:require [schema.core :as s]
-            [shevek.schemas.query :refer [Filters Split]]))
+            [shevek.schemas.query :refer [Filters Split Measure]]))
 
 (s/defschema Pinboard
   {:measure s/Str :dimensions [Split]})
@@ -11,11 +11,11 @@
    (s/optional-key :description) s/Str
    :cube s/Str
    :viztype s/Str
-   :measures [s/Str]
+   :measures [Measure]
    :filters Filters
    (s/optional-key :splits) [Split]
-   :pinboard Pinboard
-   :user-id s/Str
+   (s/optional-key :pinboard) Pinboard
+   (s/optional-key :user-id) s/Str
    (s/optional-key :dashboards-ids) [s/Str]
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})

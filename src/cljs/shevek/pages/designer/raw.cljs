@@ -1,18 +1,20 @@
-(ns shevek.viewer.raw
+(ns shevek.pages.designer.raw
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
-            [shevek.schemas.conversion :refer [viewer->raw-query]]
+            [shevek.schemas.conversion :refer [designer->raw-query]]
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.components.modal :refer [show-modal]]
-            [shevek.viewer.shared :refer [current-cube viewer]]
+            [shevek.pages.designer.helpers :refer [current-cube]]
             [shevek.domain.dw :refer [dimension-value format-measure]]
-            [shevek.viewer.filter :refer [slice->filters filter-title]]
+            [shevek.pages.designer.filters :refer [slice->filters filter-title]]
             [shevek.domain.dimension :refer [time-dimension? add-dimension merge-dimensions]]
+            [shevek.lib.time.ext :refer [format-time]]
             [cuerdas.core :as str]
-            [shevek.lib.time.ext :refer [format-time]]))
+            [reagent.core :as r]))
 
 (def limit 100)
+(def raw-data (r/atom {}))
 
 (defn- format-dimension [dim result]
   (let [value (dimension-value dim result)]
@@ -22,7 +24,7 @@
       :else value)))
 
 (defn raw-data-table []
-  (let [results (db/get-in [:viewer :results :raw :results])
+  (let [results (get-in @raw-data [:response :results])
         {:keys [dimensions measures]} (current-cube)]
     [:table.ui.compact.single.line.table
      [:thead>tr
@@ -48,25 +50,21 @@
 
 (defn modal-content []
   [:div.subcontent
-   [:p (t :raw-data/showing limit) [filters->str (viewer :raw-data-filter)]]
-   (if (rpc/loading? [:viewer :results :raw])
+   [:p (t :raw-data/showing limit) [filters->str (:filter @raw-data)]]
+   (if (:loading? @raw-data)
     [:div.ui.basic.segment.loading]
     [:div.table-container [raw-data-table]])])
 
-(defevh :viewer/raw-data-arrived [db results]
-  (-> (assoc-in db [:viewer :results :raw] results)
-      (rpc/loaded [:viewer :results :raw])))
-
-(defevh :viewer/raw-data-requested [{:keys [viewer] :as db} slice]
+(defevh :designer/raw-data-requested [{:keys [designer] :as db} slice]
+  (reset! raw-data {:loading? true})
   (show-modal {:header (t :raw-data/title)
                :content [modal-content]
                :actions [[:div.ui.cancel.button (t :actions/close)]]
                :class "large raw-data"
                :js-opts {:observeChanges false}})
-  (let [viewer (cond-> viewer
+  (let [designer (cond-> designer
                        slice (update :filters merge-dimensions (slice->filters slice "include")))
-        q (-> (viewer->raw-query viewer)
-              (assoc-in [:paging :threshold] limit))]
-    (rpc/call "querying/raw-query" :args [q] :handler #(dispatch :viewer/raw-data-arrived %))
-    (-> (assoc-in db [:viewer :raw-data-filter] (:filters viewer))
-        (rpc/loading [:viewer :results :raw]))))
+        q (-> (designer->raw-query designer)
+              (assoc-in [:paging :threshold] limit))
+        handler #(reset! raw-data {:loading? false :response % :filter (:filters designer)})]
+    (rpc/call "querying/raw-query" :args [q] :handler handler)))

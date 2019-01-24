@@ -11,8 +11,7 @@
             [shevek.lib.time.ext :refer [format-time]]
             [shevek.lib.string :refer [present?]]
             [shevek.lib.util :refer [new-record? trigger]]
-            [shevek.components.notification :refer [notify]]
-            [shevek.navigation :refer [navigate]]))
+            [shevek.components.notification :refer [notify]]))
 
 (defn fetch-dashboards []
   (dispatch :dashboards-requested))
@@ -42,11 +41,8 @@
   (rpc/call "dashboards/delete" :args [dashboard] :handler #(notify (t :dashboards/deleted name)))
   (update db :dashboards (partial remove #{dashboard})))
 
-(defn select-dashboard [{:keys [id]}]
-  (navigate "/dashboard/" id))
-
-(defn- show-card [{:keys [name description updated-at reports] :as dashboard} form-data]
-  [:a.ui.fluid.dashboard.card {:on-click #(select-dashboard dashboard)}
+(defn- show-card [{:keys [id name description updated-at reports] :as dashboard} form-data]
+  [:a.ui.fluid.dashboard.card {:href (str "/dashboards/" id)}
    [:div.content
     [:div.right.floated
      [:div.item-actions {:on-click #(.stopPropagation %)}
@@ -93,8 +89,8 @@
         [:div.column
          [:h2.ui.app.header (t :dashboards/title)]
          [:div.actions
-          [:button.ui.compact.button
-           {:on-click #(dispatch :new-dashboard-started)
+          [:a.ui.compact.button
+           {:href "/dashboards/new"
             :disabled (->> dashboards (map :id) (some nil?))
             :tab-index -1}
            (t :actions/new)]]

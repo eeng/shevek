@@ -9,6 +9,10 @@
   (-> (assoc db :error error)
       (rpc/loaded db)))
 
+(defevh :errors/show-without-url-change [db error]
+  (dispatch :navigate :error)
+  (assoc db :error error))
+
 (defn page []
   (let [{:keys [title message] :or {title "Oops!"}} (db/get :error)]
     [:div#error.ui.grid.centered.container

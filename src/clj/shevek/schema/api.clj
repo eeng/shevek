@@ -11,6 +11,7 @@
        (map #(dissoc % :created-at :updated-at))
        (sort-by :title)))
 
+; TODO DASHBOARD se sigue usando?
 (defn cube [{:keys [user]} name]
   (-> (r/find-cube db name)
       (auth/filter-cube user)

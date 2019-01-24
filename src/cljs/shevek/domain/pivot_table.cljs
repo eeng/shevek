@@ -40,7 +40,7 @@
 
 (defn grand-total-cell [& {:keys [col-span in-columns] :or {col-span 1 in-columns false}}]
   (DimensionValueCell. nil
-                       (t :viewer/grand-total)
+                       (t :designer/grand-total)
                        col-span
                        0
                        in-columns

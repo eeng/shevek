@@ -12,3 +12,9 @@
 
 ; Use this to reread the config file
 #_(shevek.app/reload-config)
+
+#_(shevek.schema.seed/db-reset! shevek.db/db)
+
+; Testing
+#_(shevek.acceptance.test-helper/start-system)
+#_(shevek.acceptance.test-helper/stop-system)

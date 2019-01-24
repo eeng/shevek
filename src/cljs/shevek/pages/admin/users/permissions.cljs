@@ -5,7 +5,7 @@
             [shevek.lib.string :refer [split]]
             [shevek.domain.dimension :refer [includes-dim? find-dimension remove-dimension replace-dimension time-dimension?]]
             [shevek.components.form :refer [select dropdown]]
-            [shevek.viewer.filter :refer [filter-title filter-popup build-filter empty-value? show-popup-when-added set-as-last-added-filter]]
+            [shevek.pages.designer.filters :refer [filter-title filter-popup build-filter empty-value? show-popup-when-added set-as-last-added-filter]]
             [shevek.components.popup :refer [show-popup]]))
 
 (defn filter-button [cube {:keys [name]}]
@@ -60,7 +60,7 @@
              [dropdown (map (juxt :title :name) (remove #(includes-dim? filters %) (sort-by :title dimensions)))
               {:class "labeled icon top left pointing tiny basic button" :in-menu-search true :on-change add-filter}
               [:i.filter.icon]
-              [:span (if (seq filters) (str (t :viewer/filters) ":") (t :permissions/add-filter))]]
+              [:span (if (seq filters) (str (t :designer/filters) ":") (t :permissions/add-filter))]]
              (when (seq filters)
                [:span
                 (for [{:keys [name] :as dim} filters]

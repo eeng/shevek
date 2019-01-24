@@ -1,4 +1,4 @@
-(ns shevek.support.viewer
+(ns shevek.support.designer
   (:require [shevek.acceptance.test-helper :refer :all]
             [shevek.makers :refer [make!]]
             [shevek.schemas.cube :refer [Cube]]))
@@ -57,7 +57,7 @@
                  :type "hyperUnique",
                  :title "User Unique"}]}))
 
-(defn go-to-viewer []
+(defn go-to-designer []
   (make-wikiticker-cube)
   (login)
   (click {:css "#cubes-menu"})

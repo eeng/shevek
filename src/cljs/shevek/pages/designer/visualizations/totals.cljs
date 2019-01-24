@@ -1,4 +1,4 @@
-(ns shevek.viewer.visualizations.totals
+(ns shevek.pages.designer.visualizations.totals
   (:require [shevek.domain.dw :refer [format-measure]]))
 
 (defn totals-visualization [{:keys [results measures]}]

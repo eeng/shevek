@@ -28,12 +28,12 @@
 
 (defn- report-card []
   (let [form-data (r/atom nil)]
-    (fn [{:keys [name description updated-at cube] :as report}]
+    (fn [{:keys [id name description updated-at cube] :as report}]
       (if @form-data
         [:div.ui.fluid.card
          [:div.content
           [save-report-form form-data fetch-dashboards]]]
-        [:a.ui.fluid.report.card {:on-click #(dispatch :report-selected report)}
+        [:a.ui.fluid.report.card {:href (str "/reports/" id)}
          [:div.content
           [:div.right.floated [report-actions report form-data]]
           [:div.header [:i.line.chart.icon] name]

@@ -1,9 +1,11 @@
 (ns shevek.dashboards.api
-  (:require [shevek.dashboards.repository :as r]
+  (:require [schema.core :as s]
+            [shevek.schemas.dashboard :refer [Dashboard]]
+            [shevek.dashboards.repository :as r]
             [shevek.db :refer [db]]
             [shevek.lib.auth :refer [authorize]]))
 
-(defn save [{:keys [user-id]} dashboard]
+(s/defn save [{:keys [user-id]} dashboard :- Dashboard]
   (r/save-dashboard db (assoc dashboard :user-id user-id)))
 
 (defn delete [_ dashboard]
@@ -12,7 +14,10 @@
 (defn find-all [{:keys [user-id]}]
   (r/find-dashboards db user-id))
 
-(defn find-by-id [{:keys [user-id]} id]
+(s/defn find-by-id :- Dashboard [{:keys [user-id]} id]
   (let [dashboard (r/find-by-id db id)]
     (authorize (= (:user-id dashboard) user-id))
     dashboard))
+
+#_(find-by-id {:user-id "5c4a064444d29c076e5b1219"} "5c4cafbb44d29c055644add6")
+#_(find-all {:user-id "5c4a064444d29c076e5b1219"})

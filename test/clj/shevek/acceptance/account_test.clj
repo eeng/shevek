@@ -1,6 +1,6 @@
 (ns shevek.acceptance.account-test
-  (:require [clojure.test :refer :all]
-            [shevek.acceptance.test-helper :refer :all]
+  (:require [clojure.test :refer [deftest use-fixtures is]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login click click-link visit fill has-css? has-text?]]
             [etaoin.keys :as k]))
 
 (use-fixtures :once wrap-acceptance-tests)
@@ -23,6 +23,3 @@
     (fill {:name "current-password"} "secret999" k/enter)
     (is (has-css? "#notification" :text "Your account has been saved"))
     (is (has-css? ".segment .item" :text "max@acme.com"))))
-
-#_(start-system)
-#_(stop-system)

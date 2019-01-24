@@ -1,23 +1,20 @@
 (ns shevek.menu.cubes
   (:require [shevek.i18n :refer [t]]
-            [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.navigation :refer [current-page?]]
             [shevek.components.popup :refer [show-popup close-popup]]
-            [shevek.viewer.shared :refer [current-cube-name]]
+            [shevek.pages.designer.helpers :refer [current-cube]]
             [shevek.domain.cubes :refer [fetch-cubes cubes-list]]))
 
 (defn- popup-content []
-  (let [cubes (cubes-list)
-        select-cube #(do (dispatch :cube-selected %) (close-popup))]
+  (let [cubes (cubes-list)]
     [:div#cubes-popup
      [:h3.ui.sub.orange.header (t :cubes/title)]
      (if (seq cubes)
        [:div.ui.relaxed.middle.aligned.selection.list
         (doall
           (for [{:keys [name title description] :or {description (t :errors/no-desc)}} cubes
-                :let [selected? (and (current-page? :viewer) (= name (current-cube-name)))]]
-            [:div.item {:key name :on-click #(select-cube name)}
+                :let [selected? (and (current-page? :designer) (= name (current-cube :name)))]]
+            [:a.item {:key name :href (str "/reports/new/" name) :on-click close-popup}
              [:i.large.middle.aligned.cube.icon {:class (when selected? "orange")}]
              [:div.content
               [:div.header title]
@@ -30,6 +27,6 @@
   (fn []
     [:a#cubes-menu.item {:on-click #(show-popup % popup-content {:position "bottom left"})}
      [:i.cubes.icon]
-     (if (current-page? :viewer)
-       (db/get-in [:cubes (current-cube-name) :title])
+     (if (current-page? :designer)
+       (current-cube :title)
        (t :cubes/menu))]))

@@ -11,8 +11,8 @@
             [shevek.pages.error :as error]
             [shevek.pages.dashboard :as dashboard]
             [shevek.pages.admin.page :as admin]
+            [shevek.pages.designer.page :as designer]
             [shevek.components.notification :refer [notification]]
-            [shevek.viewer.page :as viewer]
             [shevek.menu.cubes :refer [cubes-menu]]
             [shevek.menu.reports :refer [reports-menu]]
             [shevek.menu.dashboards :refer [dashboards-menu]]
@@ -26,7 +26,7 @@
    :home #'home/page
    :dashboard #'dashboard/page
    :admin #'admin/page
-   :viewer #'viewer/page
+   :designer #'designer/page
    :account #'account/page
    :error #'error/page})
 
@@ -41,8 +41,8 @@
    [dashboards-menu]
    [reports-menu]
    [:div.right.menu
-    (when (current-page? :viewer) [maximize-menu])
-    (when (current-page? :viewer) [share-menu])
+    (when (current-page? :designer) [maximize-menu])
+    (when (current-page? :designer) [share-menu])
     [settings-menu]
     (when (admin?)
       [:a.icon.item {:href "/admin" :class (current-page-class :admin) :ref (tooltip (t :admin/menu))}

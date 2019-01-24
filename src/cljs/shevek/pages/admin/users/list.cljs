@@ -9,7 +9,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.collections :refer [find-by]]
             [shevek.pages.admin.users.form :refer [adapt-for-client user-form]]
-            [shevek.viewer.raw :refer [filters->str]]))
+            [shevek.pages.designer.raw :refer [filters->str]]))
 
 (defevh :users-requested [db]
   (rpc/fetch db :users "users/find-all"))
@@ -32,7 +32,7 @@
                                (map #(merge (find-by :name (:name %) (db/get-in [:cubes name :dimensions])) %))
                                filters->str))
         measures-details (when (not= measures "all")
-                           (str (t :viewer/measures) ": " measures-titles))
+                           (str (t :designer/measures) ": " measures-titles))
         details (->> [filters-details measures-details] (filter some?) (interpose ", "))]
     [:span.cube
      [:span.cube-name cube-title]

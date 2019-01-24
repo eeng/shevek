@@ -4,6 +4,7 @@
   (for [x coll]
     ^{:key (key-fn x)} [component-fn x]))
 
+; TODO DEPRECATED replace with [:<>]
 (defn with-react-keys [coll]
   (doall (map #(with-meta %2 {:key %1}) (range) coll)))
 

@@ -58,5 +58,6 @@
 
 (defevh :errors/unexpected-error [db error]
   (log/error error)
-  (js/setTimeout #(uncaught-error-handler error) 500) ; Otherwise StackTrace.JS delays the transition to the error page
-  (dispatch :errors/show-page {:message (t :errors/unexpected)}))
+  (when-not debug?
+    (js/setTimeout #(uncaught-error-handler error) 500) ; Otherwise StackTrace.JS delays the transition to the error page
+    (dispatch :errors/show-page {:message (t :errors/unexpected)})))

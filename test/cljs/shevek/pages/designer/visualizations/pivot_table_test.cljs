@@ -1,7 +1,7 @@
-(ns shevek.viewer.visualizations.pivot-table-test
+(ns shevek.pages.designer.visualizations.pivot-table-test
   (:require [cljs.test :refer [deftest testing is use-fixtures]]
             [shevek.support.reagent :refer [with-container render-component texts]]
-            [shevek.viewer.visualizations.pivot-table :refer [table-visualization]]))
+            [shevek.pages.designer.visualizations.pivot-table :refer [table-visualization]]))
 
 (deftest table-visualization-tests
   (testing "one dimension on rows, one on columns and one measure"

@@ -19,8 +19,8 @@
     (-> ips (str/split #",") first)
     (:remote-addr req)))
 
-(defn- log-request? [uri]
-  (not (str/starts-with? uri "/public")))
+(defn log-request? [uri]
+  (not-any? #(str/starts-with? uri %) ["/public" "/js/out"]))
 
 (defn wrap-request-logging [handler]
   (fn [{:keys [request-method uri query-string params identity uuid] :as req}]

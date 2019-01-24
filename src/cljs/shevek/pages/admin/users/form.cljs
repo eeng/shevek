@@ -3,17 +3,15 @@
             [shevek.i18n :refer [t]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.lib.validation :as v]
-            [shevek.lib.collections :refer [assoc-nil]]
+            [shevek.lib.collections :refer [assoc-nil find-by]]
             [shevek.rpc :as rpc]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.util :refer [new-record?]]
-            [shevek.lib.collections :refer [find-by]]
             [shevek.domain.cubes :refer [cubes-list]]
             [shevek.pages.admin.users.permissions :refer [user-permissions]]
-            [shevek.schemas.conversion :refer [unparse-filters report-dims->viewer]]
+            [shevek.schemas.conversion :refer [unparse-filters report-dims->designer]]
             [shevek.schemas.user :refer [CubePermissions]]
-            [schema-tools.core :as st]
-            [com.rpl.specter :refer [transform ALL must]]))
+            [schema-tools.core :as st]))
 
 (defevh :user-saved [db]
   (dispatch :users-requested)
@@ -27,7 +25,7 @@
                                 (assoc :selected (some? allowed-cube)
                                        :only-measures-selected (not= "all" allowed-measures)
                                        :allowed-measures (when (not= "all" allowed-measures) allowed-measures)
-                                       :filters (report-dims->viewer (:filters allowed-cube) cube)))))]
+                                       :filters (report-dims->designer (:filters allowed-cube) cube)))))]
     (assoc user
            :cubes (mapv cube-permission (cubes-list))
            :only-cubes-selected (not= allowed-cubes "all"))))

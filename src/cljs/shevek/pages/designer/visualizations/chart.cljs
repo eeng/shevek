@@ -1,4 +1,4 @@
-(ns shevek.viewer.visualizations.chart
+(ns shevek.pages.designer.visualizations.chart
   (:require [cljsjs.chartjs]
             [reagent.core :as r]
             [shevek.domain.dw :refer [format-dimension measure-value format-measure]]
@@ -129,12 +129,12 @@
     (> (count splits) 2)
     [:div.icon-hint
      [:i.warning.circle.icon]
-     [:div.text (t :viewer/too-many-splits-for-chart)]]
+     [:div.text (t :designer/too-many-splits-for-chart)]]
 
     (and (= (count splits) 2) (= (:on (second splits)) "rows")) ; We need the child-cols of the grand-total result to get a list of all second split values, as one dataset is generated for each one
     [:div.icon-hint
      [:i.warning.circle.icon]
-     [:div.text (t :viewer/chart-with-second-split-on-rows)]]
+     [:div.text (t :designer/chart-with-second-split-on-rows)]]
 
     :else
     [:div.charts
