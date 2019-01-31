@@ -124,7 +124,7 @@
                                   [cider/piggieback "0.3.8"] ; ClojureScript REPL on top of nREPL
                                   [figwheel-sidecar "0.5.16"] ; ClojureScript REPL on top of nREPL
                                   ;; Testing clj
-                                  [etaoin "0.2.1"]
+                                  [etaoin "0.3.2"]
                                   [se.haleby/stub-http "0.2.1"]
                                   [prismatic/schema-generators "0.1.0"]
                                   ;; Testing cljs

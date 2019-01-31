@@ -125,19 +125,20 @@
 (defn by [& fields]
   #(str/join "|" ((apply juxt fields) %)))
 
-(defn- filter-matching [search get-value results]
+(defn filter-matching [search get-value results]
   (if (seq search)
     (let [pattern (re-pattern (str "(?i)" (regex-escape search)))]
       (filter #(re-find pattern (get-value %)) results))
     results))
 
-(defn search-input [search {:keys [on-change on-stop on-enter input wrapper]
-                            :or {on-change identity on-stop identity on-enter identity input {} wrapper {}}}]
+(defn search-input [search {:keys [on-change on-stop on-enter input wrapper placeholder]
+                            :or {on-change identity on-stop identity on-enter identity
+                                 input {} wrapper {} placeholder (t :actions/search)}}]
   (let [change #(on-change (reset! search %))
         clear #(do (when (seq @search) (change ""))
                  (on-stop))
         wrapper-opts (merge {:ref (kb-shortcuts :enter on-enter :escape clear)} wrapper)
-        input-opts (merge {:type "text" :placeholder (t :actions/search) :value @search
+        input-opts (merge {:type "text" :placeholder placeholder :value @search
                            :on-change #(change (.-target.value %)) :auto-focus true}
                           input)]
      [:div.ui.icon.fluid.input.search wrapper-opts
@@ -159,6 +160,7 @@
 (defn start-timeout [action]
   (reset! holding (js/setTimeout #(do (stop-timeout) (action)) 1000)))
 
+; TODO DASHBOARD vuela
 (defn hold-to-confirm [on-confirm]
   {:on-mouse-down #(start-timeout on-confirm)
    :on-mouse-up cancel-timeout

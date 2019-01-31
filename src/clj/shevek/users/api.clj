@@ -11,8 +11,8 @@
 (defn save [_ user]
   (r/save-user db user))
 
-(defn delete [_ user]
-  (r/delete-user db user))
+(defn delete [_ id]
+  (r/delete-user db id))
 
 (defn save-account [{:keys [user]} {:keys [current-password] :as new-fields}]
   (if-let [user (authenticate db (:username user) current-password)]

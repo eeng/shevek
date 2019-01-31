@@ -12,6 +12,12 @@
    (s/optional-key :auto-refresh) s/Int
    (s/optional-key :abbreviations) s/Str})
 
+(s/defschema Preferences
+  {(s/optional-key :lang) s/Str
+   (s/optional-key :auto-refresh) s/Int
+   (s/optional-key :abbreviations) s/Str
+   (s/optional-key :sidebar-visible) s/Bool})
+
 (s/defschema CurrentDashboard
   (st/assoc Dashboard
             :panels [(st/assoc Panel :report NewOrSavedReport :id s/Int)]
@@ -27,11 +33,12 @@
 (s/defschema AppDB
   {(s/optional-key :page) s/Keyword
    (s/optional-key :current-user) s/Any
-   (s/optional-key :user-restored) s/Bool ; Used to prevent the login form from appearing briefly when a user is logged in and the app is initializing
+   (s/optional-key :initialized) s/Bool ; Used to prevent the login form from appearing briefly when a user is logged in and the app is initializing
    (s/optional-key :loading) {(s/cond-pre s/Keyword [s/Any]) s/Bool}
    (s/optional-key :error) Error
    (s/optional-key :cubes) {s/Str Cube}
-   (s/optional-key :settings) (s/maybe Settings)
+   (s/optional-key :settings) (s/maybe Settings) ; TODO DASHBOARD vuela
+   (s/optional-key :preferences) Preferences
    (s/optional-key :designer) Designer
    (s/optional-key :reports) [Report]
    (s/optional-key :users) [s/Any]

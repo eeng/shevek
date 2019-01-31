@@ -45,7 +45,7 @@
       (format-dim-value (dimension-value dim result) dim))))
 
 (defn- personalize-abbreviations [format]
-  (let [abbreviations (db/get-in [:settings :abbreviations])]
+  (let [abbreviations (db/get-in [:preferences :abbreviations])]
     (case abbreviations
       "yes" (str/replace format #"0$" "0a")
       "no" (str/replace format "a" "")

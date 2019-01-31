@@ -1,39 +1,53 @@
 @background-color: #F7F7F7;
-@menu-height: 40px;
 
 body {
   background-color: @background-color;
 }
 
-.preloader {
-  pointer-events: none; // So acceptance test can click through
-}
+.layout {
+  display: flex;
 
-.ui.fixed.menu {
-  .icon.item {
-    padding-left: 0.9em;
-    padding-right: 0.9em;
+  #sidebar {
+    display: flex;
+    &:not(.compact) {
+      .box-shadow(0 0 15px 0 rgba(0, 0, 0, 0.3));
+    }
+    &.compact {
+      background: transparent
+    }
+    .top.divider { height: 3.85em }
+    .middle.divider { flex: 1 }
+    .bottom.divider { height: 1em; padding: 0 }
+    .item {
+      padding: 1.3em;
+      color: #ffffffdd;
+    }
+    .item > i { font-size: 1.4em }
+
+    .profile {
+      padding: 9px;
+      .user-avatar { width: 40px; }
+    }
+  }
+  #sidebar:not(.compact) + .page {
+    margin-left: 59px;
+  }
+
+  .page {
+    flex: 1;
+    .page-title {
+      padding: 2em;
+      padding-bottom: 1.7em;
+      border-bottom: .5em solid #0c6ab1;
+      margin-bottom: 3em;
+    }
+    .page-footer {
+      padding: 1rem;
+    }
   }
 }
 
-.page {
-  padding-top: @menu-height;
-
-  > .ui.container {
-    padding-top: 30px;
-  }
-
-  h1.header {
-    margin-bottom: 1em;
-  }
-
-  h2.app.header {
-    color: #307db7;
-    border-bottom: 2px solid rgba(48, 125, 183, 0.18);
-    margin-bottom: .7em;
-    font-size: 1.5rem;
-  }
-}
+.preloader { pointer-events: none; } // So acceptance test can click through
 
 #reports-popup, #cubes-popup, #dashboards-popup, #settings-popup {
   width: 300px;
@@ -81,6 +95,17 @@ body {
   .content, .actions { text-align: center }
 }
 
-.ui.inverted.popup, .ui.inverted.popup:before {
-  background-color: #f26202 !important;
+.ui.table {
+  td.actions {
+    white-space: nowrap;
+    text-align: center;
+    .ui.button {
+      margin-left: 3px;
+      margin-right: 3px;
+      opacity: .7;
+    }
+  }
+  tr:hover {
+    .ui.button { opacity: 1 }
+  }
 }

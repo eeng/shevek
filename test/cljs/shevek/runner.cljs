@@ -2,8 +2,8 @@
   (:require [doo.runner :refer-macros [doo-tests]]
             [pjstadig.humane-test-output]
             [cljsjs.jquery]
-            [shevek.admin.users.form-test]
-            [shevek.admin.users.list-test]
+            [shevek.pages.configuration.users.form-test]
+            [shevek.pages.configuration.users.list-test]
             [shevek.domain.dimension]
             [shevek.lib.time.ext-test]
             [shevek.lib.validation-test]
@@ -14,8 +14,8 @@
             [shevek.domain.pivot-table-test]))
 
 (doo-tests
- 'shevek.admin.users.form-test
- 'shevek.admin.users.list-test
+ 'shevek.pages.configuration.users.form-test
+ 'shevek.pages.configuration.users.list-test
  'shevek.domain.dimension
  'shevek.lib.time.ext-test
  'shevek.lib.validation-test

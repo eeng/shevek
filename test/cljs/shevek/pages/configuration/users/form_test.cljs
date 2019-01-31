@@ -1,9 +1,9 @@
-(ns shevek.admin.users.form-test
+(ns shevek.pages.configuration.users.form-test
   (:require [cljs.test :refer-macros [deftest testing is]]
             [shevek.asserts :refer [error-on? no-error-on?]]
-            [shevek.pages.admin.users.form :refer [user-validations adapt-for-client adapt-for-server]]
+            [shevek.pages.configuration.users.form :refer [user-validations adapt-for-client adapt-for-server]]
             [shevek.lib.validation :as v]
-            [shevek.domain.cubes :refer [cubes-list]]
+            [shevek.pages.cubes.page :refer [cubes-list]]
             [shevek.lib.time :refer [date-time]]))
 
 (defn validate-user [user]

@@ -16,8 +16,9 @@
        (transform [:panels ALL] (partial save-report-and-keep-id db))
        (m/save db "dashboards")))
 
-(defn delete-dashboard [db {:keys [id]}]
-  (mc/update db "reports" {:dashboards-ids (m/oid id)} {$pull {:dashboards-ids (m/oid id)}} {:multi true})
+(defn delete-dashboard [db id]
+  ; TODO DASHBOARD aca creo q habria que borrar todos los reports directamente ya que ahora seria one-to-many
+  ; (mc/update db "reports" {:dashboards-ids (m/oid id)} {$pull {:dashboards-ids (m/oid id)}} {:multi true})
   (m/delete-by-id db "dashboards" id))
 
 (defn- fetch-report [db {:keys [report-id] :as panel}]
@@ -27,7 +28,7 @@
 (defn find-dashboards [db user-id]
   (m/find-all db "dashboards"
               :where {:user-id user-id}
-              :fields [:name :updated-at :user-id]
+              :fields [:name :description :updated-at :user-id]
               :sort {:name 1}))
 
 (defn delete-dashboards [db user-id]

@@ -1,11 +1,12 @@
 (ns shevek.pages.home.cubes
   (:require [reagent.core :as r]
             [shevek.reflow.db :as db]
+            [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap]]
             [shevek.lib.util :refer [trigger]]
             [shevek.lib.string :refer [present?]]
-            [shevek.domain.cubes :refer [fetch-cubes cubes-list]]
+            [shevek.pages.cubes.page :refer [cubes-list]]
             [shevek.lib.time.ext :refer [format-time]]
             [shevek.components.form :refer [search-input filter-matching by]]
             [shevek.components.popup :refer [tooltip]]))
@@ -20,7 +21,7 @@
      (format-time min-time :day) " - " (format-time max-time :day)]]])
 
 (defn cubes-cards []
-  (fetch-cubes)
+  (dispatch :cubes/fetch)
   (let [search (r/atom "")]
     (fn []
       (let [cubes (cubes-list)]

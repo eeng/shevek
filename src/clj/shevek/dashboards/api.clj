@@ -8,8 +8,8 @@
 (s/defn save [{:keys [user-id]} dashboard :- Dashboard]
   (r/save-dashboard db (assoc dashboard :user-id user-id)))
 
-(defn delete [_ dashboard]
-  (r/delete-dashboard db dashboard))
+(defn delete [_ id]
+  (r/delete-dashboard db id))
 
 (defn find-all [{:keys [user-id]}]
   (r/find-dashboards db user-id))

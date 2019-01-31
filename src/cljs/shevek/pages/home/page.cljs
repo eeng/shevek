@@ -1,14 +1,7 @@
 (ns shevek.pages.home.page
-  (:require [shevek.components.text :refer [page-title]]
-            [shevek.i18n :refer [t]]
-            [shevek.pages.home.dashboards :refer [dashboards-cards]]
-            [shevek.pages.home.cubes :refer [cubes-cards]]
-            [shevek.pages.home.reports :refer [reports-cards]]))
+  (:require [shevek.i18n :refer [t]]
+            [shevek.components.layout :refer [page-with-header]]))
 
 (defn page []
-  [:div#home.ui.container
-   [page-title (t :home/title) (t :home/subtitle) "home"]
-   [:div.ui.equal.width.relaxed.grid
-    [cubes-cards]
-    [reports-cards]
-    [dashboards-cards]]])
+  [page-with-header
+   {:title (t :home/title) :subtitle (t :home/subtitle) :icon "home"}])

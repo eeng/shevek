@@ -1,4 +1,4 @@
-(ns shevek.pages.admin.users.permissions
+(ns shevek.pages.configuration.users.permissions
   (:require [reagent.core :as r]
             [shevek.i18n :refer [t]]
             [shevek.lib.react :refer [rmap without-propagation]]
@@ -41,7 +41,7 @@
     (fn [_ {:keys [title description selected only-measures-selected measures allowed-measures filters dimensions]} _]
       [:div.item {:on-click #(swap! cube update :selected not)
                   :class (when-not selected "hidden")}
-       [:i.icon.large.selected {:class (if selected "checkmark" "minus")}]
+       [:i.icon.large.selected {:class (if selected "check" "close")}]
        [:div.content
         [:div.header title]
         [:div.description [:p description]
@@ -69,7 +69,7 @@
 (defn user-permissions [user]
   (let [{:keys [only-cubes-selected cubes]} @user]
     [:div.permissions-fields
-     [:h3.ui.header (t :users/permissions)]
+     [:h3.ui.orange.header (t :users/permissions)]
      [:h4.ui.header (t :permissions/allowed-cubes)]
      (if (:admin @user)
        [:div (t :permissions/admin-all-cubes)]

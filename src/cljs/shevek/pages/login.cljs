@@ -39,14 +39,14 @@
 (defevh :logout [db]
   (local-storage/remove-item! "access-token")
   (navigate "/")
-  (select-keys db [:settings :page :user-restored]))
+  (select-keys db [:preferences :page :initialized]))
 
 (defevh :session-expired [db]
   (notify (t :users/session-expired) :type :info)
   (dispatch :logout))
 
-(defevh :user-restored [db]
-  (assoc db :current-user (extract-user (local-storage/get-item "access-token")) :user-restored true))
+(defevh :sessions/user-restored [db]
+  (assoc db :current-user (extract-user (local-storage/get-item "access-token")) :initialized true))
 
 (defn- login-form []
   (let [user (r/atom {})

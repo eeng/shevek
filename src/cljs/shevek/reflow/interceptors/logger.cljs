@@ -17,8 +17,8 @@
             diff-time (- (js/Date.) end-time)
             db-changed? (or (some? only-before) (some? only-after))
             changes (if db-changed?
-                      ["with changes: before" only-before "after" only-after]
+                      ["with changes from" only-before "to" only-after]
                       ["with no changes."])]
-        (apply log/info "Finished event in" elapsed-time "ms" (conj changes (str "(diff: " diff-time " ms)")))
+        (apply log/info "Finished event in" elapsed-time "ms" changes)
         new-db)
       (interceptor db event))))

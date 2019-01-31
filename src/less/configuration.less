@@ -1,0 +1,49 @@
+#configuration {
+  .users-list {
+    .permissions {
+      .cube {
+        .cube-name { font-weight: bold }
+        .cube-details {
+          .muted;
+          font-size: 0.9em;
+        }
+      }
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  .user-form {
+    .permissions-fields {
+      a { cursor: pointer; }
+      .items { margin-top: 2em }
+      .item {
+        cursor: pointer;
+        user-select: none;
+        .icon.selected {
+          margin-top: -.1em;
+          margin-right: 0.4em;
+        }
+        .description { margin-top: 0.3em }
+        * { transition: color 0.3s ease, color 0.3s ease; }
+        &.hidden * { .more.muted; }
+        &.hidden:hover * { .muted; }
+
+        .measures {
+          cursor: auto;
+          .ui.dropdown {
+            display: block;
+            margin-bottom: .3em;
+          }
+        }
+        .filters {
+          cursor: auto;
+          margin-top: 1em;
+          .ui.dropdown { margin-right: .5em }
+        }
+      }
+    }
+  }
+}

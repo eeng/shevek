@@ -1,18 +1,23 @@
 (ns shevek.locales.en)
 
 (def translations
-  {:menu {:logout "Logout"}
+  {:sessions {:logout "Log out"}
    :home {:menu "Home"
           :title "Welcome!"
           :subtitle "What would you like to see today?"}
-   :cubes {:title "Data Cubes"
-           :menu "Cubes"
+   :cubes {:title "Cubes"
+           :subtitle "Available data cubes"
+           :name  "Name"
+           :description  "Description"
            :missing "There aren't any data cubes defined"
            :data-range "Available data range"}
    :dashboards {:title "Dashboards"
-                :missing "There aren't any dashboards created"
+                :subtitle "Manage your dashboards"
+                :search-hint "Filter by name or description"
+                :missing "You have no dashboards yet"
                 :saved "Dashboard saved!"
                 :deleted "Dashboard '{1}' deleted!"
+                ; TODO DASHBOARD vuela
                 :report-count #(cond
                                  (zero? %) "No reports"
                                  (= 1 %) "1 report"
@@ -20,8 +25,11 @@
                 :updated-at "Last updated"
                 :new "New Dashboard"
                 :save "Save Dashboard"
-                :new-panel "Create Panel"}
+                :new-panel "Create Panel"
+                :name "Name"
+                :description "Description"}
    :reports {:title "Reports"
+             :subtitle "Manage your reports"
              :missing "There aren't any reports created"
              :name "Name"
              :description "Description"
@@ -89,6 +97,7 @@
               :title "Raw Event Data"
               :showing "Showing the first {1} events matching: "
               :button "Raw Data"}
+   ; TODO DASHBOARD vuela
    :settings {:menu "Settings"
               :lang "Language"
               :update-now "Update Now"
@@ -96,12 +105,27 @@
               :auto-refresh-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 10 minutes" 600] ["Every 30 minutes" 1800]])
               :abbreviations "Number Abbreviations"
               :abbreviations-opts (fn [] [["Use default settings" "default"] ["Don't use abbreviations" "no"] ["Use abbreviations" "yes"]])}
+   :configuration {:menu "Application Configuration, Manage Users"
+                   :title "Configuration"
+                   :subtitle "Application level settings"
+                   :users "Users"}
+   :profile {:menu "User preferences, Change Password"
+             :preferences "Preferences"
+             :password "Change Password"}
+   :preferences {:lang "Language"
+                 :abbreviations "Number Abbreviations"
+                 :abbreviations-opts (fn [] [["Use default settings" "default"] ["Don't use abbreviations" "no"] ["Use abbreviations" "yes"]])
+                 :saved "Preferences saved!"}
+   :account {:current-password "Current Password"
+             :new-password "New Password"
+             :saved "Your account has been saved"
+             :invalid-current-password "is incorrect"}
    :admin {:menu "Manage Users"
            :title "Management"
            :subtitle "Configure the users who will be using the system and their permissions"
            :users "Users"}
    :users {:username "Username"
-           :fullname "Full Name"
+           :fullname "Name"
            :email "Email"
            :admin "Admin"
            :password "Password"
@@ -111,7 +135,9 @@
            :password-hint "Leave blank if you don't want to change it"
            :unauthorized "Sorry, you are not allow to access this page. Please contact the administrator for more information."
            :basic-info "Basic Information"
-           :permissions "Permissions"}
+           :permissions "Permissions"
+           :search-hint "Filter by username or fullname"
+           :deleted "User deleted!"}
    :permissions {:allowed-cubes "Allowed Cubes"
                  :admin-all-cubes "Admin users view everything"
                  :all-cubes "Can view all cubes"
@@ -122,12 +148,6 @@
                  :select-measures "Please select the allowed measures"
                  :no-measures "None"
                  :add-filter "Add Filter"}
-   :account {:title "Your Account"
-             :subtitle "Edit your profile details here"
-             :current-password "Current Password"
-             :new-password "New Password"
-             :saved "Your account has been saved"
-             :invalid-current-password "is incorrect"}
    :date-formats {:second "yyyy-MM-dd HH:mm:ss"
                   :minute "MMM d, h:mma"
                   :hour "MMM d, yyyy ha"
@@ -152,7 +172,9 @@
              :close "Close"
              :select "Select"
              :hold-delete "You must click the button and hold for one second to confirm"
-             :search "Search"}
+             :search "Search"
+             :header "Actions"
+             :confirm "Confirm"}
    :validation {:required "can't be blank"
                 :regex "doesn't match pattern"
                 :email "is not a valid email address"

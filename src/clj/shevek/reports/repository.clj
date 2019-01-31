@@ -21,7 +21,7 @@
 (defn save-report [db report]
   (m/save db "reports" report))
 
-(defn delete-report [db {:keys [id]}]
+(defn delete-report [db id]
   (remove-report-from-non-selected-dashboards db (m/oid id) [])
   (m/delete-by-id db "reports" id))
 

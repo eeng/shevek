@@ -1,8 +1,8 @@
-(ns shevek.admin.users.list-test
+(ns shevek.pages.configuration.users.list-test
   (:require [cljs.test :refer-macros [deftest testing is use-fixtures]]
             [shevek.support.db :refer-macros [with-app-db]]
             [shevek.support.reagent :refer [with-container render-component text]]
-            [shevek.pages.admin.users.list :as l]))
+            [shevek.pages.configuration.users.list :as l]))
 
 (defn permissions-text [args]
   (render-component [l/permissions-text args])

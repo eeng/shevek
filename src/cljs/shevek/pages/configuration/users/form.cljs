@@ -1,20 +1,19 @@
-(ns shevek.pages.admin.users.form
-  (:require [reagent.core :as r]
-            [shevek.i18n :refer [t]]
+(ns shevek.pages.configuration.users.form
+  (:require [shevek.i18n :refer [t]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.lib.validation :as v]
             [shevek.lib.collections :refer [assoc-nil find-by]]
             [shevek.rpc :as rpc]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.util :refer [new-record?]]
-            [shevek.domain.cubes :refer [cubes-list]]
-            [shevek.pages.admin.users.permissions :refer [user-permissions]]
+            [shevek.pages.cubes.page :refer [cubes-list]]
+            [shevek.pages.configuration.users.permissions :refer [user-permissions]]
             [shevek.schemas.conversion :refer [unparse-filters report-dims->designer]]
             [shevek.schemas.user :refer [CubePermissions]]
             [schema-tools.core :as st]))
 
 (defevh :user-saved [db]
-  (dispatch :users-requested)
+  (dispatch :users/fetch)
   (rpc/loaded db :saving-user))
 
 (defn adapt-for-client [{:keys [allowed-cubes] :or {allowed-cubes "all"} :as user}]
@@ -58,25 +57,31 @@
 (defn- user-fields [user shortcuts]
   (let [new-user? (new-record? @user)]
     [:div
-     [:h3.ui.header (t :users/basic-info)]
+     [:h3.ui.orange.header (t :users/basic-info)]
      [:div.ui.form {:ref shortcuts}
-      [input-field user :username {:label (t :users/username) :class "required" :auto-focus true}]
-      [input-field user :fullname {:label (t :users/fullname) :class "required"}]
-      [input-field user :password {:label (t :users/password) :class (when new-user? "required")
-                                          :type "password" :placeholder (when-not new-user? (t :users/password-hint))}]
-      [input-field user :password-confirmation {:label (t :users/password-confirmation)
-                                                       :placeholder (when-not new-user? (t :users/password-hint))
-                                                       :class (when new-user? "required") :type "password"}]
-      [input-field user :email {:label (t :users/email)}]
-      [input-field user :admin {:label (t :users/admin) :as :checkbox :input {:class "toggle"}}]]]))
+      [input-field user :username
+       {:label (t :users/username) :class "required" :auto-focus true}]
+      [input-field user :fullname
+       {:label (t :users/fullname) :class "required"}]
+      [input-field user :password
+       {:label (t :users/password) :class (when new-user? "required")
+        :type "password" :placeholder (when-not new-user? (t :users/password-hint))}]
+      [input-field user :password-confirmation
+       {:label (t :users/password-confirmation)
+        :placeholder (when-not new-user? (t :users/password-hint))
+        :class (when new-user? "required") :type "password"}]
+      [input-field user :email
+       {:label (t :users/email)}]
+      [input-field user :admin
+       {:label (t :users/admin) :as :checkbox :input {:class "toggle"} :data-tid "user-admin-cb"}]]]))
 
 (defn user-form [user]
   (let [cancel #(reset! user nil)
         save #(dispatch :user-changed user cancel)
         shortcuts (kb-shortcuts :enter save :escape cancel)]
     (fn []
-      [:div.ui.padded.segment (rpc/loading-class :saving-user)
-       [:div.ui.grid
+      [:div.ui.segment.user-form (rpc/loading-class :saving-user)
+       [:div.ui.relaxed.grid
         [:div.five.wide.column
          [user-fields user shortcuts]]
         [:div.eleven.wide.column.permissions

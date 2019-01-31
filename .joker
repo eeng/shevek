@@ -1,1 +1,1 @@
-{:known-macros [mount.core/defstate compojure.core/defroutes schema.core/defschema schema.core/defn]}
+{:known-macros [mount.core/defstate compojure.core/defroutes schema.core/defschema schema.core/defn reagent.core/with-let]}

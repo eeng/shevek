@@ -1,6 +1,6 @@
 (ns shevek.app
   (:require [reagent.core :as r]
-            [shevek.layout :refer [layout]]
+            [shevek.pages.layout :refer [layout]]
             [shevek.schemas.interceptor :as schema]
             [shevek.reflow.core :as reflow]
             [shevek.reflow.router :refer [router]]
@@ -11,8 +11,8 @@
 
 (defn init-reflow []
   (reflow/init (-> (router) (recorder) (logger) (schema/checker)))
-  (reflow/dispatch :settings-loaded)
-  (reflow/dispatch :user-restored))
+  (reflow/dispatch :preferences/loaded)
+  (reflow/dispatch :sessions/user-restored))
 
 (defn remove-loader []
   (-> ".preloader" js/$ (.fadeOut "slow")))

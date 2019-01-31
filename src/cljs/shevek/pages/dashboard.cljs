@@ -3,7 +3,7 @@
             [reagent.core :as r]
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform setval ALL NONE]]
-            [shevek.domain.cubes :refer [cubes-list]]
+            [shevek.pages.cubes.page :refer [cubes-list]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]

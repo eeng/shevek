@@ -12,7 +12,8 @@
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
             [shevek.users.repository :as users]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [com.rpl.specter :refer [transform MAP-KEYS ALL]]))
 
 (defstate page
   :start (e/chrome)
@@ -87,17 +88,24 @@
   (click {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
 
 (defn click-link [text]
-  (click {:xpath (str/join "|"
-                           [(format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)
-                            (format "//*[(self::a or self::button) and contains(@title,'%s')]" text)])}))
+  (click {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)}))
+
+(defn click-tid [test-id]
+  (click {:data-tid test-id}))
 
 (defn fill [field & values]
   (e/wait-visible page field)
   (apply e/fill page field values))
 
 (defn fill-multi [fields]
-  (e/wait-visible page (-> fields keys first))
+  (e/wait-visible page (if (map? fields)
+                         (-> fields keys first)
+                         (first fields)))
   (e/fill-multi page fields))
+
+(defn fill-by-name [map-of-input-names-to-value]
+  (fill-multi
+   (transform [MAP-KEYS] (fn [input-name] {:name input-name}) map-of-input-names-to-value)))
 
 (defn refresh []
   (e/refresh page))
@@ -118,3 +126,6 @@
 
 (defn login-admin []
   (login {:username "adm" :fullname "Admin" :password "secret666" :admin true}))
+
+#_(start-system)
+#_(stop-system)

@@ -1,15 +1,19 @@
 (ns shevek.locales.es)
 
 (def translations
-  {:menu {:logout "Salir"}
+  {:sessions {:logout "Salir"}
    :home {:menu "Inicio"
           :title "Bienvenido!"
           :subtitle "Qué le gustaría analizar hoy?"}
-   :cubes {:title "Cubos de Datos"
-           :menu "Cubos"
+   :cubes {:title "Cubos"
+           :subtitle "Cubos de datos disponibles"
+           :name  "Nombre"
+           :description  "Descripción"
            :missing "No hay cubos definidos"
            :data-range "Rango de datos disponibles"}
    :dashboards {:title "Dashboards"
+                :subtitle "Administrar dashboards"
+                :search-hint "Filtrar por nombre o descripción"
                 :missing "No se ha creado ningún dashboard todavía"
                 :saved "Dashboard guardado correctamente"
                 :deleted "Dashboard '{1}' eliminado correctamente"
@@ -17,11 +21,14 @@
                                  (zero? %) "Sin reportes"
                                  (= 1 %) "1 reporte"
                                  :else "{1} reportes")
-                :updated-at "Última actualización"
+                :updated-at "Última Actualización"
                 :new "Nuevo Dashboard"
                 :save "Guardar Dashboard"
-                :new-panel "Agregar Panel"}
+                :new-panel "Agregar Panel"
+                :name "Nombre"
+                :description "Descripción"}
    :reports {:title "Reportes"
+             :subtitle "Administrar reportes"
              :missing "No se ha guardado ningún reporte todavía"
              :name "Nombre"
              :description "Descripción"
@@ -87,6 +94,7 @@
               :title "Datos Desagregados"
               :showing "Primeros {1} eventos según filtro: "
               :button "Datos Desagregados"}
+   ; TODO DASHBOARD vuela
    :settings {:menu "Preferencias"
               :lang "Lenguaje"
               :update-now "Actualizar Ahora"
@@ -94,6 +102,21 @@
               :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])
               :abbreviations "Abreviaturas de Números"
               :abbreviations-opts (fn [] [["User formato por defecto" "default"] ["No abreviar nada" "no"] ["Abreviar todo" "yes"]])}
+   :configuration {:menu "Configuración de la Aplicación, Gestionar Usuarios"
+                   :title "Configuración"
+                   :subtitle "Gestionar usuarios"
+                   :users "Usuarios"}
+   :profile {:menu "Preferencias del Usuario, Cambiar Password"
+             :preferences "Preferencias"
+             :password "Cambiar Password"}
+   :preferences {:lang "Lenguaje"
+                 :abbreviations "Abreviaturas de Números"
+                 :abbreviations-opts (fn [] [["User formato por defecto" "default"] ["No abreviar nada" "no"] ["Abreviar todo" "yes"]])
+                 :saved "Preferencias guardadas!"}
+   :account {:current-password "Password Actual"
+             :new-password "Nuevo Password"
+             :saved "Tu cuenta se grabó correctamente"
+             :invalid-current-password "es incorrecto"}
    :admin {:menu "Configurar Usuarios"
            :title "Administración"
            :subtitle "Configure los usuarios que podrán acceder al sistema y sus permisos"
@@ -107,7 +130,9 @@
            :password-hint "Dejar en blanco para no cambiarlo"
            :unauthorized "Ud. no tiene acceso a esta página. Por favor, contacte al administrador para más información."
            :basic-info "Información Básica"
-           :permissions "Permisos"}
+           :permissions "Permisos"
+           :search-hint "Filtrar por usuario o nombre"
+           :deleted "Usuario eliminado!"}
    :permissions {:allowed-cubes "Cubes Visibles"
                  :admin-all-cubes "Administradores pueden ver todo"
                  :all-cubes "Puede ver todos los cubos"
@@ -118,12 +143,6 @@
                  :select-measures "Por favor seleccion las métricas permitidas"
                  :no-measures "Ninguna"
                  :add-filter "Agregar Filtro"}
-   :account {:title "Tu Cuenta"
-             :subtitle "Aquí puede cambiar los detalles de su perfil"
-             :current-password "Password Actual"
-             :new-password "Nuevo Password"
-             :saved "Tu cuenta se grabó correctamente"
-             :invalid-current-password "es incorrecto"}
    :date-formats {:second "dd/MM/yyyy HH:mm:ss"
                   :minute "dd/MM HH:mm"
                   :hour "dd/MM/yy H 'hs'"
@@ -145,7 +164,8 @@
              :close "Cerrar"
              :select "Seleccionar"
              :hold-delete "Clickee el botón y mantenga presionado por un segundo para confirmar"
-             :search "Buscar"}
+             :search "Buscar"
+             :confirm "Confirmar"}
    :validation {:required "este campo es obligatorio"
                 :email "no es una dirección válida"
                 :password "debería tener al menos 7 letras y números (o símbolos)"

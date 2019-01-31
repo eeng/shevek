@@ -1,3 +1,4 @@
+; TODO DASHBOARD vuela
 (ns shevek.menu.settings
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh defevhi]]
             [shevek.reflow.db :as db]
@@ -30,7 +31,7 @@
     (reset! auto-refresh-interval (js/setInterval refresh-page (* 1000 every)))))
 
 (defn restart-auto-refresh! []
-  (set-auto-refresh-interval! (db/get-in [:settings :auto-refresh])))
+  (set-auto-refresh-interval! (db/get-in [:preferences :auto-refresh])))
 
 (defn- try-parse [settings]
   (try
@@ -53,7 +54,7 @@
    [:div.field
     [:label (t :settings/auto-refresh)]
     [select (t :settings/auto-refresh-opts)
-      {:selected (db/get-in [:settings :auto-refresh] 0)
+      {:selected (db/get-in [:preferences :auto-refresh] 0)
        :on-change #(let [auto-refresh (str/parse-int %)]
                      (set-auto-refresh-interval! auto-refresh)
                      (dispatch :settings-saved {:auto-refresh auto-refresh}))}]
@@ -64,12 +65,12 @@
    [:div#lang-dropdown.field
     [:label (t :settings/lang)]
     [select [["English" "en"] ["Español" "es"]]
-      {:selected (db/get-in [:settings :lang])
+      {:selected (db/get-in [:preferences :lang])
        :on-change #(dispatch :settings-saved {:lang %})}]]
    [:div.field
     [:label (t :settings/abbreviations)]
     [select (t :settings/abbreviations-opts)
-      {:selected (db/get-in [:settings :abbreviations])
+      {:selected (db/get-in [:preferences :abbreviations])
        :on-change #(dispatch :settings-saved {:abbreviations %})}]]])
 
 (defn- settings-menu []

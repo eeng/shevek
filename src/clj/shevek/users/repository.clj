@@ -43,7 +43,7 @@
 (defn save-user [db user]
   (create-or-update-by db :id user))
 
-(defn delete-user [db {:keys [id]}]
+(defn delete-user [db id]
   (m/delete-by-id db "users" id)
   (delete-reports db id)
   (delete-dashboards db id))

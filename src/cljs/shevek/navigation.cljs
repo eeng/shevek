@@ -25,6 +25,9 @@
 (defn get-url []
   (pushy/get-token history))
 
+(defn active-class-when-page [& pages]
+  (when (some current-page? pages) "active"))
+
 (defn set-url
   "Changes the URL without dispatching the routes"
   [next-url]
@@ -45,23 +48,35 @@
 (defroute "/" []
   (dispatch :navigate :home))
 
-(defroute "/admin" []
-  (dispatch :navigate :admin))
+(defroute "/cubes" []
+  (dispatch :navigate :cubes))
 
-(defroute "/account" []
-  (dispatch :navigate :account))
+(defroute "/reports" []
+  (dispatch :navigate :reports))
 
-(defroute "/reports/new/:cube" [cube]
-  (dispatch :designer/new-report cube))
-
-(defroute "/reports/:id" [id]
-  (dispatch :designer/edit-report id))
+(defroute "/dashboards" []
+  (dispatch :navigate :dashboards))
 
 (defroute "/dashboards/new" [query-params]
   (dispatch :dashboards/new query-params))
 
 (defroute "/dashboards/:id" [id query-params]
   (dispatch :dashboards/show id query-params))
+
+(defroute "/profile" []
+  (dispatch :navigate :profile/preferences))
+
+(defroute "/profile/password" []
+  (dispatch :navigate :profile/password))
+
+(defroute "/configuration" []
+  (dispatch :navigate :configuration))
+
+(defroute "/reports/new/:cube" [cube]
+  (dispatch :designer/new-report cube))
+
+(defroute "/reports/:id" [id]
+  (dispatch :designer/edit-report id))
 
 (defroute "/error" []
   (dispatch :navigate :error))

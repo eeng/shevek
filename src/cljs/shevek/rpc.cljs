@@ -13,7 +13,7 @@
 
 (defn loaded
   ([db] (assoc db :loading {}))
-  ([db key] (update db :loading dissoc key)))
+  ([db key] (update db :loading (fnil dissoc {}) key)))
 
 (defn auth-header []
   {"Authorization" (str "Token " (local-storage/get-item "access-token"))})
