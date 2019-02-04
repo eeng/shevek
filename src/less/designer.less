@@ -1,12 +1,15 @@
-@panel-separator: 1px solid #f0f0f0;
 @panel-horizontal-padding: 14px;
 
 #designer {
   display: flex;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-direction: column;
+  height: 100%;
+
+  .body {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+  }
 
   @gutter: 10px;
 
@@ -22,15 +25,16 @@
   .center-column {
     display: flex;
     flex-direction: column;
-    margin: @gutter;
     flex: 1;
     overflow: hidden; // Necessary when the pivot-table is too big so it can scroll
     .top-row {
       margin-bottom: 0;
-      margin-bottom: @gutter;
+      margin: @gutter;
     }
     .bottom-row {
       height: 100%;
+      margin: @gutter;
+      margin-top: 0;
     }
   }
 
@@ -38,10 +42,10 @@
     background-color: white;
     margin: 0;
     padding: 0;
-    &:not(:last-child) { border-bottom: @panel-separator; }
+    &:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
     &:first-child { .border-radiuses(3px, 0, 0, 3px); }
     &:last-child { .border-radiuses(0, 3px, 3px, 0); }
-    .box-shadow(0px 4px 15px 0px rgba(0,0,0,0.1));
+    .box-shadow(0px 4px 15px 0px rgba(0, 0, 0, 0.1));
 
     .sub.header {
       .muted;

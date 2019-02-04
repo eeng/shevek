@@ -50,7 +50,7 @@
       [:i.sign.out.icon]]
      [:div.item.bottom.divider]]
 
-    [:div#sidebar.ui.inverted.fixed.compact.vertical.icon.menu
+    [:div#sidebar.ui.inverted.left.fixed.compact.vertical.icon.menu
      [:a.item
       {:on-click #(dispatch :preferences/save {:sidebar-visible true})}
       [:i.bars.icon]]]))

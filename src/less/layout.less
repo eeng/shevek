@@ -1,8 +1,12 @@
 @background-color: #F7F7F7;
+@primary-color: #4c505d;
 
 body {
   background-color: @background-color;
 }
+
+// Required for the designer page so that we can set there the full height too
+#app, .layout, .page-container { height: 100%; }
 
 .layout {
   display: flex;
@@ -13,7 +17,7 @@ body {
       .box-shadow(0 0 15px 0 rgba(0, 0, 0, 0.3));
     }
     &.compact {
-      background: transparent
+      background: transparent;
     }
     .top.divider { height: 3.85em }
     .middle.divider { flex: 1 }
@@ -22,6 +26,10 @@ body {
       padding: 1.3em;
       color: #ffffffdd;
     }
+    &.compact .item {
+      padding-top: 1.1em;
+      padding-bottom: 1.1em;
+    }
     .item > i { font-size: 1.4em }
 
     .profile {
@@ -29,18 +37,52 @@ body {
       .user-avatar { width: 40px; }
     }
   }
-  #sidebar:not(.compact) + .page {
-    margin-left: 59px;
+
+  @sidebar-width: 59px;
+  #sidebar:not(.compact) + .page-container {
+    margin-left: @sidebar-width;
+  }
+  #sidebar.compact + .page-container {
+    .topbar {
+      .left { margin-left: @sidebar-width; }
+    }
   }
 
-  .page {
+  .page-container {
     flex: 1;
+
     .page-title {
       padding: 2em;
       padding-bottom: 1.7em;
-      border-bottom: .5em solid #0c6ab1;
+      background-color: @primary-color;
+      border-bottom: .5em solid darken(@primary-color, 5%);
       margin-bottom: 3em;
     }
+
+    .topbar {
+      background-color: @primary-color;
+      display: flex;
+      justify-content: space-between;
+      padding: .5em;
+      .left, .right {
+        align-self: center;
+        .button {
+          color: #eee;
+          background-color: darken(@primary-color, 10%);
+          &:hover {
+            color: #fff;
+            background-color: darken(@primary-color, 20%);
+          }
+        }
+      }
+      .left {
+        padding-left: 1em;
+      }
+      .header {
+        padding-top: 2px; // To center it a little bit better
+      }
+    }
+
     .page-footer {
       padding: 1rem;
     }
@@ -49,6 +91,7 @@ body {
 
 .preloader { pointer-events: none; } // So acceptance test can click through
 
+// TODO DASHBOARD vuela
 #reports-popup, #cubes-popup, #dashboards-popup, #settings-popup {
   width: 300px;
   .actions {

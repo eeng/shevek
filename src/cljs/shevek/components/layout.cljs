@@ -2,7 +2,7 @@
 
 (defn page-with-header [{:keys [title subtitle icon id image]} & children]
   [:div {:id id}
-   [:div.ui.blue.inverted.basic.segment.page-title
+   [:div.ui.inverted.basic.segment.page-title
     [:div.ui.container
      [:h1.ui.inverted.header
       (when icon [:i.icon {:class icon}])
@@ -20,3 +20,8 @@
    [:div.ui.segment.clearing.panel
     [:div.ui.top.attached.label title]]
    content))
+
+(defn topbar [& {:keys [left right]}]
+  [:div.topbar
+   [:div.left left]
+   [:div.right right]])

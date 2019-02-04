@@ -4,7 +4,7 @@
   {:sessions {:logout "Log out"}
    :home {:menu "Home"
           :title "Welcome!"
-          :subtitle "What would you like to see today?"}
+          :subtitle "What would you like to analyze today?"}
    :cubes {:title "Cubes"
            :subtitle "Available data cubes"
            :name  "Name"
@@ -30,7 +30,7 @@
                 :description "Description"}
    :reports {:title "Reports"
              :subtitle "Manage your reports"
-             :missing "You have not created any reports yet. Click on a cube to design a new one and then save it."
+             :missing "You haven't created any reports yet. Click on a cube to design a new one and then save it."
              :name "Name"
              :description "Description"
              :dashboards "Pin in Dashboards"

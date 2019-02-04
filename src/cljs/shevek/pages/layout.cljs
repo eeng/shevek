@@ -36,7 +36,7 @@
           page-component (pages page)]
       [:div.layout
        (when (logged-in?) [sidebar])
-       [:div.page
+       [:div.page-container
         (if page-component
           [page-component]
           [:div "Page :" page " not defined"])]

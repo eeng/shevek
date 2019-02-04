@@ -1,6 +1,7 @@
 (ns shevek.pages.designer.page
   (:require [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
+            [shevek.components.layout :refer [topbar]]
             [shevek.pages.designer.dimensions :refer [dimensions-panel]]
             [shevek.pages.designer.measures :refer [measures-panel]]
             [shevek.pages.designer.filters :refer [filters-panel]]
@@ -26,7 +27,6 @@
       (assoc-in [:designer :built?] false)
       (update :designer dissoc :report)))
 
-; TODO DASHBOARD aqui quizas convenga traer el cubo de nuevo (a pesar q ya esta en :cubes) simplemente para actualizar el max-time (o quizas ver de traer solo el max-time) pero actualizar en el cubo de :cubes nomas. No copiar al designer como antes en el viewer
 (defevh :designer/init [db {cube-name :cube :keys [viztype] :as report} {:keys [on-report-change] :or {on-report-change identity}}]
   (let [cube (get-in db [:cubes cube-name])
         report (if viztype report (build-new-report cube))
@@ -40,24 +40,33 @@
 
 (defn- render-designer [report opts]
   (dispatch :designer/init report opts)
-  (fn []
+  (fn [{:keys [name]} _]
     (let [{:keys [built? maximized] :as designer} (db/get :designer)
           maximized-class {:class (when maximized "hide")}]
-      (when built? ; The first render occours before the :designer/init when the designer is not built yet
-        [:div#designer
-         [:div.left-column maximized-class
-          [dimensions-panel]
-          [measures-panel designer]]
-         [:div.center-column
-          [:div.top-row maximized-class
-           [:div.filter-split
-            [filters-panel designer]
-            [splits-panel designer]]
-           [viztype-selector designer]]
-          [:div.bottom-row.panel
-           [visualization-panel designer]]]
-         [:div.right-column maximized-class
-          [pinboard-panel designer]]]))))
+      [:div#designer
+       [topbar
+        :left [:h3.ui.inverted.header name]
+        :right [:<>
+                [:button.ui.icon.button
+                 [:i.save.icon]]
+                [:button.ui.icon.button
+                 [:i.refresh.icon]]]]
+
+       (when built? ; The first render occours before the :designer/init when the designer is not built yet
+         [:div.body
+          [:div.left-column maximized-class
+           [dimensions-panel]
+           [measures-panel designer]]
+          [:div.center-column
+           [:div.top-row maximized-class
+            [:div.filter-split
+             [filters-panel designer]
+             [splits-panel designer]]
+            [viztype-selector designer]]
+           [:div.bottom-row.panel
+            [visualization-panel designer]]]
+          [:div.right-column maximized-class
+           [pinboard-panel designer]]])])))
 
 (defn designer [{:keys [cube] :as report} opts]
   (when (get-cube cube) ; When entering directly to the designer via URL, the cube metadata has not arrived yet. Also when navigating to a report, we don't have the cube name until the report arrive.
@@ -65,4 +74,6 @@
 
 ; For creating or editing reports directly
 (defn page []
-  [designer (db/get-in [:designer :report])])
+  (dispatch :cubes/fetch) ; When entering via URL
+  (fn []
+    [designer (db/get-in [:designer :report])]))

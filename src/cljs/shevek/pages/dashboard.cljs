@@ -4,6 +4,9 @@
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform setval ALL NONE]]
             [shevek.pages.cubes.page :refer [cubes-list]]
+            [shevek.pages.designer.page :refer [designer]]
+            [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
+            [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
@@ -11,9 +14,7 @@
             [shevek.lib.collections :refer [detect find-by]]
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.notification :refer [notify]]
-            [shevek.pages.designer.page :refer [designer]]
-            [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
-            [shevek.pages.designer.visualization :refer [visualization]]))
+            [shevek.components.layout :refer [topbar]]))
 
 (defn- set-panels-ids [db dashboard]
   (let [update-panels #(for [[id panel] (map-indexed vector %)]
@@ -129,18 +130,20 @@
 
 (defn- dashboard [{:keys [panels]}]
   [:div#dashboard
-   [:div.ui.right.aligned.basic.segment
-    [:button.ui.button
-     {:on-click #(dispatch :dashboard/new-panel)}
-     (t :dashboards/new-panel)]
-    [:button.ui.button
-     {:on-click #(dispatch :dashboard/save)}
-     (t :dashboards/save)]]
+   [topbar
+    :right
+    [:<>
+     [:button.ui.button
+      {:on-click #(dispatch :dashboard/new-panel)}
+      (t :dashboards/new-panel)]
+     [:button.ui.button
+      {:on-click #(dispatch :dashboard/save)}
+      (t :dashboards/save)]]]
    [:div.ui.basic.segment
     [render-panels panels]]])
 
 (defn page []
-  (when-not (rpc/loading? :current-dashboard)
+  (when-not (rpc/loading? :current-dashboard) ; TODO DASHBOARD esto produce un glitch en la topbar cada vez q se switchea de dashboard
     (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
           {:keys [report] :as panel} (find-by :id id (db/get-in [:current-dashboard :panels]))]
       (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
