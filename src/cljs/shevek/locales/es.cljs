@@ -9,12 +9,12 @@
            :subtitle "Cubos de datos disponibles"
            :name  "Nombre"
            :description  "Descripción"
-           :missing "No hay cubos definidos"
+           :missing "No hay cubos definidos."
            :data-range "Rango de datos disponibles"}
    :dashboards {:title "Dashboards"
                 :subtitle "Administrar dashboards"
                 :search-hint "Filtrar por nombre o descripción"
-                :missing "No se ha creado ningún dashboard todavía"
+                :missing "No has creado ningún dashboard todavía."
                 :saved "Dashboard guardado correctamente"
                 :deleted "Dashboard '{1}' eliminado correctamente"
                 :report-count #(cond
@@ -29,7 +29,7 @@
                 :description "Descripción"}
    :reports {:title "Reportes"
              :subtitle "Administrar reportes"
-             :missing "No se ha guardado ningún reporte todavía"
+             :missing "No has creado ningún reporte todavía. Seleccioná un cubo para crear uno y luego guardalo para que aparezca aquí."
              :name "Nombre"
              :description "Descripción"
              :dashboards "Mostrar en Dashboards"
@@ -172,7 +172,7 @@
                 :confirmation "no coincide con el valor anterior"}
    :boolean {:true "Si"
              :false "No"}
-   :errors {:no-results "No se encontraron resultados"
+   :errors {:no-results "No se encontraron resultados."
             :no-desc "Sin descripción"
             :bad-gateway "El sistema no está disponible en este momento. Por favor, intente nuevamente más tarde."
             :unexpected "Lo sentimos pero algo salió mal. Hemos sido notificados y lo estaremos resolviendo a la brevedad."

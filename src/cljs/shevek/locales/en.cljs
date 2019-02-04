@@ -9,12 +9,12 @@
            :subtitle "Available data cubes"
            :name  "Name"
            :description  "Description"
-           :missing "There aren't any data cubes defined"
+           :missing "There are no cubes defined."
            :data-range "Available data range"}
    :dashboards {:title "Dashboards"
                 :subtitle "Manage your dashboards"
                 :search-hint "Filter by name or description"
-                :missing "You have no dashboards yet"
+                :missing "You have no dashboards yet."
                 :saved "Dashboard saved!"
                 :deleted "Dashboard '{1}' deleted!"
                 ; TODO DASHBOARD vuela
@@ -30,7 +30,7 @@
                 :description "Description"}
    :reports {:title "Reports"
              :subtitle "Manage your reports"
-             :missing "There aren't any reports created"
+             :missing "You have not created any reports yet. Click on a cube to design a new one and then save it."
              :name "Name"
              :description "Description"
              :dashboards "Pin in Dashboards"
@@ -182,7 +182,7 @@
                 :confirmation "doesn't match the previous value"}
    :boolean {:true "Yes"
              :false "No"}
-   :errors {:no-results "No results where found"
+   :errors {:no-results "No results where found."
             :no-desc "No description"
             :bad-gateway "The system is not available right now. Please try again later."
             :unexpected "We're sorry but something went wrong. We've been notified about this issue and we'll take a look at it shortly."

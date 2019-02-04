@@ -14,3 +14,9 @@
 
 (defn page-loader []
   [:div.ui.active.large.loader])
+
+(defn panel [{:keys [title]} & content]
+  (into
+   [:div.ui.segment.clearing.panel
+    [:div.ui.top.attached.label title]]
+   content))
