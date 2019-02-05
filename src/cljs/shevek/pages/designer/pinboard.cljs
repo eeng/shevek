@@ -9,7 +9,7 @@
             [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside search-input filter-matching]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.pages.designer.filters :refer [filter-operators]]
-            [shevek.pages.designer.helpers :refer [current-cube panel-header format-measure format-dimension search-button highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries]]
+            [shevek.pages.designer.helpers :refer [current-cube panel-header format-measure format-dimension search-button highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries notify-designer-changes]]
             [shevek.domain.dw :refer [format-measure format-dimension dimension-value]]))
 
 (defn init-pinned-dim [dim designer]
@@ -18,12 +18,14 @@
             (time-dimension? dim) (assoc :granularity (default-granularity designer)
                                          :sort-by (assoc dim :descending true)))))
 
-(defevh :designer/dimension-pinned [{:keys [designer] :as db} dim]
+(defevhi :designer/dimension-pinned [{:keys [designer] :as db} dim]
+  {:after [notify-designer-changes]}
   (let [dim (init-pinned-dim dim designer)]
     (-> (update-in db [:designer :pinboard :dimensions] add-dimension dim)
         (send-pinned-dim-query dim))))
 
-(defevh :designer/dimension-unpinned [db dim]
+(defevhi :designer/dimension-unpinned [db dim]
+  {:after [notify-designer-changes]}
   (update-in db [:designer :pinboard :dimensions] remove-dimension dim))
 
 (defevh :designer/pinboard-measure-selected [db measure-name]
@@ -115,7 +117,7 @@
              [:div.items [:div.item.no-results (t :errors/no-results)]])
            [:div.items.empty])]))))
 
-(defn pinboard-panel [pinboard]
+(defn pinboard-panel [{:keys [pinboard] :as designer}]
   [:div.pinboard (droppable #(dispatch :designer/dimension-pinned %))
    [:div.panel.header-container
     [panel-header (t :designer/pinboard)

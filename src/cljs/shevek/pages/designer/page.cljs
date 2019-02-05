@@ -15,19 +15,18 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]))
 
-(defevh :designer/new-report [db cube]
-  (assoc db :page :designer
-            :designer {:built? false :report {:cube cube :name (t :reports/new)}}))
+(defonce requested-report (r/atom nil))
 
-(defevh :designer/report-arrived [db report]
-  (assoc-in db [:designer :report] report))
+(defevh :designer/new-report [db cube]
+  (reset! requested-report {:cube cube :name (t :reports/new)})
+  (assoc db :page :designer))
 
 (defevh :designer/edit-report [db id]
-  (rpc/call "reports/find-by-id" :args [id] :handler #(dispatch :designer/report-arrived %))
-  (assoc db :page :designer
-            :designer {:built? false}))
+  (reset! requested-report nil)
+  (rpc/call "reports/find-by-id" :args [id] :handler #(reset! requested-report %))
+  (assoc db :page :designer))
 
-(defn- designer-renderer [{:keys [maximized measures filters splits viztype pinboard report report-results]}]
+(defn- designer-renderer [{:keys [maximized measures filters splits viztype report report-results] :as designer}]
   (let [maximized-class {:class (when maximized "hide")}]
     [:div.body
      [:div.left-column maximized-class
@@ -42,7 +41,7 @@
       [:div.bottom-row.panel
        [visualization-panel report report-results]]]
      [:div.right-column maximized-class
-      [pinboard-panel pinboard]]]))
+      [pinboard-panel designer]]]))
 
 ; TODO DASHBOARD usar esto en lugar de el dispatch directo en todos lados, y cambiar la condicion para q refresque periodicamente los cubos
 (defn- cube-fetcher [cube-name render-fn]
@@ -58,46 +57,59 @@
                  (build-new-report cube))]
     (render-fn report)))
 
-(defevh :designer/build [db {:keys [report cube on-report-change] :or {on-report-change identity}}]
+(defevh :designer/build [db {:keys [report cube report-results on-report-change] :or {on-report-change identity}}]
   (let [designer (-> (report->designer report cube)
                      (assoc :report report
                             :on-report-change on-report-change
-                            :built? true))]
-    (-> (assoc db :designer designer)
-        (send-designer-query)
-        (send-pinboard-queries))))
+                            :report-results report-results))]
+    (cond-> (assoc db :designer designer)
+            (not report-results) (send-designer-query) ; No need to send the query again if we already have the results (which come from the dashboard)
+            true (send-pinboard-queries))))
 
+ ; We need to unbuild it so the next time the user enters, the previous designer doesn't show until the new one is built
 (defevh :designer/unbuild [db]
-  (assoc-in db [:designer :built?] false))
+  (dissoc db :designer))
 
 (defn- designer-builder [props render-fn]
   (r/create-class
    {:reagent-render (fn []
-                      (let [{:keys [built?] :as designer} (db/get :designer)]
-                        (when built?
-                          (render-fn designer))))
+                      (when-let [designer (db/get :designer)]
+                        (render-fn designer)))
     :component-did-mount #(dispatch :designer/build props)
     :component-will-unmount #(dispatch :designer/unbuild)}))
 
-(defn- designer [{:keys [report] :as props}]
-  (when report ; Is nil while fetching a report by id
-    [cube-fetcher (:cube report) ; Wait until the cube metadata is ready
-     (fn [cube]
-       [report-builder report cube ; Build the new report unless already built
-        (fn [report]
-          [designer-builder (assoc props :report report :cube cube) ; Build the designer and put it in the app-db
-           (fn [designer]
-             [designer-renderer designer])])])]))
+(defn- designer
+  "To render the designer we need a report, and to build a report we need the full cube,
+   but the events that fetch them are async so can happen in any order.
+   This component takes care of handling all this and only render the designer when everything is ready."
+  [{:keys [report] :as props}]
+  [cube-fetcher (:cube report) ; Wait until the cube metadata is ready
+   (fn [cube]
+     [report-builder report cube ; Build the new report unless already built
+      (fn [report]
+        [designer-builder (assoc props :report report :cube cube) ; Build the designer and put it in the app-db
+         (fn [designer]
+           [designer-renderer designer])])])])
 
 (defn page
   "For creating or editing reports directly"
   []
-  (let [report (db/get-in [:designer :report])]
-    [:div#designer
-     [topbar {:left [:h3.ui.inverted.header (:name report)]
-              :right [:<>
-                      [:button.ui.icon.button
-                       [:i.save.icon]]
-                      [:button.ui.icon.button
-                       [:i.refresh.icon]]]}]
-     [designer {:report report}]]))
+  [:div#designer
+   [topbar {:left [:h3.ui.inverted.header (:name @requested-report)]
+            :right [:<>
+                    [:button.ui.icon.button
+                     [:i.save.icon]]
+                    [:button.ui.icon.button
+                     [:i.refresh.icon]]]}]
+   (when @requested-report ; Is nil while fetching a report by id
+     [designer {:report @requested-report}])])
+
+(defn slave-designer
+  "A designer whose report is owned by another component (a dashboard)"
+  [{:keys [report] :as props}]
+  [:div#designer
+   [topbar {:left [:h3.ui.inverted.header (:name report)]
+            :right [:<>
+                    [:button.ui.icon.button
+                     [:i.reply.icon]]]}]
+   [designer props]])

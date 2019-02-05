@@ -4,7 +4,7 @@
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform setval ALL NONE]]
             [shevek.pages.cubes.page :refer [cubes-list]]
-            [shevek.pages.designer.page :refer [designer]]
+            [shevek.pages.designer.page :refer [slave-designer]]
             [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
             [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
@@ -144,6 +144,13 @@
     (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
           {:keys [report] :as panel} (find-by :id id (db/get-in [:current-dashboard :panels]))]
       (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
-        (and panel edit) [designer report {:on-report-change #(dispatch :dashboard/report-changed % id)}]
-        (and panel fullscreen) [:div#dashboard [render-panel panel true]]
-        :else [dashboard (db/get :current-dashboard)]))))
+        (and panel edit)
+        [slave-designer {:report report
+                         :report-results (db/get-in [:current-dashboard :reports-results id])
+                         :on-report-change #(dispatch :dashboard/report-changed % id)}]
+
+        (and panel fullscreen)
+        [:div#dashboard [render-panel panel true]]
+
+        :else
+        [dashboard (db/get :current-dashboard)]))))

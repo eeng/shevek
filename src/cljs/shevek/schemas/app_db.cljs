@@ -3,7 +3,7 @@
             [schema-tools.core :as st]
             [shevek.schemas.cube :refer [Cube]]
             [shevek.schemas.query :refer [Results]]
-            [shevek.schemas.designer :refer [Designer NewOrSavedReport]]
+            [shevek.schemas.designer :refer [Designer]]
             [shevek.schemas.report :refer [Report]]
             [shevek.schemas.dashboard :refer [Dashboard Panel]]))
 
@@ -17,6 +17,12 @@
    (s/optional-key :auto-refresh) s/Int
    (s/optional-key :abbreviations) s/Str
    (s/optional-key :sidebar-visible) s/Bool})
+
+(s/defschema NewOrSavedReport
+  (s/if :measures
+        Report
+        {:name s/Str
+         (s/optional-key :cube) s/Str})) ; Optional because when adding a new report to a dashboard, the cube is not present until the user selects it
 
 (s/defschema CurrentDashboard
   (st/assoc Dashboard

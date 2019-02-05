@@ -28,15 +28,8 @@
 (s/defschema Pinboard
   {:measure Measure :dimensions [Split]})
 
-(s/defschema NewOrSavedReport
-  (s/if :measures
-        Report
-        {:name s/Str
-         (s/optional-key :cube) s/Str})) ; Optional because when adding a new report to a dashboard, the cube is not present until the user selects it
-
 (s/defschema Designer
-  {:built? s/Bool
-   (s/optional-key :report) NewOrSavedReport ; When entering to a report URL this key is missing until it arrives
+  {:report Report
    (s/optional-key :on-report-change) s/Any
    (s/optional-key :viztype) s/Keyword
    (s/optional-key :filters) Filters
