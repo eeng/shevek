@@ -32,7 +32,7 @@
 
 (defn viztype-selector []
   (let [opened (r/atom false)]
-    (fn [{:keys [viztype]}]
+    (fn [viztype]
       [:div.viztype-selector.panel {:on-click #(show-popup % [viztype-popup] {:position "bottom right"
                                                                               :on-toggle (partial reset! opened)})
                                     :class (when @opened "active")}

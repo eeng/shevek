@@ -135,7 +135,7 @@
          [:i.close.icon {:on-click (without-propagation dispatch :designer/split-dimension-removed dim)}]
          title]))))
 
-(defn splits-panel [{:keys [splits]}]
+(defn splits-panel [splits]
   [:div.split.panel (droppable #(dispatch :designer/split-dimension-added %))
    [panel-header (t :designer/splits)]
    (for [dim splits]

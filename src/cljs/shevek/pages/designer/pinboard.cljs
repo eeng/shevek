@@ -115,7 +115,7 @@
              [:div.items [:div.item.no-results (t :errors/no-results)]])
            [:div.items.empty])]))))
 
-(defn pinboard-panel [{:keys [pinboard] :as designer}]
+(defn pinboard-panel [pinboard]
   [:div.pinboard (droppable #(dispatch :designer/dimension-pinned %))
    [:div.panel.header-container
     [panel-header (t :designer/pinboard)

@@ -31,7 +31,6 @@
                  :selected-panel (when panel {:id (str/parse-int panel)
                                               :edit (str/to-bool edit)
                                               :fullscreen (str/to-bool fullscreen)}))
-          true (assoc-in [:designer :built?] false)
           (or (not current-dashboard) (not= id (:id current-dashboard))) (init-current-dashboard)))
 
 (defevh :dashboards/new [{:keys [current-dashboard] :as db} query-params]
@@ -130,15 +129,13 @@
 
 (defn- dashboard [{:keys [panels]}]
   [:div#dashboard
-   [topbar
-    :right
-    [:<>
-     [:button.ui.button
-      {:on-click #(dispatch :dashboard/new-panel)}
-      (t :dashboards/new-panel)]
-     [:button.ui.button
-      {:on-click #(dispatch :dashboard/save)}
-      (t :dashboards/save)]]]
+   [topbar {:right [:<>
+                    [:button.ui.button
+                     {:on-click #(dispatch :dashboard/new-panel)}
+                     (t :dashboards/new-panel)]
+                    [:button.ui.button
+                     {:on-click #(dispatch :dashboard/save)}
+                     (t :dashboards/save)]]}]
    [:div.ui.basic.segment
     [render-panels panels]]])
 

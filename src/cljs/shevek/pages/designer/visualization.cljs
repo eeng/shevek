@@ -28,7 +28,7 @@
            :table [table-visualization viz]
            [chart-visualization viz]))])))
 
-(defn visualization-panel [{:keys [report report-results]}]
+(defn visualization-panel [report report-results]
   [:div.visualization-container.ui.basic.segment
    (merge (droppable #(dispatch :designer/split-replaced %)))
    [loader [:designer :report-results]]

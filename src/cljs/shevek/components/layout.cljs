@@ -21,7 +21,7 @@
     [:div.ui.top.attached.label title]]
    content))
 
-(defn topbar [& {:keys [left right]}]
+(defn topbar [{:keys [left right]}]
   [:div.topbar
    [:div.left left]
    [:div.right right]])

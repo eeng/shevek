@@ -1,7 +1,6 @@
 (ns shevek.pages.designer.measures
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
-            [shevek.rpc :as rpc :refer [loading?]]
             [shevek.components.form :refer [checkbox toggle-checkbox-inside]]
             [shevek.pages.designer.helpers :refer [current-cube panel-header description-help-icon send-designer-query]]
             [shevek.reflow.db :as db]
@@ -17,8 +16,8 @@
     [:span title [description-help-icon dim]]
     {:checked (includes-dim? selected-measures dim) :on-change #(dispatch :designer/measure-toggled dim %)}]])
 
-(defn measures-panel [{:keys [measures]}]
-  [:div.measures.panel.ui.basic.segment (rpc/loading-class :cube-metadata)
+(defn measures-panel [measures]
+  [:div.measures.panel.ui.basic.segment
    [panel-header (t :designer/measures)]
    [:div.items
     (for [m (sort-by :title (current-cube :measures))]

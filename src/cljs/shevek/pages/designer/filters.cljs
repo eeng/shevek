@@ -250,7 +250,7 @@
          [:i.close.icon {:on-click (without-propagation dispatch :designer/dimension-removed-from-filter dim)}])
        (filter-title dim)])))
 
-(defn filters-panel [{:keys [filters]}]
+(defn filters-panel [filters]
   [:div.filter.panel (droppable #(dispatch :designer/dimension-added-to-filter %))
    [panel-header (t :designer/filters)]
    (for [dim filters]
