@@ -13,6 +13,7 @@
             [shevek.pages.designer.helpers :refer [build-new-report send-designer-query send-pinboard-queries]]
             [shevek.pages.designer.actions.refresh :refer [refresh-button]]
             [shevek.pages.designer.actions.save :refer [save-button]]
+            [shevek.pages.designer.actions.maximize :refer [maximize-button]]
             [shevek.schemas.conversion :refer [report->designer]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]))
@@ -101,6 +102,7 @@
      [topbar {:left [:h3.ui.inverted.header name]
               :right [:<>
                       [save-button report]
+                      [maximize-button]
                       [refresh-button]]}]
      (when @requested-report ; Is nil while fetching a report by id
        [designer {:report @requested-report}])]))

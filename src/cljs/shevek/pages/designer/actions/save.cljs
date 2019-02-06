@@ -54,6 +54,5 @@
                   (dispatch :designer/save-report report))
     :ref (tooltip (t (if (new-record? report)
                        :actions/save-as
-                       :actions/save))
-                  {:delay 500})}
+                       :actions/save)))}
    [:i.save.icon]])
