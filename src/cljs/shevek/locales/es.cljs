@@ -38,7 +38,7 @@
              :saved "Reporte guardado correctamente"
              :deleted "Reporte '{1}' eliminado correctamente"
              :unauthorized "Oops! Este reporte ya no está disponible."
-             :export-as-csv "Exportar a CSV"
+             :download-csv "Descargar en formato CSV"
              :new "Nuevo Reporte"}
    :designer {:dimensions "Dimensiones"
               :measures "Métricas"

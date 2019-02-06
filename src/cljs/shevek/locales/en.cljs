@@ -39,7 +39,7 @@
              :saved "Report saved!"
              :deleted "Report '{1}' deleted!"
              :unauthorized "Oops! This report is no longer available."
-             :export-as-csv "Export as CSV"
+             :download-csv "Download as CSV"
              :new "New Report"}
    :designer {:dimensions "Dimensions"
               :measures "Measures"

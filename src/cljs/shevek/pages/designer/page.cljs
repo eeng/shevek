@@ -14,6 +14,7 @@
             [shevek.pages.designer.actions.refresh :refer [refresh-button]]
             [shevek.pages.designer.actions.save :refer [save-button]]
             [shevek.pages.designer.actions.maximize :refer [maximize-button]]
+            [shevek.pages.designer.actions.download :refer [download-csv-button]]
             [shevek.schemas.conversion :refer [report->designer]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]))
@@ -102,6 +103,7 @@
      [topbar {:left [:h3.ui.inverted.header name]
               :right [:<>
                       [save-button report]
+                      [download-csv-button report (db/get-in [:designer :report-results])]
                       [maximize-button]
                       [refresh-button]]}]
      (when @requested-report ; Is nil while fetching a report by id
