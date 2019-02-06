@@ -9,6 +9,7 @@
             [shevek.components.form :refer [search-input filter-matching by]]
             [shevek.components.confirmation :refer [with-confirm]]
             [shevek.components.notification :refer [notify]]
+            [shevek.pages.reports.save :refer [save-as-dialog]]
             [shevek.i18n :refer [t]]))
 
 (defevh :reports/fetch [db]
@@ -22,19 +23,22 @@
 (defn- clicked-inside-actions? [node]
   (-> node .-target js/$ (.closest "td.actions") .-length (> 0)))
 
-(defn- report-row [{:keys [id name description updated-at] :as report}]
+(defn- report-row [{:keys [id name description updated-at] :as report} edited-report]
   [:tr.selectable {:on-click #(when-not (clicked-inside-actions? %)
                                 (navigate "/reports/" id))}
    [:td name]
    [:td description]
    [:td (format-time updated-at :day)]
    [:td.actions
+    [:button.ui.inverted.compact.circular.secondary.icon.button
+     {:on-click #(reset! edited-report report)}
+     [:i.edit.icon]]
     [with-confirm
-     [:button.ui.inverted.compact.circular.red.icon.button
-      {:on-click #(dispatch :reports/delete report)}
-      [:i.trash.icon]]]]])
+      [:button.ui.inverted.compact.circular.red.icon.button
+       {:on-click #(dispatch :reports/delete report)}
+       [:i.trash.icon]]]]])
 
-(defn- reports-table [search]
+(defn- reports-table [search edited-report]
   (let [reports (filter-matching @search (by :name :description) (db/get :reports))]
     (if (seq reports)
       [:table.ui.striped.table
@@ -45,19 +49,28 @@
         [:th.center.aligned.collapsing (t :actions/header)]]
        [:tbody
         (for [{:keys [id] :as report} reports]
-          ^{:key id} [report-row report])]]
+          ^{:key id} [report-row report edited-report])]]
       [:div.large.tip (t :errors/no-results)])))
 
 (defn page []
   (dispatch :reports/fetch)
-  (let [search (r/atom "")]
+  (let [search (r/atom "")
+        edited-report (r/atom nil)]
     (fn []
       [page-with-header
        {:title (t :reports/title) :subtitle (t :reports/subtitle) :icon "line graph layout"}
+
        (if (db/get :reports)
          [:div.ui.grid
           [:div.five.wide.column
            [search-input search {:placeholder (t :dashboards/search-hint)}]]
           [:div.sixteen.wide.column
-           [reports-table search]]]
-         [page-loader])])))
+           [reports-table search edited-report]]]
+         [page-loader])
+
+       (when @edited-report
+         [save-as-dialog {:report @edited-report
+                          :after-save #(do
+                                         (dispatch :reports/fetch)
+                                         (reset! edited-report nil))
+                          :on-hide #(reset! edited-report nil)}])])))
