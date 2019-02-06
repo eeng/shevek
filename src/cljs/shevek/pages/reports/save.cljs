@@ -3,27 +3,27 @@
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.components.modal2 :refer [modal]]
+            [shevek.components.modal :refer [show-modal close-modal]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.components.notification :refer [notify]]))
 
 (defevh :reports/saved [db {:keys [id name] :as report} after-save]
   (notify (t :reports/saved name))
-  (after-save)
+  (after-save report)
+  (close-modal)
   (rpc/loaded db :saving-report))
 
 (defevh :reports/save [db report after-save]
   (rpc/call "reports/save-report" :args [report] :handler #(dispatch :reports/saved % after-save))
   (rpc/loading db :saving-report))
 
-(defn save-as-dialog [{:keys [report after-save] :as props}]
+(defn- save-as-dialog [{:keys [report after-save]}]
   (r/with-let [form-data (r/atom (select-keys report [:name :description]))
                valid? #(seq (:name @form-data))
                save #(when (valid?)
                        (dispatch :reports/save (merge report @form-data) after-save))
                shortcuts (kb-shortcuts :enter save)]
-    [modal (-> (dissoc props :report :after-save)
-               (assoc :class "tiny"))
+    [:<>
      [:div.header (t :actions/save-as)]
      [:div.content
       [:div.ui.form {:ref shortcuts}
@@ -37,3 +37,6 @@
        (t :actions/save)]
       [:div.ui.cancel.button
        (t :actions/cancel)]]]))
+
+(defn open-save-as-dialog [props]
+  (show-modal {:modal [save-as-dialog props] :class "tiny"}))

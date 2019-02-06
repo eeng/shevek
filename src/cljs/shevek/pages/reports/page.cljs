@@ -9,7 +9,7 @@
             [shevek.components.form :refer [search-input filter-matching by]]
             [shevek.components.confirmation :refer [with-confirm]]
             [shevek.components.notification :refer [notify]]
-            [shevek.pages.reports.save :refer [save-as-dialog]]
+            [shevek.pages.reports.save :refer [open-save-as-dialog]]
             [shevek.i18n :refer [t]]))
 
 (defevh :reports/fetch [db]
@@ -31,14 +31,14 @@
    [:td (format-time updated-at :day)]
    [:td.actions
     [:button.ui.inverted.compact.circular.secondary.icon.button
-     {:on-click #(reset! edited-report report)}
+     {:on-click #(open-save-as-dialog {:report report :after-save (fn [] (dispatch :reports/fetch))})}
      [:i.edit.icon]]
     [with-confirm
       [:button.ui.inverted.compact.circular.red.icon.button
        {:on-click #(dispatch :reports/delete report)}
        [:i.trash.icon]]]]])
 
-(defn- reports-table [search edited-report]
+(defn- reports-table [search]
   (let [reports (filter-matching @search (by :name :description) (db/get :reports))]
     (if (seq reports)
       [:table.ui.striped.table
@@ -49,13 +49,12 @@
         [:th.center.aligned.collapsing (t :actions/header)]]
        [:tbody
         (for [{:keys [id] :as report} reports]
-          ^{:key id} [report-row report edited-report])]]
+          ^{:key id} [report-row report])]]
       [:div.large.tip (t :errors/no-results)])))
 
 (defn page []
   (dispatch :reports/fetch)
-  (let [search (r/atom "")
-        edited-report (r/atom nil)]
+  (let [search (r/atom "")]
     (fn []
       [page-with-header
        {:title (t :reports/title) :subtitle (t :reports/subtitle) :icon "line graph layout"}
@@ -65,12 +64,5 @@
           [:div.five.wide.column
            [search-input search {:placeholder (t :dashboards/search-hint)}]]
           [:div.sixteen.wide.column
-           [reports-table search edited-report]]]
-         [page-loader])
-
-       (when @edited-report
-         [save-as-dialog {:report @edited-report
-                          :after-save #(do
-                                         (dispatch :reports/fetch)
-                                         (reset! edited-report nil))
-                          :on-hide #(reset! edited-report nil)}])])))
+           [reports-table search]]]
+         [page-loader])])))
