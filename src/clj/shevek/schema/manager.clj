@@ -70,5 +70,5 @@
            (merge cube)
            (save-cube db)))))
 
-#_(discover! shevek.dw/dw shevek.db/db)
-#_(update-time-boundary! shevek.dw/dw shevek.db/db)
+#_(discover! shevek.engine.state/dw shevek.db/db)
+#_(update-time-boundary! shevek.engine.state/dw shevek.db/db)

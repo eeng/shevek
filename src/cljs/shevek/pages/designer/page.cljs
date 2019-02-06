@@ -11,6 +11,7 @@
             [shevek.pages.designer.visualization :refer [visualization-panel]]
             [shevek.pages.designer.pinboard :refer [pinboard-panel]]
             [shevek.pages.designer.helpers :refer [build-new-report send-designer-query send-pinboard-queries]]
+            [shevek.pages.designer.actions :refer [refresh-button]]
             [shevek.schemas.conversion :refer [report->designer]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]))
@@ -97,10 +98,9 @@
   [:div#designer
    [topbar {:left [:h3.ui.inverted.header (:name @requested-report)]
             :right [:<>
-                    [:button.ui.icon.button
+                    [:button.ui.icon.default.button
                      [:i.save.icon]]
-                    [:button.ui.icon.button
-                     [:i.refresh.icon]]]}]
+                    [refresh-button]]}]
    (when @requested-report ; Is nil while fetching a report by id
      [designer {:report @requested-report}])])
 
@@ -110,6 +110,7 @@
   [:div#designer
    [topbar {:left [:h3.ui.inverted.header (:name report)]
             :right [:<>
-                    [:button.ui.icon.button
+                    [:button.ui.icon.green.button
+                     {:on-click #(.back js/history)}
                      [:i.reply.icon]]]}]
    [designer props]])

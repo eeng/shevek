@@ -1,8 +1,6 @@
 (ns shevek.schema.api
   (:require [shevek.schema.repository :as r]
             [shevek.db :refer [db]]
-            [shevek.engine.state :refer [dw]]
-            [shevek.engine.protocol :as e]
             [shevek.schema.auth :as auth]))
 
 (defn cubes [{:keys [user]}]
@@ -21,7 +19,7 @@
   (r/save-cube db cube))
 
 (defn max-time [_ cube-name]
-  (:max-time (e/time-boundary dw cube-name)))
+  (:max-time (r/find-cube db cube-name)))
 
 ;; Examples
 

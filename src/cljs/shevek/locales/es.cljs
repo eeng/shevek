@@ -165,7 +165,9 @@
              :select "Seleccionar"
              :hold-delete "Clickee el botón y mantenga presionado por un segundo para confirmar"
              :search "Buscar"
-             :confirm "Confirmar"}
+             :confirm "Confirmar"
+             :manage "Gestionar"
+             :refresh "Refrescar"}
    :validation {:required "este campo es obligatorio"
                 :email "no es una dirección válida"
                 :password "debería tener al menos 7 letras y números (o símbolos)"

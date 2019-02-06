@@ -174,7 +174,9 @@
              :hold-delete "You must click the button and hold for one second to confirm"
              :search "Search"
              :header "Actions"
-             :confirm "Confirm"}
+             :confirm "Confirm"
+             :manage "Manage"
+             :refresh "Refresh"}
    :validation {:required "can't be blank"
                 :regex "doesn't match pattern"
                 :email "is not a valid email address"

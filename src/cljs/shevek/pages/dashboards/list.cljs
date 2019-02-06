@@ -40,4 +40,7 @@
               [:div.tip (t :errors/no-results)])])
 
          [:div.ui.divider]
-         [create-button]]))))
+         [create-button]
+         (when (seq dashboards)
+           [:a.ui.button {:href "/dashboards"}
+            (t :actions/manage)])]))))

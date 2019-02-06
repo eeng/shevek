@@ -32,4 +32,7 @@
            [:div.ui.selection.list
             (rmap report-item :id filtered-reports)]
            (when (empty? filtered-reports)
-             [:div.tip (t :errors/no-results)])])))))
+             [:div.tip (t :errors/no-results)])
+           [:div.ui.divider]
+           [:a.ui.button {:href "/reports"}
+            (t :actions/manage)]])))))
