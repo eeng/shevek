@@ -95,14 +95,6 @@
               :title "Datos Desagregados"
               :showing "Primeros {1} eventos según filtro: "
               :button "Datos Desagregados"}
-   ; TODO DASHBOARD vuela
-   :settings {:menu "Preferencias"
-              :lang "Lenguaje"
-              :update-now "Actualizar Ahora"
-              :auto-refresh "Refrescar Automáticamente"
-              :auto-refresh-opts (fn [] [["Nunca" 0] ["Cada 10 segundos" 10] ["Cada 30 segundos" 30] ["Cada 1 minuto" 60] ["Cada 10 minutos" 600] ["Cada 30 minutos" 1800]])
-              :abbreviations "Abreviaturas de Números"
-              :abbreviations-opts (fn [] [["User formato por defecto" "default"] ["No abreviar nada" "no"] ["Abreviar todo" "yes"]])}
    :configuration {:menu "Configuración de la Aplicación, Gestionar Usuarios"
                    :title "Configuración"
                    :subtitle "Gestionar usuarios"
@@ -113,7 +105,15 @@
    :preferences {:lang "Lenguaje"
                  :abbreviations "Abreviaturas de Números"
                  :abbreviations-opts (fn [] [["User formato por defecto" "default"] ["No abreviar nada" "no"] ["Abreviar todo" "yes"]])
-                 :saved "Preferencias guardadas!"}
+                 :saved "Preferencias guardadas!"
+                 :refresh-every "Refrescar cada"
+                 :refresh-every-opts (fn [] {0 "Nunca"
+                                             10 "10s"
+                                             30 "30s"
+                                             60 "1m"
+                                             600 "10m"
+                                             1800 "30m"})
+                 :refresh-now "Actualizar Ahora"}
    :account {:current-password "Password Actual"
              :new-password "Nuevo Password"
              :saved "Tu cuenta se grabó correctamente"

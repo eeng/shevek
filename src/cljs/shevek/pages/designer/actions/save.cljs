@@ -33,7 +33,7 @@
      [:div.header (t :actions/save-as)]
      [:div.content
       [:div.ui.form {:ref shortcuts}
-       [input-field form-data :name {:label (t :reports/name) :class "required" :auto-focus true :on-focus #(-> % .-target .select)}]
+       [input-field form-data :name {:label (t :reports/name) :auto-focus true :on-focus #(-> % .-target .select)}]
        [input-field form-data :description {:label (t :reports/description) :as :textarea :rows 2}]]]
      [:div.actions
       [:div.ui.green.button

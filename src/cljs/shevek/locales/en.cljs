@@ -98,14 +98,6 @@
               :title "Raw Event Data"
               :showing "Showing the first {1} events matching: "
               :button "Raw Data"}
-   ; TODO DASHBOARD vuela
-   :settings {:menu "Settings"
-              :lang "Language"
-              :update-now "Update Now"
-              :auto-refresh "Auto Update"
-              :auto-refresh-opts (fn [] [["Off" 0] ["Every 10 seconds" 10] ["Every 30 seconds" 30] ["Every minute" 60] ["Every 10 minutes" 600] ["Every 30 minutes" 1800]])
-              :abbreviations "Number Abbreviations"
-              :abbreviations-opts (fn [] [["Use default settings" "default"] ["Don't use abbreviations" "no"] ["Use abbreviations" "yes"]])}
    :configuration {:menu "Application Configuration, Manage Users"
                    :title "Configuration"
                    :subtitle "Application level settings"
@@ -116,7 +108,15 @@
    :preferences {:lang "Language"
                  :abbreviations "Number Abbreviations"
                  :abbreviations-opts (fn [] [["Use default settings" "default"] ["Don't use abbreviations" "no"] ["Use abbreviations" "yes"]])
-                 :saved "Preferences saved!"}
+                 :saved "Preferences saved!"
+                 :refresh-every "Refresh every"
+                 :refresh-every-opts (fn [] {0 "Never"
+                                             10 "10s"
+                                             30 "30s"
+                                             60 "1m"
+                                             600 "10m"
+                                             1800 "30m"})
+                 :refresh-now "Refresh Now"}
    :account {:current-password "Current Password"
              :new-password "New Password"
              :saved "Your account has been saved"

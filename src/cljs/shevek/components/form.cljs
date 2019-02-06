@@ -18,11 +18,16 @@
             :on-change #(on-change (not checked))}]
    [:label {:for id} label]])
 
+(defn coll-to-options [coll]
+  (if (map? coll)
+    (map vector (vals coll) (keys coll))
+    coll))
+
 ; El selected-title es necesario xq semantic muestra la opción seleccionada en el on-change nomás, y en el mount inicial sólo si selected no es nil. En el pinboard measure por ej. el selected arranca en nil y luego cuando llega la metadata se updatea con el selected, pero no se reflejaba en el dropdown xq ya se había ejecutado el $(..).dropdown() antes.
 (defn- dropdown [coll {:keys [selected class on-change in-menu-search] :or {on-change identity}} & content]
   (let [bind-events #(when % (-> % r/dom-node js/$ (.dropdown #js {:onChange on-change})))
         menu [:div.menu {:class (when in-menu-search "scrolling")}
-              (for [[title val] coll]
+              (for [[title val] (coll-to-options coll)]
                 ^{:key val} [:div.item {:data-value val} title])]]
     [:div.ui.dropdown {:class class :ref bind-events}
      [:input {:type "hidden" :value (or selected "")}]
