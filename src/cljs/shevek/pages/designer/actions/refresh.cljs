@@ -1,4 +1,4 @@
-(ns shevek.pages.designer.actions
+(ns shevek.pages.designer.actions.refresh
   (:require [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
@@ -19,6 +19,5 @@
 (defn refresh-button []
   [:button.ui.icon.default.button
    {:on-click #(dispatch :designer/refresh)
-    :class (when (rpc/loading? [:designer :report-results]) "loading disabled")
-    :ref (tooltip (t :actions/refresh))}
-   [:i.refresh.icon]])
+    :ref (tooltip (t :actions/refresh) {:delay 500})}
+   [:i.refresh.icon {:class (when (rpc/loading? [:designer :report-results]) "loading")}]])

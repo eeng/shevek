@@ -11,7 +11,8 @@
             [shevek.pages.designer.visualization :refer [visualization-panel]]
             [shevek.pages.designer.pinboard :refer [pinboard-panel]]
             [shevek.pages.designer.helpers :refer [build-new-report send-designer-query send-pinboard-queries]]
-            [shevek.pages.designer.actions :refer [refresh-button]]
+            [shevek.pages.designer.actions.refresh :refer [refresh-button]]
+            [shevek.pages.designer.actions.save :refer [save-button]]
             [shevek.schemas.conversion :refer [report->designer]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]))
@@ -95,14 +96,14 @@
 (defn page
   "For creating or editing reports directly"
   []
-  [:div#designer
-   [topbar {:left [:h3.ui.inverted.header (:name @requested-report)]
-            :right [:<>
-                    [:button.ui.icon.default.button
-                     [:i.save.icon]]
-                    [refresh-button]]}]
-   (when @requested-report ; Is nil while fetching a report by id
-     [designer {:report @requested-report}])])
+  (let [{:keys [name] :or {name (:name @requested-report)} :as report} (db/get-in [:designer :report])]
+    [:div#designer
+     [topbar {:left [:h3.ui.inverted.header name]
+              :right [:<>
+                      [save-button report]
+                      [refresh-button]]}]
+     (when @requested-report ; Is nil while fetching a report by id
+       [designer {:report @requested-report}])]))
 
 (defn slave-designer
   "A designer whose report is owned by another component (a dashboard)"

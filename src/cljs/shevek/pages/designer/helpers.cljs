@@ -100,7 +100,7 @@
 
 (defn description-help-icon [{:keys [description]}]
   (when (seq description)
-    [:i.question.circle.outline.icon {:ref (tooltip description {:position "right center"})}]))
+    [:i.question.circle.outline.icon {:ref (tooltip description {:position "right center" :delay 250})}]))
 
 (defn search-button [searching]
   [:i.search.link.icon {:on-click #(swap! searching not)}])

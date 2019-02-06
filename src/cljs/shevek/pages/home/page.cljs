@@ -16,5 +16,5 @@
      [panel {:title (t :dashboards/title)}
       [dashboards-list]]]
     [:div.column
-     [panel {:title (t :reports/title)}
+     [panel {:title (t :reports/recent)}
       [reports-list]]]]])

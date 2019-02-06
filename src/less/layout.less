@@ -66,17 +66,20 @@ body {
       padding: .5em;
       .left, .right {
         align-self: center;
-        .button { color: #fff; }
         .button.default {
+          color: #eee;
           background-color: darken(@primary-color, 10%);
-          &:hover { background-color: darken(@primary-color, 15%) }
+          &:hover {
+            color: #fff;
+            background-color: darken(@primary-color, 15%);
+          }
           &:active { background-color: darken(@primary-color, 30%) }
         }
       }
       .left {
         padding-left: 1em;
       }
-      .header {
+      h3.ui.header {
         padding-top: 2px; // To center it a little bit better
       }
     }

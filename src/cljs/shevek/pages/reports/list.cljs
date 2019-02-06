@@ -18,7 +18,8 @@
   (let [search (r/atom "")]
     (fn []
       (let [reports (db/get :reports)
-            filtered-reports (filter-matching @search (by :name :description) reports)]
+            filtered-reports (->> (filter-matching @search (by :name :description) reports)
+                                  (sort-by :updated-at) reverse)]
         (cond
           (not reports)
           [:div.ui.active.inline.centered.loader]

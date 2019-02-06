@@ -1,3 +1,4 @@
+; TODO DASHBOARD VUELA este y los demas en esta carpeta
 (ns shevek.menu.share
   (:require [reagent.core :as r]
             [cljsjs.clipboard]
