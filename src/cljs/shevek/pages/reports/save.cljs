@@ -23,7 +23,7 @@
                save #(when (valid?)
                        (dispatch :reports/save (merge report @form-data) after-save))
                shortcuts (kb-shortcuts :enter save)]
-    [:<>
+    [:div.ui.tiny.modal
      [:div.header (t :actions/save-as)]
      [:div.content
       [:div.ui.form {:ref shortcuts}
@@ -39,4 +39,4 @@
        (t :actions/cancel)]]]))
 
 (defn open-save-as-dialog [props]
-  (show-modal {:modal [save-as-dialog props] :class "tiny"}))
+  (show-modal [save-as-dialog props]))

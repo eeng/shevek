@@ -49,7 +49,7 @@
   (r/with-let [on-refresh #(dispatch :designer/refresh)
                _ (set-auto-refresh-interval! (db/get-in [:preferences :auto-refresh]) on-refresh)]
     (let [every (db/get-in [:preferences :auto-refresh])] ; Repetead to get the updated value when the user changes it
-      [:button.ui.icon.default.button
+      [:button.ui.default.icon.button
        {:on-click #(show-popup % [popup-content every on-refresh] {:position "bottom right"})}
        (when (pos? every)
          [:span.current-refresh

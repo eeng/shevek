@@ -13,6 +13,8 @@
             [shevek.pages.designer.helpers :refer [build-new-report send-designer-query send-pinboard-queries]]
             [shevek.pages.designer.actions.refresh :refer [refresh-button]]
             [shevek.pages.designer.actions.save :refer [save-button]]
+            [shevek.pages.designer.actions.share :refer [share-button]]
+            [shevek.pages.designer.actions.raw :refer [raw-data-button]]
             [shevek.pages.designer.actions.maximize :refer [maximize-button]]
             [shevek.pages.designer.actions.download :refer [download-csv-button]]
             [shevek.schemas.conversion :refer [report->designer]]
@@ -103,8 +105,12 @@
      [topbar {:left [:h3.ui.inverted.header name]
               :right [:<>
                       [save-button report]
+                      [share-button report]
                       [download-csv-button report (db/get-in [:designer :report-results])]
+                      [:div.divider]
+                      [raw-data-button report]
                       [maximize-button]
+                      [:div.divider]
                       [refresh-button]]}]
      (when @requested-report ; Is nil while fetching a report by id
        [designer {:report @requested-report}])]))

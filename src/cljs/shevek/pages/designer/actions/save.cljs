@@ -13,7 +13,7 @@
   (assoc-in db [:designer :report] report))
 
 (defn save-button [report]
-  [:button.ui.icon.default.button
+  [:button.ui.default.icon.button
    {:on-click #(if (new-record? report)
                   (open-save-as-dialog {:report report
                                         :after-save (fn [report]

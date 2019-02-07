@@ -94,8 +94,7 @@
    :share {:title "Share"
            :copy-url "Copy URL"
            :copied "URL Copied!"}
-   :raw-data {:menu "View raw data"
-              :title "Raw Event Data"
+   :raw-data {:title "Raw Event Data"
               :showing "Showing the first {1} events matching: "
               :button "Raw Data"}
    :configuration {:menu "Application Configuration, Manage Users"
