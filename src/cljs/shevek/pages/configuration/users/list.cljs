@@ -11,7 +11,7 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.collections :refer [find-by]]
             [shevek.pages.configuration.users.form :refer [adapt-for-client user-form]]
-            [shevek.pages.designer.raw :refer [filters->str]]
+            [shevek.pages.designer.actions.raw :refer [filters->str]]
             [shevek.pages.profile.helpers :refer [avatar]]))
 
 (defevh :users/fetch [db]

@@ -100,15 +100,16 @@
 (defn page
   "For creating or editing reports directly"
   []
-  (let [{:keys [name] :or {name (:name @requested-report)} :as report} (db/get-in [:designer :report])]
+  (let [{:keys [report report-results]} (db/get :designer)
+        {:keys [name] :or {name (:name @requested-report)} :as report} report]
     [:div#designer
      [topbar {:left [:h3.ui.inverted.header name]
               :right [:<>
                       [save-button report]
                       [share-button report]
-                      [download-csv-button report (db/get-in [:designer :report-results])]
+                      [download-csv-button report report-results]
                       [:div.divider]
-                      [raw-data-button report]
+                      [raw-data-button]
                       [maximize-button]
                       [:div.divider]
                       [refresh-button]]}]

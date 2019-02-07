@@ -16,7 +16,6 @@
    {:display-name "modal"
     :reagent-render (fn [this] content)
     :component-did-mount (fn [this]
-                           (js/console.log (:js-opts @modal-data))
                            (let [opts (merge {:detachable false
                                               :onHidden #(swap! modal-data {:opened? false})}
                                              (:js-opts @modal-data))]
