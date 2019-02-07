@@ -50,13 +50,13 @@
 
 (deftest delete-user-tests
   (it "should delete the reports"
-    (let [u (make! User)]
-      (make! Report {:user-id (:id u)})
-      (delete-user db u)
+    (let [{:keys [id]} (make! User)]
+      (make! Report {:owner-id id})
+      (delete-user db id)
       (is (= [] (mc/find-maps db "reports")))))
 
   (it "should delete the dashboards"
-    (let [u (make! User)]
-      (make! Dashboard {:user-id (:id u)})
-      (delete-user db u)
+    (let [{:keys [id]} (make! User)]
+      (make! Dashboard {:user-id id})
+      (delete-user db id)
       (is (= [] (mc/find-maps db "dashboards"))))))

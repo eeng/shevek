@@ -2,15 +2,15 @@
   (:require [monger.joda-time] ; Necessary for automatic joda time objects persistance in monger
             [monger.query :as mq]
             [monger.collection :as mc]
-            [monger.operators :refer [$set]]
+            [monger.operators :refer [$set $setOnInsert]]
             [clj-time.core :refer [now]]
             [com.rpl.specter :refer [transform ALL]])
-  (:refer-clojure :exclude [count]) 
+  (:refer-clojure :exclude [count])
   (:import [org.bson.types ObjectId]))
 
 (defn oid [str]
   (try
-    (ObjectId. str)
+    (when str (ObjectId. str))
     (catch java.lang.IllegalArgumentException _)))
 
 (defn timestamp [{:keys [created-at] :as record}]
@@ -68,6 +68,9 @@
   (unwrap-oids
    (mc/find-map-by-id db collection (oid id))))
 
+(defn find-last [db collection]
+  (last (find-all db collection)))
+
 (defn save [db collection m]
   (->> m
        wrap-oids
@@ -85,3 +88,13 @@
 
 (defn update-by-id [db collection id fields]
   (mc/update db collection {:_id (oid id)} {$set fields}))
+
+(defn create-or-update-by [db collection condition record]
+  (let [{:keys [created-at] :as record} (-> record wrap-oids timestamp)]
+    (mc/update db
+               collection
+               condition
+               {$set (dissoc record :created-at)
+                $setOnInsert {:created-at created-at}} 
+               {:upsert true})
+    (unwrap-oids (find-by db collection condition))))

@@ -5,8 +5,8 @@
             [shevek.components.popup :refer [tooltip]]
             [shevek.pages.reports.save :refer [open-save-as-dialog]]))
 
-(defn new-record? [{:keys [id]}]
-  (nil? id))
+(defn new-record? [{:keys [id shared-by-id]}]
+  (or (not id) shared-by-id))
 
 (defevh :designer/report-saved [db {:keys [id name] :as report}]
   (set-url (str "/reports/" id))

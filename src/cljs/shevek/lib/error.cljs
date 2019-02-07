@@ -10,16 +10,19 @@
             [clojure.string :as str]))
 
 (defn handle-app-error [{:keys [status status-text response]}]
-  (show-modal {:class "small basic app-error"
-               :header [:div.ui.icon.red.header
-                        [:i.warning.circle.icon]
-                        (str "Error " status ": " status-text)]
-               :content response
-               :actions [[:div.ui.cancel.inverted.button (t :actions/close)]]}))
+  (show-modal
+   [:div.ui.small.basic.modal
+    [:div.ui.icon.red.header
+     [:i.warning.circle.icon]
+     (str "Error " status ": " status-text)]
+    [:div.content response]
+    [:div.actions
+     [:div.ui.cancel.inverted.button (t :actions/close)]]]))
 
 (defn handle-not-authenticated []
   (dispatch :session-expired))
 
+; TODO DASHBOARD maybe we should display the error page here?
 (defn handle-not-authorized [error]
   (handle-app-error error)
   (navigate "/"))

@@ -14,7 +14,7 @@
   (rpc/loaded db :saving-report))
 
 (defevh :reports/save [db report after-save]
-  (rpc/call "reports/save-report" :args [report] :handler #(dispatch :reports/saved % after-save))
+  (rpc/call "reports/save" :args [report] :handler #(dispatch :reports/saved % after-save))
   (rpc/loading db :saving-report))
 
 (defn- save-as-dialog [{:keys [report after-save]}]

@@ -2,10 +2,14 @@
   (:require [shevek.reports.repository :as r]
             [shevek.db :refer [db]]
             [schema.core :as s]
-            [shevek.schemas.report :refer [Report]]))
+            [shevek.schemas.report :refer [Report]]
+            [shevek.lib.sharing :refer [base-url hash-data]]
+            [shevek.lib.auth :refer [authorize]]))
 
-(s/defn save-report [{:keys [user-id]} report :- Report]
-  (r/save-report db (assoc report :user-id user-id)))
+(s/defn save [{:keys [user-id]} {:keys [id] :as report} :- Report]
+  (when id
+    (authorize (= user-id (:owner-id (r/find-by-id db id)))))
+  (r/save-report db (assoc report :owner-id user-id)))
 
 (defn delete [_ id]
   (r/delete-report db id))
@@ -13,6 +17,23 @@
 (defn find-all [{:keys [user-id]}]
   (r/find-reports db user-id))
 
-; TODO DASHBOARD autorizar?
+(defn- shared? [{:keys [sharing-digest]}]
+  (some? sharing-digest))
+
 (defn find-by-id [_ id]
-  (r/find-by-id db id))
+  (let [report (r/find-by-id db id)]
+    (if (shared? report)
+      (dissoc report :id :shared-by-id :sharing-digest)
+      report)))
+
+(defn- create-shared-report [report user-id]
+  (let [structure (select-keys report [:name :cube :viztype :measures :filters :splits :pinboard])]
+    (r/create-or-update-by-sharing-digest
+     db
+     (assoc (dissoc report :id :owner-id)
+            :shared-by-id user-id
+            :sharing-digest (hash-data structure)))))
+
+(defn share-url [{:keys [user-id] :as request} report]
+  (let [{:keys [id]} (create-shared-report report user-id)]
+    (str (base-url request) "/reports/" id)))

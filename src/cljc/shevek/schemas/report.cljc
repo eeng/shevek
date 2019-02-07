@@ -15,7 +15,9 @@
    :filters Filters
    (s/optional-key :splits) [Split]
    (s/optional-key :pinboard) Pinboard
-   (s/optional-key :user-id) s/Str
+   (s/optional-key :owner-id) s/Str
+   (s/optional-key :shared-by-id) s/Str
+   (s/optional-key :sharing-digest) s/Str
    (s/optional-key :dashboards-ids) [s/Str]
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})

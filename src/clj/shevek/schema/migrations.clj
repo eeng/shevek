@@ -22,6 +22,11 @@
          (as-> report r
                (transform [:filters ALL #(:interval %) :interval LAST] to-end-of-day r)
                (select-keys r [:filters])
-               (mc/update db "reports" {:_id _id} {$set r})))))})
+               (mc/update db "reports" {:_id _id} {$set r})))))
+
+   :20180207170200-owner-id
+   (fn [db]
+     (mc/update db "reports" {} {$rename {:user-id "owner-id"}} {:multi true}))})
+
 
 #_((migrations :201710220155-expand-interval-to-end-of-day) shevek.db/db)

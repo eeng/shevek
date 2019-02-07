@@ -26,10 +26,14 @@
   (m/delete-by-id db "reports" id))
 
 (defn find-reports [db user-id]
-  (m/find-all db "reports" :where {:user-id user-id} :sort {:name 1}))
+  (m/find-all db "reports" :where {:owner-id user-id} :sort {:name 1}))
 
 (defn delete-reports [db user-id]
-  (m/delete-by db "reports" {:user-id user-id}))
+  (m/delete-by db "reports" {:owner-id user-id}))
 
 (defn find-by-id [db id]
   (m/find-by-id db "reports" id))
+
+(defn create-or-update-by-sharing-digest [db {:keys [sharing-digest] :as report}]
+  {:pre [sharing-digest]}
+  (m/create-or-update-by db "reports" {:sharing-digest sharing-digest} report))

@@ -75,4 +75,4 @@
   [:button.ui.default.icon.button
    {:ref (tooltip (t :raw-data/title))
     :on-click #(dispatch :designer/raw-data-requested)}
-   [:i.align.justify.icon]])
+   [:i.database.icon]])

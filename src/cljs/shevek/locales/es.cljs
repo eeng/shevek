@@ -89,8 +89,10 @@
                       :line-chart "línea"
                       :pie-chart "torta"}
    :share {:title "Compartir"
-           :copy-url "Copiar URL"
-           :copied "URL Copiado!"}
+           :label "Link para compartir"
+           :copy "Copiar"
+           :copied "Link Copiado!"
+           :report-hint "Este link es una copia de su reporte. Cualquier cambio posterior no se verá reflejado en el reporte compartido."}
    :raw-data {:menu "Ver datos desagregados"
               :title "Datos Desagregados"
               :showing "Primeros {1} eventos según filtro: "

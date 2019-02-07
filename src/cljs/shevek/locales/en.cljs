@@ -92,8 +92,10 @@
                       :line-chart "line chart"
                       :pie-chart "pie chart"}
    :share {:title "Share"
-           :copy-url "Copy URL"
-           :copied "URL Copied!"}
+           :label "Link to share"
+           :copy "Copy"
+           :copied "Link Copied!"
+           :report-hint "This is a point-in-time snapshot of your report. Any changes made afterward, will not be reflected on shared report."}
    :raw-data {:title "Raw Event Data"
               :showing "Showing the first {1} events matching: "
               :button "Raw Data"}
