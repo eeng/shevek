@@ -94,7 +94,7 @@
    :share {:title "Share"
            :label "Link to share"
            :copy "Copy"
-           :copied "Link Copied!"
+           :copied "Link copied!"
            :report-hint "This is a point-in-time snapshot of your report. Any changes made afterward, will not be reflected on shared report."}
    :raw-data {:title "Raw Event Data"
               :showing "Showing the first {1} events matching: "

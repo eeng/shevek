@@ -43,6 +43,7 @@
 
 (defn share-button [report]
   [:button.ui.default.icon.button
-   {:ref (tooltip (t :share/title))
-    :on-click #(show-modal [share-dialog report])}
+   {:on-click #(show-modal [share-dialog report])
+    :ref (tooltip (t :share/title))
+    :data-tid "share"}
    [:i.share.alternate.icon]])

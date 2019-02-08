@@ -125,7 +125,7 @@
                                   [figwheel-sidecar "0.5.16"] ; ClojureScript REPL on top of nREPL
                                   ;; Testing clj
                                   [etaoin "0.3.2"]
-                                  [se.haleby/stub-http "0.2.1"]
+                                  [se.haleby/stub-http "0.2.7"]
                                   [prismatic/schema-generators "0.1.0"]
                                   ;; Testing cljs
                                   [pjstadig/humane-test-output "0.8.3"]

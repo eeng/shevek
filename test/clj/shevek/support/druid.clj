@@ -1,6 +1,6 @@
 (ns shevek.support.druid
   (:require [clojure.java.io :as io]
-            [stub-http.core :refer :all]))
+            [stub-http.core :refer [start!]]))
 
 (defn druid-res [name]
   {:status 200
@@ -14,5 +14,6 @@
          (some? (re-find regex (body "postData"))))))
 
 (defmacro with-fake-druid [routes & body]
+  {:pre [(map? routes)]}
   `(with-open [server# (start! {:port 4102} ~routes)]
      ~@body))

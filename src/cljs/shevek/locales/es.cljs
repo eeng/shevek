@@ -91,7 +91,7 @@
    :share {:title "Compartir"
            :label "Link para compartir"
            :copy "Copiar"
-           :copied "Link Copiado!"
+           :copied "Link copiado!"
            :report-hint "Este link es una copia de su reporte. Cualquier cambio posterior no se verá reflejado en el reporte compartido."}
    :raw-data {:menu "Ver datos desagregados"
               :title "Datos Desagregados"

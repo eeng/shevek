@@ -1,0 +1,304 @@
+[{
+  "timestamp": "2015-09-12T00:46:58.771Z",
+  "result": [{
+      "count": 37091,
+      "deleted": 367848,
+      "cityName": null,
+      "added": 9019418
+    },
+    {
+      "count": 7,
+      "deleted": 854,
+      "cityName": "Scarborough",
+      "added": 1359
+    },
+    {
+      "count": 9,
+      "deleted": 840,
+      "cityName": "Rio de Janeiro",
+      "added": 883
+    },
+    {
+      "count": 45,
+      "deleted": 605,
+      "cityName": "Central District",
+      "added": 10955
+    },
+    {
+      "count": 37,
+      "deleted": 580,
+      "cityName": "Taipei",
+      "added": 1162
+    },
+    {
+      "count": 12,
+      "deleted": 552,
+      "cityName": "Buenos Aires",
+      "added": 317
+    },
+    {
+      "count": 13,
+      "deleted": 546,
+      "cityName": "Gif-sur-Yvette",
+      "added": 7233
+    },
+    {
+      "count": 21,
+      "deleted": 510,
+      "cityName": "Seoul",
+      "added": 2053
+    },
+    {
+      "count": 3,
+      "deleted": 494,
+      "cityName": "Bucharest",
+      "added": 824
+    },
+    {
+      "count": 2,
+      "deleted": 485,
+      "cityName": "Blora",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 484,
+      "cityName": "Pasadena",
+      "added": 0
+    },
+    {
+      "count": 2,
+      "deleted": 468,
+      "cityName": "Piscataway",
+      "added": 0
+    },
+    {
+      "count": 3,
+      "deleted": 456,
+      "cityName": "Wynnum",
+      "added": 19
+    },
+    {
+      "count": 1,
+      "deleted": 447,
+      "cityName": "Spikkestad",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 431,
+      "cityName": "Levis",
+      "added": 0
+    },
+    {
+      "count": 11,
+      "deleted": 429,
+      "cityName": "Roxas City",
+      "added": 78
+    },
+    {
+      "count": 1,
+      "deleted": 426,
+      "cityName": "McDonough",
+      "added": 0
+    },
+    {
+      "count": 35,
+      "deleted": 424,
+      "cityName": "Moscow",
+      "added": 9131
+    },
+    {
+      "count": 45,
+      "deleted": 400,
+      "cityName": "Tokyo",
+      "added": 10333
+    },
+    {
+      "count": 2,
+      "deleted": 393,
+      "cityName": "Yekaterinburg",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 388,
+      "cityName": "Surabaya",
+      "added": 0
+    },
+    {
+      "count": 14,
+      "deleted": 387,
+      "cityName": "Santiago",
+      "added": 399
+    },
+    {
+      "count": 2,
+      "deleted": 366,
+      "cityName": "Quito",
+      "added": 0
+    },
+    {
+      "count": 3,
+      "deleted": 354,
+      "cityName": "Canicattì",
+      "added": 44
+    },
+    {
+      "count": 2,
+      "deleted": 341,
+      "cityName": "Taunton",
+      "added": 1
+    },
+    {
+      "count": 1,
+      "deleted": 335,
+      "cityName": "Beenleigh",
+      "added": 0
+    },
+    {
+      "count": 4,
+      "deleted": 324,
+      "cityName": "Richmond",
+      "added": 1610
+    },
+    {
+      "count": 1,
+      "deleted": 323,
+      "cityName": "Sens-de-Bretagne",
+      "added": 0
+    },
+    {
+      "count": 4,
+      "deleted": 307,
+      "cityName": "Baltimore",
+      "added": 3
+    },
+    {
+      "count": 18,
+      "deleted": 304,
+      "cityName": "Bangalore",
+      "added": 8791
+    },
+    {
+      "count": 2,
+      "deleted": 300,
+      "cityName": "Pignan",
+      "added": 467
+    },
+    {
+      "count": 13,
+      "deleted": 274,
+      "cityName": "New York",
+      "added": 862
+    },
+    {
+      "count": 3,
+      "deleted": 272,
+      "cityName": "Shahrak-e Pars",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 251,
+      "cityName": "Holbeach",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 238,
+      "cityName": "Road Town",
+      "added": 0
+    },
+    {
+      "count": 8,
+      "deleted": 236,
+      "cityName": "Diliman Primero",
+      "added": 648
+    },
+    {
+      "count": 19,
+      "deleted": 233,
+      "cityName": "Walnut Creek",
+      "added": 331
+    },
+    {
+      "count": 1,
+      "deleted": 218,
+      "cityName": "Torcy",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 208,
+      "cityName": "Béthune",
+      "added": 0
+    },
+    {
+      "count": 3,
+      "deleted": 204,
+      "cityName": "Lima",
+      "added": 32
+    },
+    {
+      "count": 1,
+      "deleted": 202,
+      "cityName": "Bihać",
+      "added": 0
+    },
+    {
+      "count": 9,
+      "deleted": 198,
+      "cityName": "Southampton",
+      "added": 354
+    },
+    {
+      "count": 3,
+      "deleted": 193,
+      "cityName": "Los Angeles",
+      "added": 66
+    },
+    {
+      "count": 11,
+      "deleted": 186,
+      "cityName": "Vancouver",
+      "added": 298
+    },
+    {
+      "count": 1,
+      "deleted": 173,
+      "cityName": "Bolzano",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 167,
+      "cityName": "Highland",
+      "added": 0
+    },
+    {
+      "count": 7,
+      "deleted": 166,
+      "cityName": "Barcelona",
+      "added": 175
+    },
+    {
+      "count": 1,
+      "deleted": 165,
+      "cityName": "Durham",
+      "added": 0
+    },
+    {
+      "count": 2,
+      "deleted": 161,
+      "cityName": "Ho Chi Minh City",
+      "added": 0
+    },
+    {
+      "count": 1,
+      "deleted": 160,
+      "cityName": "Barletta",
+      "added": 0
+    }
+  ]
+}]

@@ -63,6 +63,9 @@
 (defn wait-exists [q]
   (e/wait-exists page q))
 
+(defn element-value [q]
+  (e/get-element-value page q))
+
 (defn- element-text [selector]
   (->> (e/query-all page {:css selector})
        (map #(e/get-element-text-el page %))
@@ -119,11 +122,17 @@
 (defn refresh []
   (e/refresh page))
 
+(defn drag-and-drop [& args]
+  (apply e/drag-and-drop page args))
+
 (defn login
   ([] (login {:username "user" :fullname "User" :password "secret666"}))
   ([{:keys [username password] :as user}]
    (when-not (users/find-by-username db username)
      (make! User user))
+   (when (e/exists? page {:css ".dimmer.visible"})
+     (e/js-execute page "$('.ui.modal').modal('hide')")
+     (e/wait-absent page {:css ".dimmer.visible"}))
    (cond
      (e/exists? page {:css "i.sign.out"}) (e/click page {:css "i.sign.out"})
      (not (e/exists? page {:css "#login"})) (visit "/"))

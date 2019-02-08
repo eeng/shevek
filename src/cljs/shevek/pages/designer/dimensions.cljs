@@ -8,19 +8,20 @@
             [shevek.components.form :refer [search-input filter-matching]]
             [shevek.pages.designer.helpers :refer [current-cube panel-header search-button highlight description-help-icon]]))
 
-(defn dimension-popup-button [color icon event name]
+(defn dimension-popup-button [color icon tid event name]
   [:button.ui.circular.icon.button
    {:class color
-    :on-click #(do (close-popup) (dispatch event name))}
+    :on-click #(do (close-popup) (dispatch event name))
+    :data-tid tid}
    [:i.icon {:class icon}]])
 
 (defn- dimension-popup [dim]
   [:div.popup-content
    [:div.buttons
-    [dimension-popup-button "green" "filter" :designer/dimension-added-to-filter dim]
-    [dimension-popup-button "orange" "square" :designer/split-replaced dim]
-    [dimension-popup-button "orange" "plus" :designer/split-dimension-added dim]
-    [dimension-popup-button "yellow" "pin" :designer/dimension-pinned dim]]])
+    [dimension-popup-button "green" "filter" "add-filter" :designer/dimension-added-to-filter dim]
+    [dimension-popup-button "orange" "square" "replace-split" :designer/split-replaced dim]
+    [dimension-popup-button "orange" "plus" "add-split" :designer/split-dimension-added dim]
+    [dimension-popup-button "yellow" "pin" "pin-dimension" :designer/dimension-pinned dim]]])
 
 (defn- dimension-item []
   (let [selected (r/atom false)]
