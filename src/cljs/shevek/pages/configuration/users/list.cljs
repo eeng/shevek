@@ -62,7 +62,8 @@
           (permissions-text user))]
    [:td.actions
     [:button.ui.inverted.compact.circular.secondary.icon.button
-     {:on-click #(reset! edited-user (adapt-for-client user))}
+     {:on-click #(reset! edited-user (adapt-for-client user))
+      :data-tid "edit"}
      [:i.edit.icon]]
     [with-confirm
      [:button.ui.inverted.compact.circular.red.icon.button

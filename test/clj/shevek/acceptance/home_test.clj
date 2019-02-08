@@ -12,12 +12,5 @@
     (make! Cube {:title "Inventory"})
     (login)
     (is (has-title? "Welcome"))
-    (is (has-css? ".cube.card:nth-child(1)" :text "Inventory"))
-    (is (has-css? ".cube.card:nth-child(2)" :text "Sales")))
-
-  (it "the cubes are displayed also on the menu"
-    (make! Cube {:title "Sales"})
-    (make! Cube {:title "Inventory"})
-    (login)
-    (click {:css "#cubes-menu"})
-    (is (has-css? "#cubes-popup .item" :count 2))))
+    (is (has-css? ".panel" :text "Inventory"))
+    (is (has-css? ".panel" :text "Sales"))))

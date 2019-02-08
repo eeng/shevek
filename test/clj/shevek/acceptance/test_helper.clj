@@ -57,6 +57,12 @@
     (catch clojure.lang.ExceptionInfo _
       false)))
 
+(defn wait-visible [q]
+  (e/wait-visible page q))
+
+(defn wait-exists [q]
+  (e/wait-exists page q))
+
 (defn- element-text [selector]
   (->> (e/query-all page {:css selector})
        (map #(e/get-element-text-el page %))
@@ -80,7 +86,7 @@
   (waiting #(not (e/has-text? page text))))
 
 (defn click [q]
-  (e/wait-exists page q)
+  (e/wait-exists page q {:message (str "Element " q " was not found")})
   (e/click page q))
 
 (defn select [q option]
@@ -94,18 +100,21 @@
   (click {:data-tid test-id}))
 
 (defn fill [field & values]
-  (e/wait-visible page field)
+  (wait-visible field)
   (apply e/fill page field values))
 
 (defn fill-multi [fields]
-  (e/wait-visible page (if (map? fields)
-                         (-> fields keys first)
-                         (first fields)))
+  (wait-visible  (if (map? fields)
+                   (-> fields keys first)
+                   (first fields)))
   (e/fill-multi page fields))
 
 (defn fill-by-name [map-of-input-names-to-value]
   (fill-multi
    (transform [MAP-KEYS] (fn [input-name] {:name input-name}) map-of-input-names-to-value)))
+
+(defn fill-active [& args]
+  (apply e/fill-active page args))
 
 (defn refresh []
   (e/refresh page))

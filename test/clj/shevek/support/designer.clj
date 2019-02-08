@@ -60,5 +60,4 @@
 (defn go-to-designer []
   (make-wikiticker-cube)
   (login)
-  (click {:css "#cubes-menu"})
   (click-link "Wikiticker"))

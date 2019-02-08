@@ -30,7 +30,8 @@
       [:i.block.layout.icon]]
      [:a.item {:href "/reports"
                :class (active-class-when-page :reports)
-               :ref (tooltip :reports/title)}
+               :ref (tooltip :reports/title)
+               :data-tid "sidebar-reports"}
       [:i.line.chart.icon]]
      (when (admin?)
        [:a.icon.item {:href "/configuration"

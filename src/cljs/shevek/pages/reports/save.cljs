@@ -30,12 +30,12 @@
        [input-field form-data :name {:label (t :reports/name) :auto-focus true}]
        [input-field form-data :description {:label (t :reports/description) :as :textarea :rows 2}]]]
      [:div.actions
-      [:div.ui.green.button
+      [:button.ui.green.button
        {:on-click save
         :class [(when-not (valid?) "disabled")
                 (when (rpc/loading? :saving-report) "loading disabled")]}
        (t :actions/save)]
-      [:div.ui.cancel.button
+      [:button.ui.cancel.button
        (t :actions/cancel)]]]))
 
 (defn open-save-as-dialog [props]

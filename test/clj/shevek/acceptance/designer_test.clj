@@ -1,6 +1,6 @@
 (ns shevek.acceptance.designer-test
   (:require [clojure.test :refer [deftest use-fixtures is]]
-            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests click click-link has-css? it has-title? login visit]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests click click-link has-css? it has-title? login visit click-tid]]
             [shevek.support.druid :refer [with-fake-druid query-req-matching druid-res]]
             [shevek.support.designer :refer [make-wikiticker-cube go-to-designer]]))
 
@@ -23,8 +23,7 @@
        (query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")
        (query-req-matching #"queryType.*select") (druid-res "acceptance/select")}
       (go-to-designer)
-      (click-link "Share")
-      (click-link "View raw data")
+      (click-tid "raw-data")
       (is (has-css? ".raw-data" :text "Showing the first 100 events matching: Latest Day"))
       (is (has-css? ".raw-data tbody tr" :count 2))
-      (visit "/"))))
+      (click-link "Close"))))

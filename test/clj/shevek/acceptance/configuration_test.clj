@@ -18,17 +18,17 @@
                      "fullname" "Bart Simpson"
                      "password" "asdf654"
                      "password-confirmation" "asdf654"})
-      (is (has-css? ".users-list tbody tr" :count 2))
-      (click-link "Save"))
+      (click-link "Save")
+      (is (has-css? ".users-list tbody tr" :count 2)))
 
     (it "permissions"
-      (make! User {:username "mary"})
+      (make! User {:username "mary" :admin false})
       (make! Cube {:title "Sales"})
       (make! Cube {:title "Inventory"})
       (login-admin)
       (click-tid "sidebar-config")
       (fill :active "mary")
-      (click-link "Modify")
+      (click-tid "edit")
       (click-link "Can view all cubes")
       (click {:fn/has-text "Sales"})
       (click-link "Save")

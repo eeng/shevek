@@ -59,7 +59,7 @@
        [:div.ui.basic.segment.loading]
        [:div.table-container [raw-data-table]])]
      [:div.actions
-      [:div.ui.cancel.button (t :actions/close)]]]))
+      [:button.ui.cancel.button (t :actions/close)]]]))
 
 (defevh :designer/raw-data-requested [{:keys [designer] :as db} slice]
   (reset! raw-data {:loading? true})
@@ -74,5 +74,6 @@
 (defn raw-data-button []
   [:button.ui.default.icon.button
    {:ref (tooltip (t :raw-data/title))
-    :on-click #(dispatch :designer/raw-data-requested)}
+    :on-click #(dispatch :designer/raw-data-requested)
+    :data-tid "raw-data"}
    [:i.database.icon]])

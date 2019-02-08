@@ -21,5 +21,6 @@
                   (dispatch :reports/save report identity))
     :ref (tooltip (t (if (new-record? report)
                        :actions/save-as
-                       :actions/save)))}
+                       :actions/save)))
+    :data-tid "save"}
    [:i.save.icon]])

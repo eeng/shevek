@@ -1,6 +1,6 @@
 (ns shevek.acceptance.auth-test
   (:require [clojure.test :refer [deftest use-fixtures is]]
-            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login login-admin click click-link visit fill has-css? has-title? has-text? has-no-text?]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login login-admin click click-link visit fill has-css? has-title? has-text? has-no-text? click-tid]]
             [etaoin.keys :as k]
             [shevek.schemas.user :refer [User]]
             [shevek.makers :refer [make!]]
@@ -22,7 +22,7 @@
 
   (it "logout"
     (login)
-    (click-link "Logout")
+    (click-tid "sidebar-logout")
     (is (has-css? "#login"))
     (is (has-no-text? "Logout")))
 
@@ -30,7 +30,7 @@
     (with-redefs [token-expiration (t/seconds 1)]
       (login-admin))
     (Thread/sleep 1100)
-    (when (has-text? "Dashboard")
-      (click {:css "i.users"}))
+    (when (has-text? "Welcome")
+      (click-tid "sidebar-reports"))
     (is (has-text? "Session expired"))
     (is (has-css? "#login"))))
