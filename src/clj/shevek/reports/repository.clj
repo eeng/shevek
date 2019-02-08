@@ -1,7 +1,8 @@
 (ns shevek.reports.repository
   (:require [shevek.lib.mongodb :as m]
             [monger.collection :as mc]
-            [monger.operators :refer :all]))
+            [monger.operators :refer :all]
+            [clj-time.core :as t]))
 
 (defn- remove-report-from-non-selected-dashboards [db rid ds-ids]
   (mc/update db "dashboards"
@@ -37,3 +38,9 @@
 (defn create-or-update-by-sharing-digest [db {:keys [sharing-digest] :as report}]
   {:pre [sharing-digest]}
   (m/create-or-update-by db "reports" {:sharing-digest sharing-digest} report))
+
+(defn delete-old-shared-reports [db & [{:keys [older-than] :or {older-than (-> 30 t/days t/ago)}}]]
+  (mc/remove db "reports" {:sharing-digest {$exists true}
+                           :updated-at {$lt older-than}}))
+
+#_(delete-old-shared-reports shevek.db/db {:older-than (t/now)})

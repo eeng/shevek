@@ -6,6 +6,8 @@
             [shevek.schema.seed :as seed]
             [shevek.schema.manager :as m]
             [shevek.engine.state :refer [dw]]
+            [shevek.lib.logging :refer [benchmark]]
+            [shevek.reports.repository :refer [delete-old-shared-reports]]
             [shevek.db :refer [db]]))
 
 (defn- wrap-error [f]
@@ -34,11 +36,19 @@
       (info "Starting time boundary update task, will execute every" interval "secs")
       (every (* interval 1000) #(wrap-error (partial m/update-time-boundary! dw db)) pool :initial-delay (* interval 1000)))))
 
+(defn- configure-old-shared-reports-purge-task [pool]
+  (every (* 24 60 60 1000)
+         #(wrap-error (fn []
+                        (benchmark {:after "Old shared repors purged in %.0f ms"})
+                        (delete-old-shared-reports db)))
+         pool))
+
 (defn start! []
   (let [pool (at/mk-pool)]
     (seed/users db)
     (configure-datasources-discovery-task pool)
     (configure-time-boundary-updating-task pool)
+    (configure-old-shared-reports-purge-task pool)
     pool))
 
 (defstate scheduler
