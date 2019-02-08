@@ -12,10 +12,7 @@
     (select {:data-tid "lang"} "Español")
     (click-link "Save")
     (is (has-css? "#notification" :text "Preferences saved!"))
-    (is (has-text? "Preferencias"))
-    (select {:data-tid "lang"} "English")
-    (click-link "Guardar")
-    (is (has-css? "#notification" :text "Preferencias guardadas!")))
+    (is (has-text? "Preferencias")))
 
   (it "the current password mast match"
     (login {:username "max" :fullname "Max" :password "secret999"})

@@ -130,12 +130,8 @@
   ([{:keys [username password] :as user}]
    (when-not (users/find-by-username db username)
      (make! User user))
-   (when (e/exists? page {:css ".dimmer.visible"})
-     (e/js-execute page "$('.ui.modal').modal('hide')")
-     (e/wait-absent page {:css ".dimmer.visible"}))
-   (cond
-     (e/exists? page {:css "i.sign.out"}) (e/click page {:css "i.sign.out"})
-     (not (e/exists? page {:css "#login"})) (visit "/"))
+   (e/js-execute page "try { localStorage.clear() } catch (e) {}") ; Clear session
+   (visit "/")
    (has-css? "input[name=username]")
    (e/clear page {:name "username"} {:name "password"})
    (fill {:name "username"} username)
