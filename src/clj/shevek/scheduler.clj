@@ -1,7 +1,7 @@
 (ns shevek.scheduler
   (:require [mount.core :refer [defstate]]
             [taoensso.timbre :refer [info error]]
-            [overtone.at-at :as at :refer [mk-pool every stop-and-reset-pool!]]
+            [overtone.at-at :as at :refer [mk-pool stop-and-reset-pool!]]
             [shevek.config :refer [config]]
             [shevek.schema.seed :as seed]
             [shevek.schema.manager :as m]
@@ -16,6 +16,9 @@
     (catch Exception e
       (error e))))
 
+(defn- every [interval fun pool & args]
+  (apply at/every interval #(wrap-error fun) pool args))
+
 (defn- refresh-schema []
   (m/discover! dw db)
   (seed/cubes db))
@@ -25,7 +28,7 @@
     (if (pos? interval)
       (do
         (info "Starting auto discovery task, will execute every" interval "secs")
-        (every (* interval 1000) #(wrap-error refresh-schema) pool))
+        (every (* interval 1000) refresh-schema pool))
       (do
         (info "Auto discovery disabled")
         (seed/cubes db)))))
@@ -34,13 +37,16 @@
   (let [interval (config :time-boundary-update-interval)]
     (when (pos? interval)
       (info "Starting time boundary update task, will execute every" interval "secs")
-      (every (* interval 1000) #(wrap-error (partial m/update-time-boundary! dw db)) pool :initial-delay (* interval 1000)))))
+      (every (* interval 1000)
+             (partial m/update-time-boundary! dw db)
+             pool
+             :initial-delay (* interval 1000)))))
 
 (defn- configure-old-shared-reports-purge-task [pool]
   (every (* 24 60 60 1000)
-         #(wrap-error (fn []
-                        (benchmark {:after "Old shared repors purged in %.0f ms"})
-                        (delete-old-shared-reports db)))
+         (fn []
+           (benchmark {:after "Old shared repors purged (%.0f ms)"})
+           (delete-old-shared-reports db))
          pool))
 
 (defn start! []
