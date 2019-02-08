@@ -1,0 +1,35 @@
+@panel-header-background: #e8e8e8;
+
+.ui.panel {
+  padding: 0;
+
+  .panel-actions {
+    float: right;
+    margin-right: -.5em;
+
+    a {
+      color: rgba(0, 0, 0, .6);
+      margin-right: 0;
+      padding: 4px 5px;
+      cursor: pointer;
+
+      &:hover {
+        color: black;
+        background-color: darken(@panel-header-background, 5%);
+      }
+
+      i { margin: 0 }
+    }
+  }
+
+  .panel-actions {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  &:hover .panel-actions { opacity: 1 }
+
+
+  .panel-content {
+    padding: 1em;
+  }
+}

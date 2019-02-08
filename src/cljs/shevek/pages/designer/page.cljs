@@ -3,6 +3,7 @@
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.components.layout :refer [topbar]]
+            [shevek.components.popup :refer [tooltip]]
             [shevek.pages.designer.dimensions :refer [dimensions-panel]]
             [shevek.pages.designer.measures :refer [measures-panel]]
             [shevek.pages.designer.filters :refer [filters-panel]]
@@ -123,6 +124,7 @@
    [topbar {:left [:h3.ui.inverted.header (:name report)]
             :right [:<>
                     [:button.ui.icon.green.button
-                     {:on-click #(.back js/history)}
+                     {:on-click #(.back js/history)
+                      :ref (tooltip (t :designer/go-back))}
                      [:i.reply.icon]]]}]
    [designer props]])

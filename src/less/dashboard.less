@@ -1,13 +1,16 @@
 #dashboard {
+  .body { padding: .3em }
+
   .panel {
     height: 100%;
     background: white;
     display: flex;
     flex-direction: column;
+    padding: 0;
+    margin: 0;
 
     .panel-header {
       cursor: move;
-      &:hover { background-color: #faffe0 }
     }
 
     .panel-content {
@@ -18,13 +21,15 @@
 
   .react-draggable {
     border: 2px solid @background-color;
-    &.react-draggable-dragging, &.resizing { border-color: #ff7f17; }
+    &.react-draggable-dragging, &.resizing { border-color: fade(@secondary-color, 70%); }
+  }
+
+  .react-grid-placeholder {
+    z-index: -1; // By default sits on top
+    background: @secondary-color;
   }
 
   // Removes the initial animation
   .react-grid-item.cssTransforms { transition-property: none; }
   .animated .react-grid-item.cssTransforms { transition-property: transform; }
-
-  // By default its on top
-  .react-grid-placeholder { z-index: -1; }
 }

@@ -18,15 +18,9 @@
    (s/optional-key :abbreviations) s/Str
    (s/optional-key :sidebar-visible) s/Bool})
 
-(s/defschema NewOrSavedReport
-  (s/if :measures
-        Report
-        {:name s/Str
-         (s/optional-key :cube) s/Str})) ; Optional because when adding a new report to a dashboard, the cube is not present until the user selects it
-
 (s/defschema CurrentDashboard
   (st/assoc Dashboard
-            :panels [(st/assoc Panel :report NewOrSavedReport :id s/Int)]
+            :panels [(st/assoc Panel :id s/Int)]
             (s/optional-key :reports-results) {s/Int Results}))
 
 (s/defschema SelectedPanel

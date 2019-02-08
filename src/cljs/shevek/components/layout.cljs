@@ -15,13 +15,15 @@
 (defn page-loader []
   [:div.ui.active.large.loader])
 
-(defn panel [{:keys [title]} & content]
-  (into
-   [:div.ui.segment.clearing.panel
-    [:div.ui.top.attached.label title]]
-   content))
-
 (defn topbar [{:keys [left right]}]
   [:div.topbar
    [:div.left left]
    [:div.right right]])
+
+(defn panel [{:keys [title actions]} & content]
+  [:div.ui.segment.clearing.panel
+   [:div.ui.top.attached.label.panel-header
+    title
+    (when (seq actions)
+      (into [:div.panel-actions] actions))]
+   (into [:div.panel-content] content)])

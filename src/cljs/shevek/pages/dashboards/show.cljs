@@ -1,9 +1,9 @@
-(ns shevek.pages.dashboard
+(ns shevek.pages.dashboards.show
   (:require [cljsjs.react-grid-layout]
             [reagent.core :as r]
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform setval ALL NONE]]
-            [shevek.pages.cubes.page :refer [cubes-list]]
+            [shevek.pages.cubes.list :refer [cubes-list fetch-cubes]]
             [shevek.pages.designer.page :refer [slave-designer]]
             [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
             [shevek.pages.designer.visualization :refer [visualization]]
@@ -14,7 +14,10 @@
             [shevek.lib.collections :refer [detect find-by]]
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.notification :refer [notify]]
-            [shevek.components.layout :refer [topbar]]))
+            [shevek.components.layout :as l :refer [topbar]]
+            [shevek.components.popup :refer [tooltip]]))
+
+(def grid-columns 24)
 
 (defn- set-panels-ids [db dashboard]
   (let [update-panels #(for [[id panel] (map-indexed vector %)]
@@ -40,19 +43,19 @@
   (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
 
 (defevh :dashboard/new-panel [db]
-  (let [new-panel {:report {:name (t :reports/new)}
-                   :layout {:x 0 :y 999 :w 8 :h 8}
+  (let [new-panel {:type "cube-selector"
+                   :layout {:x 0 :y 999 :w (/ grid-columns 3) :h 10}
                    :id (->> (get-in db [:current-dashboard :panels]) (map :id) (apply max 0) inc)}]
     (update-in db [:current-dashboard :panels] conj new-panel)))
 
 (defevh :dashboard/panel-cube-selected [db panel-id cube-name]
-  (setval [:current-dashboard :panels ALL (same-id panel-id) :report]
-          (build-new-report (get-cube cube-name))
-          db))
+  (transform [:current-dashboard :panels ALL (same-id panel-id)]
+             #(assoc % :type "report" :report (build-new-report (get-cube cube-name)))
+             db))
 
-(defevh :dashboard/delete-panel [db id]
+(defevh :dashboard/remove-panel [db id]
   (-> (setval [:current-dashboard :panels ALL (same-id id)] NONE db)
-      (update-in [:current-dashboard :reports-results] dissoc id)))
+      (update-in [:current-dashboard :reports-results] (fnil dissoc {}) id)))
 
 (defevh :dashboard/layout-changed [db full-layout]
   (let [find-panel-layout (fn [{:keys [id]}]
@@ -62,8 +65,12 @@
                     (mapv (fn [panel] (assoc panel :layout (find-panel-layout panel)))))]
     (assoc-in db [:current-dashboard :panels] panels)))
 
+(defn- cube-selector? [{:keys [type]}]
+  (= type "cube-selector"))
+
 (defevh :dashboard/save [{:keys [current-dashboard] :as db}]
   (let [dashboard (->> (dissoc current-dashboard :reports-results)
+                       (setval [:panels ALL cube-selector?] NONE)
                        (transform [:panels ALL] #(dissoc % :id)))]
     (rpc/call "dashboards/save"
               :args [dashboard]
@@ -87,30 +94,42 @@
       [:div.ui.active.loader])))
 
 (defn- cube-selector [{:keys [id]}]
-  [:div
-   (for [{:keys [name title]} (cubes-list)]
-     [:div.ui.button {:key name :on-click #(dispatch :dashboard/panel-cube-selected id name)} title])])
+  [cubes-list {:on-click #(dispatch :dashboard/panel-cube-selected id %)}])
 
-(defn- render-panel [{:keys [id]} & _]
-  (fn [{{:keys [name cube]} :report :as panel} & [already-fullscreen?]]
-    [:div.panel
-     [:div.panel-header
-      [:div.panel-name name]
-      [:div.panel-actions
-       (when cube [:a.ui.button {:href (current-url-with-params {:panel id :edit true})} "Edit"])
-       (when cube [:a.ui.button {:href (current-url-with-params {:panel id :fullscreen (not already-fullscreen?)})} "Fullscreen"])
-       [:a.ui.button {:on-click #(dispatch :dashboard/delete-panel id)} "Remove"]]]
-     [:div.panel-content
-      (if cube
-        [report-visualization panel]
-        [cube-selector panel])]]))
+(defn- edit-panel-button [{:keys [type id]}]
+  (when (= type "report")
+    [:a {:href (current-url-with-params {:panel id :edit true})
+         :ref (tooltip (t :dashboard/edit-panel))}
+     [:i.pencil.alternate.icon]]))
+
+(defn- fullscreen-panel-button [{:keys [type id]} already-fullscreen?]
+  (when (= type "report")
+    [:a {:href (current-url-with-params {:panel id :fullscreen (not already-fullscreen?)})
+         :ref (tooltip (t :dashboard/fullscreen-panel))}
+     [:i.expand.icon]]))
+
+(defn- remove-panel-button [{:keys [id]}]
+  [:a {:on-click #(dispatch :dashboard/remove-panel id)
+       :ref (tooltip (t :dashboard/remove-panel))}
+   [:i.remove.icon]])
+
+(defn- render-panel [{:keys [type report] :as panel} & [already-fullscreen?]]
+  (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report]
+    [l/panel
+     {:title name
+      :actions [[edit-panel-button panel]
+                [fullscreen-panel-button panel already-fullscreen?]
+                [remove-panel-button panel]]}
+     (case type
+       "cube-selector" [cube-selector panel]
+       "report" [report-visualization panel])]))
 
 (def GridLayout (js/ReactGridLayout.WidthProvider js/ReactGridLayout #js {:measureBeforeMount true}))
 
 (defn- render-panels* [panels animated]
   (let [on-layout-change (fn [layout]
                            (dispatch :dashboard/layout-changed (js->clj layout :keywordize-keys true)))]
-    [:> GridLayout {:cols 24
+    [:> GridLayout {:cols grid-columns
                     :rowHeight 30
                     :className (when animated "animated")
                     :draggableHandle ".panel-header"
@@ -127,30 +146,43 @@
     (r/create-class {:reagent-render (fn [panels] [render-panels* panels @animated])
                      :component-did-mount #(reset! animated true)})))
 
-(defn- dashboard [{:keys [panels]}]
+(defn- add-panel-button []
+  [:button.ui.green.button
+   {:on-click #(dispatch :dashboard/new-panel)}
+   [:i.plus.icon]
+   (t :dashboards/new-panel)])
+
+(defn- save-dashboard-button []
+  [:button.ui.default.icon.button
+   {:on-click #(dispatch :dashboard/save)
+    :ref (tooltip (t :dashboards/save))}
+   [:i.save.icon]])
+
+(defn- dashboard [{:keys [name panels]}]
   [:div#dashboard
-   [topbar {:right [:<>
-                    [:button.ui.button
-                     {:on-click #(dispatch :dashboard/new-panel)}
-                     (t :dashboards/new-panel)]
-                    [:button.ui.button
-                     {:on-click #(dispatch :dashboard/save)}
-                     (t :dashboards/save)]]}]
-   [:div.ui.basic.segment
+   [topbar {:left [:h3.ui.inverted.header name]
+            :right [:<>
+                    [add-panel-button]
+                    [:div.divider]
+                    [save-dashboard-button]]}]
+   [:div.body
     [render-panels panels]]])
 
+; TODO DASHBOARD no esta funcando al recargar el show, creo q xq no estan los cubos, usar el cubes-fetches
 (defn page []
-  (when-not (rpc/loading? :current-dashboard) ; TODO DASHBOARD esto produce un glitch en la topbar cada vez q se switchea de dashboard
-    (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
-          {:keys [report] :as panel} (find-by :id id (db/get-in [:current-dashboard :panels]))]
-      (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
-        (and panel edit)
-        [slave-designer {:report report
-                         :report-results (db/get-in [:current-dashboard :reports-results id])
-                         :on-report-change #(dispatch :dashboard/report-changed % id)}]
+  (fetch-cubes) ; The cubes are needed con build the visualization
+  (fn []
+    (when-not (rpc/loading? :current-dashboard) ; TODO DASHBOARD esto produce un glitch en la topbar
+      (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
+            {:keys [report] :as panel} (find-by :id id (db/get-in [:current-dashboard :panels]))]
+        (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
+          (and panel edit)
+          [slave-designer {:report report
+                           :report-results (db/get-in [:current-dashboard :reports-results id])
+                           :on-report-change #(dispatch :dashboard/report-changed % id)}]
 
-        (and panel fullscreen)
-        [:div#dashboard [render-panel panel true]]
+          (and panel fullscreen)
+          [:div#dashboard [render-panel panel true]]
 
-        :else
-        [dashboard (db/get :current-dashboard)]))))
+          :else
+          [dashboard (db/get :current-dashboard)])))))

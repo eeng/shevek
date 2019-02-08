@@ -27,6 +27,10 @@
                 :new-panel "Agregar Panel"
                 :name "Nombre"
                 :description "Descripción"}
+   :dashboard {:edit-panel "Modificar Panel"
+               :fullscreen-panel "Maximizar/Minimizar"
+               :remove-panel "Quitar Panel"
+               :select-cube "Seleccione un cubo para el reporte"}
    :reports {:title "Reportes"
              :subtitle "Administrar reportes"
              :recent "Reportes Recientes"
@@ -58,7 +62,8 @@
               :unauthorized "Parece que el cubo {1} ya no está disponible. Por favor, contacte al administrador."
               :maximize "Maximizar panel de resultados"
               :minimize "Minimizar panel de resultados"
-              :grand-total "Total General"}
+              :grand-total "Total General"
+              :go-back "Volver al dashboard"}
    :designer.period {:relative "Relativo"
                      :specific "Específico"
                      :latest "Ultimo"

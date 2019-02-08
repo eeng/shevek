@@ -17,17 +17,16 @@
                 :missing "You have no dashboards yet."
                 :saved "Dashboard saved!"
                 :deleted "Dashboard '{1}' deleted!"
-                ; TODO DASHBOARD vuela
-                :report-count #(cond
-                                 (zero? %) "No reports"
-                                 (= 1 %) "1 report"
-                                 :else "{1} reports")
                 :updated-at "Last updated"
                 :new "New Dashboard"
                 :save "Save Dashboard"
-                :new-panel "Create Panel"
+                :new-panel "Add Panel"
                 :name "Name"
                 :description "Description"}
+   :dashboard {:edit-panel "Edit Panel"
+               :fullscreen-panel "Toggle Fullscreen"
+               :remove-panel "Remove Panel"
+               :select-cube "Select a cube for the report"}
    :reports {:title "Reports"
              :subtitle "Manage your reports"
              :recent "Recent Reports"
@@ -61,7 +60,8 @@
               :unauthorized "It seems that the {1} cube is no longer available. Please contact the administrator."
               :maximize "Maximize results panel"
               :minimize "Minimize results panel"
-              :grand-total "Grand Total"}
+              :grand-total "Grand Total"
+              :go-back "Go back to dashboard"}
    :designer.period {:relative "Relative"
                      :specific "Specific"
                      :latest "Latest"

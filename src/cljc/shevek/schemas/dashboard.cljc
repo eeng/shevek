@@ -3,7 +3,8 @@
             [shevek.schemas.report :refer [Report]]))
 
 (s/defschema Panel
-  {:report Report
+  {:type (s/enum "cube-selector" "report")
+   (s/optional-key :report) Report
    (s/optional-key :layout) {:x s/Int :y s/Int :h s/Int :w s/Int}})
 
 (s/defschema Dashboard
