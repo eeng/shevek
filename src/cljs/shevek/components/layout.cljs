@@ -18,7 +18,9 @@
 (defn topbar [{:keys [left right]}]
   [:div.topbar
    [:div.left left]
-   [:div.right right]])
+   [:div.right right
+    (when (and (not left) (not right))
+      [:button.ui.button.placeholder])]])
 
 (defn panel [{:keys [title actions]} & content]
   [:div.ui.segment.clearing.panel

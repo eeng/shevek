@@ -172,7 +172,8 @@
 (defn page []
   (fetch-cubes) ; The cubes are needed con build the visualization
   (fn []
-    (when-not (rpc/loading? :current-dashboard) ; TODO DASHBOARD esto produce un glitch en la topbar
+    (if (rpc/loading? :current-dashboard)
+      [topbar] ; Empty placeholder so it doesn't flicker when switching dashboards
       (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
             {:keys [report] :as panel} (find-by :id id (db/get-in [:current-dashboard :panels]))]
         (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page

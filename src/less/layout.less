@@ -91,6 +91,10 @@ body {
         display: inline-block;
         width: .5em;
       }
+      .placeholder {
+        opacity: 0;
+        &::after { content: "." }
+      }
     }
 
     .page-footer {
