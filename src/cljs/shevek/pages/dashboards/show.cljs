@@ -42,10 +42,19 @@
 (defevh :dashboards/show [{:keys [current-dashboard] :as db} id query-params]
   (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
 
-(defevh :dashboard/new-panel [db]
+(defn- calculate-new-panel-position [panels]
+  (let [w (/ grid-columns 3)
+        last-pos (or (-> panels last :layout)
+                     {:x 0 :w 0})
+        pos {:x (let [x (+ (:x last-pos) (:w last-pos))]
+                  (if (> (+ x w) grid-columns) 0 x))
+             :y 999}]
+    (assoc pos :w w :h 10)))
+
+(defevh :dashboard/new-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
-                   :layout {:x 0 :y 999 :w (/ grid-columns 3) :h 10}
-                   :id (->> (get-in db [:current-dashboard :panels]) (map :id) (apply max 0) inc)}]
+                   :layout (calculate-new-panel-position panels)
+                   :id (->> panels (map :id) (apply max 0) inc)}]
     (update-in db [:current-dashboard :panels] conj new-panel)))
 
 (defevh :dashboard/panel-cube-selected [db panel-id cube-name]
