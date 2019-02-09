@@ -14,7 +14,6 @@
     }
 
     .panel-content {
-      overflow: auto;
       .statistics { padding: 0 }
     }
   }
@@ -32,4 +31,17 @@
   // Removes the initial animation
   .react-grid-item.cssTransforms { transition-property: none; }
   .animated .react-grid-item.cssTransforms { transition-property: transform; }
+
+  .react-resizable {
+    .react-resizable-handle {
+      cursor: nwse-resize;
+      opacity: 0;
+    }
+    &:hover .react-resizable-handle { opacity: 1 }
+
+    &.resizing {
+      // Fix a bug in Chrome where when resizing would make the div scroll at the same time
+      .scrollable { overflow: hidden }
+    }
+  }
 }

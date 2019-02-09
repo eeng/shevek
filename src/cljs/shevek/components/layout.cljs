@@ -22,10 +22,12 @@
     (when (and (not left) (not right))
       [:button.ui.button.placeholder])]])
 
-(defn panel [{:keys [title actions]} & content]
+(defn panel [{:keys [title actions scrollable]} & content]
   [:div.ui.segment.clearing.panel
    [:div.ui.top.attached.label.panel-header
     title
     (when (seq actions)
       (into [:div.panel-actions] actions))]
-   (into [:div.panel-content] content)])
+   (into [:div.panel-content
+          (when scrollable {:class "scrollable"})]
+         content)])

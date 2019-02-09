@@ -33,7 +33,7 @@
           [:div.tip (t :cubes/missing)]
 
           :else
-          [:div
+          [:<>
            [search-input search {:placeholder (t :dashboards/search-hint)}]
            [:div.ui.selection.list
             (for [{:keys [name] :as cube} filtered-cubes]

@@ -17,7 +17,7 @@
             [shevek.components.layout :as l :refer [topbar]]
             [shevek.components.popup :refer [tooltip]]))
 
-(def grid-columns 24)
+(def grid-columns 36)
 
 (defn- set-panels-ids [db dashboard]
   (let [update-panels #(for [[id panel] (map-indexed vector %)]
@@ -128,7 +128,8 @@
      {:title name
       :actions [[edit-panel-button panel]
                 [fullscreen-panel-button panel already-fullscreen?]
-                [remove-panel-button panel]]}
+                [remove-panel-button panel]]
+      :scrollable true}
      (case type
        "cube-selector" [cube-selector panel]
        "report" [report-visualization panel])]))
