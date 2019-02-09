@@ -45,14 +45,14 @@
                        "libs.css"
                        ["/semantic-ui-css/semantic.min.css"
                         "/semantic-ui-calendar/dist/calendar.min.css"
-                        "/perfect-scrollbar/css/perfect-scrollbar.css"])
+                        "/simplebar/dist/simplebar.min.css"])
    (assets/load-bundle "node_modules"
                        "libs.js"
                        ["/jquery/dist/jquery.min.js"
                         "/semantic-ui-css/semantic.min.js"
                         "/semantic-ui-calendar/dist/calendar.min.js"
                         "/stacktrace-js/dist/stacktrace.min.js"
-                        "/perfect-scrollbar/dist/perfect-scrollbar.min.js"])
+                        "/simplebar/dist/simplebar.min.js"])
    (assets/load-assets "node_modules" ["/stacktrace-js/dist/stacktrace.min.js.map"])
    (assets/load-bundle "public" "app.css" ["/css/app.css"])
    (assets/load-bundle "public" "app.js" ["/js/app.js"])

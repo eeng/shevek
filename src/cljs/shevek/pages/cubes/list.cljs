@@ -35,8 +35,8 @@
           :else
           [:<>
            [search-input search {:placeholder (t :dashboards/search-hint)}]
-           [:div.ui.selection.list
-            (for [{:keys [name] :as cube} filtered-cubes]
-              ^{:key name} [cube-item cube opts])]
-           (when (empty? filtered-cubes)
-             [:div.tip (t :errors/no-results)])])))))
+           (if (seq filtered-cubes)
+             [:div.ui.selection.list
+              (for [{:keys [name] :as cube} filtered-cubes]
+                ^{:key name} [cube-item cube opts])]
+             [:div.tip.top.spaced (t :errors/no-results)])])))))

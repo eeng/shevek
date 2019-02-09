@@ -14,7 +14,21 @@
     }
 
     .panel-content {
-      .statistics { padding: 0 }
+      // The following lines center the content vertically. Need to use margin auto because centering with justify-content clips the content when is large.
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      .visualization {
+        height: auto;
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+      .input { flex-shrink: 0 }
+
+      .statistics {
+        padding: 0;
+        .statistic { margin: .4em 1.5em .5em }
+      }
     }
   }
 

@@ -49,7 +49,7 @@
         pos {:x (let [x (+ (:x last-pos) (:w last-pos))]
                   (if (> (+ x w) grid-columns) 0 x))
              :y 999}]
-    (assoc pos :w w :h 10)))
+    (assoc pos :w w :h 8)))
 
 (defevh :dashboard/new-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"

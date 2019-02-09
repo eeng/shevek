@@ -30,10 +30,10 @@
           :else
           [:div
            [search-input search {:placeholder (t :dashboards/search-hint) :input {:auto-focus false}}]
-           [:div.ui.selection.list
-            (rmap report-item :id filtered-reports)]
-           (when (empty? filtered-reports)
-             [:div.tip (t :errors/no-results)])
+           (if (seq filtered-reports)
+             [:div.ui.selection.list
+              (rmap report-item :id filtered-reports)]
+             [:div.top.spaced.tip (t :errors/no-results)])
            [:div.ui.divider]
            [:a.ui.button {:href "/reports"}
             (t :actions/manage)]])))))

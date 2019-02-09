@@ -100,7 +100,7 @@
                                       :stacktrace-js "2.0.0"
                                       :semantic-ui-css "2.4.1"
                                       :jquery "3.3.1"
-                                      :perfect-scrollbar "1.4.0"}}}}}
+                                      :simplebar "3.1.3"}}}}}
 
   :test-selectors {:default (complement :acceptance)
                    :acceptance :acceptance

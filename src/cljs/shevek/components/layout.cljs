@@ -23,14 +23,19 @@
     (when (and (not left) (not right))
       [:button.ui.button.placeholder])]])
 
-(defn perfect-scrollbar []
-  (let [ps (r/atom nil)]
-    (r/create-class
-     {:display-name "perfect-scrollbar"
-      :component-did-mount #(reset! ps (-> % r/dom-node js/PerfectScrollbar.))
-      :component-will-update #(.update @ps)
-      :component-will-unmount #(.destroy @ps)
-      :reagent-render (fn [child] [:div.scrollable child])})))
+(defn simple-bar [content]
+  [:div.scrollable {:data-simplebar true}
+   [:div.simplebar-wrapper
+    [:div.simplebar-height-auto-observer-wrapper
+     [:div.simplebar-height-auto-observer]]
+    [:div.simplebar-mask
+     [:div.simplebar-offset
+      [:div.simplebar-content content]]]
+    [:div.simplebar-placeholder]]
+   [:div.simplebar-track.simplebar-horizontal
+    [:div.simplebar-scrollbar]]
+   [:div.simplebar-track.simplebar-vertical
+    [:div.simplebar-scrollbar]]])
 
 (defn panel [{:keys [title actions scrollable]} & content]
   (let [panel-content (into [:div.panel-content] content)]
@@ -40,5 +45,5 @@
       (when (seq actions)
         (into [:div.panel-actions] actions))]
      (if scrollable
-       [perfect-scrollbar panel-content]
+       [simple-bar panel-content]
        panel-content)]))

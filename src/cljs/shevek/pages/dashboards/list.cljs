@@ -34,10 +34,10 @@
            :else
            [:<>
             [search-input search {:placeholder (t :dashboards/search-hint) :input {:auto-focus false}}]
-            [:div.ui.selection.list
-             (rmap dashboard-item :id filtered-dashboards)]
-            (when (empty? filtered-dashboards)
-              [:div.tip (t :errors/no-results)])])
+            (if (seq filtered-dashboards)
+              [:div.ui.selection.list
+               (rmap dashboard-item :id filtered-dashboards)]
+              [:div.top.spaced.tip (t :errors/no-results)])])
 
          [:div.ui.divider]
          [create-button]
