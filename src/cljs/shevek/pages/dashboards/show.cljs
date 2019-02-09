@@ -44,7 +44,7 @@
 
 (defn- calculate-new-panel-position [panels]
   (let [w (/ grid-columns 3)
-        last-pos (or (-> panels last :layout)
+        last-pos (or (-> panels last :grid-pos)
                      {:x 0 :w 0})
         pos {:x (let [x (+ (:x last-pos) (:w last-pos))]
                   (if (> (+ x w) grid-columns) 0 x))
@@ -53,7 +53,7 @@
 
 (defevh :dashboard/new-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
-                   :layout (calculate-new-panel-position panels)
+                   :grid-pos (calculate-new-panel-position panels)
                    :id (->> panels (map :id) (apply max 0) inc)}]
     (update-in db [:current-dashboard :panels] conj new-panel)))
 
@@ -66,12 +66,12 @@
   (-> (setval [:current-dashboard :panels ALL (same-id id)] NONE db)
       (update-in [:current-dashboard :reports-results] (fnil dissoc {}) id)))
 
-(defevh :dashboard/layout-changed [db full-layout]
-  (let [find-panel-layout (fn [{:keys [id]}]
-                            (-> (detect #(= (:i %) (str id)) full-layout)
-                                (select-keys [:x :y :w :h])))
+(defevh :dashboard/layout-changed [db layout]
+  (let [find-panel-pos (fn [{:keys [id]}]
+                         (-> (detect #(= (:i %) (str id)) layout)
+                             (select-keys [:x :y :w :h])))
         panels (->> (get-in db [:current-dashboard :panels])
-                    (mapv (fn [panel] (assoc panel :layout (find-panel-layout panel)))))]
+                    (mapv (fn [panel] (assoc panel :grid-pos (find-panel-pos panel)))))]
     (assoc-in db [:current-dashboard :panels] panels)))
 
 (defn- cube-selector? [{:keys [type]}]
@@ -145,7 +145,7 @@
                     :draggableCancel ".panel-actions"
                     :onLayoutChange on-layout-change}
      (for [{:keys [id] :as panel} panels]
-       [:div {:key id :data-grid (:layout panel)}
+       [:div {:key id :data-grid (:grid-pos panel)}
         [render-panel panel]])]))
 
 (defn render-panels

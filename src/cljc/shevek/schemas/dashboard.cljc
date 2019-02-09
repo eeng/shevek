@@ -5,7 +5,7 @@
 (s/defschema Panel
   {:type (s/enum "cube-selector" "report")
    (s/optional-key :report) Report
-   (s/optional-key :layout) {:x s/Int :y s/Int :h s/Int :w s/Int}})
+   (s/optional-key :grid-pos) {:x s/Int :y s/Int :h s/Int :w s/Int}})
 
 (s/defschema Dashboard
   {(s/optional-key :id) s/Str
