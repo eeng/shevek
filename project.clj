@@ -99,7 +99,8 @@
                            :npm-deps {:semantic-ui-calendar "0.0.8"
                                       :stacktrace-js "2.0.0"
                                       :semantic-ui-css "2.4.1"
-                                      :jquery "3.3.1"}}}}}
+                                      :jquery "3.3.1"
+                                      :perfect-scrollbar "1.4.0"}}}}}
 
   :test-selectors {:default (complement :acceptance)
                    :acceptance :acceptance

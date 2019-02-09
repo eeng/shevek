@@ -30,7 +30,11 @@
 
   .panel-content {
     padding: 1em;
+  }
 
-    &.scrollable { overflow: auto; }
+  .scrollable {
+    overflow: hidden;   // Required for perfect-scrollbar
+    position: relative; // Required for perfect-scrollbar
+    height: 100%; // Fix for the loader to appears vertically centered after setting position relative
   }
 }
