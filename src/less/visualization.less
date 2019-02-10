@@ -28,14 +28,12 @@
       th:last-child, td:last-child { padding-right: 0.5em }
       thead {
         th:not(.dim-value) {
-          cursor: pointer;
           .icon { margin-right: 0; }
           span + .icon, .icon + span { margin-left: .25rem; }
         }
         th.dim-value { font-weight: normal }
       }
       tbody tr {
-        &:not(.grand-total) { .selectable };
         opacity: .999;
         td {
           position: relative;
@@ -68,6 +66,20 @@
         -webkit-user-select: none;
         -ms-user-select: none;
       }
+    }
+  }
+}
+
+#designer {
+  .pivot-table {
+    thead {
+      th:not(.dim-value) {
+        cursor: pointer;
+      }
+    }
+
+    tbody tr {
+      &:not(.grand-total) { .selectable };
     }
   }
 }
