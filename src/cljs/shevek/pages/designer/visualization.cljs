@@ -11,7 +11,7 @@
 (defn visualization [results {:keys [cube] :as report}]
   (when (and results (get-cube cube)) ; Results are nil until query finish, and the cube could not exists yet when the user loads the page
     (let [{:keys [results measures viztype splits] :as viz} (build-visualization results report)]
-      [:div.visualization
+      [:div.visualization {:class viztype}
        (cond
          (empty? measures)
          [warning (t :designer/no-measures)]

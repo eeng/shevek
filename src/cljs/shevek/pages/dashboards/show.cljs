@@ -178,7 +178,6 @@
    [:div.body
     [render-panels panels]]])
 
-; TODO DASHBOARD no esta funcando al recargar el show, creo q xq no estan los cubos, usar el cubes-fetches
 (defn page []
   (fetch-cubes) ; The cubes are needed con build the visualization
   (fn []

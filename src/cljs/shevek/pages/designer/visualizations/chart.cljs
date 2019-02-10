@@ -95,7 +95,7 @@
         show-legend? (or (> (count splits) 1)
                          (= viztype :pie-chart))]
     (cond-> {:title {:display true :text chart-title}
-             :legend {:display show-legend? :position "bottom"}
+             :legend {:display show-legend? :position "right"}
              :maintainAspectRatio false
              :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
             (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))))
