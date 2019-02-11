@@ -96,7 +96,10 @@ body {
             &:hover .pencil { opacity: 1; }
           }
 
-          .transparent.input { flex: 1 } // Stretches the input so it can handle a long text
+          .transparent.input {
+            flex: 1; // Stretches the input so it can handle a long text
+            margin-top: -1px; // Otherwise it'd be a bit lower than the .text
+          }
 
           ::selection {
             background: lighten(@primary-color, 50%);
