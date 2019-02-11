@@ -62,21 +62,6 @@ body {
       justify-content: space-between;
       padding: .5em;
 
-      .topbar-header {
-        color: white;
-        font-size: 1.4rem;
-        .pencil {
-          margin-left: .5em;
-          opacity: 0;
-          transition: opacity 0.2s ease;
-        }
-        &:hover .pencil { opacity: 1; }
-        ::selection {
-          background: lighten(@primary-color, 50%);
-          color: white;
-        }
-      }
-
       .left, .right {
         align-self: center;
         .button.default {
@@ -95,7 +80,29 @@ body {
       }
       .left {
         padding-left: 1em;
-        flex: 1
+        flex: 1; // So that the input can stretch if present
+
+        .topbar-header {
+          color: white;
+          font-size: 1.4rem;
+          display: flex; // So that the pencil appears only when hovering the text and not the whole left div
+
+          .text {
+            .pencil {
+              margin-left: .5em;
+              opacity: 0;
+              transition: opacity 0.2s ease;
+            }
+            &:hover .pencil { opacity: 1; }
+          }
+
+          .transparent.input { flex: 1 } // Stretches the input so it can handle a long text
+
+          ::selection {
+            background: lighten(@primary-color, 50%);
+            color: white;
+          }
+        }
       }
 
       .divider {

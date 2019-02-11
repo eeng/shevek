@@ -8,6 +8,7 @@
             [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
             [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
+            [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
@@ -15,8 +16,7 @@
             [shevek.lib.collections :refer [detect find-by]]
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.layout :as l :refer [topbar]]
-            [shevek.components.popup :refer [tooltip]]
-            [shevek.components.editable-text :refer [editable-text]]))
+            [shevek.components.popup :refer [tooltip]]))
 
 (def grid-columns 36)
 
@@ -152,13 +152,9 @@
    [:i.plus.icon]
    (t :dashboards/new-panel)])
 
-(defevh :dashboards/rename [db new-name]
-  (assoc-in db [:current-dashboard :name] new-name))
-
-(defn- dashboard [{:keys [name panels] :as d}]
+(defn- dashboard [{:keys [panels] :as d}]
   [:div#dashboard
-   [topbar {:left [:div.topbar-header
-                   [editable-text {:text name :on-save #(dispatch :dashboards/rename %)}]]
+   [topbar {:left [dashboard-name d]
             :right [:<>
                     [add-panel-button]
                     [:div.divider]

@@ -12,7 +12,7 @@
                save #(let [v (-> @value str str/trim)]
                        (when-not (empty? v) (on-save v))
                        (stop))]
-    [:div.ui.inverted.transparent.fluid.input
+    [:div.ui.inverted.transparent.input
      [:input {:type "text"
               :value @value
               :auto-focus true
@@ -29,7 +29,7 @@
       [input {:value text
               :on-save on-save
               :on-stop #(reset! editing false)}]
-      [:div
+      [:div.text
        {:on-double-click #(reset! editing true)}
        text
        [:i.pencil.icon
