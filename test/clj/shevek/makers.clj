@@ -15,7 +15,10 @@
              Report save-report
              Dashboard save-dashboard})
 
-(def default-fields {Cube {:dimensions [{:name "__time"}]}})
+(def default-fields {Cube {:dimensions [{:name "__time"}]}
+                     Report {:splits []
+                             :filters [{:name "__time" :period "latest-day"}]
+                             :viztype "totals"}})
 
 (defn make
   ([schema] (make schema {}))

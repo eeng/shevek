@@ -125,6 +125,7 @@
             :right [:<>
                     [:button.ui.icon.green.button
                      {:on-click #(.back js/history)
-                      :ref (tooltip (t :designer/go-back))}
+                      :ref (tooltip (t :designer/go-back))
+                      :data-tid "go-back"}
                      [:i.reply.icon]]]}]
    [designer props]])

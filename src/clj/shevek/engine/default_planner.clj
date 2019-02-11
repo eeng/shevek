@@ -49,7 +49,7 @@
        (build-row-if-no-results q)))
 
 (defn execute [engine query cube-schema]
-  (let [{:keys [cube totals splits] :as q} (expand-query query cube-schema)
+  (let [{:keys [totals splits] :as q} (expand-query query cube-schema)
         totals (or totals (empty? splits))
         grand-totals (if totals (resolve-grand-totals engine q) [])]
     (concat grand-totals (resolve-row-splits engine q grand-totals))))

@@ -60,5 +60,5 @@
 (defn go-to-designer []
   (make-wikiticker-cube)
   (login)
-  (click-link "Wikiticker")
+  (click-text "Wikiticker")
   (has-css? ".statistic"))

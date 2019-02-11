@@ -15,8 +15,9 @@
             [clojure.string :as str]
             [com.rpl.specter :refer [transform MAP-KEYS ALL]]))
 
+; Set a specific window size so it is the same accross all dev machines, otherwise a click on a far right would be ok on my pc but fail on the CI
 (defstate page
-  :start (e/chrome)
+  :start (e/chrome {:size [(/ 1920 2) 1050]})
   :stop (e/quit page))
 
 ; Por defecto etaoin espera 20 segs
@@ -79,6 +80,9 @@
      :text (waiting #(.contains (or (element-text selector) "") value))
      :count (waiting #(= (count (e/query-all page {:css selector})) value)))))
 
+(defn has-no-css? [selector]
+  (waiting #(not (has-css? selector))))
+
 (defn has-title? [title]
   (has-css? "h1.header" :text title))
 
@@ -96,11 +100,21 @@
   (click q)
   (click {:xpath (format "//div[contains(@class, 'active')]//div[contains(@class, 'item') and contains(text(), '%s')]" option)}))
 
-(defn click-link [text]
-  (click {:xpath (format "//text()[contains(.,'%s')]/ancestor::*[self::a or self::button][1]" text)}))
+(defn click-text [text]
+  (click {:fn/text text}))
 
 (defn click-tid [test-id]
   (click {:data-tid test-id}))
+
+; Not very pretty but the etaoin double click didn't work
+(defn double-click [css]
+  (e/js-execute page (format "
+    var event = new MouseEvent('dblclick', {
+      'view': window,
+      'bubbles': true,
+      'cancelable': true
+    });
+    document.querySelector('%s').dispatchEvent(event);" css)))
 
 (defn fill [field & values]
   (wait-visible field)
@@ -128,15 +142,16 @@
 (defn login
   ([] (login {:username "user" :fullname "User" :password "secret666"}))
   ([{:keys [username password] :as user}]
-   (when-not (users/find-by-username db username)
-     (make! User user))
-   (e/js-execute page "try { localStorage.clear() } catch (e) {}") ; Clear session
-   (visit "/")
-   (has-css? "input[name=username]")
-   (e/clear page {:name "username"} {:name "password"})
-   (fill {:name "username"} username)
-   (fill {:name "password"} password k/enter)
-   (has-css? ".menu")))
+   (let [user (or (users/find-by-username db username)
+                  (make! User user))]
+     (e/js-execute page "try { localStorage.clear() } catch (e) {}") ; Clear session
+     (visit "/")
+     (has-css? "input[name=username]")
+     (e/clear page {:name "username"} {:name "password"})
+     (fill {:name "username"} username)
+     (fill {:name "password"} password k/enter)
+     (has-css? ".menu")
+     user)))
 
 (defn login-admin []
   (login {:username "adm" :fullname "Admin" :password "secret666" :admin true}))

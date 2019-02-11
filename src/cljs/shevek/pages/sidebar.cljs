@@ -27,7 +27,8 @@
       [:i.cubes.icon]]
      [:a.item {:href "/dashboards"
                :class (active-class-when-page :dashboards)
-               :ref (tooltip :dashboards/title)}
+               :ref (tooltip :dashboards/title)
+               :data-tid "sidebar-dashboards"}
       [:i.block.layout.icon]]
      [:a.item {:href "/reports"
                :class (active-class-when-page :reports)

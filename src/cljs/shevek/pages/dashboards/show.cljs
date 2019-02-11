@@ -50,7 +50,7 @@
         pos {:x (let [x (+ (:x last-pos) (:w last-pos))]
                   (if (> (+ x w) grid-columns) 0 x))
              :y 999}]
-    (assoc pos :w w :h 8)))
+    (assoc pos :w w :h 10)))
 
 (defevh :dashboard/new-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
@@ -98,7 +98,8 @@
 (defn- edit-panel-button [{:keys [type id]}]
   (when (= type "report")
     [:a {:href (current-url-with-params {:panel id :edit true})
-         :ref (tooltip (t :dashboard/edit-panel))}
+         :ref (tooltip (t :dashboard/edit-panel))
+         :data-tid "edit-panel"}
      [:i.pencil.alternate.icon]]))
 
 (defn- fullscreen-panel-button [{:keys [type id]} already-fullscreen?]
@@ -112,7 +113,7 @@
        :ref (tooltip (t :dashboard/remove-panel))}
    [:i.remove.icon]])
 
-(defn- render-panel [{:keys [type report] :as panel} & [already-fullscreen?]]
+(defn- dashboard-panel [{:keys [type report] :as panel} & [already-fullscreen?]]
   (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report]
     [l/panel
      {:title name
@@ -126,7 +127,7 @@
 
 (def GridLayout (js/ReactGridLayout.WidthProvider js/ReactGridLayout #js {:measureBeforeMount true}))
 
-(defn- render-panels* [panels animated]
+(defn- dashboard-panels* [panels animated]
   (let [on-layout-change (fn [layout]
                            (dispatch :dashboard/layout-changed (js->clj layout :keywordize-keys true)))]
     [:> GridLayout {:cols grid-columns
@@ -137,13 +138,13 @@
                     :onLayoutChange on-layout-change}
      (for [{:keys [id] :as panel} panels]
        [:div {:key id :data-grid (:grid-pos panel)}
-        [render-panel panel]])]))
+        [dashboard-panel panel]])]))
 
-(defn render-panels
+(defn dashboard-panels
   "Removes the initial animation where all panels are positioned according to the layout"
   []
   (let [animated (r/atom false)]
-    (r/create-class {:reagent-render (fn [panels] [render-panels* panels @animated])
+    (r/create-class {:reagent-render (fn [panels] [dashboard-panels* panels @animated])
                      :component-did-mount #(reset! animated true)})))
 
 (defn- add-panel-button []
@@ -160,7 +161,7 @@
                     [:div.divider]
                     [save-button d]]}]
    [:div.body
-    [render-panels panels]]])
+    [dashboard-panels panels]]])
 
 (defn page []
   (fetch-cubes) ; The cubes are needed con build the visualization
@@ -176,7 +177,7 @@
                            :on-report-change #(dispatch :dashboard/report-changed % id)}]
 
           (and panel fullscreen)
-          [:div#dashboard [render-panel panel true]]
+          [:div#dashboard [dashboard-panel panel true]]
 
           :else
           [dashboard (db/get :current-dashboard)])))))
