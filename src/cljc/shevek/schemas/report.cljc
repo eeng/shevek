@@ -16,8 +16,9 @@
    (s/optional-key :splits) [Split]
    (s/optional-key :pinboard) Pinboard
    (s/optional-key :owner-id) s/Str
-   (s/optional-key :shared-by-id) s/Str
-   (s/optional-key :sharing-digest) s/Str
+   (s/optional-key :dashboard-id) s/Str ; Inverse relation of panels :report-id. Not used by the UI
+   (s/optional-key :shared-by-id) s/Str ; Not used by the UI (maybe we shouldn't send it then?)
+   (s/optional-key :sharing-digest) s/Str ; Not used by the UI
    (s/optional-key :dashboards-ids) [s/Str]
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})

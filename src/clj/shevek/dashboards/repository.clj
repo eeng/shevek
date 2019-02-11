@@ -1,24 +1,23 @@
 (ns shevek.dashboards.repository
   (:require [shevek.lib.mongodb :as m]
-            [monger.collection :as mc]
-            [monger.operators :refer [$pull]]
             [shevek.reports.repository :refer [save-report]]
             [com.rpl.specter :refer [transform ALL]]))
 
-(defn- save-report-and-keep-id [db {:keys [report] :as panel}]
+; The inverse relation :dashboard-id is used mainly to simplify cascade deletion.
+(defn- save-report-and-keep-id [db dashboard-id {:keys [report] :as panel}]
   (if report
     (-> (dissoc panel :report)
-        (assoc :report-id (:id (save-report db report))))
+        (assoc :report-id (:id (save-report db (assoc report :dashboard-id dashboard-id)))))
     panel))
 
 (defn save-dashboard [db dashboard]
-  (->> (m/save db "dashboards" dashboard)
-       (transform [:panels ALL] (partial save-report-and-keep-id db))
-       (m/save db "dashboards")))
+  (let [d (m/save db "dashboards" dashboard)]
+    (->> d
+         (transform [:panels ALL] (partial save-report-and-keep-id db (:id d)))
+         (m/save db "dashboards"))))
 
 (defn delete-dashboard [db id]
-  ; TODO DASHBOARD aca creo q habria que borrar todos los reports directamente ya que ahora seria one-to-many
-  ; (mc/update db "reports" {:dashboards-ids (m/oid id)} {$pull {:dashboards-ids (m/oid id)}} {:multi true})
+  (m/delete-by db "reports" {:dashboard-id id})
   (m/delete-by-id db "dashboards" id))
 
 (defn- fetch-report [db {:keys [report-id] :as panel}]
