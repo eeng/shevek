@@ -15,7 +15,8 @@
             [shevek.lib.collections :refer [detect find-by]]
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.layout :as l :refer [topbar]]
-            [shevek.components.popup :refer [tooltip]]))
+            [shevek.components.popup :refer [tooltip]]
+            [shevek.components.editable-text :refer [editable-text]]))
 
 (def grid-columns 36)
 
@@ -151,9 +152,13 @@
    [:i.plus.icon]
    (t :dashboards/new-panel)])
 
+(defevh :dashboards/rename [db new-name]
+  (assoc-in db [:current-dashboard :name] new-name))
+
 (defn- dashboard [{:keys [name panels] :as d}]
   [:div#dashboard
-   [topbar {:left [:h3.ui.inverted.header name]
+   [topbar {:left [:div.topbar-header
+                   [editable-text {:text name :on-save #(dispatch :dashboards/rename %)}]]
             :right [:<>
                     [add-panel-button]
                     [:div.divider]

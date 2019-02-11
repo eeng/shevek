@@ -174,7 +174,8 @@
              :search "Buscar"
              :confirm "Confirmar"
              :manage "Gestionar"
-             :refresh "Refrescar"}
+             :refresh "Refrescar"
+             :double-click-edit "Double click para editar"}
    :validation {:required "este campo es obligatorio"
                 :email "no es una dirección válida"
                 :password "debería tener al menos 7 letras y números (o símbolos)"

@@ -177,7 +177,8 @@
              :header "Actions"
              :confirm "Confirm"
              :manage "Manage"
-             :refresh "Refresh"}
+             :refresh "Refresh"
+             :double-click-edit "Double click to edit"}
    :validation {:required "can't be blank"
                 :regex "doesn't match pattern"
                 :email "is not a valid email address"

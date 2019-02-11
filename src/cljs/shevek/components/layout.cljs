@@ -1,5 +1,4 @@
-(ns shevek.components.layout
-  (:require [reagent.core :as r]))
+(ns shevek.components.layout)
 
 (defn page-with-header [{:keys [title subtitle icon id image]} & children]
   [:div {:id id}

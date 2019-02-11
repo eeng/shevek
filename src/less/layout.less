@@ -61,6 +61,22 @@ body {
       display: flex;
       justify-content: space-between;
       padding: .5em;
+
+      .topbar-header {
+        color: white;
+        font-size: 1.4rem;
+        .pencil {
+          margin-left: .5em;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        &:hover .pencil { opacity: 1; }
+        ::selection {
+          background: lighten(@primary-color, 50%);
+          color: white;
+        }
+      }
+
       .left, .right {
         align-self: center;
         .button.default {
@@ -79,14 +95,14 @@ body {
       }
       .left {
         padding-left: 1em;
+        flex: 1
       }
-      h3.ui.header {
-        padding-top: 2px; // To center it a little bit better
-      }
+
       .divider {
         display: inline-block;
         width: .5em;
       }
+
       .placeholder {
         opacity: 0;
         &::after { content: "." }
