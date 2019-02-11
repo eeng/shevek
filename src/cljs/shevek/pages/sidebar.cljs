@@ -1,5 +1,6 @@
 (ns shevek.pages.sidebar
-  (:require [shevek.navigation :refer [active-class-when-page]]
+  (:require [reagent.core :as r]
+            [shevek.navigation :refer [active-class-when-page]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
@@ -10,7 +11,7 @@
 (defn tooltip [i18n-key]
   (p/tooltip (t i18n-key) {:position "right center" :delay 700}))
 
-(defn sidebar []
+(defn sidebar* []
   (if (db/get-in [:preferences :sidebar-visible])
     [:div#sidebar.ui.inverted.left.fixed.vertical.icon.menu
      [:a.item {:on-click #(dispatch :preferences/save {:sidebar-visible false})}
@@ -55,3 +56,8 @@
      [:a.item
       {:on-click #(dispatch :preferences/save {:sidebar-visible true})}
       [:i.bars.icon]]]))
+
+(defn sidebar []
+  (r/create-class {:reagent-render sidebar*
+                   ; So the dashboard grid resizes accordingly
+                   :component-did-update #(.dispatchEvent js/window (js/Event. "resize"))}))
