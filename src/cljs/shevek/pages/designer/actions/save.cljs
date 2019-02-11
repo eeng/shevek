@@ -3,10 +3,8 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.navigation :refer [set-url]]
             [shevek.components.popup :refer [tooltip]]
-            [shevek.pages.reports.save :refer [open-save-as-dialog]]))
-
-(defn new-record? [{:keys [id shared-by-id]}]
-  (or (not id) shared-by-id))
+            [shevek.pages.reports.save :refer [open-save-as-dialog]]
+            [shevek.lib.util :refer [new-record?]]))
 
 (defevh :designer/report-saved [db {:keys [id name] :as report}]
   (set-url (str "/reports/" id))

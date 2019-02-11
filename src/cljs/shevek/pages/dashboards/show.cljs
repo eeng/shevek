@@ -7,13 +7,13 @@
             [shevek.pages.designer.page :refer [slave-designer]]
             [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
             [shevek.pages.designer.visualization :refer [visualization]]
+            [shevek.pages.dashboards.actions.save :refer [save-button]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.lib.collections :refer [detect find-by]]
             [shevek.navigation :refer [current-url-with-params]]
-            [shevek.components.notification :refer [notify]]
             [shevek.components.layout :as l :refer [topbar]]
             [shevek.components.popup :refer [tooltip]]))
 
@@ -73,17 +73,6 @@
         panels (->> (get-in db [:current-dashboard :panels])
                     (mapv (fn [panel] (assoc panel :grid-pos (find-panel-pos panel)))))]
     (assoc-in db [:current-dashboard :panels] panels)))
-
-(defn- cube-selector? [{:keys [type]}]
-  (= type "cube-selector"))
-
-(defevh :dashboard/save [{:keys [current-dashboard] :as db}]
-  (let [dashboard (->> (dissoc current-dashboard :reports-results)
-                       (setval [:panels ALL cube-selector?] NONE)
-                       (transform [:panels ALL] #(dissoc % :id)))]
-    (rpc/call "dashboards/save"
-              :args [dashboard]
-              :handler #(notify (t :dashboards/saved)))))
 
 (defevh :dashboard/report-changed [db report panel-id]
   (setval [:current-dashboard :panels ALL (same-id panel-id) :report] report db))
@@ -162,19 +151,13 @@
    [:i.plus.icon]
    (t :dashboards/new-panel)])
 
-(defn- save-dashboard-button []
-  [:button.ui.default.icon.button
-   {:on-click #(dispatch :dashboard/save)
-    :ref (tooltip (t :dashboards/save))}
-   [:i.save.icon]])
-
-(defn- dashboard [{:keys [name panels]}]
+(defn- dashboard [{:keys [name panels] :as d}]
   [:div#dashboard
    [topbar {:left [:h3.ui.inverted.header name]
             :right [:<>
                     [add-panel-button]
                     [:div.divider]
-                    [save-dashboard-button]]}]
+                    [save-button d]]}]
    [:div.body
     [render-panels panels]]])
 

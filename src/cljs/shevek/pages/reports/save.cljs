@@ -7,7 +7,7 @@
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.components.notification :refer [notify]]))
 
-(defevh :reports/saved [db {:keys [id name] :as report} after-save]
+(defevh :reports/saved [db {:keys [name] :as report} after-save]
   (notify (t :reports/saved name))
   (after-save report)
   (close-modal)

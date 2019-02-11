@@ -19,7 +19,6 @@
                 :deleted "Dashboard '{1}' deleted!"
                 :updated-at "Last updated"
                 :new "New Dashboard"
-                :save "Save Dashboard"
                 :new-panel "Add Panel"
                 :name "Name"
                 :description "Description"}

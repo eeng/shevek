@@ -23,7 +23,6 @@
                                  :else "{1} reportes")
                 :updated-at "Última Actualización"
                 :new "Nuevo Dashboard"
-                :save "Guardar Dashboard"
                 :new-panel "Agregar Panel"
                 :name "Nombre"
                 :description "Descripción"}
