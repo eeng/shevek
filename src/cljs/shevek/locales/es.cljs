@@ -15,7 +15,6 @@
                 :subtitle "Administrar dashboards"
                 :search-hint "Filtrar por nombre o descripción"
                 :missing "No has creado ningún dashboard todavía."
-                :saved "Dashboard guardado correctamente"
                 :deleted "Dashboard '{1}' eliminado correctamente"
                 :report-count #(cond
                                  (zero? %) "Sin reportes"
@@ -29,20 +28,23 @@
    :dashboard {:edit-panel "Modificar Panel"
                :fullscreen-panel "Maximizar/Minimizar"
                :remove-panel "Quitar Panel"
-               :select-cube "Seleccione un cubo para el reporte"}
+               :select-cube "Seleccione un cubo para el reporte"
+               :saved "Dashboard guardado correctamente"
+               :share-disabled "<b>Compartir deshabilitado</b><br/>Debe guardar el dashboard antes de poder compartirlo."
+               :share-hint "Este link es una referencia de sólo lectura a su dashboard. Cualquier cambio posterior será visible por los usuarios que posean en el link."}
    :reports {:title "Reportes"
              :subtitle "Administrar reportes"
              :recent "Reportes Recientes"
              :missing "No has creado ningún reporte todavía. Seleccioná un cubo para crear uno y luego guardalo para que aparezca aquí."
              :name "Nombre"
              :description "Descripción"
-             :dashboards "Mostrar en Dashboards"
              :updated-at "Última actualización"
              :saved "Reporte guardado correctamente"
              :deleted "Reporte '{1}' eliminado correctamente"
              :unauthorized "Oops! Este reporte ya no está disponible."
              :download-csv "Descargar en formato CSV"
-             :new "Nuevo Reporte"}
+             :new "Nuevo Reporte"
+             :share-hint "Este link es una copia de su reporte. Cualquier cambio posterior no se verá reflejado en el reporte compartido."}
    :designer {:dimensions "Dimensiones"
               :measures "Métricas"
               :filters "Filtros"
@@ -95,8 +97,7 @@
    :share {:title "Compartir"
            :label "Link para compartir"
            :copy "Copiar"
-           :copied "Link copiado!"
-           :report-hint "Este link es una copia de su reporte. Cualquier cambio posterior no se verá reflejado en el reporte compartido."}
+           :copied "Link copiado!"}
    :raw-data {:menu "Ver datos desagregados"
               :title "Datos Desagregados"
               :showing "Primeros {1} eventos según filtro: "

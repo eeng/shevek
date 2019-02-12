@@ -55,7 +55,7 @@
 
 (defn tooltip [content & [{:as opts}]]
   (let [opts (->> opts
-                  (merge {:content content :variation "small inverted"
+                  (merge {:html content :variation "small inverted"
                           :position "top center" :prefer "opposite"
                           :delay {:show 250}})
                   clj->js)]

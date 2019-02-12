@@ -15,7 +15,6 @@
                 :subtitle "Manage your dashboards"
                 :search-hint "Filter by name or description"
                 :missing "You have no dashboards yet."
-                :saved "Dashboard saved!"
                 :deleted "Dashboard '{1}' deleted!"
                 :updated-at "Last updated"
                 :new "New Dashboard"
@@ -25,20 +24,23 @@
    :dashboard {:edit-panel "Edit Panel"
                :fullscreen-panel "Toggle Fullscreen"
                :remove-panel "Remove Panel"
-               :select-cube "Select a cube for the report"}
+               :select-cube "Select a cube for the report"
+               :saved "Dashboard saved!"
+               :share-disabled "<b>Sharing is disabled</b><br/>You must first save the dashboard in order to be able to share it."
+               :share-hint "This link is a read-only reference to your dashboard. Any changes you make after sharing it, will be visible by the users who have the link."}
    :reports {:title "Reports"
              :subtitle "Manage your reports"
              :recent "Recent Reports"
              :missing "You haven't created any reports yet. Click on a cube to design a new one and then save it."
              :name "Name"
              :description "Description"
-             :dashboards "Pin in Dashboards"
              :updated-at "Last updated"
              :saved "Report saved!"
              :deleted "Report '{1}' deleted!"
              :unauthorized "Oops! This report is no longer available."
              :download-csv "Download as CSV"
-             :new "New Report"}
+             :new "New Report"
+             :share-hint "This is a point-in-time snapshot of your report. Any changes made afterward, will not be reflected on shared report."}
    :designer {:dimensions "Dimensions"
               :measures "Measures"
               :filters "Filters"
@@ -93,8 +95,7 @@
    :share {:title "Share"
            :label "Link to share"
            :copy "Copy"
-           :copied "Link copied!"
-           :report-hint "This is a point-in-time snapshot of your report. Any changes made afterward, will not be reflected on shared report."}
+           :copied "Link copied!"}
    :raw-data {:title "Raw Event Data"
               :showing "Showing the first {1} events matching: "
               :button "Raw Data"}

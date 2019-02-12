@@ -8,6 +8,7 @@
             [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
             [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
+            [shevek.pages.dashboards.actions.share :refer [share-button]]
             [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
@@ -159,7 +160,8 @@
             :right [:<>
                     [add-panel-button]
                     [:div.divider]
-                    [save-button dashboard]]}]
+                    [save-button dashboard]
+                    [share-button dashboard]]}]
    child])
 
 (defn page []

@@ -4,18 +4,8 @@
             [shevek.components.popup :refer [tooltip]]
             [shevek.components.modal :refer [show-modal close-modal]]
             [shevek.components.notification :refer [notify]]
-            [shevek.rpc :as rpc]
-            [cljsjs.clipboard]))
-
-(defn clipboard-button [button]
-  (let [clipboard-atom (atom nil)]
-    (r/create-class
-     {:component-did-mount #(let [clipboard (new js/Clipboard (r/dom-node %))]
-                              (reset! clipboard-atom clipboard))
-      :component-will-unmount #(when @clipboard-atom
-                                 (.destroy @clipboard-atom)
-                                 (reset! clipboard-atom nil))
-      :reagent-render (fn [] button)})))
+            [shevek.components.clipboard :refer [clipboard-button]]
+            [shevek.rpc :as rpc]))
 
 (defn generate-share-url [report url]
   (rpc/call "reports/share-url" :args [report] :handler #(reset! url %)))
@@ -39,11 +29,11 @@
                            (notify (t :share/copied))
                            (js/setTimeout close-modal 100))}
              (t :share/copy)]]]]]
-        [:div.tip.top.spaced (t :share/report-hint)]]])))
+        [:div.tip.top.spaced (t :reports/share-hint)]]])))
 
 (defn share-button [report]
   [:button.ui.default.icon.button
-   {:on-click #(show-modal [share-dialog report])
+   {:on-click #(show-modal [share-dialog report] {:autofocus false})
     :ref (tooltip (t :share/title))
     :data-tid "share"}
    [:i.share.alternate.icon]])

@@ -13,7 +13,7 @@
 
 (defevh :dashboards/saved [db {:keys [id name] :as dashboard}]
   (set-url (str "/dashboards/" id))
-  (notify (t :dashboards/saved))
+  (notify (t :dashboard/saved))
   (close-modal)
   (-> (update db :current-dashboard merge (dissoc dashboard :panels))
       (rpc/loaded :saving-dashboard)))
