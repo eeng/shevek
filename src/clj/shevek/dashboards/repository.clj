@@ -26,12 +26,12 @@
 
 (defn find-dashboards [db user-id]
   (m/find-all db "dashboards"
-              :where {:user-id user-id}
-              :fields [:name :description :updated-at :user-id]
+              :where {:owner-id user-id}
+              :fields [:name :description :updated-at :owner-id]
               :sort {:name 1}))
 
 (defn delete-dashboards [db user-id]
-  (m/delete-by db "dashboards" {:user-id user-id}))
+  (m/delete-by db "dashboards" {:owner-id user-id}))
 
 ; This implementation probably is going to be slow if a dashboard has many reports but the alternative that is to use the aggregation framework is less clean and hopefully there won't be many reports per dashboard
 (defn find-by-id [db id]

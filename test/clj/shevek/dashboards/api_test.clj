@@ -13,12 +13,12 @@
   (testing "save"
     (it "should set the owner"
       (let [u1 (:id (make! User))]
-        (is (= u1 (:user-id (api/save {:user-id u1} (make Dashboard))))))))
+        (is (= u1 (:owner-id (api/save {:user-id u1} (make Dashboard))))))))
 
   (testing "find-by-id"
     (it "only the author of a dashboard can view it"
       (let [u1 (:id (make! User))
             u2 (:id (make! User))
-            d (:id (make! Dashboard {:user-id u1}))]
+            d (:id (make! Dashboard {:owner-id u1}))]
         (is (submap? {:id d} (api/find-by-id {:user-id u1} d)))
         (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Unauthorized" (api/find-by-id {:user-id u2} d)))))))

@@ -57,6 +57,6 @@
 
   (it "should delete the dashboards"
     (let [{:keys [id]} (make! User)]
-      (make! Dashboard {:user-id id})
+      (make! Dashboard {:owner-id id})
       (delete-user db id)
       (is (= [] (mc/find-maps db "dashboards"))))))

@@ -4,8 +4,6 @@
             [shevek.asserts :refer [submaps? without?]]
             [shevek.dashboards.repository :as r]
             [shevek.db :refer [db]]
-            [shevek.makers :refer [make!]]
-            [shevek.schemas.dashboard :refer [Dashboard]]
             [shevek.lib.mongodb :as m]))
 
 (use-fixtures :once wrap-unit-tests)

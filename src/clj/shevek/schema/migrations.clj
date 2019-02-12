@@ -26,7 +26,7 @@
 
    :20180207170200-owner-id
    (fn [db]
-     (mc/update db "reports" {} {$rename {:user-id "owner-id"}} {:multi true}))})
-
+     (mc/update db "reports" {} {$rename {:user-id "owner-id"}} {:multi true})
+     (mc/update db "dashboards" {} {$rename {:user-id "owner-id"}} {:multi true}))})
 
 #_((migrations :201710220155-expand-interval-to-end-of-day) shevek.db/db)
