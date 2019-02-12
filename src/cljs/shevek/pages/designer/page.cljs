@@ -117,15 +117,24 @@
      (when @requested-report ; Is nil while fetching a report by id
        [designer {:report @requested-report}])]))
 
+(defn- go-back-button []
+  [:button.ui.icon.green.button
+   {:on-click #(.back js/history)
+    :ref (tooltip (t :designer/go-back))
+    :data-tid "go-back"}
+   [:i.reply.icon]])
+
 (defn slave-designer
   "A designer whose report is owned by another component (a dashboard)"
   [{:keys [report] :as props}]
   [:div#designer
    [topbar {:left [report-name (db/get-in [:designer :report] report)]
             :right [:<>
-                    [:button.ui.icon.green.button
-                     {:on-click #(.back js/history)
-                      :ref (tooltip (t :designer/go-back))
-                      :data-tid "go-back"}
-                     [:i.reply.icon]]]}]
+                    [share-button report]
+                    [download-csv-button report (db/get-in [:designer :report-results])]
+                    [:div.divider]
+                    [raw-data-button]
+                    [maximize-button]
+                    [:div.divider]
+                    [go-back-button]]}]
    [designer props]])

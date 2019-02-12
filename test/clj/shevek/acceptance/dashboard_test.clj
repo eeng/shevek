@@ -65,7 +65,7 @@
       (make-wikiticker-cube)
       (let [user (login)
             report (make Report {:name "New Report" :cube "wikiticker" :measures ["count"]})]
-        (make! Dashboard {:user-id (:id user) :name "New Dashboard"
+        (make! Dashboard {:owner-id (:id user) :name "New Dashboard"
                           :panels [{:type "report" :report report :grid-pos {:x 0 :y 0 :w 10 :h 10}}]}))
       (click-tid "sidebar-dashboards")
       (click-text "New Dashboard")
