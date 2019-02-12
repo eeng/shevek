@@ -111,7 +111,7 @@
 (defn- remove-panel-button [{:keys [id]}]
   [:a {:on-click #(dispatch :dashboard/remove-panel id)
        :ref (tooltip (t :dashboard/remove-panel))}
-   [:i.remove.icon]])
+   [:i.trash.icon]])
 
 (defn- dashboard-panel [{:keys [type report] :as panel} & [already-fullscreen?]]
   (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report]
@@ -153,15 +153,14 @@
    [:i.plus.icon]
    (t :dashboards/new-panel)])
 
-(defn- dashboard [{:keys [panels] :as d}]
+(defn- dashboard-container [dashboard child]
   [:div#dashboard
-   [topbar {:left [dashboard-name d]
+   [topbar {:left [dashboard-name dashboard]
             :right [:<>
                     [add-panel-button]
                     [:div.divider]
-                    [save-button d]]}]
-   [:div.body
-    [dashboard-panels panels]]])
+                    [save-button dashboard]]}]
+   child])
 
 (defn page []
   (fetch-cubes) ; The cubes are needed con build the visualization
@@ -169,7 +168,8 @@
     (if (rpc/loading? :current-dashboard)
       [topbar] ; Empty placeholder so it doesn't flicker when switching dashboards
       (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
-            {:keys [report] :as panel} (find-by :id id (db/get-in [:current-dashboard :panels]))]
+            {:keys [panels] :as dashboard} (db/get :current-dashboard)
+            {:keys [report] :as panel} (find-by :id id panels)]
         (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
           (and panel edit)
           [slave-designer {:report report
@@ -177,7 +177,11 @@
                            :on-report-change #(dispatch :dashboard/report-changed % id)}]
 
           (and panel fullscreen)
-          [:div#dashboard [dashboard-panel panel true]]
+          [dashboard-container dashboard
+           [:div.fullscreen-panel
+            [dashboard-panel panel true]]]
 
           :else
-          [dashboard (db/get :current-dashboard)])))))
+          [dashboard-container dashboard
+           [:div.panels
+            [dashboard-panels panels]]])))))

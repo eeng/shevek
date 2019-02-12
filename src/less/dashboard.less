@@ -1,5 +1,12 @@
 #dashboard {
-  .body { padding: .3em .5em }
+  height: 100%;
+  .panels {
+    padding: 3px;
+  }
+  .fullscreen-panel {
+    height: calc(~"100% - 54px");
+    padding: 15px; // Depends on the .panels and ReactGridLayout paddings
+  }
 
   .panel {
     height: 100%;
