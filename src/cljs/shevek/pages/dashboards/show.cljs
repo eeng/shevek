@@ -7,9 +7,11 @@
             [shevek.pages.designer.page :refer [slave-designer]]
             [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
             [shevek.pages.designer.visualization :refer [visualization]]
+            [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
             [shevek.pages.dashboards.actions.share :refer [share-button]]
-            [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
+            [shevek.pages.dashboards.actions.import-dashboard :refer [import-button]]
+            [shevek.pages.dashboards.helpers :refer [modifiable?]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
@@ -17,7 +19,8 @@
             [shevek.lib.collections :refer [detect find-by]]
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.layout :as l :refer [topbar]]
-            [shevek.components.popup :refer [tooltip]]))
+            [shevek.components.popup :refer [tooltip]]
+            [shevek.domain.auth :refer [current-user]]))
 
 (def grid-columns 36)
 
@@ -39,7 +42,9 @@
           (or (not current-dashboard) (not= id (:id current-dashboard))) (init-current-dashboard)))
 
 (defevh :dashboards/new [{:keys [current-dashboard] :as db} query-params]
-  (init-page db nil query-params #(assoc % :current-dashboard {:name (t :dashboards/new) :panels []})))
+  (init-page db nil query-params #(assoc % :current-dashboard {:name (t :dashboards/new)
+                                                               :panels []
+                                                               :owner-id (current-user :id)})))
 
 (defevh :dashboards/show [{:keys [current-dashboard] :as db} id query-params]
   (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
@@ -53,7 +58,7 @@
              :y 999}]
     (assoc pos :w w :h 10)))
 
-(defevh :dashboard/new-panel [{{:keys [panels]} :current-dashboard :as db}]
+(defevh :dashboard/add-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
                    :grid-pos (calculate-new-panel-position panels)
                    :id (->> panels (map :id) (apply max 0) inc)}]
@@ -114,13 +119,14 @@
        :ref (tooltip (t :dashboard/remove-panel))}
    [:i.trash.icon]])
 
-(defn- dashboard-panel [{:keys [type report] :as panel} & [already-fullscreen?]]
-  (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report]
+(defn- dashboard-panel [{:keys [type report] :as panel} dashboard & [{:keys [already-fullscreen?]}]]
+  (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report
+        modifiable? (modifiable? dashboard)]
     [l/panel
      {:title name
-      :actions [[edit-panel-button panel]
+      :actions [(when modifiable? [edit-panel-button panel])
                 [fullscreen-panel-button panel already-fullscreen?]
-                [remove-panel-button panel]]
+                (when modifiable? [remove-panel-button panel])]
       :scrollable true}
      (case type
        "cube-selector" [cube-selector panel]
@@ -128,7 +134,7 @@
 
 (def GridLayout (js/ReactGridLayout.WidthProvider js/ReactGridLayout #js {:measureBeforeMount true}))
 
-(defn- dashboard-panels* [panels animated]
+(defn- dashboard-panels* [{:keys [panels] :as dashboard} animated]
   (let [on-layout-change (fn [layout]
                            (dispatch :dashboard/layout-changed (js->clj layout :keywordize-keys true)))]
     [:> GridLayout {:cols grid-columns
@@ -136,32 +142,39 @@
                     :className (when animated "animated")
                     :draggableHandle ".panel-header"
                     :draggableCancel ".panel-actions"
-                    :onLayoutChange on-layout-change}
+                    :onLayoutChange on-layout-change
+                    :isDraggable (modifiable? dashboard)
+                    :isResizable (modifiable? dashboard)}
      (for [{:keys [id] :as panel} panels]
        [:div {:key id :data-grid (:grid-pos panel)}
-        [dashboard-panel panel]])]))
+        [dashboard-panel panel dashboard]])]))
 
 (defn dashboard-panels
   "Removes the initial animation where all panels are positioned according to the layout"
   []
   (let [animated (r/atom false)]
-    (r/create-class {:reagent-render (fn [panels] [dashboard-panels* panels @animated])
+    (r/create-class {:reagent-render (fn [dashboard] [dashboard-panels* dashboard @animated])
                      :component-did-mount #(reset! animated true)})))
 
 (defn- add-panel-button []
-  [:button.ui.green.button
-   {:on-click #(dispatch :dashboard/new-panel)}
+  [:button.ui.green.labeled.icon.button
+   {:on-click #(dispatch :dashboard/add-panel)}
    [:i.plus.icon]
-   (t :dashboards/new-panel)])
+   (t :dashboard/add-panel)])
 
 (defn- dashboard-container [dashboard child]
   [:div#dashboard
    [topbar {:left [dashboard-name dashboard]
-            :right [:<>
-                    [add-panel-button]
-                    [:div.divider]
-                    [save-button dashboard]
-                    [share-button dashboard]]}]
+            :right (cond
+                     (modifiable? dashboard)
+                     [:<>
+                      [add-panel-button]
+                      [:div.divider]
+                      [save-button dashboard]
+                      [share-button dashboard]]
+
+                     :else
+                     [import-button dashboard])}]
    child])
 
 (defn page []
@@ -181,9 +194,9 @@
           (and panel fullscreen)
           [dashboard-container dashboard
            [:div.fullscreen-panel
-            [dashboard-panel panel true]]]
+            [dashboard-panel panel dashboard {:already-fullscreen? true}]]]
 
           :else
           [dashboard-container dashboard
            [:div.panels
-            [dashboard-panels panels]]])))))
+            [dashboard-panels dashboard]]])))))

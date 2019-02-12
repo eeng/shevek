@@ -11,6 +11,7 @@
     (authorize (= user-id (:owner-id (r/find-by-id db id)))))
   (r/save-report db (assoc report :owner-id user-id)))
 
+; TODO DASHBOARD authorize here
 (defn delete [_ id]
   (r/delete-report db id))
 

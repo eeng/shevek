@@ -7,10 +7,11 @@
 
 (s/defn save [{:keys [user-id]} {:keys [id] :as dashboard} :- Dashboard]
   (when id
+    ; TODO DASHBOARD este find-by-id trae los reports tb q aca no se usan, refactorizar
     (authorize (= user-id (:owner-id (r/find-by-id db id)))))
   (r/save-dashboard db (assoc dashboard :owner-id user-id)))
 
-; TODO authorize here
+; TODO DASHBOARD authorize here
 (defn delete [_ id]
   (r/delete-dashboard db id))
 

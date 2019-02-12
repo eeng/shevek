@@ -18,16 +18,17 @@
                 :deleted "Dashboard '{1}' deleted!"
                 :updated-at "Last updated"
                 :new "New Dashboard"
-                :new-panel "Add Panel"
                 :name "Name"
                 :description "Description"}
-   :dashboard {:edit-panel "Edit Panel"
+   :dashboard {:add-panel "Add Panel"
+               :edit-panel "Edit Panel"
                :fullscreen-panel "Toggle Fullscreen"
                :remove-panel "Remove Panel"
                :select-cube "Select a cube for the report"
                :saved "Dashboard saved!"
                :share-disabled "<b>Sharing is disabled</b><br/>You must first save the dashboard in order to be able to share it."
-               :share-hint "This link is a read-only reference to your dashboard. Any changes you make after sharing it, will be visible by the users who have the link."}
+               :share-hint "This link is a read-only reference to your dashboard. Any changes you make after sharing it, will be visible by the users who have the link."
+               :import "Import Dashboard"}
    :reports {:title "Reports"
              :subtitle "Manage your reports"
              :recent "Recent Reports"

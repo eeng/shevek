@@ -22,16 +22,17 @@
                                  :else "{1} reportes")
                 :updated-at "Última Actualización"
                 :new "Nuevo Dashboard"
-                :new-panel "Agregar Panel"
                 :name "Nombre"
                 :description "Descripción"}
-   :dashboard {:edit-panel "Modificar Panel"
+   :dashboard {:add-panel "Agregar Panel"
+               :edit-panel "Modificar Panel"
                :fullscreen-panel "Maximizar/Minimizar"
                :remove-panel "Quitar Panel"
                :select-cube "Seleccione un cubo para el reporte"
                :saved "Dashboard guardado correctamente"
                :share-disabled "<b>Compartir deshabilitado</b><br/>Debe guardar el dashboard antes de poder compartirlo."
-               :share-hint "Este link es una referencia de sólo lectura a su dashboard. Cualquier cambio posterior será visible por los usuarios que posean en el link."}
+               :share-hint "Este link es una referencia de sólo lectura a su dashboard. Cualquier cambio posterior será visible por los usuarios que posean en el link."
+               :import "Importar Dashboard"}
    :reports {:title "Reportes"
              :subtitle "Administrar reportes"
              :recent "Reportes Recientes"

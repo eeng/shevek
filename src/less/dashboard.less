@@ -16,10 +16,6 @@
     padding: 0;
     margin: 0;
 
-    .panel-header {
-      cursor: move;
-    }
-
     .panel-content {
       // The following lines center the content vertically. Need to use margin auto because centering with justify-content clips the content when is large.
       height: 100%;
@@ -40,6 +36,8 @@
   .react-draggable {
     border: 2px solid @background-color;
     &.react-draggable-dragging, &.resizing { border-color: fade(@secondary-color, 70%); }
+
+    .panel-header { cursor: move; }
   }
 
   .react-grid-placeholder {
