@@ -10,7 +10,7 @@
             [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
             [shevek.pages.dashboards.actions.share :refer [share-button]]
-            [shevek.pages.dashboards.actions.import-dashboard :refer [import-button]]
+            [shevek.pages.dashboards.actions.importd :refer [import-button]]
             [shevek.pages.dashboards.helpers :refer [modifiable?]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]

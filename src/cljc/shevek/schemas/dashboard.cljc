@@ -13,5 +13,6 @@
    (s/optional-key :description) s/Str
    (s/optional-key :panels) [Panel]
    (s/optional-key :owner-id) s/Str
+   (s/optional-key :master-id) s/Str
    (s/optional-key :created-at) s/Any
    (s/optional-key :updated-at) s/Any})

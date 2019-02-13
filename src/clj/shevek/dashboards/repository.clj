@@ -1,7 +1,7 @@
 (ns shevek.dashboards.repository
   (:require [shevek.lib.mongodb :as m]
             [shevek.reports.repository :refer [save-report]]
-            [com.rpl.specter :refer [transform ALL]]))
+            [com.rpl.specter :refer [transform ALL NIL->VECTOR]]))
 
 ; The inverse relation :dashboard-id is used mainly to simplify cascade deletion.
 (defn- save-report-and-keep-id [db dashboard-id {:keys [report] :as panel}]
@@ -13,7 +13,7 @@
 (defn save-dashboard [db dashboard]
   (let [d (m/save db "dashboards" dashboard)]
     (->> d
-         (transform [:panels ALL] (partial save-report-and-keep-id db (:id d)))
+         (transform [:panels NIL->VECTOR ALL] (partial save-report-and-keep-id db (:id d)))
          (m/save db "dashboards"))))
 
 (defn delete-dashboard [db id]
@@ -33,7 +33,17 @@
 (defn delete-dashboards [db user-id]
   (m/delete-by db "dashboards" {:owner-id user-id}))
 
-; This implementation probably is going to be slow if a dashboard has many reports but the alternative that is to use the aggregation framework is less clean and hopefully there won't be many reports per dashboard
 (defn find-by-id [db id]
-  (->> (m/find-by-id db "dashboards" id)
-       (transform [:panels ALL] (partial fetch-report db))))
+  (m/find-by-id db "dashboards" id))
+
+(defn- merge-master-if-slave [db {:keys [master-id] :as dashboard}]
+  (if master-id
+    (let [master (find-by-id db master-id)]
+      (assoc dashboard :panels (master :panels)))
+    dashboard))
+
+; This implementation probably is going to be slow if a dashboard has many reports but the alternative that is to use the aggregation framework is less clean and hopefully there won't be many reports per dashboard
+(defn find-with-relations [db id]
+  (when-let [d (find-by-id db id)]
+    (->> (merge-master-if-slave db d)
+         (transform [:panels ALL] (partial fetch-report db)))))

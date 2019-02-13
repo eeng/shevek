@@ -4,7 +4,7 @@
   {:sessions {:logout "Salir"}
    :home {:menu "Inicio"
           :title "Bienvenido!"
-          :subtitle "Qué le gustaría analizar hoy?"}
+          :subtitle "Qué te gustaría analizar hoy?"}
    :cubes {:title "Cubos"
            :subtitle "Cubos de datos disponibles"
            :name  "Nombre"
@@ -28,11 +28,14 @@
                :edit-panel "Modificar Panel"
                :fullscreen-panel "Maximizar/Minimizar"
                :remove-panel "Quitar Panel"
-               :select-cube "Seleccione un cubo para el reporte"
+               :select-cube "Seleccioná un cubo para el reporte"
                :saved "Dashboard guardado correctamente"
                :share-disabled "<b>Compartir deshabilitado</b><br/>Debe guardar el dashboard antes de poder compartirlo."
                :share-hint "Este link es una referencia de sólo lectura a su dashboard. Cualquier cambio posterior será visible por los usuarios que posean en el link."
-               :import "Importar Dashboard"}
+               :import "Importar Dashboard"
+               :import-desc "Permite incorporar este dashboard a los tuyos, como un espejo del original. Esto quiere decir que cualquier cambio que el propietario original realice sobre el dashboard se verá reflejado en tu copia."
+               :import-name "Podés darle otro nombre aquí"
+               :imported "Dashboard importado!"}
    :reports {:title "Reportes"
              :subtitle "Administrar reportes"
              :recent "Reportes Recientes"
@@ -61,7 +64,7 @@
               :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
               :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"
               :chart-with-second-split-on-rows "Debe colocar el segundo split en las columnas para poder generar el gráfico"
-              :unauthorized "Parece que el cubo {1} ya no está disponible. Por favor, contacte al administrador."
+              :unauthorized "Parece que el cubo {1} ya no está disponible. Por favor, contactá al administrador para más información."
               :maximize "Maximizar panel de resultados"
               :minimize "Minimizar panel de resultados"
               :grand-total "Total General"
@@ -137,7 +140,7 @@
            :invalid-credentials "Usuario y/o password incorrecto"
            :session-expired "Sesión expirada, por favor ingrese nuevamente"
            :password-hint "Dejar en blanco para no cambiarlo"
-           :unauthorized "Ud. no tiene acceso a esta página. Por favor, contacte al administrador para más información."
+           :unauthorized "No tenés acceso a esta página. Por favor, contactá al administrador para más información."
            :basic-info "Información Básica"
            :permissions "Permisos"
            :search-hint "Filtrar por usuario o nombre"
@@ -149,7 +152,7 @@
                  :only-cubes-selected "Puede ver sólo los siguientes cubos"
                  :all-measures "Todas las métricas serán visibles"
                  :only-measures-selected "Sólo las siguientes métricas serán visibles"
-                 :select-measures "Por favor seleccion las métricas permitidas"
+                 :select-measures "Seleccioná las métricas permitidas"
                  :no-measures "Ninguna"
                  :add-filter "Agregar Filtro"}
    :date-formats {:second "dd/MM/yyyy HH:mm:ss"
@@ -177,6 +180,7 @@
              :confirm "Confirmar"
              :manage "Gestionar"
              :refresh "Refrescar"
+             :import "Importar"
              :double-click-edit "Double click para editar"}
    :validation {:required "este campo es obligatorio"
                 :email "no es una dirección válida"

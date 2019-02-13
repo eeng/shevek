@@ -29,12 +29,6 @@
     (r/save-dashboard db {:name "D" :panels [{:report {:name "R"}}]})
     (is (without? :owner-id (m/find-last db "reports")))))
 
-(deftest find-by-id-tests
-  (it "should fetch the reports"
-    (let [d (r/save-dashboard db {:panels [{:report {:name "R1"}} {:report {:name "R2"}}]})]
-      (is (submaps? [{:name "R1"} {:name "R2"}]
-                    (->> (r/find-by-id db (:id d)) :panels (map :report)))))))
-
 (deftest delete-dashboard-tests
   (it "should remove the dashboard and its reports"
     (let [d1 (r/save-dashboard db {:name "D1" :panels [{:report {:name "R1"}}]})]

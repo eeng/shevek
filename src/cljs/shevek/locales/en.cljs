@@ -28,7 +28,10 @@
                :saved "Dashboard saved!"
                :share-disabled "<b>Sharing is disabled</b><br/>You must first save the dashboard in order to be able to share it."
                :share-hint "This link is a read-only reference to your dashboard. Any changes you make after sharing it, will be visible by the users who have the link."
-               :import "Import Dashboard"}
+               :import "Import Dashboard"
+               :import-desc "This allows you to store this dashboard alongside your own. A link is saved, so every change made to the dashboard by the original owner will be reflected in yours. Also, you will not be able to modify it, unless you make a copy afterwards."
+               :import-name "Give it another name if you like"
+               :imported "Dashboard imported!"}
    :reports {:title "Reports"
              :subtitle "Manage your reports"
              :recent "Recent Reports"
@@ -180,6 +183,7 @@
              :confirm "Confirm"
              :manage "Manage"
              :refresh "Refresh"
+             :import "Import"
              :double-click-edit "Double click to edit"}
    :validation {:required "can't be blank"
                 :regex "doesn't match pattern"

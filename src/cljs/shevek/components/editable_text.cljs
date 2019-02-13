@@ -17,7 +17,7 @@
               :value @value
               :auto-focus true
               :on-change #(reset! value (.-target.value %))
-              ; :on-blur save
+              :on-blur save
               :on-key-down #(case (.-which %)
                               13 (save)
                               27 (stop)
