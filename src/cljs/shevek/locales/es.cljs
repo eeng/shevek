@@ -33,10 +33,12 @@
                :share-disabled "<b>Compartir deshabilitado</b><br/>Debe guardar el dashboard antes de poder compartirlo."
                :share-hint "Este link es una referencia de sólo lectura a su dashboard. Cualquier cambio posterior será visible por los usuarios que posean en el link."
                :import "Importar Dashboard"
-               :import-desc "Permite incorporar este dashboard a los tuyos, como un espejo del original. Esto quiere decir que cualquier cambio que el propietario original realice sobre el dashboard se verá reflejado en tu copia."
+               :import-as-link "Importar como Link"
+               :import-as-link-desc "El dashboard se guardará como un link al original. Cualquier cambio que el propietario realice sobre el original se verá reflejado en tu copia, pero no podrás realizar modificaciones."
+               :import-as-copy "Importar como Copia"
+               :import-as-copy-desc "Genera una copia completa del dashboard, lo cual te permitirá hacerle modificaciones. No recibirás actualizaciones posteriores realizadas sobre dashboard original."
                :import-name "Podés darle otro nombre aquí"
-               :imported "Dashboard importado!"
-               :duplicate-slave-desc "Genera una copia completa del dashboard, lo cual permitirá hacerle modificaciones. Tener en cuenta que se perderá la referencia al dashboard original."}
+               :imported "Dashboard importado!"}
    :reports {:title "Reportes"
              :subtitle "Administrar reportes"
              :recent "Reportes Recientes"
@@ -182,8 +184,7 @@
              :manage "Gestionar"
              :refresh "Refrescar"
              :import "Importar"
-             :double-click-edit "Double click para editar"
-             :duplicate "Duplicar"}
+             :double-click-edit "Double click para editar"}
    :validation {:required "este campo es obligatorio"
                 :email "no es una dirección válida"
                 :password "debería tener al menos 7 letras y números (o símbolos)"

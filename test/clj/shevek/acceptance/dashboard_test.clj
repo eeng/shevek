@@ -1,6 +1,6 @@
 (ns shevek.acceptance.dashboard-test
   (:require [clojure.test :refer [deftest use-fixtures is]]
-            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests click has-css? has-no-css? it has-title? has-text? login visit click-tid fill wait-exists refresh element-value refresh click-text double-click]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests click has-css? has-no-css? it has-title? has-text? login visit click-tid fill wait-exists refresh element-value refresh click-text double-click has-no-text?]]
             [shevek.support.druid :refer [with-fake-druid query-req-matching druid-res]]
             [shevek.support.designer :refer [make-wikiticker-cube]]
             [shevek.makers :refer [make make!]]
@@ -85,4 +85,43 @@
 
       (refresh)
       (is (has-css? ".panel" :text "SuperReport"))
-      (is (has-css? ".topbar-header" :text "MegaDash")))))
+      (is (has-css? ".topbar-header" :text "MegaDash"))))
+
+  ; TODO if we had text panels, these test wouldn't require the fake-druid
+  (it "sharing a dashboard as a link"
+    (with-fake-druid
+      {(query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}
+      (make-wikiticker-cube)
+      (let [u1 (login {:username "u1"})
+            report (make Report {:name "R1" :cube "wikiticker" :measures ["count"]})
+            master (make! Dashboard {:owner-id (:id u1) :name "MasterDash"
+                                     :panels [{:type "report" :report report}]})]
+        (visit (str "/dashboards/" (:id master)))
+        (click-tid "share")
+        (is (has-css? ".modal .header" :text "Share"))
+        (click-text "Copy")
+        (is (has-css? "#notification" :text "Link copied!"))
+
+        (login {:username "u2"})
+        (is (has-no-text? "MasterDash"))
+        (visit (str "/dashboards/" (:id master)))
+        (is (has-text? "MasterDash"))
+        (click-text "Import Dashboard")
+        (is (has-css? ".modal.visible .header" :text "Import Dashboard"))
+        (fill {:name "name"} "LinkedDash" k/enter)
+        (is (has-css? "#notification" :text "Dashboard imported!"))
+        (is (has-text? "LinkedDash"))
+        (is (has-css? ".panel" :text "R1"))
+        (is (has-no-text? "Add Panel"))
+
+        (login {:username "u1"})
+        (is (has-no-text? "LinkedDash"))
+        (click-text "MasterDash")
+        (click-text "Add Panel")
+        (click-text "Wikiticker")
+        (click-tid "save")
+        (is (has-css? "#notification" :text "Dashboard saved!"))
+
+        (login {:username "u2"})
+        (click-text "LinkedDash")
+        (is (has-css? ".panel" :count 2))))))

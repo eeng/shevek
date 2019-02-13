@@ -9,7 +9,6 @@
             [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
-            [shevek.pages.dashboards.actions.duplicate :refer [duplicate-button]]
             [shevek.pages.dashboards.actions.share :refer [share-button]]
             [shevek.pages.dashboards.actions.importd :refer [import-button]]
             [shevek.pages.dashboards.helpers :refer [modifiable? mine? master?]]
@@ -24,6 +23,7 @@
             [shevek.domain.auth :refer [current-user]]))
 
 (def grid-columns 36)
+(def default-grid-pos {:x 0 :y 0 :w (/ grid-columns 3) :h 10})
 
 (defn- set-panels-ids [db dashboard]
   (let [update-panels #(for [[id panel] (map-indexed vector %)]
@@ -51,13 +51,13 @@
   (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
 
 (defn- calculate-new-panel-position [panels]
-  (let [w (/ grid-columns 3)
+  (let [w (:w default-grid-pos)
         last-pos (or (-> panels last :grid-pos)
                      {:x 0 :w 0})
         pos {:x (let [x (+ (:x last-pos) (:w last-pos))]
                   (if (> (+ x w) grid-columns) 0 x))
              :y 999}]
-    (assoc pos :w w :h 10)))
+    (assoc pos :w w :h (:h default-grid-pos))))
 
 (defevh :dashboard/add-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
@@ -146,8 +146,10 @@
                     :onLayoutChange on-layout-change
                     :isDraggable (modifiable? dashboard)
                     :isResizable (modifiable? dashboard)}
-     (for [{:keys [id] :as panel} panels]
-       [:div {:key id :data-grid (:grid-pos panel)}
+     (for [[idx {:keys [id] :as panel}] (map-indexed vector panels)
+           ; Normally panels should have a grid-pos but during testing we usually create them without it
+           :let [default-grid-pos (assoc default-grid-pos :x (* idx (:w default-grid-pos)))]]
+       [:div {:key id :data-grid (get panel :grid-pos default-grid-pos)}
         [dashboard-panel panel dashboard]])]))
 
 (defn dashboard-panels
@@ -177,8 +179,8 @@
                      (and (master? dashboard) (not (mine? dashboard)))
                      [import-button dashboard]
 
-                     :else ; slave
-                     [duplicate-button dashboard])}]
+                     :else ; TODO add some buttons for the slaves
+                     nil)}]
    child])
 
 (defn page []

@@ -18,9 +18,7 @@
 (defn topbar [{:keys [left right]}]
   [:div.topbar
    [:div.left left]
-   [:div.right right
-    (when (and (not left) (not right))
-      [:button.ui.button.placeholder])]])
+   [:div.right right]])
 
 (defn simple-bar [content]
   [:div.scrollable {:data-simplebar true}

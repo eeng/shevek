@@ -9,22 +9,40 @@
 
 (defn- send-import-request [{:keys [id]} form-data]
   (rpc/call "dashboards/import"
-            :args [(assoc form-data :master-id id)]
+            :args [(assoc form-data :original-id id)]
             :handler (fn [new-dash]
                         (navigate (str "/dashboards/" (:id new-dash)))
                         (notify (t :dashboard/imported))))
   (close-modal))
 
-(defn- import-dialog [dashboard]
-  (r/with-let [form-data (r/atom (select-keys dashboard [:name :description]))
+(defn- info-message [text]
+  [:div.ui.icon.message
+   [:i.info.circle.small.icon]
+   [:div.content text]])
+
+(defn- import-dialog [{:keys [name] :as dashboard}]
+  (r/with-let [form-data (r/atom {:name name :import-as "link"})
                valid? #(seq (:name @form-data))
                save #(when (valid?)
                        (send-import-request dashboard @form-data))
-               shortcuts (kb-shortcuts :enter save)]
+               shortcuts (kb-shortcuts :enter save)
+               active-for #(when (= (:import-as @form-data) %) "active")]
     [:div.ui.tiny.modal
      [:div.header (t :dashboard/import)]
+
      [:div.content
-      [:p (t :dashboard/import-desc)]
+      [:div.ui.secondary.menu
+       [:a.item {:class (active-for "link") :on-click #(swap! form-data assoc :import-as "link")}
+        [:i.linkify.icon]
+        (t :dashboard/import-as-link)]
+       [:a.item {:class (active-for "copy") :on-click #(swap! form-data assoc :import-as "copy")}
+        [:i.copy.icon]
+        (t :dashboard/import-as-copy)]]
+      [:div.ui.tab {:class (active-for "link")}
+       [info-message (t :dashboard/import-as-link-desc)]]
+      [:div.ui.tab {:class (active-for "copy")}
+       [info-message (t :dashboard/import-as-copy-desc)]]
+      [:div.ui.hidden.divider]
       [:div.ui.form {:ref shortcuts}
        [input-field form-data :name {:label (t :dashboard/import-name)
                                      :auto-focus true

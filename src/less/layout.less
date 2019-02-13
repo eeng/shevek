@@ -35,16 +35,6 @@ body {
     }
   }
 
-  @sidebar-width: 59px;
-  #sidebar:not(.compact) + .page-container {
-    margin-left: @sidebar-width;
-  }
-  #sidebar.compact + .page-container {
-    .topbar {
-      .left { margin-left: @sidebar-width; }
-    }
-  }
-
   .page-container {
     flex: 1;
 
@@ -61,6 +51,7 @@ body {
       display: flex;
       justify-content: space-between;
       padding: .5em;
+      height: 50px; // Keep always the same height even when there are no buttons
 
       .left, .right {
         align-self: center;
@@ -111,15 +102,20 @@ body {
         display: inline-block;
         width: .5em;
       }
-
-      .placeholder {
-        opacity: 0;
-        &::after { content: "." }
-      }
     }
 
     .page-footer {
       padding: 1rem;
+    }
+  }
+
+  @sidebar-width: 59px;
+  #sidebar:not(.compact) + .page-container {
+    margin-left: @sidebar-width;
+  }
+  #sidebar.compact + .page-container {
+    .topbar {
+      .left { margin-left: @sidebar-width; }
     }
   }
 }

@@ -140,9 +140,10 @@
   (apply e/drag-and-drop page args))
 
 (defn login
-  ([] (login {:username "user" :fullname "User" :password "secret666"}))
-  ([{:keys [username password] :as user}]
-   (let [user (or (users/find-by-username db username)
+  ([] (login {:username "user" :fullname "User"}))
+  ([{:keys [username password] :or {password "secret666"} :as user}]
+   (let [user (merge {:password password} user)
+         user (or (users/find-by-username db username)
                   (make! User user))]
      (e/js-execute page "try { localStorage.clear() } catch (e) {}") ; Clear session
      (visit "/")
@@ -154,7 +155,7 @@
      user)))
 
 (defn login-admin []
-  (login {:username "adm" :fullname "Admin" :password "secret666" :admin true}))
+  (login {:username "adm" :fullname "Admin" :admin true}))
 
 #_(start-system)
 #_(stop-system)
