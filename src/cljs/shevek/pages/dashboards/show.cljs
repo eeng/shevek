@@ -9,9 +9,10 @@
             [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
+            [shevek.pages.dashboards.actions.duplicate :refer [duplicate-button]]
             [shevek.pages.dashboards.actions.share :refer [share-button]]
             [shevek.pages.dashboards.actions.importd :refer [import-button]]
-            [shevek.pages.dashboards.helpers :refer [modifiable?]]
+            [shevek.pages.dashboards.helpers :refer [modifiable? mine? master?]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
@@ -173,8 +174,11 @@
                       [save-button dashboard]
                       [share-button dashboard]]
 
-                     :else
-                     [import-button dashboard])}]
+                     (and (master? dashboard) (not (mine? dashboard)))
+                     [import-button dashboard]
+
+                     :else ; slave
+                     [duplicate-button dashboard])}]
    child])
 
 (defn page []

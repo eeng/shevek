@@ -35,7 +35,8 @@
                :import "Importar Dashboard"
                :import-desc "Permite incorporar este dashboard a los tuyos, como un espejo del original. Esto quiere decir que cualquier cambio que el propietario original realice sobre el dashboard se verá reflejado en tu copia."
                :import-name "Podés darle otro nombre aquí"
-               :imported "Dashboard importado!"}
+               :imported "Dashboard importado!"
+               :duplicate-slave-desc "Genera una copia completa del dashboard, lo cual permitirá hacerle modificaciones. Tener en cuenta que se perderá la referencia al dashboard original."}
    :reports {:title "Reportes"
              :subtitle "Administrar reportes"
              :recent "Reportes Recientes"
@@ -181,7 +182,8 @@
              :manage "Gestionar"
              :refresh "Refrescar"
              :import "Importar"
-             :double-click-edit "Double click para editar"}
+             :double-click-edit "Double click para editar"
+             :duplicate "Duplicar"}
    :validation {:required "este campo es obligatorio"
                 :email "no es una dirección válida"
                 :password "debería tener al menos 7 letras y números (o símbolos)"

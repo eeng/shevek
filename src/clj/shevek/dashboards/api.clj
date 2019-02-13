@@ -6,7 +6,8 @@
             [shevek.lib.auth :refer [authorize]])
   (:refer-clojure :exclude [import]))
 
-(s/defn save [{:keys [user-id]} {:keys [id] :as dashboard} :- Dashboard]
+(s/defn save [{:keys [user-id]} {:keys [id master-id] :as dashboard} :- Dashboard]
+  {:pre [(not master-id)]} ; Slaves can't be saved (no pun intented :-)
   (when id
     (authorize (= user-id (:owner-id (r/find-by-id db id)))))
   (r/save-dashboard db (assoc dashboard :owner-id user-id)))
