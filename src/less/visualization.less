@@ -16,6 +16,20 @@
   }
 
   .visualization {
+    .ui.corner.label {
+      border-color: #e8e8e873;
+
+      transition: opacity .2s ease-in-out;
+      &.hideme { opacity: 0 }
+
+      // Make the icon a little smaller
+      i {
+        font-size: 1em;
+        top: .8em;
+        left: .9em;
+      }
+    }
+
     .icon-hint, .statistics { padding: 40px }
     .statistics {
       justify-content: center;
@@ -23,6 +37,7 @@
     }
 
     .pivot-table {
+      margin: 0;
       th, td { white-space: nowrap; }
       th:first-child, td:first-child { padding-left: 0.5em; }
       th:last-child, td:last-child { padding-right: 0.5em }

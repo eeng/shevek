@@ -8,10 +8,17 @@
             [shevek.pages.designer.visualizations.pivot-table :refer [table-visualization]]
             [shevek.pages.designer.visualizations.chart :refer [chart-visualization]]))
 
-(defn visualization [results {:keys [cube] :as report}]
+(defn refreshing-indicator [{:keys [refreshing?] :or {refreshing? (constantly false)}}]
+  [:div.ui.right.corner.label
+   {:class (when-not (refreshing?) "hideme")}
+   [:i.sync.loading.icon]])
+
+(defn visualization [results {:keys [cube] :as report} & [opts]]
   (when (and results (get-cube cube)) ; Results are nil until query finish, and the cube could not exists yet when the user loads the page
     (let [{:keys [results measures viztype splits] :as viz} (build-visualization results report)]
       [:div.visualization {:class viztype}
+       [refreshing-indicator opts]
+
        (cond
          (empty? measures)
          [warning (t :designer/no-measures)]
