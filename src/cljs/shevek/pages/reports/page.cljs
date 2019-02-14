@@ -28,7 +28,7 @@
                                 (navigate "/reports/" id))}
    [:td name]
    [:td description]
-   [:td (format-time updated-at :day)]
+   [:td.single.line (format-time updated-at :day)]
    [:td.actions
     [:button.ui.inverted.compact.circular.secondary.icon.button
      {:on-click #(open-save-as-dialog {:report report :after-save (fn [] (dispatch :reports/fetch))})}

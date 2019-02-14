@@ -24,7 +24,7 @@
             [shevek.domain.auth :refer [current-user mine?]]))
 
 (def grid-columns 36)
-(def default-grid-pos {:x 0 :y 0 :w (/ grid-columns 3) :h 10})
+(def first-grid-pos {:x 0 :y 0 :w (/ grid-columns 3) :h 10})
 
 (defn- set-panels-ids [db dashboard]
   (let [update-panels #(for [[id panel] (map-indexed vector %)]
@@ -52,13 +52,13 @@
   (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
 
 (defn- calculate-new-panel-position [panels]
-  (let [w (:w default-grid-pos)
+  (let [w (:w first-grid-pos)
         last-pos (or (-> panels last :grid-pos)
                      {:x 0 :w 0})
         pos {:x (let [x (+ (:x last-pos) (:w last-pos))]
                   (if (> (+ x w) grid-columns) 0 x))
              :y 999}]
-    (assoc pos :w w :h (:h default-grid-pos))))
+    (assoc pos :w w :h (:h first-grid-pos))))
 
 (defevh :dashboard/add-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
@@ -130,6 +130,14 @@
        "cube-selector" [cube-selector panel]
        "report" [report-visualization panel])]))
 
+; Normally panels should have a grid-pos but during testing we usually create them without it.
+; Also, the grid-pos was added after some user's dashboards already existed, so this could would have been alternately on a migration
+(defn- calculate-default-grid-pos [idx]
+  (let [x (* idx (:w first-grid-pos))]
+    (assoc first-grid-pos
+           :x (mod x grid-columns)
+           :y (Math/floor (/ x grid-columns)))))
+
 (def GridLayout (js/ReactGridLayout.WidthProvider js/ReactGridLayout #js {:measureBeforeMount true}))
 
 (defn- dashboard-panels* [{:keys [panels] :as dashboard} animated]
@@ -143,10 +151,8 @@
                     :onLayoutChange on-layout-change
                     :isDraggable (modifiable? dashboard)
                     :isResizable (modifiable? dashboard)}
-     (for [[idx {:keys [id] :as panel}] (map-indexed vector panels)
-           ; Normally panels should have a grid-pos but during testing we usually create them without it
-           :let [default-grid-pos (assoc default-grid-pos :x (* idx (:w default-grid-pos)))]]
-       [:div {:key id :data-grid (get panel :grid-pos default-grid-pos)}
+     (for [[idx {:keys [id] :as panel}] (map-indexed vector panels)]
+       [:div {:key id :data-grid (get panel :grid-pos (calculate-default-grid-pos idx))}
         [dashboard-panel panel dashboard]])]))
 
 (defn dashboard-panels

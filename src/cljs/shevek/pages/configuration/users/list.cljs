@@ -54,8 +54,9 @@
   [:tr
    [:td [avatar user]]
    [:td username]
-   [:td fullname]
-   [:td (when (seq email) (mail-to email))]
+   [:td
+    [:div fullname]
+    (when (seq email) (mail-to email))]
    [:td (if admin
           [:div.extra
            [:div.ui.blue.label "Admin"]]
@@ -88,7 +89,6 @@
             [:th]
             [:th (t :users/username)]
             [:th (t :users/fullname)]
-            [:th (t :users/email)]
             [:th (t :users/permissions)]
             [:th.center.aligned.collapsing (t :actions/header)]]
            [:tbody

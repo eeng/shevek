@@ -27,7 +27,7 @@
                                 (navigate "/dashboards/" id))}
    [:td name]
    [:td description]
-   [:td (format-time updated-at :day)]
+   [:td.single.line (format-time updated-at :day)]
    [:td.actions
     [with-confirm
      [:button.ui.inverted.compact.circular.red.icon.button

@@ -20,10 +20,12 @@
                               :js-opts {:borderWidth 2}}
                   :line-chart {:js-type "line"
                                :background-alpha "22"
-                               :js-opts {:borderWidth 2 :pointRadius 2}}
+                               :legend-position "bottom"
+                               :js-opts {:borderWidth 2 :pointRadius 1}}
                   :pie-chart {:js-type "pie"
                               :background-alpha "CC"
                               :hover-alpha "EE"
+                              :legend-position "right"
                               :js-opts {:borderWidth 2}}})
 
 (defn- build-data [measure results viztype]
@@ -95,7 +97,7 @@
         show-legend? (or (> (count splits) 1)
                          (= viztype :pie-chart))]
     (cond-> {:title {:display true :text chart-title}
-             :legend {:display show-legend? :position "right"}
+             :legend {:display show-legend? :position (:legend-position (chart-types viztype))}
              :maintainAspectRatio false
              :tooltips {:callbacks {:label (partial tooltip-label measure) :title (partial tooltip-title viztype)}}}
             (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))))
