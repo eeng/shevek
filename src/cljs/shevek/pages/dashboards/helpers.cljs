@@ -1,8 +1,5 @@
 (ns shevek.pages.dashboards.helpers
-  (:require [shevek.domain.auth :refer [current-user]]))
-
-(defn mine? [{:keys [owner-id]}]
-  (= owner-id (current-user :id)))
+  (:require [shevek.domain.auth :refer [mine?]]))
 
 (defn slave? [{:keys [master-id]}]
   (some? master-id))

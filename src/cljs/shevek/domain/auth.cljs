@@ -9,3 +9,6 @@
 
 (defn admin? []
   (current-user :admin))
+
+(defn mine? [{:keys [owner-id]}]
+  (= owner-id (current-user :id)))

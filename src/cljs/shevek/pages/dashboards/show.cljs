@@ -12,7 +12,7 @@
             [shevek.pages.dashboards.actions.share :refer [share-button]]
             [shevek.pages.dashboards.actions.refresh :refer [refresh-button]]
             [shevek.pages.dashboards.actions.importd :refer [import-button]]
-            [shevek.pages.dashboards.helpers :refer [modifiable? mine? master?]]
+            [shevek.pages.dashboards.helpers :refer [modifiable? master?]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
@@ -21,7 +21,7 @@
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.layout :as l :refer [topbar]]
             [shevek.components.popup :refer [tooltip]]
-            [shevek.domain.auth :refer [current-user]]))
+            [shevek.domain.auth :refer [current-user mine?]]))
 
 (def grid-columns 36)
 (def default-grid-pos {:x 0 :y 0 :w (/ grid-columns 3) :h 10})
