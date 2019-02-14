@@ -10,6 +10,7 @@
             [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
             [shevek.pages.dashboards.actions.share :refer [share-button]]
+            [shevek.pages.dashboards.actions.refresh :refer [refresh-button]]
             [shevek.pages.dashboards.actions.importd :refer [import-button]]
             [shevek.pages.dashboards.helpers :refer [modifiable? mine? master?]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
@@ -87,10 +88,6 @@
 
 (defevh :dashboard/report-query [db report panel-id]
   (send-report-query db report [:current-dashboard :reports-results panel-id]))
-
-(defevh :dashboard/refresh [db]
-  (console.log "TODO dashboard refresh")
-  db)
 
 (defn- report-visualization [{:keys [report id]}]
   (dispatch :dashboard/report-query report id)
@@ -174,13 +171,18 @@
                       [add-panel-button]
                       [:div.divider]
                       [save-button dashboard]
-                      [share-button dashboard]]
+                      [share-button dashboard]
+                      [:div.divider]
+                      [refresh-button]]
 
                      (and (master? dashboard) (not (mine? dashboard)))
-                     [import-button dashboard]
+                     [:<>
+                      [import-button dashboard]
+                      [:div.divider]
+                      [refresh-button]]
 
-                     :else ; TODO add some buttons for the slaves
-                     nil)}]
+                     :else ; slave
+                     [refresh-button])}]
    child])
 
 (defn page []

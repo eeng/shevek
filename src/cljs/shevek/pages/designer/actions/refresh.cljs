@@ -16,7 +16,7 @@
         (send-pinboard-queries))))
 
 (defevh :designer/refresh [db]
-  (when-not (rpc/loading?)
+  (when-not (rpc/loading?) ; Do not refresh again if there is a slow query still running
     (let [cube (get-in db [:designer :report :cube])]
       (rpc/call "schema/max-time" :args [cube] :handler #(dispatch :designer/max-time-arrived cube %)))))
 
@@ -30,7 +30,7 @@
   (when (and every (pos? every))
     (reset! auto-refresh-interval (js/setInterval on-refresh (* 1000 every)))))
 
-(defn- popup-content [every on-refresh]
+(defn- popup-content [every {:keys [on-refresh loading?]}]
   [:div#settings-popup.ui.form
    [:div.field
     [:label (t :preferences/refresh-every)]
@@ -42,19 +42,22 @@
                     (close-popup))}]]
    [:button.ui.fluid.primary.button
     {:on-click on-refresh
-     :class (when (rpc/loading? [:designer :report-results]) "loading disabled")}
+     :class (when (loading?) "loading disabled")}
     (t :preferences/refresh-now)]])
 
-(defn refresh-button []
-  (r/with-let [on-refresh #(dispatch :designer/refresh)
-               _ (set-auto-refresh-interval! (db/get-in [:preferences :auto-refresh]) on-refresh)]
+(defn refresh-button [{:keys [on-refresh loading?]
+                       :or {on-refresh #(dispatch :designer/refresh)
+                            loading? #(rpc/loading? [:designer :report-results])}}]
+  (r/with-let [_ (set-auto-refresh-interval! (db/get-in [:preferences :auto-refresh]) on-refresh)]
     (let [every (db/get-in [:preferences :auto-refresh])] ; Repetead to get the updated value when the user changes it
       [:button.ui.default.icon.button
-       {:on-click #(show-popup % [popup-content every on-refresh] {:position "bottom right"})}
+       {:on-click #(show-popup %
+                               [popup-content every {:on-refresh on-refresh :loading? loading?}]
+                               {:position "bottom right"})}
        (when (pos? every)
          [:span.current-refresh
            (t :preferences/refresh-every) " "
            (get (t :preferences/refresh-every-opts) every)])
-       [:i.refresh.icon {:class (when (rpc/loading? [:designer :report-results]) "loading")}]])
+       [:i.refresh.icon {:class (when (loading?) "loading")}]])
     (finally
       (clear-auto-refresh-interval!))))
