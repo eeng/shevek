@@ -10,13 +10,14 @@
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.pages.designer.filters :refer [filter-operators]]
             [shevek.pages.designer.helpers :refer [current-cube panel-header format-measure format-dimension search-button highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries notify-designer-changes]]
-            [shevek.domain.dw :refer [format-measure format-dimension dimension-value]]))
+            [shevek.domain.dw :refer [format-measure format-dimension dimension-value]]
+            [shevek.schemas.conversion :refer [clean-sort-by]]))
 
 (defn init-pinned-dim [dim designer]
   (let [dim (clean-dim dim)]
     (cond-> (assoc dim :limit 100)
             (time-dimension? dim) (assoc :granularity (default-granularity designer)
-                                         :sort-by (assoc dim :descending true)))))
+                                         :sort-by (assoc (clean-sort-by dim) :descending true)))))
 
 (defevhi :designer/dimension-pinned [{:keys [designer] :as db} dim]
   {:after [notify-designer-changes]}

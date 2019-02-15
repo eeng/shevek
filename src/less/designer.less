@@ -27,6 +27,7 @@
     flex-direction: column;
     flex: 1;
     overflow: hidden; // Necessary when the pivot-table is too big so it can scroll
+    width: 0; // Hack, without this when the visualization is large horizontally, instead of showing the scrollbar it would extend beyond the window width.
     .top-row {
       margin: @gutter;
       margin-bottom: 0;
