@@ -29,7 +29,8 @@
                         (transform [:panels ALL] #(dissoc % :id) d))]
     (rpc/call "dashboards/save"
               :args [dashboard]
-              :handler #(dispatch :dashboards/saved %))))
+              :handler #(dispatch :dashboards/saved %))
+    (rpc/loading db :saving-dashboard)))
 
 (defn- save-as-dialog [{:keys [dashboard]}]
   (r/with-let [form-data (r/atom (select-keys dashboard [:name :description]))
@@ -60,5 +61,6 @@
     :ref (tooltip (t (if (new-record? dashboard)
                        :actions/save-as
                        :actions/save)))
+    :class (when (rpc/loading? :saving-dashboard) "loading disabled")
     :data-tid "save"}
    [:i.save.icon]])

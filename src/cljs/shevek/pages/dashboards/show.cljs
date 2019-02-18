@@ -31,25 +31,21 @@
                          (assoc panel :id id))]
     (assoc db :current-dashboard (update dashboard :panels update-panels))))
 
-(defn- same-id [other-id]
-  (fn [{:keys [id]}]
-    (= id other-id)))
-
-(defn- init-page [{:keys [current-dashboard] :as db} id {:keys [panel edit fullscreen]} init-current-dashboard]
+(defn- init-page [{:keys [current-dashboard] :as db} {:keys [panel edit fullscreen]} init-current-dashboard]
   (cond-> (assoc db
                  :page :dashboard
                  :selected-panel (when panel {:id (str/parse-int panel)
                                               :edit (str/to-bool edit)
                                               :fullscreen (str/to-bool fullscreen)}))
-          (or (not current-dashboard) (not= id (:id current-dashboard))) (init-current-dashboard)))
+          (not current-dashboard) (init-current-dashboard)))
 
 (defevh :dashboards/new [{:keys [current-dashboard] :as db} query-params]
-  (init-page db nil query-params #(assoc % :current-dashboard {:name (t :dashboards/new)
-                                                               :panels []
-                                                               :owner-id (current-user :id)})))
+  (init-page db query-params #(assoc % :current-dashboard {:name (t :dashboards/new)
+                                                           :panels []
+                                                           :owner-id (current-user :id)})))
 
 (defevh :dashboards/show [{:keys [current-dashboard] :as db} id query-params]
-  (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
+  (init-page db query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
 
 (defn- calculate-new-panel-position [panels]
   (let [w (:w first-grid-pos)
@@ -65,6 +61,10 @@
                    :grid-pos (calculate-new-panel-position panels)
                    :id (->> panels (map :id) (apply max 0) inc)}]
     (update-in db [:current-dashboard :panels] conj new-panel)))
+
+(defn- same-id [other-id]
+  (fn [{:keys [id]}]
+    (= id other-id)))
 
 (defevh :dashboard/panel-cube-selected [db panel-id cube-name]
   (transform [:current-dashboard :panels ALL (same-id panel-id)]
@@ -191,7 +191,7 @@
                      [refresh-button])}]
    child])
 
-(defn page []
+(defn- page* []
   (fetch-cubes) ; The cubes are needed con build the visualization
   (fn []
     (if (rpc/loading? :current-dashboard)
@@ -214,3 +214,11 @@
           [dashboard-container dashboard
            [:div.panels
             [dashboard-panels dashboard]]])))))
+
+(defevh :dashboard/unmount [db]
+  (dissoc db :current-dashboard))
+
+(defn page []
+  (r/create-class
+   {:reagent-render page*
+    :component-will-unmount #(dispatch :dashboard/unmount)}))

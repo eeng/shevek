@@ -1,5 +1,6 @@
 (ns shevek.pages.designer.actions.save
   (:require [shevek.i18n :refer [t]]
+            [shevek.rpc :as rpc]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.navigation :refer [set-url]]
             [shevek.components.popup :refer [tooltip]]
@@ -23,5 +24,6 @@
       :ref (tooltip (t (if save-as?
                          :actions/save-as
                          :actions/save)))
+      :class (when (rpc/loading? :saving-report) "loading disabled")
       :data-tid "save"}
      [:i.save.icon]]))

@@ -23,8 +23,7 @@
     dim))
 
 (defn- designer-visible? []
-  (or (current-page? :designer)
-      (db/get-in [:selected-panel :edit])))
+  (some? (db/get :designer)))
 
 (defn- sortable-th [title sorting-mapping opts]
   (if (designer-visible?)
