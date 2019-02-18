@@ -17,29 +17,28 @@
             [shevek.pages.configuration.page :as configuration]
             [shevek.components.notification :refer [notification]]))
 
-(def pages
-  {:login #'login/page
-   :home #'home/page
-   :designer #'designer/page
-   :dashboard #'dashboard/page
-   :dashboards #'dashboards/page
-   :cubes #'cubes/page
-   :reports #'reports/page
-   :configuration #'configuration/page
-   :profile/preferences #'profile/page
-   :profile/password #'profile/page
-   :error #'error/page})
+(defn page-component-for [page]
+  (case page
+    :login #'login/page
+    :home #'home/page
+    :designer #'designer/page
+    :dashboard #'dashboard/page
+    :dashboards #'dashboards/page
+    :cubes #'cubes/page
+    :reports #'reports/page
+    :configuration #'configuration/page
+    :profile/preferences #'profile/page
+    :profile/password #'profile/page
+    :error #'error/page))
 
 (defn layout []
   (when (db/get :initialized)
     (let [page (if (logged-in?) (current-page) :login)
-          page-component (pages page)]
+          page-component (page-component-for page)]
       [:div.layout
        (when (logged-in?) [sidebar])
        [:div.page-container
-        (if page-component
-          [page-component]
-          [:div "Page :" page " not defined"])]
+        [page-component]]
        [popup]
        [modal]
        [notification]])))

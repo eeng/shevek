@@ -5,7 +5,8 @@
 
 (defevh :dashboard/refresh [db]
   (when-not (rpc/loading?) ; Do not refresh again if there is a slow query still running
-    (doseq [{:keys [id report]} (get-in db [:current-dashboard :panels])]
+    (doseq [{:keys [id report type]} (get-in db [:current-dashboard :panels])
+            :when (= type "report")]
       (dispatch :dashboard/report-query report id)))
   db)
 
