@@ -14,8 +14,12 @@
       cursor: pointer;
 
       &:hover {
+        .border-radius(3px);
         color: black;
         background-color: darken(@panel-header-background, 5%);
+      }
+      &:active {
+        background-color: darken(@panel-header-background, 10%);
       }
 
       i { margin: 0 }
