@@ -37,7 +37,6 @@
    (s/optional-key :loading) {(s/cond-pre s/Keyword [s/Any]) s/Bool}
    (s/optional-key :error) Error
    (s/optional-key :cubes) {s/Str Cube}
-   (s/optional-key :settings) (s/maybe Settings) ; TODO DASHBOARD vuela
    (s/optional-key :preferences) Preferences
    (s/optional-key :designer) Designer
    (s/optional-key :reports) [Report]

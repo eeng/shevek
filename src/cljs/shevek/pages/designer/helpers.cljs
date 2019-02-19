@@ -55,7 +55,7 @@
     coll
     (remove-dimension coll dim)))
 
-; TODO DASHBOARD esto del unexpand y tantos metodos de conversion no me convence, revisar. Tambien ver si no conviene manejarse con algo mas simple como en la query que trae los results de filtros, o sea con un atom interno nomas
+; TODO esto del unexpand y tantos metodos de conversion no me convence, revisar. Tambien ver si no conviene manejarse con algo mas simple como en la query que trae los results de filtros, o sea con un atom interno nomas
 (defn send-pinned-dim-query [{:keys [designer] :as db} {:keys [name] :as dim} & [{:as search-filter}]]
   (let [q (cond-> {:cube (get-in designer [:report :cube])
                    :filters (remove-dim-unless-time dim (:filters designer))

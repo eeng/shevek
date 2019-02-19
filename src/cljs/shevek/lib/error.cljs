@@ -22,7 +22,7 @@
 (defn handle-not-authenticated []
   (dispatch :session-expired))
 
-; TODO DASHBOARD maybe we should display the error page here?
+; TODO maybe we should display the error page here?
 (defn handle-not-authorized [error]
   (handle-app-error error)
   (navigate "/"))
@@ -32,10 +32,7 @@
     401 (handle-not-authenticated)
     403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
     502 (handle-app-error (assoc error :response (t :errors/bad-gateway)))
-    (let [found-translation (translation :errors response)
-          new-response (or found-translation response)
-          new-status-text (if found-translation response status-text)]
-      (handle-app-error (assoc error :response new-response :status-text new-status-text))))
+    (handle-app-error (assoc error :response (t :errors/unexpected))))
   (rpc/loaded db))
 
 (defn report-error-to-server [message stacktrace app-db]

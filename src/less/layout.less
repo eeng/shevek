@@ -122,60 +122,6 @@ body {
 
 .preloader { pointer-events: none; } // So acceptance test can click through
 
-// TODO DASHBOARD vuela
-#reports-popup, #cubes-popup, #dashboards-popup, #settings-popup {
-  width: 300px;
-  .actions {
-    float: right;
-    .button:last-child { margin-right: 0 }
-  }
-  .ui.header {
-    margin-top: 0;
-    margin-bottom: 1em;
-    &.has-actions { margin-bottom: 2em }
-  }
-  .ui.list {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 0 1em 1em 1em;
-    margin: 0 -1em -1em -1em;
-    .item {
-      margin: 0 -.5em;
-      padding: .5em;
-      .border-radius(.5em) !important;
-      &:last-child { margin-bottom: -.3em }
-      .middle.aligned.icon { color: black }
-      .content { padding-left: .3em }
-      .right.content {
-        .muted;
-        font-size: .9em;
-        .item-actions {
-          .icon:hover { color: black }
-          .icon:last-child { margin-right: 0; }
-          .trash.icon:active { color: #d41c1c; }
-        }
-      }
-      .description { margin-top: .1em }
-    }
-  }
-}
-
-#settings-popup {
-  width: 230px;
-  .fluid.button { margin-top: .4em }
-}
-
 .app-error.modal {
   .content, .actions { text-align: center }
-}
-
-.ui.table {
-  td.actions {
-    white-space: nowrap;
-    text-align: center;
-    .ui.button {
-      margin-left: 3px;
-      margin-right: 3px;
-    }
-  }
 }

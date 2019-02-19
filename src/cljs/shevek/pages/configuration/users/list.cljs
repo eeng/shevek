@@ -3,7 +3,7 @@
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]
             [shevek.components.text :refer [mail-to]]
-            [shevek.components.form :refer [hold-to-confirm search-input filter-matching by]]
+            [shevek.components.form :refer [search-input filter-matching by]]
             [shevek.components.notification :refer [notify]]
             [shevek.components.confirmation :refer [with-confirm]]
             [shevek.rpc :as rpc]

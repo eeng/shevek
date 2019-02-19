@@ -4,8 +4,7 @@
             [shevek.lib.react :refer [with-react-keys]]
             [shevek.lib.string :refer [regex-escape split]]
             [cuerdas.core :as str]
-            [shevek.i18n :refer [t]]
-            [shevek.components.notification :refer [notify]]))
+            [shevek.i18n :refer [t]]))
 
 (defn classes [& css-classes]
   (->> css-classes (filter identity) (str/join " ")))
@@ -151,23 +150,3 @@
       (if (seq @search)
         [:i.link.remove.circle.icon {:on-click clear}]
         [:i.search.icon])]))
-
-(defonce holding (r/atom nil))
-
-(defn stop-timeout []
-  (swap! holding js/clearTimeout))
-
-(defn cancel-timeout []
-  (when @holding
-    (stop-timeout)
-    (notify (t :actions/hold-delete) :type :info)))
-
-(defn start-timeout [action]
-  (reset! holding (js/setTimeout #(do (stop-timeout) (action)) 1000)))
-
-; TODO DASHBOARD vuela
-(defn hold-to-confirm [on-confirm]
-  {:on-mouse-down #(start-timeout on-confirm)
-   :on-mouse-up cancel-timeout
-   :on-mouse-leave cancel-timeout
-   :on-click #(.stopPropagation %)})
