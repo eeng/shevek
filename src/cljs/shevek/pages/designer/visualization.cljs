@@ -1,7 +1,8 @@
 (ns shevek.pages.designer.visualization
   (:require [shevek.reflow.core :refer [dispatch]]
             [shevek.i18n :refer [t translation]]
-            [shevek.components.text :refer [warning loader]]
+            [shevek.components.text :refer [loader]]
+            [shevek.components.message :refer [warning]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.pages.cubes.helpers :refer [cube-authorized?]]
             [shevek.pages.designer.helpers :refer [build-visualization]]

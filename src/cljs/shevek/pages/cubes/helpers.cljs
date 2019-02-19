@@ -31,5 +31,5 @@
 (defn cube-fetcher [cube-name render-fn]
   (fetch-cubes)
   (fn []
-    (when-let [cube (db/get-in [:cubes cube-name])]
-      (render-fn cube))))
+    (when (db/get :cubes)
+      (render-fn (get-cube cube-name)))))

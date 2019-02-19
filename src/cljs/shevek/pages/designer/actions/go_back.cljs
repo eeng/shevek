@@ -1,4 +1,4 @@
-(ns shevek.pages.designer.actions.return
+(ns shevek.pages.designer.actions.go-back
   (:require [shevek.i18n :refer [t]]
             [shevek.components.popup :refer [tooltip]]))
 

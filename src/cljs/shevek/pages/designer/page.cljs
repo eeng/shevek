@@ -3,6 +3,7 @@
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.components.layout :refer [topbar]]
+            [shevek.components.message :refer [page-message]]
             [shevek.pages.cubes.helpers :refer [cube-fetcher cube-authorized?]]
             [shevek.pages.designer.dimensions :refer [dimensions-panel]]
             [shevek.pages.designer.measures :refer [measures-panel]]
@@ -18,7 +19,7 @@
             [shevek.pages.designer.actions.raw :refer [raw-data-button]]
             [shevek.pages.designer.actions.maximize :refer [maximize-button]]
             [shevek.pages.designer.actions.download :refer [download-csv-button]]
-            [shevek.pages.designer.actions.return :refer [go-back-button]]
+            [shevek.pages.designer.actions.go-back :refer [go-back-button]]
             [shevek.pages.designer.actions.rename :refer [report-name]]
             [shevek.schemas.conversion :refer [report->designer]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
@@ -86,11 +87,13 @@
   [{:keys [report] :as props}]
   [cube-fetcher (:cube report) ; Wait until the cube metadata is ready
    (fn [cube]
-     [report-builder report cube ; Build the new report unless already built
-      (fn [report]
-        [designer-builder (assoc props :report report :cube cube) ; Build the designer and put it in the app-db
-         (fn [designer]
-           [designer-renderer designer])])])])
+     (if cube
+       [report-builder report cube ; Build the new report unless already built
+        (fn [report]
+          [designer-builder (assoc props :report report :cube cube) ; Build the designer and put it in the app-db
+           (fn [designer]
+             [designer-renderer designer])])]
+       [page-message {:header (t :cubes/unauthorized-title) :content (t :cubes/unauthorized)}]))])
 
 (defn- designer-container [{initial-report :report :keys [actions] :as props}]
   (let [{:keys [report report-results]} (db/get :designer)]

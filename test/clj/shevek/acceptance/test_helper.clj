@@ -140,9 +140,11 @@
   (apply e/drag-and-drop page args))
 
 (defn login
-  ([] (login {:username "user" :fullname "User"}))
-  ([{:keys [username password] :or {password "secret666"} :as user}]
-   (let [user (merge {:password password} user)
+  ([] (login {}))
+  ([{:keys [username password fullname]
+     :or {username "user" password "secret666" fullname "User"}
+     :as user}]
+   (let [user (merge {:username username :password password :fullname fullname} user)
          user (or (users/find-by-username db username)
                   (make! User user))]
      (e/js-execute page "try { localStorage.clear() } catch (e) {}") ; Clear session

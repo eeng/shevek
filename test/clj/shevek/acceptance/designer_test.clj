@@ -1,8 +1,10 @@
 (ns shevek.acceptance.designer-test
   (:require [clojure.test :refer [deftest use-fixtures is]]
-            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests click click-text has-css? it has-title? has-text? login visit click-tid fill wait-exists refresh element-value]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests click click-text has-css? it has-title? has-text? login visit click-tid fill wait-exists refresh element-value has-no-text?]]
             [shevek.support.druid :refer [with-fake-druid query-req-matching druid-res]]
             [shevek.support.designer :refer [make-wikiticker-cube go-to-designer]]
+            [shevek.makers :refer [make!]]
+            [shevek.schemas.report :refer [Report]]
             [etaoin.keys :as keys]))
 
 (use-fixtures :once wrap-acceptance-tests)
@@ -70,4 +72,16 @@
       (is (re-matches #"http://localhost:4100/reports/.+"
                       (element-value {:css ".modal input"})))
       (click-text "Copy")
-      (is (has-css? "#notification" :text "Link copied!")))))
+      (is (has-css? "#notification" :text "Link copied!"))))
+
+  (it "authorization"
+    (make-wikiticker-cube)
+    (let [u (login {:allowed-cubes []})]
+      (make! Report {:name "R1" :cube "wikiticker" :measures ["count"] :owner-id (:id u)})
+      (is (has-text? "There are no cubes defined"))
+      (refresh)
+      (click-text "R1")
+      (is (has-css? "#designer"))
+      (is (has-css? ".page-message" :text "This cube is no longer available"))
+      (is (has-no-text? "Count"))
+      (is (has-no-text? "City")))))

@@ -11,6 +11,7 @@
            :description  "Descripción"
            :missing "No hay cubos definidos."
            :data-range "Rango de datos disponibles"
+           :unauthorized-title "Cubo Inexistente"
            :unauthorized "El cubo ya no está disponible o no estás autorizado para verlo. Por favor, contactá al administrador para más información."}
    :dashboards {:title "Dashboards"
                 :subtitle "Administrar dashboards"

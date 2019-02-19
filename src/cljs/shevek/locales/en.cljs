@@ -11,6 +11,7 @@
            :description  "Description"
            :missing "There are no cubes defined."
            :data-range "Available data range"
+           :unauthorized-title "Missing Cube"
            :unauthorized "This cube is no longer available or you are not authorized to view it. Please contact the administrator for more information."}
    :dashboards {:title "Dashboards"
                 :subtitle "Manage your dashboards"
