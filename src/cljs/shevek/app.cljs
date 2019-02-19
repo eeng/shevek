@@ -7,6 +7,7 @@
             [shevek.reflow.interceptors.logger :refer [logger]]
             [shevek.reflow.interceptors.recorder :refer [recorder]]
             [shevek.navigation :refer [init-navigation]]
+            [shevek.lib.react :refer [with-reload-mark]]
             [shevek.lib.error])) ; So the error handlers are registered
 
 (defn init-reflow []
@@ -25,4 +26,7 @@
     (init-reflow)
     :done))
 
-(r/render-component [layout] (.getElementById js/document "app"))
+(defn mount-root []
+  (r/render-component [layout] (.getElementById js/document "app")))
+
+(with-reload-mark mount-root)

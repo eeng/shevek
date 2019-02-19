@@ -18,6 +18,7 @@
             [shevek.reflow.db :as db]
             [shevek.rpc :as rpc]
             [shevek.lib.collections :refer [detect find-by]]
+            [shevek.lib.react :refer [hot-reloading?]]
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.layout :as l :refer [topbar]]
             [shevek.components.popup :refer [tooltip]]
@@ -191,7 +192,7 @@
                      [refresh-button])}]
    child])
 
-(defn page []
+(defn page* []
   (fetch-cubes) ; The cubes are needed con build the visualization
   (fn []
     (if (rpc/loading? :current-dashboard)
@@ -214,3 +215,13 @@
           [dashboard-container dashboard
            [:div.panels
             [dashboard-panels dashboard]]])))))
+
+(defevh :dashboard/unmount [db]
+  (dissoc db :current-dashboard))
+
+; Clean the dashboard on unmount so every time the user enters a dashboard we start with a clean state.
+; The hot-reloading hack is needed because otherwise during dev when this file is reloaded, the will-mount trigger first sending the report queries that depends on the dashboard, which is then cleaned by the will-unmount, so when the results arrive the dashboard is no longer present. Alsa, it is nice to not loose the state during dev
+(defn page []
+  (r/create-class {:reagent-render page*
+                   :component-will-unmount #(when-not (hot-reloading?)
+                                              (dispatch :dashboard/unmount))}))
