@@ -47,7 +47,7 @@
                        :ref (tooltip :profile/menu)
                        :data-tid "sidebar-profile"}
       [avatar (current-user)]]
-     [:a.item {:on-click #(dispatch :logout)
+     [:a.item {:on-click #(dispatch :sessions/logout)
                :ref (tooltip :sessions/logout)
                :data-tid "sidebar-logout"}
       [:i.sign.out.icon]]

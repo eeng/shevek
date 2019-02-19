@@ -20,14 +20,14 @@
      [:div.ui.cancel.inverted.button (t :actions/close)]]]))
 
 (defn handle-not-authenticated []
-  (dispatch :session-expired))
+  (dispatch :sessions/expired))
 
 ; TODO maybe we should display the error page here?
 (defn handle-not-authorized [error]
   (handle-app-error error)
   (navigate "/"))
 
-(defevh :server-error [db {:keys [status status-text response] :as error}]
+(defevh :errors/from-server [db {:keys [status status-text response] :as error}]
   (case status
     401 (handle-not-authenticated)
     403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))

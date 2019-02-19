@@ -17,40 +17,40 @@
       (js->clj (js/jwt_decode token) :keywordize-keys true)
       (catch js/Error _ {}))))
 
-(defevh :login-successful [db {:keys [token]}]
+(defevh :sessions/login-successful [db {:keys [token]}]
   (local-storage/set-item! "access-token" token)
   (-> (assoc db :current-user (extract-user token))
       (rpc/loaded :logging-in)))
 
-(defevh :login-failed [db]
+(defevh :sessions/login-failed [db]
   (notify (t :users/invalid-credentials) :type :error)
   (-> (js/$ "#form-container") (.transition "shake" #js {:duration ".6s" :queue false}))
   (rpc/loaded db :logging-in))
 
-(defevh :login [db user]
+(defevh :sessions/login [db user]
   (POST "/login" {:params @user
-                  :handler #(dispatch :login-successful %)
+                  :handler #(dispatch :sessions/login-successful %)
                   :error-handler (fn [{:keys [status] :as response}]
                                    (if (= status 401)
-                                     (dispatch :login-failed)
-                                     (dispatch :server-error response)))})
+                                     (dispatch :sessions/login-failed)
+                                     (dispatch :errors/from-server response)))})
   (rpc/loading db :logging-in))
 
-(defevh :logout [db]
+(defevh :sessions/logout [db]
   (local-storage/remove-item! "access-token")
   (navigate "/")
   (select-keys db [:preferences :page :initialized]))
 
-(defevh :session-expired [db]
+(defevh :sessions/expired [db]
   (notify (t :users/session-expired) :type :info)
-  (dispatch :logout))
+  (dispatch :sessions/logout))
 
 (defevh :sessions/user-restored [db]
   (assoc db :current-user (extract-user (local-storage/get-item "access-token")) :initialized true))
 
 (defn- login-form []
   (let [user (r/atom {})
-        login #(dispatch :login user)
+        login #(dispatch :sessions/login user)
         shortcuts (kb-shortcuts :enter login)]
     (fn []
       [:div.ui.form {:ref shortcuts}

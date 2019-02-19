@@ -22,7 +22,7 @@
   {:pre [(vector? args)]}
   (POST "/rpc" {:params {:fn fid :args args}
                 :handler handler
-                :error-handler #(dispatch :server-error %)
+                :error-handler #(dispatch :errors/from-server %)
                 :headers (auth-header)}))
 
 (defevh :data-arrived [db db-key data db-handler]
