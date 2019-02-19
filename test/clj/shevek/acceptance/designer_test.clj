@@ -75,7 +75,6 @@
       (is (has-css? "#notification" :text "Link copied!"))))
 
   (it "authorization"
-    (make-wikiticker-cube)
     (let [u (login {:allowed-cubes []})]
       (make! Report {:name "R1" :cube "wikiticker" :measures ["count"] :owner-id (:id u)})
       (is (has-text? "There are no cubes defined"))

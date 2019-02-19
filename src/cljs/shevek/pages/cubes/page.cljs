@@ -28,7 +28,7 @@
       [:div.large.tip (t :errors/no-results)])))
 
 (defn page []
-  (fetch-cubes)
+  (fetch-cubes {:always true})
   (let [search (r/atom "")]
     (fn []
       [page-with-header

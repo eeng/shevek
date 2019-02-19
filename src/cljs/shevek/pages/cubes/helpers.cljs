@@ -9,8 +9,8 @@
 (defevh :cubes/fetch [db]
   (rpc/fetch db :cubes "schema/cubes" :handler cube-names-as-keys))
 
-(defn fetch-cubes []
-  (when-not (db/get :cubes)
+(defn fetch-cubes [& [{:keys [always]}]]
+  (when (or (not (db/get :cubes)) always)
     (dispatch :cubes/fetch)))
 
 (defn cubes-list []
