@@ -1,14 +1,8 @@
 (ns shevek.pages.cubes.list
   (:require [reagent.core :as r]
             [shevek.i18n :refer [t]]
-            [shevek.reflow.core :refer [dispatch]]
-            [shevek.reflow.db :as db]
-            [shevek.pages.cubes.page :as p]
+            [shevek.pages.cubes.helpers :as h :refer [fetch-cubes]]
             [shevek.components.form :refer [search-input filter-matching by]]))
-
-(defn fetch-cubes []
-  (when-not (db/get :cubes)
-    (dispatch :cubes/fetch)))
 
 (defn- cube-item [{:keys [name title description]} {:keys [on-click]}]
   [:a.item {:href (when-not on-click (str "/reports/new/" name))
@@ -23,7 +17,7 @@
   (fetch-cubes)
   (let [search (r/atom "")]
     (fn [opts]
-      (let [cubes (p/cubes-list)
+      (let [cubes (h/cubes-list)
             filtered-cubes (filter-matching @search (by :title :description) cubes)]
         (cond
           (not cubes)

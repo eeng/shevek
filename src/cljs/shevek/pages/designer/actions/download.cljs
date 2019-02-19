@@ -20,9 +20,7 @@
   (js/setTimeout ; So the loading indicator is shown immediately
    (fn []
      (download (str "report_" (format-time (now) :file))
-               (csv/generate (build-visualization
-                              report-results
-                              report))
+               (csv/generate (build-visualization report-results report))
                "text/csv; charset=utf-8")
      (reset! loading false))
    0))

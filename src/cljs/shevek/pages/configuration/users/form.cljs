@@ -6,7 +6,7 @@
             [shevek.rpc :as rpc]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.lib.util :refer [new-record?]]
-            [shevek.pages.cubes.page :refer [cubes-list]]
+            [shevek.pages.cubes.helpers :refer [cubes-list]]
             [shevek.pages.configuration.users.permissions :refer [user-permissions]]
             [shevek.schemas.conversion :refer [unparse-filters report-dims->designer]]
             [shevek.schemas.user :refer [CubePermissions]]

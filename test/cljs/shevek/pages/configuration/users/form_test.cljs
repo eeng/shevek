@@ -3,7 +3,7 @@
             [shevek.asserts :refer [error-on? no-error-on?]]
             [shevek.pages.configuration.users.form :refer [user-validations adapt-for-client adapt-for-server]]
             [shevek.lib.validation :as v]
-            [shevek.pages.cubes.page :refer [cubes-list]]
+            [shevek.pages.cubes.helpers :refer [cubes-list]]
             [shevek.lib.time :refer [date-time]]))
 
 (defn validate-user [user]

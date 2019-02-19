@@ -6,12 +6,10 @@
             [shevek.lib.logger :as log]
             [shevek.lib.util :refer [debounce]]
             [shevek.domain.dimension :refer [dim= add-dimension remove-dimension time-dimension?]]
+            [shevek.pages.cubes.helpers :refer [get-cube]]
             [shevek.rpc :as rpc]
             [shevek.schemas.conversion :refer [designer->report report->designer unexpand]]
             [shevek.i18n :refer [t]]))
-
-(defn get-cube [name]
-  (db/get-in [:cubes name]))
 
 (defn current-cube [& keys]
   (let [cube-name (db/get-in [:designer :report :cube])
@@ -74,6 +72,7 @@
 
 (defn build-visualization [results {:keys [cube] :as report}]
   (let [cube (get-cube cube)]
+    (assert cube)
     (-> (report->designer report cube)
         (select-keys [:viztype :splits :measures])
         (assoc :results results))))

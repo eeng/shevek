@@ -1,22 +1,12 @@
 (ns shevek.pages.cubes.page
   (:require [reagent.core :as r]
-            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
-            [shevek.rpc :as rpc]
             [shevek.navigation :refer [navigate]]
             [shevek.components.layout :refer [page-with-header page-loader]]
             [shevek.components.form :refer [search-input filter-matching by]]
+            [shevek.pages.cubes.helpers :refer [cubes-list fetch-cubes]]
             [shevek.i18n :refer [t]]
             [shevek.lib.time.ext :refer [format-time]]))
-
-(defn cubes-list []
-  (vals (db/get :cubes)))
-
-(defn- cube-names-as-keys [db cubes]
-  (assoc db :cubes (zipmap (map :name cubes) cubes)))
-
-(defevh :cubes/fetch [db]
-  (rpc/fetch db :cubes "schema/cubes" :handler cube-names-as-keys))
 
 (defn- cube-row [{:keys [name title description min-time max-time]}]
   [:tr.selectable {:on-click #(navigate "/reports/new/" name)}
@@ -38,7 +28,7 @@
       [:div.large.tip (t :errors/no-results)])))
 
 (defn page []
-  (dispatch :cubes/fetch)
+  (fetch-cubes)
   (let [search (r/atom "")]
     (fn []
       [page-with-header

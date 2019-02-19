@@ -12,7 +12,8 @@
             [shevek.lib.collections :refer [find-by]]
             [shevek.pages.configuration.users.form :refer [adapt-for-client user-form]]
             [shevek.pages.designer.actions.raw :refer [filters->str]]
-            [shevek.pages.profile.helpers :refer [avatar]]))
+            [shevek.pages.profile.helpers :refer [avatar]]
+            [shevek.pages.cubes.helpers :refer [fetch-cubes]]))
 
 (defevh :users/fetch [db]
   (rpc/fetch db :users "users/find-all"))
@@ -97,7 +98,7 @@
           [:div.large.tip (t :errors/no-results)]))]]))
 
 (defn users-section []
-  (dispatch :cubes/fetch)
+  (fetch-cubes)
   (dispatch :users/fetch)
   (let [edited-user (r/atom nil)]
     (fn []

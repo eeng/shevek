@@ -10,7 +10,8 @@
            :name  "Name"
            :description  "Description"
            :missing "There are no cubes defined."
-           :data-range "Available data range"}
+           :data-range "Available data range"
+           :unauthorized "This cube is no longer available or you are not authorized to view it. Please contact the administrator for more information."}
    :dashboards {:title "Dashboards"
                 :subtitle "Manage your dashboards"
                 :search-hint "Filter by name or description"
@@ -65,7 +66,6 @@
               :split-required "At least one split is required for the {1} visualization"
               :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"
               :chart-with-second-split-on-rows "The second split must be on the columns to be able to generate the chart"
-              :unauthorized "It seems that the {1} cube is no longer available. Please contact the administrator."
               :maximize "Maximize results panel"
               :minimize "Minimize results panel"
               :grand-total "Grand Total"

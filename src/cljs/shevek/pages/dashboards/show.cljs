@@ -3,9 +3,10 @@
             [reagent.core :as r]
             [cuerdas.core :as str]
             [com.rpl.specter :refer [transform setval ALL NONE]]
-            [shevek.pages.cubes.list :refer [cubes-list fetch-cubes]]
+            [shevek.pages.cubes.list :refer [cubes-list]]
+            [shevek.pages.cubes.helpers :refer [cubes-fetcher get-cube]]
             [shevek.pages.designer.page :refer [slave-designer]]
-            [shevek.pages.designer.helpers :refer [send-report-query build-new-report get-cube]]
+            [shevek.pages.designer.helpers :refer [send-report-query build-new-report]]
             [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
@@ -193,28 +194,28 @@
    child])
 
 (defn page* []
-  (fetch-cubes) ; The cubes are needed con build the visualization
-  (fn []
-    (if (rpc/loading? :current-dashboard)
-      [topbar] ; Empty placeholder so it doesn't flicker when switching dashboards
-      (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
-            {:keys [panels] :as dashboard} (db/get :current-dashboard)
-            {:keys [report] :as panel} (find-by :id id panels)]
-        (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
-          (and panel edit)
-          [slave-designer {:report report
-                           :report-results (db/get-in [:current-dashboard :reports-results id])
-                           :on-report-change #(dispatch :dashboard/report-changed % id)}]
+  [cubes-fetcher ; The cubes are needed for build the visualization
+   (fn []
+     (if (rpc/loading? :current-dashboard)
+       [topbar] ; Empty placeholder so it doesn't flicker when switching dashboards
+       (let [{:keys [id edit fullscreen]} (db/get :selected-panel)
+             {:keys [panels] :as dashboard} (db/get :current-dashboard)
+             {:keys [report] :as panel} (find-by :id id panels)]
+         (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
+           (and panel edit)
+           [slave-designer {:report report
+                            :report-results (db/get-in [:current-dashboard :reports-results id])
+                            :on-report-change #(dispatch :dashboard/report-changed % id)}]
 
-          (and panel fullscreen)
-          [dashboard-container dashboard
-           [:div.fullscreen-panel
-            [dashboard-panel panel dashboard {:already-fullscreen? true}]]]
+           (and panel fullscreen)
+           [dashboard-container dashboard
+            [:div.fullscreen-panel
+             [dashboard-panel panel dashboard {:already-fullscreen? true}]]]
 
-          :else
-          [dashboard-container dashboard
-           [:div.panels
-            [dashboard-panels dashboard]]])))))
+           :else
+           [dashboard-container dashboard
+            [:div.panels
+             [dashboard-panels dashboard]]]))))])
 
 (defevh :dashboard/unmount [db]
   (dissoc db :current-dashboard))

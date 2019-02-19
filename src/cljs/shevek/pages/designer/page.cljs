@@ -4,6 +4,7 @@
             [shevek.i18n :refer [t]]
             [shevek.components.layout :refer [topbar]]
             [shevek.components.popup :refer [tooltip]]
+            [shevek.pages.cubes.helpers :refer [cube-fetcher]]
             [shevek.pages.designer.dimensions :refer [dimensions-panel]]
             [shevek.pages.designer.measures :refer [measures-panel]]
             [shevek.pages.designer.filters :refer [filters-panel]]
@@ -50,14 +51,6 @@
        [visualization-panel report report-results]]]
      [:div.right-column maximized-class
       [pinboard-panel designer]]]))
-
-; TODO DASHBOARD usar esto en lugar de el dispatch directo en todos lados, y cambiar la condicion para q refresque periodicamente los cubos
-(defn- cube-fetcher [cube-name render-fn]
-  (when-not (db/get :cubes)
-    (dispatch :cubes/fetch))
-  (fn []
-    (when-let [cube (db/get-in [:cubes cube-name])]
-      (render-fn cube))))
 
 (defn- report-builder [{:keys [measures] :as provisory-report} cube render-fn]
   (let [report (if measures
