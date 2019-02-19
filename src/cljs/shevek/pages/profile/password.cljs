@@ -14,7 +14,7 @@
     (swap! user assoc-in [:errors :current-password] [(translation :account error)])
     (do
       (notify (t :account/saved))
-      (dispatch :login-successful response)))
+      (dispatch :sessions/login-successful response)))
   (swap! user assoc :loading? false :current-password nil))
 
 (defevh :account/save [db user cancel]

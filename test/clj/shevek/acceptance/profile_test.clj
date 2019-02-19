@@ -27,7 +27,7 @@
     (login {:username "max" :fullname "Max" :password "secret999"})
     (click-tid "sidebar-profile")
     (click-text "Change Password")
-    (fill {:name "fullname"} "Mex")
+    (fill {:name "fullname"} (k/with-shift k/home) k/delete "Mex")
     (fill {:name "current-password"} "secret999" k/enter)
     (is (has-css? "#notification" :text "Your account has been saved"))
     (is (has-css? ".page-title" :text "Mex"))))
