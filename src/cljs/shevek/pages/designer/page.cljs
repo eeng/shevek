@@ -3,8 +3,7 @@
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
             [shevek.components.layout :refer [topbar]]
-            [shevek.components.popup :refer [tooltip]]
-            [shevek.pages.cubes.helpers :refer [cube-fetcher]]
+            [shevek.pages.cubes.helpers :refer [cube-fetcher cube-authorized?]]
             [shevek.pages.designer.dimensions :refer [dimensions-panel]]
             [shevek.pages.designer.measures :refer [measures-panel]]
             [shevek.pages.designer.filters :refer [filters-panel]]
@@ -19,6 +18,7 @@
             [shevek.pages.designer.actions.raw :refer [raw-data-button]]
             [shevek.pages.designer.actions.maximize :refer [maximize-button]]
             [shevek.pages.designer.actions.download :refer [download-csv-button]]
+            [shevek.pages.designer.actions.return :refer [go-back-button]]
             [shevek.pages.designer.actions.rename :refer [report-name]]
             [shevek.schemas.conversion :refer [report->designer]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
@@ -92,42 +92,40 @@
          (fn [designer]
            [designer-renderer designer])])])])
 
+(defn- designer-container [{initial-report :report :keys [actions] :as props}]
+  (let [{:keys [report report-results]} (db/get :designer)]
+    [:div#designer
+     [topbar {:left [report-name (or report initial-report)]
+              :right (when (cube-authorized? (:cube report))
+                       (into [:<>] (actions {:report report :report-results report-results})))}]
+     (when initial-report ; Is nil while fetching a report by id
+       [designer (dissoc props :actions)])]))
+
 (defn page
   "For creating or editing reports directly"
   []
-  (let [{:keys [report report-results]} (db/get :designer)]
-    [:div#designer
-     [topbar {:left [report-name report]
-              :right [:<>
-                      [save-button report]
-                      [share-button report]
+  [designer-container
+   {:report @requested-report
+    :actions (fn [{:keys [report report-results]}]
+               [[save-button report]
+                [share-button report]
+                [download-csv-button report report-results]
+                [:div.divider]
+                [raw-data-button]
+                [maximize-button]
+                [:div.divider]
+                [refresh-button]])}])
+
+(defn slave-designer
+  "A designer whose report is owned by another component (a dashboard)"
+  [props]
+  [designer-container
+   (assoc props
+          :actions (fn [{:keys [report report-results]}]
+                     [[share-button report]
                       [download-csv-button report report-results]
                       [:div.divider]
                       [raw-data-button]
                       [maximize-button]
                       [:div.divider]
-                      [refresh-button]]}]
-     (when @requested-report ; Is nil while fetching a report by id
-       [designer {:report @requested-report}])]))
-
-(defn- go-back-button []
-  [:button.ui.icon.green.button
-   {:on-click #(.back js/history)
-    :ref (tooltip (t :designer/go-back))
-    :data-tid "go-back"}
-   [:i.reply.icon]])
-
-(defn slave-designer
-  "A designer whose report is owned by another component (a dashboard)"
-  [{:keys [report] :as props}]
-  [:div#designer
-   [topbar {:left [report-name (db/get-in [:designer :report] report)]
-            :right [:<>
-                    [share-button report]
-                    [download-csv-button report (db/get-in [:designer :report-results])]
-                    [:div.divider]
-                    [raw-data-button]
-                    [maximize-button]
-                    [:div.divider]
-                    [go-back-button]]}]
-   [designer props]])
+                      [go-back-button]]))])
