@@ -1,7 +1,7 @@
 (ns shevek.pages.dashboards.actions.refresh
   (:require [shevek.rpc :as rpc]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.pages.designer.actions.refresh :refer [refresh-button] :rename {refresh-button designer-refresh-button}]))
+            [shevek.components.refresh :as refresh]))
 
 (defevh :dashboard/refresh [db]
   (when-not (rpc/loading?) ; Do not refresh again if there is a slow query still running
@@ -11,4 +11,4 @@
   db)
 
 (defn refresh-button []
-  [designer-refresh-button {:on-refresh #(dispatch :dashboard/refresh)}])
+  [refresh/refresh-button {:on-refresh #(dispatch :dashboard/refresh)}])

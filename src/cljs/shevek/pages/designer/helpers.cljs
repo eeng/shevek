@@ -2,6 +2,7 @@
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
             [shevek.components.popup :refer [tooltip]]
+            [shevek.components.refresh :refer [debounce-auto-refresh!]]
             [shevek.lib.string :refer [regex-escape]]
             [shevek.lib.logger :as log]
             [shevek.lib.util :refer [debounce]]
@@ -27,6 +28,8 @@
       (assoc :totals true)))
 
 (defevh :designer/results-arrived [db results results-path pending-report]
+  (when pending-report
+    (debounce-auto-refresh!))
   (-> (assoc-in db results-path results)
       (rpc/loaded results-path)
       (cond-> ; We change the report only after results arrived so the visualization doesn't rerender until that moment
