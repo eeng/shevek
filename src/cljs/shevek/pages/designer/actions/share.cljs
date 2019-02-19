@@ -21,7 +21,7 @@
          [:div.field
           [:label (t :share/label)]
           [:div.ui.action.input
-           [:input#link {:type "text" :read-only true :value @url :on-focus #(-> % .-target .select)}]
+           [:input#link {:type "text" :read-only true :value @url}]
            [clipboard-button
             [:button.ui.green.button
              {:data-clipboard-target "#link"
