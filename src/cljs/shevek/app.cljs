@@ -18,15 +18,15 @@
 (defn remove-loader []
   (-> ".preloader" js/$ (.fadeOut "slow")))
 
-(defonce init-process
-  (do
-    (enable-console-print!)
-    (remove-loader)
-    (init-navigation)
-    (init-reflow)
-    :done))
-
-(defn mount-root []
+(defn- mount-root []
   (r/render-component [layout] (.getElementById js/document "app")))
 
-(with-reload-mark mount-root)
+(defn reload []
+  (with-reload-mark mount-root))
+
+(defn ^:export main []
+  (enable-console-print!)
+  (remove-loader)
+  (init-navigation)
+  (init-reflow)
+  (mount-root))

@@ -14,4 +14,5 @@
      [:div.ui.active.large.loader.preloader]
      [:div#app]
      (link-to-js-bundles request ["libs.js"])
-     (link-to-js-bundles request ["app.js"])]]))
+     (link-to-js-bundles request ["app.js"])
+     [:script "shevek.app.main()"]]]))

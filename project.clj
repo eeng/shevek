@@ -135,7 +135,7 @@
                              [lein-doo "0.1.10"]]
                    :cljsbuild {:builds
                                {:app
-                                {:figwheel true
+                                {:figwheel {:on-jsload "shevek.app/reload"}
                                  :compiler {:main shevek.app
                                             :asset-path "/js/out"
                                             :source-map-timestamp true
