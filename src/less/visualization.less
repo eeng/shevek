@@ -80,6 +80,12 @@
         -moz-user-select: none;
         -webkit-user-select: none;
         -ms-user-select: none;
+        transition: opacity .3s ease-in-out;
+        visibility: visible;
+        &.hidden {
+          opacity: 0;
+          visibility: hidden;
+        }
       }
     }
   }

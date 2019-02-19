@@ -42,7 +42,7 @@
                  [cljsjs/numeral "2.0.6-0"]
                  [cljsjs/jwt-decode "2.1.0-0"]
                  [cljsjs/clipboard "1.6.1-1"]
-                 [cljsjs/chartjs "2.6.0-0"]
+                 [cljsjs/chartjs "2.7.3-0"]
                  [org.slf4j/slf4j-nop "1.7.12"] ; To disable monger log messages
                  [cljsjs/filesaverjs "1.3.3-0"]
                  [testdouble/clojurescript.csv "0.3.0"]

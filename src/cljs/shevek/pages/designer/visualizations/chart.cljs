@@ -23,10 +23,10 @@
                                :legend-position "bottom"
                                :js-opts {:borderWidth 2 :pointRadius 1}}
                   :pie-chart {:js-type "pie"
-                              :background-alpha "CC"
-                              :hover-alpha "EE"
+                              :background-alpha "DD"
+                              :hover-alpha "FF"
                               :legend-position "right"
-                              :js-opts {:borderWidth 2}}})
+                              :js-opts {:borderWidth 1}}})
 
 (defn- build-data [measure results viztype]
   (for [result results :let [value (measure-value measure result)]]
@@ -103,6 +103,7 @@
             (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))))
 
 (defn- build-chart [canvas measure {:keys [viztype] :as viz}]
+  (js/setTimeout #(-> canvas js/$ (.removeClass "hidden")) 50) ; Give some time for the resizing (set-chart-height) to finish and then do a smooth transition
   (js/Chart. canvas (clj->js {:type ((chart-types viztype) :js-type)
                               :data (build-chart-data measure viz)
                               :options (build-chart-opts measure viz)})))
@@ -114,7 +115,7 @@
 
 (defn- chart [measure viz]
   (let [chart (atom nil)]
-    (r/create-class {:reagent-render (fn [_] [:canvas])
+    (r/create-class {:reagent-render (fn [_] [:canvas.hidden])
                      :component-did-mount #(reset! chart (build-chart (r/dom-node %) measure viz))
                      :component-did-update #(apply update-chart @chart (r/props %) (r/children %))
                      :component-will-unmount #(do (.destroy @chart) (reset! chart nil))})))
