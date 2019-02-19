@@ -9,7 +9,7 @@
 
 (def token-expiration (t/days 30))
 
-(defn generate-token [{:keys [id] :as user}]
+(defn generate-token [user]
   (let [token (-> (select-keys user [:id :username :fullname :admin :email])
                   (assoc :exp (t/plus (t/now) token-expiration)))]
     (jwt/sign token (config :jwt-secret))))
@@ -39,6 +39,9 @@
 (defn authorize [authorized?]
   (when-not authorized?
     (throw-unauthorized)))
+
+(defn authorize-to-owner [{:keys [user-id]} {:keys [owner-id]}]
+  (authorize (= user-id owner-id)))
 
 #_(def token (:token (authenticate-and-generate-token db {:username "admin" :password "asdf654"})))
 #_(jwt/unsign token (config :jwt-secret))

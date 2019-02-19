@@ -68,5 +68,5 @@
 
   (it "the master dashboard must exists"
     (let [u (:id (make! User))]
-      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Unauthorized"
-                            (api/import {:user-id u} {:import-as "link" :original-id u :name "S"}))))))
+      (is (thrown? java.lang.AssertionError
+                   (api/import {:user-id u} {:import-as "link" :original-id u :name "S"}))))))

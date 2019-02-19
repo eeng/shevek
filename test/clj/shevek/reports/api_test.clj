@@ -17,7 +17,7 @@
     (let [id (:id (make! User))]
       (is (= id (:owner-id (api/save {:user-id id} (make Report)))))))
 
-  (it "should not allow to save a report if the request's is not the owner"
+  (it "should not allow to update a report if the request's is not the owner"
     (let [id1 (:id (make! User))
           id2 (:id (make! User))]
       (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Unauthorized"
@@ -78,3 +78,11 @@
         (is (some? id))
         (is (= (str "http://dw.com/reports/" id) url))
         (is (= 1 (m/count db "reports")))))))
+
+(deftest delete-tests
+  (it "only the owner can delete a report"
+    (let [u1 (:id (make! User))
+          u2 (:id (make! User))
+          r (:id (make! Report {:owner-id u1}))]
+      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Unauthorized"
+                            (api/delete {:user-id u2} r))))))

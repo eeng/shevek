@@ -4,15 +4,15 @@
             [schema.core :as s]
             [shevek.schemas.report :refer [Report]]
             [shevek.lib.sharing :refer [base-url hash-data]]
-            [shevek.lib.auth :refer [authorize]]))
+            [shevek.lib.auth :refer [authorize-to-owner]]))
 
-(s/defn save [{:keys [user-id]} {:keys [id] :as report} :- Report]
+(s/defn save [{:keys [user-id] :as req} {:keys [id] :as report} :- Report]
   (when id
-    (authorize (= user-id (:owner-id (r/find-by-id db id)))))
+    (authorize-to-owner req (r/find-by-id db id)))
   (r/save-report db (assoc report :owner-id user-id)))
 
-; TODO DASHBOARD authorize here
-(defn delete [_ id]
+(defn delete [req id]
+  (authorize-to-owner req (r/find-by-id db id))
   (r/delete-report db id))
 
 (defn find-all [{:keys [user-id]}]
