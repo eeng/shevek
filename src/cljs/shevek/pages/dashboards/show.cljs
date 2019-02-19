@@ -152,7 +152,8 @@
                     :draggableCancel ".panel-actions"
                     :onLayoutChange on-layout-change
                     :isDraggable (modifiable? dashboard)
-                    :isResizable (modifiable? dashboard)}
+                    :isResizable (modifiable? dashboard)
+                    :margin [15 15]}
      (for [[idx {:keys [id] :as panel}] (map-indexed vector panels)]
        [:div {:key id :data-grid (get panel :grid-pos (calculate-default-grid-pos idx))}
         [dashboard-panel panel dashboard]])]))
