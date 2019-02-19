@@ -50,7 +50,6 @@
              :updated-at "Última actualización"
              :saved "Reporte guardado correctamente"
              :deleted "Reporte '{1}' eliminado correctamente"
-             :unauthorized "Oops! Este reporte ya no está disponible."
              :download-csv "Descargar en formato CSV"
              :new "Nuevo Reporte"
              :share-hint "Este link es una copia de su reporte. Cualquier cambio posterior no se verá reflejado en el reporte compartido."}
@@ -144,7 +143,7 @@
            :invalid-credentials "Usuario y/o password incorrecto"
            :session-expired "Sesión expirada, por favor ingrese nuevamente"
            :password-hint "Dejar en blanco para no cambiarlo"
-           :unauthorized "No tenés acceso a esta página. Por favor, contactá al administrador para más información."
+           :unauthorized "No tenés permisos suficientes para realizar esta acción. Por favor, contactá al administrador para más información."
            :basic-info "Información Básica"
            :permissions "Permisos"
            :search-hint "Filtrar por usuario o nombre"

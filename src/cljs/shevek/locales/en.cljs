@@ -46,7 +46,6 @@
              :updated-at "Last updated"
              :saved "Report saved!"
              :deleted "Report '{1}' deleted!"
-             :unauthorized "Oops! This report is no longer available."
              :download-csv "Download as CSV"
              :new "New Report"
              :share-hint "This is a point-in-time snapshot of your report. Any changes made afterward, will not be reflected on shared report."}
@@ -143,7 +142,7 @@
            :invalid-credentials "Invalid username or password"
            :session-expired "Session expired, please login again"
            :password-hint "Leave blank if you don't want to change it"
-           :unauthorized "Sorry, you are not allow to access this page. Please contact the administrator for more information."
+           :unauthorized "Sorry but you are not allowed to execute this action. Please contact the administrator for more information."
            :basic-info "Basic Information"
            :permissions "Permissions"
            :search-hint "Filter by username or fullname"

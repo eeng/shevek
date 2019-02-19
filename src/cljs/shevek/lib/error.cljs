@@ -3,7 +3,6 @@
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :refer [db]]
             [shevek.i18n :refer [t translation]]
-            [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]
             [shevek.lib.logger :as log :refer [debug?]]
             [ajax.core :refer [POST]]
@@ -11,7 +10,7 @@
 
 (defn handle-app-error [{:keys [status status-text response]}]
   (show-modal
-   [:div.ui.small.basic.modal
+   [:div.ui.tiny.basic.error.modal
     [:div.ui.icon.red.header
      [:i.warning.circle.icon]
      (str "Error " status ": " status-text)]
@@ -22,15 +21,10 @@
 (defn handle-not-authenticated []
   (dispatch :sessions/expired))
 
-; TODO maybe we should display the error page here?
-(defn handle-not-authorized [error]
-  (handle-app-error error)
-  (navigate "/"))
-
 (defevh :errors/from-server [db {:keys [status status-text response] :as error}]
   (case status
     401 (handle-not-authenticated)
-    403 (handle-not-authorized (assoc error :response (t :users/unauthorized)))
+    403 (handle-app-error (assoc error :response (t :users/unauthorized)))
     502 (handle-app-error (assoc error :response (t :errors/bad-gateway)))
     (handle-app-error (assoc error :response (t :errors/unexpected))))
   (rpc/loaded db))
