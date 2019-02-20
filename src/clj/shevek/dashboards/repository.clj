@@ -16,10 +16,6 @@
          (transform [:panels NIL->VECTOR ALL] (partial save-report-and-keep-id db (:id d)))
          (m/save db "dashboards"))))
 
-(defn- fetch-report [db {:keys [report-id] :as panel}]
-  (-> (dissoc panel :report-id)
-      (assoc :report (m/find-by-id db "reports" report-id))))
-
 (defn find-dashboards [db user-id]
   (m/find-all db "dashboards"
               :where {:owner-id user-id}
@@ -28,6 +24,12 @@
 
 (defn find-by-id [db id]
   (m/find-by-id db "dashboards" id))
+
+(defn- fetch-report [db {:keys [report-id] :as panel}]
+  (let [report-copy (-> (m/find-by-id db "reports" report-id)
+                        (dissoc :id))]
+    (-> (dissoc panel :report-id)
+        (assoc :report report-copy))))
 
 (defn- merge-master-if-slave [db {:keys [master-id] :as dashboard}]
   (if master-id
@@ -42,7 +44,15 @@
     (->> (merge-master-if-slave db d)
          (transform [:panels ALL] (partial fetch-report db)))))
 
+(defn upgrade-slaves-of [db id]
+  (doseq [slave (m/find-all db "dashboards" :where {:master-id id})]
+    (as-> slave s
+          (find-with-relations db (:id s))
+          (dissoc s :master-id)
+          (save-dashboard db s))))
+
 (defn delete-dashboard [db id]
+  (upgrade-slaves-of db id)
   (m/delete-by db "reports" {:dashboard-id id})
   (m/delete-by-id db "dashboards" id))
 
