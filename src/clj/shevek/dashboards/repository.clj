@@ -16,10 +16,6 @@
          (transform [:panels NIL->VECTOR ALL] (partial save-report-and-keep-id db (:id d)))
          (m/save db "dashboards"))))
 
-(defn delete-dashboard [db id]
-  (m/delete-by db "reports" {:dashboard-id id})
-  (m/delete-by-id db "dashboards" id))
-
 (defn- fetch-report [db {:keys [report-id] :as panel}]
   (-> (dissoc panel :report-id)
       (assoc :report (m/find-by-id db "reports" report-id))))
@@ -30,15 +26,13 @@
               :fields [:name :description :updated-at :owner-id]
               :sort {:name 1}))
 
-(defn delete-dashboards [db user-id]
-  (m/delete-by db "dashboards" {:owner-id user-id}))
-
 (defn find-by-id [db id]
   (m/find-by-id db "dashboards" id))
 
 (defn- merge-master-if-slave [db {:keys [master-id] :as dashboard}]
   (if master-id
     (let [master (find-by-id db master-id)]
+      (assert master)
       (assoc dashboard :panels (master :panels)))
     dashboard))
 
@@ -47,3 +41,11 @@
   (when-let [d (find-by-id db id)]
     (->> (merge-master-if-slave db d)
          (transform [:panels ALL] (partial fetch-report db)))))
+
+(defn delete-dashboard [db id]
+  (m/delete-by db "reports" {:dashboard-id id})
+  (m/delete-by-id db "dashboards" id))
+
+(defn delete-dashboards [db user-id]
+  (doseq [{:keys [id]} (find-dashboards db user-id)]
+    (delete-dashboard db id)))
