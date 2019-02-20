@@ -103,7 +103,6 @@
             (not= viztype :pie-chart) (assoc :scales {:yAxes [{:ticks {:beginAtZero true} :position "right"}]}))))
 
 (defn- build-chart [canvas measure {:keys [viztype] :as viz}]
-  (js/setTimeout #(-> canvas js/$ (.removeClass "hidden")) 50) ; Give some time for the resizing (set-chart-height) to finish and then do a smooth transition
   (js/Chart. canvas (clj->js {:type ((chart-types viztype) :js-type)
                               :data (build-chart-data measure viz)
                               :options (build-chart-opts measure viz)})))
@@ -115,10 +114,16 @@
 
 (defn- chart [measure viz]
   (let [chart (atom nil)]
-    (r/create-class {:reagent-render (fn [_] [:canvas.hidden])
-                     :component-did-mount #(reset! chart (build-chart (r/dom-node %) measure viz))
-                     :component-did-update #(apply update-chart @chart (r/props %) (r/children %))
-                     :component-will-unmount #(do (.destroy @chart) (reset! chart nil))})))
+    (r/create-class
+     {:reagent-render (fn [_] [:canvas])
+      :component-did-mount (fn [this]
+                             ; The timeout is needed for the chart animation to work
+                             (js/setTimeout #(reset! chart (build-chart (r/dom-node this) measure viz)) 0))
+      :component-did-update (fn [this]
+                              (apply update-chart @chart (r/props this) (r/children this)))
+      :component-will-unmount (fn []
+                                (.destroy @chart)
+                                (reset! chart nil))})))
 
 (defn- set-chart-height [component measures-count]
   (let [chart (-> component r/dom-node js/$)
