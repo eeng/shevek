@@ -1,7 +1,5 @@
 (ns shevek.schema.auth
-  (:require [schema.core :as s]
-            [shevek.lib.collections :refer [includes? find-by]]
-            [shevek.lib.auth :refer [authorize]]))
+  (:require [shevek.lib.collections :refer [includes? find-by]]))
 
 (defn- cube-visible? [cube-name {:keys [allowed-cubes] :or {allowed-cubes "all"}}]
   (or (= allowed-cubes "all")

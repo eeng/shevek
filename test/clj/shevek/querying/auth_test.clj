@@ -1,5 +1,5 @@
 (ns shevek.querying.auth-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest testing is]]
             [shevek.asserts :refer [without?]]
             [shevek.makers :refer [make]]
             [shevek.querying.auth :refer [filter-query]]

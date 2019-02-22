@@ -1,5 +1,5 @@
 (ns shevek.schema.auth-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest testing is]]
             [shevek.schema.auth :refer [filter-cubes filter-cube]]))
 
 (defn filtered-cubes [user cubes]
