@@ -5,9 +5,6 @@
   (or (= allowed-cubes "all")
       (includes? (map :name allowed-cubes) cube-name)))
 
-(defn filter-cubes [user cubes]
-  (filter #(cube-visible? (:name %) user) cubes))
-
 (defn- measure-visible? [measure {:keys [measures] :or {measures "all"}}]
   (let [measure (if (string? measure) measure (:name measure))]
     (or (= measures "all")
@@ -23,3 +20,8 @@
 
 (defn filter-cube [{:keys [name] :as cube} user]
   (update cube :measures filter-measures name user))
+
+(defn filter-cubes [user cubes]
+  (->> cubes
+    (filter #(cube-visible? (:name %) user))
+    (map #(filter-cube % user))))

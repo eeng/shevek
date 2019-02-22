@@ -15,7 +15,15 @@
 
     (testing "if a list of allowed-cubes is specified, only those cubes are visible"
       (is (= ["c2"] (filtered-cubes {:allowed-cubes [{:name "c2"}]} all-cubes)))
-      (is (= [] (filtered-cubes {:allowed-cubes []} all-cubes))))))
+      (is (= [] (filtered-cubes {:allowed-cubes []} all-cubes))))
+
+    (testing "should filter the measures of each cube"
+      (let [filtered-cubes (filter-cubes {:allowed-cubes [{:name "c1" :measures ["m11"]}
+                                                          {:name "c2" :measures ["m22"]}]}
+                            [{:name "c1" :measures [{:name "m11"} {:name "m12"}]}
+                             {:name "c2" :measures [{:name "m21"} {:name "m22"}]}])]
+        (is (= ["m11"] (->> filtered-cubes first :measures (map :name))))
+        (is (= ["m22"] (->> filtered-cubes second :measures (map :name))))))))
 
 (defn filtered-measures [cube user]
   (->> (filter-cube cube user) :measures (map :name)))
