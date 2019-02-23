@@ -14,7 +14,7 @@
             [shevek.pages.designer.pinboard :refer [pinboard-panel]]
             [shevek.pages.designer.helpers :refer [build-new-report send-designer-query send-pinboard-queries]]
             [shevek.pages.designer.actions.refresh :refer [refresh-button]]
-            [shevek.pages.designer.actions.save :refer [save-button]]
+            [shevek.pages.designer.actions.save :refer [save-button save-as-button]]
             [shevek.pages.designer.actions.share :refer [share-button]]
             [shevek.pages.designer.actions.raw :refer [raw-data-button]]
             [shevek.pages.designer.actions.maximize :refer [maximize-button]]
@@ -111,6 +111,7 @@
    {:report @requested-report
     :actions (fn [{:keys [report report-results]}]
                [[save-button report]
+                [save-as-button report]
                 [share-button report]
                 [download-csv-button report report-results]
                 [:div.divider]

@@ -12,18 +12,31 @@
   (set-url (str "/reports/" id))
   (assoc-in db [:designer :report] report))
 
-(defn save-button [report]
   ; Would be not-mine (and have an id) if you enter another user's report via URL
-  (let [save-as? (or (new-record? report) (not (mine? report)))]
+(defn- owned-and-saved? [report]
+  (and (not (new-record? report))
+       (mine? report)))
+
+(defn- open-dialog [report]
+  (open-save-as-dialog {:report (dissoc report :id)
+                        :after-save (fn [report]
+                                      (dispatch :designer/report-saved report))}))
+
+(defn save-button [report]
+  (let [save? (owned-and-saved? report)]
     [:button.ui.default.icon.button
-     {:on-click #(if save-as?
-                    (open-save-as-dialog {:report (dissoc report :id)
-                                          :after-save (fn [report]
-                                                        (dispatch :designer/report-saved report))})
-                    (dispatch :reports/save report identity))
-      :ref (tooltip (t (if save-as?
-                         :actions/save-as
-                         :actions/save)))
+     {:on-click #(if save?
+                    (dispatch :reports/save report identity)
+                    (open-dialog report))
+      :ref (tooltip (t (if save? :actions/save :actions/save-as)))
       :class (when (rpc/loading? :saving-report) "loading disabled")
       :data-tid "save"}
      [:i.save.icon]]))
+
+(defn save-as-button [report]
+  (when (owned-and-saved? report)
+    [:button.ui.default.icon.button
+     {:on-click #(open-dialog report)
+      :ref (tooltip (t :actions/save-as))
+      :data-tid "save-as"}
+     [:i.copy.icon]]))
