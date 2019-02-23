@@ -5,7 +5,8 @@
             [shevek.navigation :refer [set-url]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.components.modal :refer [show-modal close-modal]]
-            [shevek.components.form :refer [input-field kb-shortcuts]]
+            [shevek.components.form :refer [input-field]]
+            [shevek.components.shortcuts :refer [shortcuts]]
             [shevek.components.notification :refer [notify]]
             [shevek.components.popup :refer [tooltip]]
             [shevek.lib.util :refer [new-record?]]
@@ -36,14 +37,14 @@
   (r/with-let [form-data (r/atom (select-keys dashboard [:name :description]))
                valid? #(seq (:name @form-data))
                save #(when (valid?)
-                       (dispatch :dashboards/save @form-data))
-               shortcuts (kb-shortcuts :enter save)]
+                       (dispatch :dashboards/save @form-data))]
     [:div.ui.tiny.modal
      [:div.header (t :actions/save-as)]
      [:div.content
-      [:div.ui.form {:ref shortcuts}
-       [input-field form-data :name {:label (t :dashboards/name) :auto-focus true :on-focus #(-> % .-target .select)}]
-       [input-field form-data :description {:label (t :dashboards/description) :as :textarea :rows 2}]]]
+      [shortcuts {:enter save}
+       [:div.ui.form
+        [input-field form-data :name {:label (t :dashboards/name) :auto-focus true :on-focus #(-> % .-target .select)}]
+        [input-field form-data :description {:label (t :dashboards/description) :as :textarea :rows 2}]]]]
      [:div.actions
       [:button.ui.green.button
        {:on-click save

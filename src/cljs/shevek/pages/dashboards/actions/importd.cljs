@@ -3,7 +3,8 @@
             [shevek.rpc :as rpc]
             [shevek.i18n :refer [t]]
             [shevek.components.modal :refer [show-modal close-modal]]
-            [shevek.components.form :refer [input-field kb-shortcuts]]
+            [shevek.components.form :refer [input-field]]
+            [shevek.components.shortcuts :refer [shortcuts]]
             [shevek.components.notification :refer [notify]]
             [shevek.components.message :refer [info-message]]
             [shevek.navigation :refer [navigate]]))
@@ -21,7 +22,6 @@
                valid? #(seq (:name @form-data))
                save #(when (valid?)
                        (send-import-request dashboard @form-data))
-               shortcuts (kb-shortcuts :enter save)
                active-for #(when (= (:import-as @form-data) %) "active")]
     [:div.ui.tiny.modal
      [:div.header (t :dashboard/import)]
@@ -39,10 +39,11 @@
       [:div.ui.tab {:class (active-for "copy")}
        [info-message (t :dashboard/import-as-copy-desc)]]
       [:div.ui.hidden.divider]
-      [:div.ui.form {:ref shortcuts}
-       [input-field form-data :name {:label (t :dashboard/import-name)
-                                     :auto-focus true
-                                     :on-focus #(-> % .-target .select)}]]]
+      [shortcuts {:enter save}
+       [:div.ui.form
+        [input-field form-data :name {:label (t :dashboard/import-name)
+                                      :auto-focus true
+                                      :on-focus #(-> % .-target .select)}]]]]
      [:div.actions
       [:button.ui.positive.button
        {:on-click save

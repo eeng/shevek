@@ -5,9 +5,9 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.components.popup :refer [tooltip]]
             [shevek.components.modal :refer [show-modal close-modal]]
-            [shevek.components.form :refer [select kb-shortcuts]]
+            [shevek.components.form :refer [select]]
             [shevek.components.message :refer [info-message]]
-            [shevek.components.notification :refer [notify]]
+            [shevek.components.shortcuts :refer [shortcuts]]
             [shevek.rpc :as rpc]))
 
 (defn- send-to-dashboard [report dashboard-id]
@@ -20,24 +20,24 @@
   (r/with-let [_ (dispatch :dashboards/fetch)
                selected-dash (r/atom nil)
                valid? #(some? @selected-dash)
-               accept #(send-to-dashboard report @selected-dash)
-               shortcuts (kb-shortcuts :enter accept)]
-    [:div.ui.tiny.modal
-     [:div.header (t :send-to-dashboard/title)]
-     [:div.content
-      [info-message (t :send-to-dashboard/desc)]
-      [:div.ui.form {:ref shortcuts}
-       [:div.field
-        [:label (t :send-to-dashboard/label)]
-        [select (map (juxt :name :id) (db/get :dashboards))
-         {:class "search selection"
-          :selected @selected-dash
-          :on-change #(reset! selected-dash %)}]]]]
-     [:div.actions
-      [:button.ui.green.button
-       {:on-click accept
-        :class (when-not (valid?) "disabled")}
-       (t :actions/ok)]]]))
+               accept #(send-to-dashboard report @selected-dash)]
+    [shortcuts {:enter accept}
+     [:div.ui.tiny.modal
+      [:div.header (t :send-to-dashboard/title)]
+      [:div.content
+       [info-message (t :send-to-dashboard/desc)]
+       [:div.ui.form
+        [:div.field
+         [:label (t :send-to-dashboard/label)]
+         [select (map (juxt :name :id) (db/get :dashboards))
+          {:class "search selection"
+           :selected @selected-dash
+           :on-change #(reset! selected-dash %)}]]]]
+      [:div.actions
+       [:button.ui.green.button
+        {:on-click accept
+         :class (when-not (valid?) "disabled")}
+        (t :actions/ok)]]]]))
 
 (defn send-to-dashboard-button [report]
   [:button.ui.default.icon.button

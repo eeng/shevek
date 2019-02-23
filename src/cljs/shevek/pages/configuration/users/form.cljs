@@ -1,6 +1,7 @@
 (ns shevek.pages.configuration.users.form
   (:require [shevek.i18n :refer [t]]
-            [shevek.components.form :refer [input-field kb-shortcuts]]
+            [shevek.components.form :refer [input-field]]
+            [shevek.components.shortcuts :refer [shortcuts]]
             [shevek.lib.validation :as v]
             [shevek.lib.collections :refer [assoc-nil find-by]]
             [shevek.rpc :as rpc]
@@ -54,11 +55,11 @@
     (rpc/call "users/save" :args [(adapt-for-server @edited-user)] :handler #(do (dispatch :user-saved) (cancel)))
     (rpc/loading db :saving-user)))
 
-(defn- user-fields [user shortcuts]
+(defn- user-fields [user]
   (let [new-user? (new-record? @user)]
     [:div
      [:h3.ui.orange.header (t :users/basic-info)]
-     [:div.ui.form {:ref shortcuts}
+     [:div.ui.form
       [input-field user :username
        {:label (t :users/username) :class "required" :auto-focus true}]
       [input-field user :fullname
@@ -77,15 +78,15 @@
 
 (defn user-form [user]
   (let [cancel #(reset! user nil)
-        save #(dispatch :user-changed user cancel)
-        shortcuts (kb-shortcuts :enter save :escape cancel)]
+        save #(dispatch :user-changed user cancel)]
     (fn []
-      [:div.ui.segment.user-form (rpc/loading-class :saving-user)
-       [:div.ui.relaxed.grid
-        [:div.five.wide.column
-         [user-fields user shortcuts]]
-        [:div.eleven.wide.column.permissions
-         [user-permissions user]]
-        [:div.sixteen.wide.column
-         [:button.ui.primary.button {:on-click save} (t :actions/save)]
-         [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]])))
+      [shortcuts {:enter save :escape cancel}
+       [:div.ui.segment.user-form (rpc/loading-class :saving-user)
+        [:div.ui.relaxed.grid
+         [:div.five.wide.column
+          [user-fields user]]
+         [:div.eleven.wide.column.permissions
+          [user-permissions user]]
+         [:div.sixteen.wide.column
+          [:button.ui.primary.button {:on-click save} (t :actions/save)]
+          [:button.ui.button {:on-click cancel} (t :actions/cancel)]]]]])))

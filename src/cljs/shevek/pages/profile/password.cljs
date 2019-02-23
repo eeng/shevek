@@ -3,7 +3,8 @@
             [shevek.i18n :refer [t translation]]
             [shevek.domain.auth :refer [current-user]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.components.form :refer [input-field kb-shortcuts]]
+            [shevek.components.form :refer [input-field]]
+            [shevek.components.shortcuts :refer [shortcuts]]
             [shevek.rpc :as rpc]
             [shevek.lib.validation :as v]
             [shevek.pages.configuration.users.form :refer [user-validations]]
@@ -27,21 +28,21 @@
 
 (defn password-panel []
   (r/with-let [user (r/atom (current-user))
-               save #(dispatch :account/save user)
-               shortcuts (kb-shortcuts :enter save)]
-    [:div.ui.form.change-password {:ref shortcuts}
-     [input-field user :current-password {:label (t :account/current-password)
-                                          :class "required"
-                                          :type "password"
-                                          :auto-focus true}]
-     [input-field user :password {:label (t :account/new-password)
-                                  :placeholder (t :users/password-hint)
-                                  :type "password"}]
-     [input-field user :password-confirmation {:label (t :users/password-confirmation)
-                                               :placeholder (t :users/password-hint)
-                                               :type "password"}]
-     [input-field user :fullname {:label (t :users/fullname) :class "required"}]
-     [input-field user :email {:label (t :users/email)}]
-     [:button.ui.primary.button
-      {:on-click save :class (when (:loading? @user) "loading")}
-      (t :actions/save)]]))
+               save #(dispatch :account/save user)]
+    [shortcuts {:enter save}
+     [:div.ui.form.change-password
+      [input-field user :current-password {:label (t :account/current-password)
+                                           :class "required"
+                                           :type "password"
+                                           :auto-focus true}]
+      [input-field user :password {:label (t :account/new-password)
+                                   :placeholder (t :users/password-hint)
+                                   :type "password"}]
+      [input-field user :password-confirmation {:label (t :users/password-confirmation)
+                                                :placeholder (t :users/password-hint)
+                                                :type "password"}]
+      [input-field user :fullname {:label (t :users/fullname) :class "required"}]
+      [input-field user :email {:label (t :users/email)}]
+      [:button.ui.primary.button
+       {:on-click save :class (when (:loading? @user) "loading")}
+       (t :actions/save)]]]))

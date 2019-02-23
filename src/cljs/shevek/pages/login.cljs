@@ -1,14 +1,15 @@
 (ns shevek.pages.login
   (:require [reagent.core :as r]
+            [ajax.core :refer [POST]]
+            [cljsjs.jwt-decode]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
-            [shevek.components.form :refer [text-input input-field kb-shortcuts]]
+            [shevek.components.form :refer [text-input input-field]]
+            [shevek.components.shortcuts :refer [shortcuts]]
             [shevek.lib.local-storage :as local-storage]
-            [ajax.core :refer [POST]]
             [shevek.navigation :refer [navigate]]
-            [cljsjs.jwt-decode]
             [shevek.components.notification :refer [notify]]))
 
 (defn extract-user [token]
@@ -50,13 +51,13 @@
 
 (defn- login-form []
   (let [user (r/atom {})
-        login #(dispatch :sessions/login user)
-        shortcuts (kb-shortcuts :enter login)]
+        login #(dispatch :sessions/login user)]
     (fn []
-      [:div.ui.form {:ref shortcuts}
-       [input-field user :username {:placeholder (t :users/username) :auto-focus true :icon "user"}]
-       [input-field user :password {:placeholder (t :users/password) :type "password" :icon "lock"}]
-       [:button.ui.fluid.large.blue.primary.button {:on-click login} "Login"]])))
+      [shortcuts {:enter login}
+       [:div.ui.form
+        [input-field user :username {:placeholder (t :users/username) :auto-focus true :icon "user"}]
+        [input-field user :password {:placeholder (t :users/password) :type "password" :icon "lock"}]
+        [:button.ui.fluid.large.blue.primary.button {:on-click login} "Login"]]])))
 
 (defn page []
   [:div#login.ui.center.aligned.grid
