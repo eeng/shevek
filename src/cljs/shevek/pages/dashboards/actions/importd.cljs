@@ -5,6 +5,7 @@
             [shevek.components.modal :refer [show-modal close-modal]]
             [shevek.components.form :refer [input-field kb-shortcuts]]
             [shevek.components.notification :refer [notify]]
+            [shevek.components.message :refer [info-message]]
             [shevek.navigation :refer [navigate]]))
 
 (defn- send-import-request [{:keys [id]} form-data]
@@ -14,11 +15,6 @@
                         (navigate (str "/dashboards/" (:id new-dash)))
                         (notify (t :dashboard/imported))))
   (close-modal))
-
-(defn- info-message [text]
-  [:div.ui.icon.message
-   [:i.info.circle.small.icon]
-   [:div.content text]])
 
 (defn- import-dialog [{:keys [name] :as dashboard}]
   (r/with-let [form-data (r/atom {:name name :import-as "link"})

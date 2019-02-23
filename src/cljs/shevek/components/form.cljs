@@ -117,8 +117,10 @@
   (let [key (-> e .-which Keys)
         assigned-fn (shortcuts key)
         textarea? (-> e .-target .-tagName (= "TEXTAREA"))
-        dropdown? (-> e .-target js/$ (.closest ".dropdown") .-length (> 0))]
-    (when (and assigned-fn (not textarea?) (not dropdown?))
+        dropdown? (-> e .-target js/$ (.closest ".dropdown.visible") .-length (> 0))]
+    (when (and assigned-fn
+               (not textarea?) ; Keep the enter default function on a textarea which adds a new line
+               (not dropdown?)) ; Only handle the shortcuts when the dropdown is not unfolded
       (assigned-fn))))
 
 (defn kb-shortcuts [& {:as shortcuts}]

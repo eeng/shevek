@@ -16,6 +16,7 @@
             [shevek.pages.designer.actions.refresh :refer [refresh-button]]
             [shevek.pages.designer.actions.save :refer [save-button save-as-button]]
             [shevek.pages.designer.actions.share :refer [share-button]]
+            [shevek.pages.designer.actions.send-to-dashboard :refer [send-to-dashboard-button]]
             [shevek.pages.designer.actions.raw :refer [raw-data-button]]
             [shevek.pages.designer.actions.maximize :refer [maximize-button]]
             [shevek.pages.designer.actions.download :refer [download-csv-button]]
@@ -111,8 +112,10 @@
    {:report @requested-report
     :actions (fn [{:keys [report report-results]}]
                [[save-button report]
+                [:div.divider]
                 [save-as-button report]
                 [share-button report]
+                [send-to-dashboard-button report]
                 [download-csv-button report report-results]
                 [:div.divider]
                 [raw-data-button]
@@ -127,6 +130,7 @@
    (assoc props
           :actions (fn [{:keys [report report-results]}]
                      [[share-button report]
+                      [send-to-dashboard-button report]
                       [download-csv-button report report-results]
                       [:div.divider]
                       [raw-data-button]

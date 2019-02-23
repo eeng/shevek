@@ -66,10 +66,10 @@
               :split-required "At least one split is required for the {1} visualization"
               :too-many-splits-for-chart "A maximum of two splits may be provided for chart visualization"
               :chart-with-second-split-on-rows "The second split must be on the columns to be able to generate the chart"
-              :maximize "Maximize results panel"
-              :minimize "Minimize results panel"
+              :maximize "Maximize Results Panel"
+              :minimize "Minimize Results Panel"
               :grand-total "Grand Total"
-              :go-back "Go back to dashboard"}
+              :go-back "Go Back to Dashboard"}
    :designer.period {:relative "Relative"
                      :specific "Specific"
                      :latest "Latest"
@@ -99,6 +99,9 @@
                       :bar-chart "bar chart"
                       :line-chart "line chart"
                       :pie-chart "pie chart"}
+   :send-to-dashboard {:title "Send to Dashboard"
+                       :label "Choose the destination dashboard"
+                       :desc "This action will insert a copy of the current report into the selected dashboard."}
    :share {:title "Share"
            :label "Link to share"
            :copy "Copy"

@@ -68,10 +68,10 @@
               :split-required "Se necesita al menos una dimensión en el split ver los datos en forma de {1}"
               :too-many-splits-for-chart "Para visualización de gráficos debe haber como máximo dos splits"
               :chart-with-second-split-on-rows "Debe colocar el segundo split en las columnas para poder generar el gráfico"
-              :maximize "Maximizar panel de resultados"
-              :minimize "Minimizar panel de resultados"
+              :maximize "Maximizar Panel de Resultados"
+              :minimize "Minimizar Panel de Resultados"
               :grand-total "Total General"
-              :go-back "Volver al dashboard"}
+              :go-back "Volver al Dashboard"}
    :designer.period {:relative "Relativo"
                      :specific "Específico"
                      :latest "Ultimo"
@@ -101,6 +101,9 @@
                       :bar-chart "barras"
                       :line-chart "línea"
                       :pie-chart "torta"}
+   :send-to-dashboard {:title "Enviar a Dashboard"
+                       :label "Elegí el dashboard destino"
+                       :desc "Esta acción insertará una copia del reporte actual en el dashboard seleccionado."}
    :share {:title "Compartir"
            :label "Link para compartir"
            :copy "Copiar"

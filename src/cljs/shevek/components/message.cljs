@@ -12,3 +12,8 @@
   [:div.icon-hint
    [:i.warning.circle.icon]
    [:div.text text]])
+
+(defn info-message [text]
+  [:div.ui.icon.message
+   [:i.info.circle.small.icon]
+   [:div.content text]])
