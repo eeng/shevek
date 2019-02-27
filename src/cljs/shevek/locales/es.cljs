@@ -103,7 +103,8 @@
                       :pie-chart "torta"}
    :send-to-dashboard {:title "Enviar a Dashboard"
                        :label "Elegí el dashboard destino"
-                       :desc "Esta acción insertará una copia del reporte actual en el dashboard seleccionado."}
+                       :desc "Esta acción insertará una copia del reporte actual en el dashboard seleccionado."
+                       :success "El reporte fue enviado al dashboard seleccionado"}
    :share {:title "Compartir"
            :label "Link para compartir"
            :copy "Copiar"

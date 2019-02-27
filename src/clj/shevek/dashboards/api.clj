@@ -41,3 +41,10 @@
             "copy" (assoc i :panels (transform [ALL :report] #(dissoc % :id) (:panels original))))
           (r/save-dashboard db i)
           (select-keys i [:id]))))
+
+(defn receive-report [req {:keys [report dashboard-id]}]
+  (let [dashboard (r/find-by-id db dashboard-id)
+        report (dissoc report :id :owner-id :dashboard-id)]
+    (authorize-to-owner req dashboard)
+    (->> (update dashboard :panels conj {:type "report" :report report})
+         (r/save-dashboard db))))

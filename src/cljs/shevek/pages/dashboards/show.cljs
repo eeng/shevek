@@ -134,6 +134,7 @@
 
 ; Normally panels should have a grid-pos but during testing we usually create them without it.
 ; Also, the grid-pos was added after some user's dashboards already existed, so this could would have been alternately on a migration
+; Lastly, the send to dashboard function takes advantage of this as well, because it doesn't need to set the grid-pos
 (defn- calculate-default-grid-pos [idx]
   (let [x (* idx (:w first-grid-pos))]
     (assoc first-grid-pos

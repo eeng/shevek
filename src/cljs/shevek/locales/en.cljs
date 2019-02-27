@@ -101,7 +101,8 @@
                       :pie-chart "pie chart"}
    :send-to-dashboard {:title "Send to Dashboard"
                        :label "Choose the destination dashboard"
-                       :desc "This action will insert a copy of the current report into the selected dashboard."}
+                       :desc "This action will insert a copy of the current report into the selected dashboard."
+                       :success "The report was sent to the dashboard"}
    :share {:title "Share"
            :label "Link to share"
            :copy "Copy"

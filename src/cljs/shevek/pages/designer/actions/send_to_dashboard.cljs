@@ -5,22 +5,24 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.components.popup :refer [tooltip]]
             [shevek.components.modal :refer [show-modal close-modal]]
-            [shevek.components.form :refer [select]]
+            [shevek.components.form :refer [select input-field]]
             [shevek.components.message :refer [info-message]]
             [shevek.components.shortcuts :refer [shortcuts]]
+            [shevek.components.notification :refer [notify]]
             [shevek.rpc :as rpc]))
 
-(defn- send-to-dashboard [report dashboard-id]
-  (close-modal)
-  (rpc/call "reports/send-to-dashboard"
-            :args [{:report (dissoc report :id) :dashboard-id dashboard-id}]
-            :handler #(js/console.log %)))
+(defn- send-to-dashboard [form-data]
+  (rpc/call "dashboards/receive-report"
+            :args [form-data]
+            :handler #(do
+                        (close-modal)
+                        (notify (t :send-to-dashboard/success)))))
 
 (defn- dialog [report]
   (r/with-let [_ (dispatch :dashboards/fetch)
-               selected-dash (r/atom nil)
-               valid? #(some? @selected-dash)
-               accept #(send-to-dashboard report @selected-dash)]
+               form-data (r/atom {:report report :dashboard-id nil})
+               valid? #(some? (:dashboard-id @form-data))
+               accept #(when (valid?) (send-to-dashboard @form-data))]
     [shortcuts {:enter accept}
      [:div.ui.tiny.modal
       [:div.header (t :send-to-dashboard/title)]
@@ -31,8 +33,9 @@
          [:label (t :send-to-dashboard/label)]
          [select (map (juxt :name :id) (db/get :dashboards))
           {:class "search selection"
-           :selected @selected-dash
-           :on-change #(reset! selected-dash %)}]]]]
+           :selected (:dashboard-id @form-data)
+           :on-change #(swap! form-data assoc :dashboard-id %)}]]
+        [input-field form-data [:report :name] {:label (t :dashboard/import-name)}]]]
       [:div.actions
        [:button.ui.green.button
         {:on-click accept

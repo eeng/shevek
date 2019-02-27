@@ -38,7 +38,3 @@
 (defn share-url [{:keys [user-id] :as request} report]
   (let [{:keys [id]} (create-shared-report report user-id)]
     (str (base-url request) "/reports/" id)))
-
-(defn send-to-dashboard [_ {:keys [report dashboard-id]}]
-  (println dashboard-id)
-  (println report))

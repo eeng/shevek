@@ -8,6 +8,7 @@
             [shevek.asserts :refer [submap? submaps? without?]]
             [shevek.schemas.user :refer [User]]
             [shevek.schemas.dashboard :refer [Dashboard]]
+            [shevek.schemas.report :refer [Report]]
             [shevek.lib.mongodb :as m]))
 
 (use-fixtures :once wrap-unit-tests)
@@ -70,3 +71,28 @@
     (let [u (:id (make! User))]
       (is (thrown? java.lang.AssertionError
                    (api/import {:user-id u} {:import-as "link" :original-id u :name "S"}))))))
+
+(deftest receive-report-tests
+  (it "should add a panel with the report"
+    (let [u (:id (make! User))
+          d (:id (make! Dashboard {:owner-id u :panels [{:report {:name "R1"}}]}))]
+      (api/receive-report {:user-id u} {:dashboard-id d :report (make Report {:name "R2"})})
+      (is (= 2 (count (:panels (r/find-by-id db d)))))
+      (is (= 2 (m/count db "reports")))
+      (is (submaps? [{:name "R1" :dashboard-id d} {:name "R2" :dashboard-id d}]
+                    (m/find-all db "reports")))))
+
+  (it "should remove the owner-id from the report as the dashboard already has it"
+    (let [u (:id (make! User))
+          d (:id (make! Dashboard {:owner-id u :panels []}))]
+      (api/receive-report {:user-id u} {:dashboard-id d :report (make Report {:name "R" :owner-id u})})
+      (is (= [nil] (map :owner-id (m/find-all db "reports"))))
+      (is (= ["R"] (map :name (m/find-all db "reports"))))))
+
+  (it "should always create a new report even if it had and id"
+    (let [u (:id (make! User))
+          d (:id (make! Dashboard {:owner-id u :panels []}))
+          r (make! Report)]
+      (api/receive-report {:user-id u} {:dashboard-id d :report r})
+      (is (= 2 (m/count db "reports")))
+      (is (= [nil d] (map :dashboard-id (m/find-all db "reports")))))))
