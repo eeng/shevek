@@ -58,10 +58,13 @@
              :y 99}]
     (assoc pos :w w :h (:h first-grid-pos))))
 
+(defn- calculate-new-panel-id [panels]
+  (->> panels (map :id) (apply max 0) inc))
+
 (defevh :dashboard/add-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
                    :grid-pos (calculate-new-grid-position panels)
-                   :id (->> panels (map :id) (apply max 0) inc)}]
+                   :id (calculate-new-panel-id panels)}]
     (update-in db [:current-dashboard :panels] conj new-panel)))
 
 (defn- same-id [other-id]
@@ -76,6 +79,13 @@
 (defevh :dashboard/remove-panel [db id]
   (-> (setval [:current-dashboard :panels ALL (same-id id)] NONE db)
       (update-in [:current-dashboard :reports-results] (fnil dissoc {}) id)))
+
+(defevh :dashboard/duplicate-panel [{{:keys [panels]} :current-dashboard :as db} panel]
+  (let [new-panel (assoc panel
+                         :grid-pos (merge (calculate-new-grid-position panels)
+                                          (select-keys (:grid-pos panel) [:w :h]))
+                         :id (calculate-new-panel-id panels))]
+    (update-in db [:current-dashboard :panels] conj new-panel)))
 
 (defevh :dashboard/layout-changed [db layout]
   (let [find-panel-pos (fn [{:keys [id]}]
@@ -119,13 +129,19 @@
        :ref (tooltip (t :dashboard/remove-panel))}
    [:i.trash.icon]])
 
+(defn- duplicate-panel-button [panel]
+  [:a {:on-click #(dispatch :dashboard/duplicate-panel panel)
+       :ref (tooltip (t :dashboard/duplicate-panel))}
+   [:i.copy.icon]])
+
 (defn- dashboard-panel [{:keys [type report] :as panel} dashboard & [{:keys [already-fullscreen?]}]]
   (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report
         modifiable? (modifiable? dashboard)]
     [l/panel
      {:title name
-      :actions [(when modifiable? [edit-panel-button panel])
-                [fullscreen-panel-button panel already-fullscreen?]
+      :actions [[fullscreen-panel-button panel already-fullscreen?]
+                (when modifiable? [edit-panel-button panel])
+                (when modifiable? [duplicate-panel-button panel])
                 (when modifiable? [remove-panel-button panel])]
       :scrollable true}
      (case type

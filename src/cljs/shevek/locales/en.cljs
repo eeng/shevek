@@ -24,6 +24,7 @@
                 :description "Description"}
    :dashboard {:add-panel "Add Panel"
                :edit-panel "Edit Panel"
+               :duplicate-panel "Duplicate Panel"
                :fullscreen-panel "Toggle Fullscreen"
                :remove-panel "Remove Panel"
                :select-cube "Select a cube for the report"

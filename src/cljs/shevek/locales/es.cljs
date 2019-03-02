@@ -28,6 +28,7 @@
                 :description "Descripción"}
    :dashboard {:add-panel "Agregar Panel"
                :edit-panel "Modificar Panel"
+               :duplicate-panel "Duplicar Panel"
                :fullscreen-panel "Maximizar/Minimizar"
                :remove-panel "Quitar Panel"
                :select-cube "Seleccioná un cubo para el reporte"
