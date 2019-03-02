@@ -49,18 +49,18 @@
 (defevh :dashboards/show [{:keys [current-dashboard] :as db} id query-params]
   (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
 
-(defn- calculate-new-panel-position [panels]
+(defn- calculate-new-grid-position [panels]
   (let [w (:w first-grid-pos)
         last-pos (or (-> panels last :grid-pos)
                      {:x 0 :w 0})
         pos {:x (let [x (+ (:x last-pos) (:w last-pos))]
                   (if (> (+ x w) grid-columns) 0 x))
-             :y 999}]
+             :y 99}]
     (assoc pos :w w :h (:h first-grid-pos))))
 
 (defevh :dashboard/add-panel [{{:keys [panels]} :current-dashboard :as db}]
   (let [new-panel {:type "cube-selector"
-                   :grid-pos (calculate-new-panel-position panels)
+                   :grid-pos (calculate-new-grid-position panels)
                    :id (->> panels (map :id) (apply max 0) inc)}]
     (update-in db [:current-dashboard :panels] conj new-panel)))
 
@@ -135,11 +135,12 @@
 ; Normally panels should have a grid-pos but during testing we usually create them without it.
 ; Also, the grid-pos was added after some user's dashboards already existed, so this could would have been alternately on a migration
 ; Lastly, the send to dashboard function takes advantage of this as well, because it doesn't need to set the grid-pos
-(defn- calculate-default-grid-pos [idx]
-  (let [x (* idx (:w first-grid-pos))]
-    (assoc first-grid-pos
-           :x (mod x grid-columns)
-           :y (Math/floor (/ x grid-columns)))))
+(defn add-missing-grid-positions [panels]
+  (reduce (fn [ready-panels panel]
+            (conj ready-panels
+                  (assoc panel :grid-pos (calculate-new-grid-position ready-panels))))
+          (filterv :grid-pos panels)
+          (remove :grid-pos panels)))
 
 (def GridLayout (js/ReactGridLayout.WidthProvider js/ReactGridLayout #js {:measureBeforeMount true}))
 
@@ -155,8 +156,8 @@
                     :isDraggable (modifiable? dashboard)
                     :isResizable (modifiable? dashboard)
                     :margin [15 15]}
-     (for [[idx {:keys [id] :as panel}] (map-indexed vector panels)]
-       [:div {:key id :data-grid (get panel :grid-pos (calculate-default-grid-pos idx))}
+     (for [{:keys [id grid-pos] :as panel} (add-missing-grid-positions panels)]
+       [:div {:key id :data-grid grid-pos}
         [dashboard-panel panel dashboard]])]))
 
 (defn dashboard-panels
