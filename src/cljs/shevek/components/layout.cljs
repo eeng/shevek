@@ -34,9 +34,9 @@
    [:div.simplebar-track.simplebar-vertical
     [:div.simplebar-scrollbar]]])
 
-(defn panel [{:keys [title actions scrollable]} & content]
+(defn panel [{:keys [title actions scrollable id]} & content]
   (let [panel-content (into [:div.panel-content] content)]
-    [:div.ui.segment.clearing.panel
+    [:div.ui.segment.clearing.panel {:id id}
      [:div.ui.top.attached.label.panel-header
       title
       (when (seq actions)

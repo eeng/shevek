@@ -23,3 +23,9 @@
 
 (defn trigger-click [on]
   (trigger "click" on))
+
+(defn scroll-to [selector & [{:keys [after] :or {after identity}}]]
+  (let [el (js/$ selector)
+        scrollTop (-> el .offset .-top)]
+    (.animate (js/$ "html, body") #js{:scrollTop scrollTop} 500 "swing" (partial after el))
+    el))

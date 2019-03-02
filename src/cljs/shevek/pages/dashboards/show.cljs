@@ -20,6 +20,7 @@
             [shevek.rpc :as rpc]
             [shevek.lib.collections :refer [detect find-by]]
             [shevek.lib.react :refer [hot-reloading?]]
+            [shevek.lib.util :refer [scroll-to]]
             [shevek.navigation :refer [current-url-with-params]]
             [shevek.components.layout :as l :refer [topbar]]
             [shevek.components.popup :refer [tooltip]]
@@ -85,6 +86,7 @@
                          :grid-pos (merge (calculate-new-grid-position panels)
                                           (select-keys (:grid-pos panel) [:w :h]))
                          :id (calculate-new-panel-id panels))]
+    (js/setTimeout #(scroll-to (str "#panel-" (:id new-panel))) 100)
     (update-in db [:current-dashboard :panels] conj new-panel)))
 
 (defevh :dashboard/layout-changed [db layout]
@@ -134,11 +136,12 @@
        :ref (tooltip (t :dashboard/duplicate-panel))}
    [:i.copy.icon]])
 
-(defn- dashboard-panel [{:keys [type report] :as panel} dashboard & [{:keys [already-fullscreen?]}]]
+(defn- dashboard-panel [{:keys [type report id] :as panel} dashboard & [{:keys [already-fullscreen?]}]]
   (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report
         modifiable? (modifiable? dashboard)]
     [l/panel
      {:title name
+      :id (str "panel-" id) ; For scrolling to
       :actions [[fullscreen-panel-button panel already-fullscreen?]
                 (when modifiable? [edit-panel-button panel])
                 (when modifiable? [duplicate-panel-button panel])
