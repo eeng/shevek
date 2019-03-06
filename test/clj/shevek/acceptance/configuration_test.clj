@@ -22,7 +22,7 @@
       (is (has-css? ".users-list tbody tr" :count 2)))
 
     (it "permissions"
-      (make! User {:username "mary" :admin false})
+      (make! User {:username "mary" :fullname "Mary" :admin false})
       (make! Cube {:title "Sales"})
       (make! Cube {:title "Inventory"})
       (login-admin)
@@ -32,5 +32,6 @@
       (click-text "Can view all cubes")
       (click {:fn/has-text "Sales"})
       (click-text "Save")
+      (is (has-no-text? "Basic Information"))
       (is (has-text? "Sales"))
       (is (has-no-text? "Inventory")))))
