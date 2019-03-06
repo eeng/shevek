@@ -68,11 +68,11 @@
                 {:name "cilindrico" :title "Cilíndrico" :type "FLOAT"}
                 {:name "eje_cilindrico" :title "Eje Cilíndrico" :type "FLOAT"}
                 {:name "adicion" :title "Adición" :type "FLOAT"}]
-   :measures [{:name "importe" :title "Importe Total" :format "$0.00a"
+   :measures [{:name "importe" :title "Importe Total" :format "$0,0.00a"
                :expression "(/ (sum $importe) 100)"}
-              {:name "importe_productos" :format "$0.00a" :favorite true
+              {:name "importe_productos" :format "$0,0.00a" :favorite true
                :expression "(/ (where {$grupo_item \"Productos\"} (sum $importe)) 100)"}
-              {:name "importe_impuestos" :format "$0.00a"
+              {:name "importe_impuestos" :format "$0,0.00a"
                :expression "(/ (where {$grupo_item \"Impuestos\"} (sum $importe)) 100)"}
               {:name "ultimo_nro_cbte" :title "Último Cbte" :format "0,0"}
               {:name "unidades_precios" :title "Unidades"
