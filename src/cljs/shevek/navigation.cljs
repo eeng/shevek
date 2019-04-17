@@ -37,7 +37,7 @@
 
 (defn url-with-params [url params]
   (str url
-       (when (seq params) (str "?" (js/URLSearchParams. (clj->js params))))))
+       (when (seq params) (str "?" (secretary/encode-query-params params)))))
 
 (defn current-url-with-params [params]
   (url-with-params (.-pathname js/location) params))
