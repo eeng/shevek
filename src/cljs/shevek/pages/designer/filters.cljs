@@ -12,7 +12,7 @@
             [shevek.rpc :as rpc]
             [shevek.pages.designer.helpers :refer [panel-header send-designer-query send-query highlight current-cube send-pinboard-queries]]
             [shevek.domain.dw :refer [format-dimension format-dim-value dimension-value]]
-            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching classes]]
+            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching]]
             [shevek.components.popup :refer [show-popup close-popup tooltip]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.components.calendar :refer [build-range-calendar]]
@@ -206,7 +206,7 @@
        [:div.top-inputs
         [operator-selector filter]
         [search-input search {:on-change #(fetch-dim-values-deb %)
-                              :wrapper {:class (classes "small" (when (@filter :loading?) "loading"))}}]]
+                              :wrapper {:class ["small" (when (@filter :loading?) "loading")]}}]]
        [:div.items-container
         (into [:div.items]
           (map #(dimension-value-item dim % filter @search)

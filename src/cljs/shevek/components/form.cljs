@@ -6,9 +6,6 @@
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]))
 
-(defn classes [& css-classes]
-  (->> css-classes (filter identity) (str/join " ")))
-
 ;; Basic components
 
 (defn checkbox [id label & [{:keys [checked on-change] :or {on-change identity}}]]
@@ -99,7 +96,7 @@
         input-opts (cond-> (merge input-opts (dissoc opts :input :class :wrapper :as :icon))
                            (not= as :checkbox) (dissoc :label))]
     (assert input (str "Input type '" as "' not supported"))
-    [:div.field {:class (classes class (when errors "error"))}
+    [:div.field {:class [class (when errors "error")]}
      (when (and label (not= as :checkbox)) [:label label])
      [:div.ui.input (merge {:class (when icon "left icon")} wrapper)
       (when icon [:i.icon {:class icon}])
