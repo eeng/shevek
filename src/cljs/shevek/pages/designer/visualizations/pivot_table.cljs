@@ -3,7 +3,6 @@
             [shevek.reflow.core :refer [dispatch]]
             [shevek.reflow.db :as db]
             [shevek.i18n :refer [t]]
-            [shevek.navigation :refer [current-page?]]
             [shevek.domain.dimension :refer [find-dimension]]
             [shevek.pages.designer.helpers :refer [current-cube]]
             [shevek.components.popup :refer [show-popup close-popup]]
@@ -97,9 +96,11 @@
 ; The slice can't be used directly for the hash because it fails when the values are floats, as they are hash as ints and can produce duplicate values
 (defn- body-row []
   (let [selected (r/atom false)]
-    (fn [{:keys [cells slice grand-total?]} row-key]
+    (fn [{:keys [cells slice grand-total? subtotal?]} row-key]
       (into
-       [:tr {:class (if grand-total? "grand-total" (when @selected "active"))
+       [:tr {:class [(when grand-total? "grand-total")
+                     (when @selected "active")
+                     (when subtotal? "subtotal")]
              :on-click (when (and (not grand-total?) (designer-visible?))
                          (fn [event]
                            (let [tr (-> (.-target event) js/$ (.closest "tr"))

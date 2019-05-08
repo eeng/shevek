@@ -121,7 +121,8 @@
                      (dimension-value-cell row-split result :depth (count slice-so-far)))]
     {:cells (cons first-cell (measure-values-cells result grand-total? viz))
      :slice (conj slice-so-far first-cell)
-     :grand-total? grand-total?}))
+     :grand-total? grand-total?
+     :subtotal? (< (inc (count slice-so-far)) (count (:row-splits viz)))}))
 
 (defn- results-rows
   [{:keys [child-rows] :as result} viz [row-split & row-splits] slice-so-far]
