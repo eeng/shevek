@@ -3,11 +3,6 @@
  :time-boundary-update-interval 300
  :log {:level :debug :timestamp false}
 
- ; :monitoring {:influx {:uri "http://10.0.1.17:8086"
- ;                       :username "root"
- ;                       :password "InfluxPass541"
- ;                       :database "telegraf"}}
-
  :cubes
  [{:name "facturacion"
    :title "Ventas"
