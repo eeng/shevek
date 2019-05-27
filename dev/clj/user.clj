@@ -10,7 +10,8 @@
 ; To start a ClojureScript REPL connect to the figwheel nREPL (port 4002) and then eval this
 #_(cljs-repl)
 
-; Use this to reread the config file
+; Re-read configuration file
 #_(shevek.app/reload-config)
 
+; Restores the database to its initial state
 #_(shevek.schema.seed/db-reset! shevek.db/db)

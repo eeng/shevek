@@ -9,7 +9,8 @@
 (defn users [db]
   (when-not (users/find-by db {:admin true})
     (debug "Seeding admin user.")
-    (users/create-or-update-by db :username {:username "admin" :fullname "Administrator" :password "asdf654" :admin true})))
+    (users/create-or-update-by db :username {:username "admin" :fullname "Administrator"
+                                             :password "secret123" :admin true})))
 
 (defn cubes [db]
   (debug "Seeding schema.")
