@@ -34,10 +34,6 @@
 (defn- set-default-type [dimension]
   (merge {:type "STRING"} dimension))
 
-; (defn- clean-old-fields [{:keys [expression] :as dimension}]
-;   (cond-> dimension
-;           expression (dissoc :extraction :column)))
-;
 (defn set-defaults [{:keys [dimensions measures] :as cube}]
   (-> (set-default-title cube)
       (assoc :dimensions (mapv (comp set-default-type set-default-title) dimensions))
@@ -70,5 +66,6 @@
            (merge cube)
            (save-cube db)))))
 
+#_(discover-cubes shevek.engine.state/dw)
 #_(discover! shevek.engine.state/dw shevek.db/db)
 #_(update-time-boundary! shevek.engine.state/dw shevek.db/db)

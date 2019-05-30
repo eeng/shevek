@@ -1,6 +1,6 @@
 (ns shevek.schema.manager-test
-  (:require [clojure.test :refer :all]
-            [shevek.test-helper :refer :all]
+  (:require [clojure.test :refer [use-fixtures deftest is testing]]
+            [shevek.test-helper :refer [wrap-unit-tests it]]
             [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
             [shevek.schema.manager :refer [discover! update-cubes]]
@@ -17,15 +17,15 @@
   (it "initial descovery should save all cubes with their dimensions and metrics"
     (f/with-fakes
       (let [dw (f/reify-fake Engine
-                 (cubes :fake [[] ["wikiticker" "vtol_stats"]])
-                 (cube-metadata :fake [["wikiticker"]
+                 (cubes :fake [[] ["wikipedia" "vtol_stats"]])
+                 (cube-metadata :fake [["wikipedia"]
                                        {:dimensions [{:name "region" :type "STRING"}]
                                         :measures [{:name "added" :type "longSum"}]}
                                        ["vtol_stats"]
                                        {:dimensions [{:name "path" :type "LONG"}]
                                         :measures [{:name "requests" :type "hyperUnique"}]}]))]
         (let [cubes (do (discover! dw db) (find-cubes db))]
-          (is (submaps? [{:name "wikiticker"} {:name "vtol_stats"}] cubes))
+          (is (submaps? [{:name "wikipedia"} {:name "vtol_stats"}] cubes))
           (is (submaps? [{:name "__time"}
                          {:name "region" :type "STRING"}
                          {:name "__time"}

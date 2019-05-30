@@ -153,8 +153,8 @@
                :expression "(/ (where {$evento \"Repetición\"} (count-distinct $pedidos))
                                (count-distinct $pedidos))"}]}
 
-  {:name "wikiticker"
-   :description "Druid quickstart sample of Wikipedia edits"
+  {:name "wikipedia"
+   :description "Druid quickstart sample of Wikipedia stats"
    :dimensions
    [{:name "isMinor" :format "boolean"}
     {:name "isUnpatrolled" :format "boolean"}
@@ -174,4 +174,6 @@
      :extraction [{:type "javascript"
                    :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}]
    :measures
-   [{:name "count" :description "Character count"}]}]}
+   [{:name "deleted" :description "Deleted characters"}
+    {:name "added"}
+    {:name "delta"}]}]}
