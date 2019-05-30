@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [;; Backend
-                 [org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojure "1.10.0"]
                  [mount "0.1.12"]
                  [cprop "0.1.11"]
                  [http-kit "2.2.0"]
@@ -23,7 +23,7 @@
                  [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]] ; Sin la exclusion usaba guava 18 con el cual no es compatible clojurescript 1.10
                  [org.clojure/tools.nrepl "0.2.13"]
                  [clj-http "2.3.0"]
-                 [org.clojure/core.match "0.3.0-alpha4"]
+                 [org.clojure/core.match "0.3.0"]
                  [ns-tracker "0.3.1"] ; For the reloader
                  [hiccup "1.0.5"]
                  [optimus "0.20.1"]
@@ -32,13 +32,13 @@
 
                  ;; Frontend
                  [org.clojure/clojurescript "1.10.238"]
-                 [org.clojure/core.async "0.4.474"]
+                 [org.clojure/core.async "0.4.490"]
                  [reagent "0.8.1"]
                  [cljs-ajax "0.7.4"]
                  [secretary "1.2.3"]
                  [kibu/pushy "0.3.8"]
                  [com.andrewmcveigh/cljs-time "0.5.1"]
-                 [tongue "0.1.4"]
+                 [tongue "0.2.6"]
                  [cljsjs/numeral "2.0.6-0"]
                  [cljsjs/jwt-decode "2.1.0-0"]
                  [cljsjs/clipboard "1.6.1-1"]
@@ -52,7 +52,7 @@
                  [funcool/cuerdas "2.0.5"]
                  [com.rpl/specter "1.1.1"]
                  [prismatic/schema "1.1.10"]
-                 [metosin/schema-tools "0.10.5"]]
+                 [metosin/schema-tools "0.11.0"]]
 
   :plugins [[lein-pprint "1.1.2"]
             [lein-cooper "1.2.2"]
@@ -127,7 +127,7 @@
                                   ;; Testing clj
                                   [etaoin "0.3.2"]
                                   [se.haleby/stub-http "0.2.7"]
-                                  [prismatic/schema-generators "0.1.0"]
+                                  [prismatic/schema-generators "0.1.2"]
                                   ;; Testing cljs
                                   [pjstadig/humane-test-output "0.8.3"]
                                   [cljsjs/jquery "3.2.1-0"]]
