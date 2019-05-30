@@ -1,9 +1,12 @@
 (ns shevek.lib.logging
   (:require [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as appenders]
-            [shevek.config :refer [env? config]]
+            [shevek.config :refer [config]]
+            [shevek.env :refer [env]]
             [shevek.lib.collections :refer [assoc-if]]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [clojure.pprint :refer [pprint]]
+            [mount.core :refer [defstate]])
   (:import java.util.TimeZone))
 
 (defn output-fn
@@ -19,16 +22,20 @@
      (when-let [err ?err]
        (str "\n" (log/stacktrace err nil))))))
 
-(defn configure-logging! []
-  (log/merge-config!
-   (assoc-if {:level (config [:log :level])}
-             :output-fn output-fn
-             :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS" :timezone (TimeZone/getDefault)} ; By default msecs are missing and uses UTC
-             :appenders (when (not= "stdout" (config [:log :to]))
-                          {:println {:enabled? false} :spit (appenders/spit-appender {:fname (config [:log :to])})}))))
+(defstate logger
+  :start
+  (do
+    (log/merge-config!
+     (assoc-if {:level (config [:log :level])}
+               :output-fn output-fn
+               :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS" :timezone (TimeZone/getDefault)} ; By default msecs are missing and uses UTC
+               :appenders (when (not= "stdout" (config [:log :to]))
+                            {:println {:enabled? false} :spit (appenders/spit-appender {:fname (config [:log :to])})})))
+    (log/info "Starting app in" (env) "environment")
+    :ok))
 
 (defn pp-str [& args]
-  (with-out-str (apply clojure.pprint/pprint args)))
+  (with-out-str (apply pprint args)))
 
 (defmacro benchmark [{:keys [before after log-level] :or {log-level :info}} & body]
   (let [log-fn (case log-level

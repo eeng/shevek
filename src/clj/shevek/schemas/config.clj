@@ -9,7 +9,7 @@
   {(s/optional-key :influx) {s/Keyword s/Str}})
 
 (s/defschema Config
-  {:env s/Keyword
+  {:env s/Str
    :port s/Int
    :nrepl-port s/Int
    :mongodb-uri s/Str

@@ -74,7 +74,7 @@
 
   :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
 
-  :cooper {"backend" ["lein" "run" "-m" "shevek.app/start-for-dev"]
+  :cooper {"backend" ["lein" "run" "-m" "shevek.app/start"]
            "less" ["lein" "less4j" "auto"]
            "figwheel" ["lein" "figwheel"]}
 

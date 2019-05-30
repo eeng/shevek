@@ -21,7 +21,7 @@ user=> (cljs-repl)
 
 ```
 lein build-frontend
-lein run -m shevek.app/start-for-dev
+lein run -m shevek.app/start
 ```
 
 ### Packaging

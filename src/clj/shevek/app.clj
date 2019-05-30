@@ -1,34 +1,27 @@
 (ns shevek.app
   (:require [mount.core :as mount]
-            [shevek.init]
-            [shevek.web.server :refer [web-server]]
+            [taoensso.timbre :as log]
+            [schema.core :as schema]
+            [shevek.env :refer [env]]
+            [shevek.lib.logging]
+            [shevek.web.server]
             [shevek.nrepl :refer [nrepl]]
-            [shevek.db :refer [db]]
+            [shevek.db]
             [shevek.engine.state]
-            [shevek.scheduler :refer [scheduler]]
-            [shevek.reloader :refer [reloader]]
-            [shevek.schema.seed :refer [seed!]])
+            [shevek.scheduler]
+            [shevek.reloader])
   (:gen-class))
 
-(defn start-for-dev []
-  (mount/start))
-
-(defn- start-for-seed []
-  (mount/start-without #'nrepl #'web-server #'scheduler #'reloader))
-
 (defn start []
-  (mount/start-without #'reloader))
+  (schema/set-fn-validation! true)
+  (mount/start))
 
 (defn stop []
-  (mount/stop))
+  (mount/stop-except #'nrepl))
 
 (defn restart []
-  (mount/stop-except #'nrepl)
+  (mount/stop)
   (mount/start))
-
-(defn seed []
-  (start-for-seed)
-  (seed! db))
 
 (defn -main [& args]
   (start)

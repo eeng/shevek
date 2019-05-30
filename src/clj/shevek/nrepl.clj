@@ -2,13 +2,14 @@
   (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [clojure.java.io :as io]
             [mount.core :refer [defstate]]
-            [shevek.config :refer [config env?]]
+            [shevek.config :refer [config]]
+            [shevek.env :as env]
             [taoensso.timbre :as log]))
 
 (defn- create-nrepl-file
   "ProtoREPL detects the this file so there is no need to type it"
   [port]
-  (when (env? :development)
+  (when (env/development?)
     (doto (io/file ".nrepl-port")
       (spit port)
       (.deleteOnExit))))

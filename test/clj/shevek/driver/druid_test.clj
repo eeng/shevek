@@ -1,10 +1,13 @@
 (ns shevek.driver.druid-test
-  (:require [clojure.test :refer [deftest testing is]]
+  (:require [clojure.test :refer [use-fixtures deftest testing is]]
+            [shevek.test-helper :refer [wrap-unit-tests]]
             [stub-http.core :refer [with-routes!]]
             [shevek.driver.druid :as driver]
             [shevek.driver.http-druid :refer [http-druid-driver]]
             [shevek.support.druid :refer [druid-res]]
             [cheshire.core :refer [generate-string]]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest datasources-test
   (with-routes!

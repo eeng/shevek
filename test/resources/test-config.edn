@@ -1,4 +1,4 @@
-{:env :test
+{:env "test"
  :port 4100
  :nrepl-port 4101
  :druid-uri "http://localhost:4102"

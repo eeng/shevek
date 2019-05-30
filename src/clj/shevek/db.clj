@@ -2,7 +2,8 @@
   (:require [mount.core :refer [defstate]]
             [monger.core :as mg]
             [monger.collection :as mc]
-            [shevek.config :refer [config env?]]
+            [shevek.config :refer [config]]
+            [shevek.env :as env]
             [shevek.schema.migrator :refer [migrate!]]
             [taoensso.timbre :as log]))
 
@@ -21,7 +22,7 @@
   (mc/ensure-index db "reports" (array-map :owner-id 1 :name 1))
   (mc/ensure-index db "reports" (array-map :sharing-digest 1))
   (mc/ensure-index db "dashboards" (array-map :user-id 1 :name 1))
-  (when-not (env? :test) (migrate! db))
+  (when-not (env/test?) (migrate! db))
   db)
 
 (defstate db :start (init-db (mongo :db)))

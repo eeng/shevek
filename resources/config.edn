@@ -1,6 +1,6 @@
 ; Default config file. Every property here can be overridden with environment variables or Java system properties. We use cprop (https://github.com/tolitius/cprop) for configuration so check its documentation for more instructions on how to do this.
 
-{:env :production
+{:env "production"
  :port 4000
  :nrepl-port 4001
 
