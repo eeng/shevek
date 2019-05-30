@@ -33,3 +33,6 @@
 (defn -main [& args]
   (start)
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop)))
+
+#_(start-for-dev)
+#_(stop)

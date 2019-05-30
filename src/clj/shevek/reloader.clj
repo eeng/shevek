@@ -13,21 +13,25 @@
       (log/error e))))
 
 (defn- auto-reloader []
-  (loop [tracker (tracker/ns-tracker ["src"])]
-    (reload-namespaces (tracker))
+  (let [tracker (tracker/ns-tracker ["src"])]
     (Thread/sleep 1000)
-    (recur tracker)))
+    (reload-namespaces (tracker))))
 
-(defn start-reloader []
-  (log/info "Starting reloader")
-  (doto (Thread. auto-reloader)
-    (.setDaemon true)
-    (.start)))
+(defn- start-infinite [f]
+  (let [running (atom true)]
+    (future
+     (loop []
+       (when @running
+         (f)
+         (recur))))
+    running))
 
-(defstate ^{:on-reload :noop} reloader
-  :start (start-reloader)
-  :stop (.stop reloader))
+(defn- stop-infinite [running]
+  (reset! running false))
 
-; To manually restart the reloader in case of changes in this file, as the state has to have a on-reload
-#_(mount.core/stop #'reloader)
+(defstate reloader
+  :start (start-infinite auto-reloader)
+  :stop (stop-infinite reloader))
+
 #_(mount.core/start #'reloader)
+#_(mount.core/stop #'reloader)
