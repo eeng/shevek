@@ -10,7 +10,7 @@
   (log/info "Establishing connection to" (config :mongodb-uri))
   (mg/connect-via-uri (config :mongodb-uri)))
 
-(defstate ^{:on-reload :noop} mongo
+(defstate mongo
   :start (connect)
   :stop (mg/disconnect (mongo :conn)))
 

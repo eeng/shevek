@@ -19,10 +19,10 @@
 (defn start []
   (mount/start-without #'reloader))
 
-(defn- stop []
+(defn stop []
   (mount/stop))
 
-(defn reload-config []
+(defn restart []
   (mount/stop-except #'nrepl)
   (mount/start))
 
@@ -33,6 +33,3 @@
 (defn -main [& args]
   (start)
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop)))
-
-#_(start-for-dev)
-#_(stop)

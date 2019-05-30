@@ -3,5 +3,5 @@
             [shevek.engine.protocol :as e]))
 
 #_(e/cubes dw)
-#_(e/time-boundary dw "wikiticker")
-#_(e/cube-metadata dw "wikiticker")
+#_(e/time-boundary dw "wikipedia")
+#_(e/cube-metadata dw "wikipedia")
