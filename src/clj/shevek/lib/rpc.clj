@@ -20,4 +20,12 @@
 
 ; I remove the optimus-assets otherwise when a schema validation error occours in any api method it would become very slow when the error middleware logs it
 (defn controller [request]
-  {:status 200 :body (call-fn (dissoc request :optimus-assets))})
+  (try
+    {:status 200 :body (call-fn (dissoc request :optimus-assets))}
+    (catch clojure.lang.ExceptionInfo e
+      (case (-> e ex-data :type)
+        :shevek/record-not-found {:status 404 :body "Record not found"}
+        (throw e)))))
+
+#_(controller {:params {:fn "reports/find-all"} :user-id "5cec63d1f8d5029a718afe17"})
+#_(controller {:params {:fn "dashboards/find-by-id" :args ["..."]}})

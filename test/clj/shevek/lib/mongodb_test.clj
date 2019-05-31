@@ -1,9 +1,12 @@
 (ns shevek.lib.mongodb-test
-  (:require [clojure.test :refer :all]
-            [shevek.test-helper :refer [it]]
+  (:require [clojure.test :refer [deftest testing is use-fixtures]]
+            [shevek.test-helper :refer [it wrap-unit-tests]]
             [shevek.asserts :refer [submap?]]
-            [shevek.lib.mongodb :refer [timestamp oid wrap-oids unwrap-oids]]
-            [clj-time.core :refer [date-time now]]))
+            [shevek.lib.mongodb :as m :refer [timestamp oid wrap-oids unwrap-oids]]
+            [clj-time.core :refer [date-time now]]
+            [shevek.db :refer [db]]))
+
+(use-fixtures :once wrap-unit-tests)
 
 (deftest timestamp-tests
   (testing "should set created-at if not present"
@@ -50,3 +53,15 @@
   (testing "should not touch other fields"
     (is (= {:a 1 :b nil :c "d" :tags ["a"]}
            (unwrap-oids {:a 1 :b nil :c "d" :tags ["a"]})))))
+
+(deftest find-by-id
+  (it "wraps and unwraps the ids"
+    (let [{:keys [id]} (m/save db "docs" {:title "t"})]
+      (is (string? id))
+      (is (submap? {:id id :title "t"} (m/find-by-id db "docs" id)))))
+
+  (it "with invalid ids returns nil"
+    (is (nil? (m/find-by-id db "docs" "invalid"))))
+
+  (it "if the document doesn't exists returns nil"
+    (is (nil? (m/find-by-id db "docs" "597b7622f8d5026e49917be4")))))

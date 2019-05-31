@@ -204,4 +204,4 @@
             :no-desc "No description"
             :bad-gateway "The system is not available right now. Please try again later."
             :unexpected "We're sorry but something went wrong. We've been notified about this issue and we'll take a look at it shortly."
-            :page-not-found "The requested page was not found. Make sure there aren't any errors in the web address."}})
+            :page-not-found "The requested page was not found. Make sure the web address is correct."}})

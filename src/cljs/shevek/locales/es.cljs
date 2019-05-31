@@ -200,4 +200,4 @@
             :no-desc "Sin descripción"
             :bad-gateway "El sistema no está disponible en este momento. Por favor, intente nuevamente más tarde."
             :unexpected "Lo sentimos pero algo salió mal. Hemos sido notificados y lo estaremos resolviendo a la brevedad."
-            :page-not-found "La página solicitada no existe. Tal vez hay un error en la dirección, o quizás la página haya sido movida."}})
+            :page-not-found "La página solicitada no existe. Esto puede deberse a un error en la dirección ingresada o quizás la página fue movida."}})

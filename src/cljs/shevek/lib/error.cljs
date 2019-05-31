@@ -21,11 +21,15 @@
 (defn handle-not-authenticated []
   (dispatch :sessions/expired))
 
+(defn show-page-404 []
+  (dispatch :errors/show-without-url-change {:title "Error 404" :message (t :errors/page-not-found)}))
+
 (defevh :errors/from-server [db {:keys [status status-text response] :as error}]
   (case status
     401 (handle-not-authenticated)
-    403 (handle-app-error (assoc error :response (t :users/unauthorized)))
+    404 (show-page-404)
     502 (handle-app-error (assoc error :response (t :errors/bad-gateway)))
+    403 (handle-app-error (assoc error :response (t :users/unauthorized)))
     (handle-app-error (assoc error :response (t :errors/unexpected))))
   (rpc/loaded db))
 

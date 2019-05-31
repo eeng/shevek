@@ -22,8 +22,8 @@
               :fields [:name :description :updated-at :owner-id]
               :sort {:name 1}))
 
-(defn find-by-id [db id]
-  (m/find-by-id db "dashboards" id))
+(defn find-by-id! [db id]
+  (m/find-by-id! db "dashboards" id))
 
 (defn- fetch-report [db {:keys [report-id] :as panel}]
   (let [report-copy (-> (m/find-by-id db "reports" report-id)
@@ -33,14 +33,13 @@
 
 (defn- merge-master-if-slave [db {:keys [master-id] :as dashboard}]
   (if master-id
-    (let [master (find-by-id db master-id)]
-      (assert master)
+    (let [master (find-by-id! db master-id)]
       (assoc dashboard :panels (master :panels)))
     dashboard))
 
 ; This implementation probably is going to be slow if a dashboard has many reports but the alternative that is to use the aggregation framework is less clean and hopefully there won't be many reports per dashboard
 (defn find-with-relations [db id]
-  (when-let [d (find-by-id db id)]
+  (let [d (find-by-id! db id)]
     (->> (merge-master-if-slave db d)
          (transform [:panels ALL] (partial fetch-report db)))))
 

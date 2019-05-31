@@ -65,8 +65,16 @@
    (mc/find-one-as-map db collection (wrap-oids condition))))
 
 (defn find-by-id [db collection id]
-  (unwrap-oids
-   (mc/find-map-by-id db collection (oid id))))
+  (when-let [id (oid id)]
+    (unwrap-oids
+     (mc/find-map-by-id db collection id))))
+
+(defn throw-record-not-found [collection id]
+  (throw (ex-info "Record not found" {:type :shevek/record-not-found :collection collection :id id})))
+
+(defn find-by-id! [db collection id]
+  (or (find-by-id db collection id)
+      (throw-record-not-found collection id)))
 
 (defn find-last [db collection]
   (last (find-all db collection)))
@@ -79,7 +87,8 @@
        unwrap-oids))
 
 (defn delete-by-id [db collection id]
-  (mc/remove-by-id db collection (oid id))
+  (when-let [id (oid id)]
+    (mc/remove-by-id db collection id))
   true)
 
 (defn delete-by [db collection condition]
@@ -95,6 +104,6 @@
                collection
                condition
                {$set (dissoc record :created-at)
-                $setOnInsert {:created-at created-at}} 
+                $setOnInsert {:created-at created-at}}
                {:upsert true})
     (unwrap-oids (find-by db collection condition))))

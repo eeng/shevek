@@ -3,7 +3,7 @@
             [pushy.core :as pushy]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
-            [shevek.i18n :refer [t]]))
+            [shevek.lib.error :refer [show-page-404]]))
 
 (defonce history
   (pushy/pushy secretary/dispatch!
@@ -82,4 +82,4 @@
   (dispatch :navigate :error))
 
 (defroute "*" []
-  (dispatch :errors/show-without-url-change {:message (t :errors/page-not-found)}))
+  (show-page-404))

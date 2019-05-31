@@ -52,7 +52,7 @@
           u2 (:id (make! User))
           orig (:id (make! Dashboard {:name "M" :owner-id u1 :panels [{:report {:name "R"}}]}))
           link (->> (api/import {:user-id u2} {:import-as "link" :original-id orig :name "S"})
-                    :id (r/find-by-id db))]
+                    :id (r/find-by-id! db))]
       (is (submap? {:owner-id u2 :name "S" :master-id orig :panels []} link))))
 
   (it "as a copy (master) should duplicate the panels",
@@ -60,7 +60,7 @@
           u2 (:id (make! User))
           orig (make! Dashboard {:name "M1" :owner-id u1 :panels [{:report {:name "R"}}]})
           copy (->> (api/import {:user-id u2} {:import-as "copy" :original-id (:id orig) :name "M2"})
-                    :id (r/find-by-id db))
+                    :id (r/find-by-id! db))
           [r1 r2 :as reports] (m/find-all db "reports")]
       (is (= 2 (count reports)))
       (is (submaps? [{:report-id (:id r1)}] (:panels orig)))
@@ -69,15 +69,15 @@
 
   (it "the master dashboard must exists"
     (let [u (:id (make! User))]
-      (is (thrown? java.lang.AssertionError
-                   (api/import {:user-id u} {:import-as "link" :original-id u :name "S"}))))))
+      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Record not found"
+                            (api/import {:user-id u} {:import-as "link" :original-id u :name "S"}))))))
 
 (deftest receive-report-tests
   (it "should add a panel with the report"
     (let [u (:id (make! User))
           d (:id (make! Dashboard {:owner-id u :panels [{:report {:name "R1"}}]}))]
       (api/receive-report {:user-id u} {:dashboard-id d :report (make Report {:name "R2"})})
-      (is (= 2 (count (:panels (r/find-by-id db d)))))
+      (is (= 2 (count (:panels (r/find-by-id! db d)))))
       (is (= 2 (m/count db "reports")))
       (is (submaps? [{:name "R1" :dashboard-id d} {:name "R2" :dashboard-id d}]
                     (m/find-all db "reports")))))

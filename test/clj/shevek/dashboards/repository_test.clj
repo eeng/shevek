@@ -42,8 +42,8 @@
           slave1 (r/save-dashboard db {:name "S1" :master-id (:id master)})
           slave2 (r/save-dashboard db {:name "S2" :master-id (:id master)})]
       (r/delete-dashboard db (:id master))
-      (let [slave1 (r/find-by-id db (:id slave1))
-            slave2 (r/find-by-id db (:id slave2))
+      (let [slave1 (r/find-by-id! db (:id slave1))
+            slave2 (r/find-by-id! db (:id slave2))
             idrs1 (get-in slave1 [:panels 0 :report-id])
             idrs2 (get-in slave2 [:panels 0 :report-id])
             r1 (m/find-by-id db "reports" idrs1)
