@@ -7,4 +7,5 @@
  :datasources-discovery-interval 0
  :time-boundary-update-interval 0
  :log {:level :debug
-       :to "log/test.log"}}
+       :to "log/test.log"}
+ :cubes []}

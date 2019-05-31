@@ -28,4 +28,31 @@
  ; :monitoring {:influx {:uri "influxuri" :username "admin" :password "admin" :database "db"}}
  :monitoring {}
 
- :cubes []}
+ :cubes
+ [{:name "wikipedia"
+   :description "Druid quickstart sample of Wikipedia stats"
+   :dimensions
+   [{:name "isMinor" :format "boolean"}
+    {:name "isUnpatrolled" :format "boolean"}
+    {:name "isAnonymous" :format "boolean"}
+    {:name "isRobot" :format "boolean"
+     :description "Indicates whether a computer or a human being made this edit"}
+    {:name "isNew" :format "boolean"}
+    {:name "regionIsoCode" :title "Region ISO Code"}
+    {:name "regionName" :default-sort-by "regionIsoCode"}
+    {:name "countryIsoCode" :title "Country ISO Code"}
+    {:name "countryName" :empty-value "Country Not Available"}
+    {:name "year" :expression "timestamp_extract(__time, 'YEAR')"}
+    {:name "month" :expression "timestamp_format(__time, 'MMMM')"}
+    {:name "monthNumWithExpression" :type "LONG"
+     :expression "timestamp_extract(__time, 'MONTH')"}
+    {:name "monthNumWithExtraction" :column "__time" :type "LONG"
+     :extraction [{:type "timeFormat" :format "M"}]}
+    {:name "semester"
+     :column "__time"
+     :extraction [{:type "javascript"
+                   :function "function(d) { return 'S' + (Math.floor(new Date(d).getMonth() / 6) + 1) }"}]}]
+   :measures
+   [{:name "deleted" :description "Deleted characters"}
+    {:name "added"}
+    {:name "delta"}]}]}

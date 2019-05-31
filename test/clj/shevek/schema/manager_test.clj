@@ -1,20 +1,84 @@
 (ns shevek.schema.manager-test
   (:require [clojure.test :refer [use-fixtures deftest is testing]]
             [shevek.test-helper :refer [wrap-unit-tests it]]
-            [shevek.makers :refer [make!]]
             [shevek.asserts :refer [submaps?]]
-            [shevek.schema.manager :refer [discover! update-cubes]]
+            [shevek.makers :refer [make!]]
+            [shevek.schemas.cube :refer [Cube]]
+            [shevek.schema.manager :refer [seed-schema! merge-cubes update-cubes!]]
             [shevek.engine.protocol :refer [Engine cubes cube-metadata]]
             [shevek.schema.repository :refer [find-cubes]]
-            [shevek.schemas.cube :refer [Cube]]
             [shevek.db :refer [db]]
-            [com.rpl.specter :refer [select ALL]]
             [clj-fakes.core :as f]))
 
 (use-fixtures :once wrap-unit-tests)
 
-(deftest discover-tests
-  (it "initial descovery should save all cubes with their dimensions and metrics"
+(deftest merge-cubes-tests
+  (testing "should allow to override a cube title and set a default if not specified"
+    (is (= ["C1" "Cube 2" "C3"]
+           (map :title
+                (merge-cubes [{:name "c1"} {:name "c2"} {:name "c3"}]
+                             [{:name "c2" :title "Cube 2"} {:name "c3"}])))))
+
+  (testing "should keep configures cubes that don't exists in the discovered"
+    (is (submaps? [{:name "c" :title "Cube"}]
+                  (merge-cubes []
+                               [{:name "c" :title "Cube"}]))))
+
+  (testing "should keep discovered measures not configured, and should allow to add new ones"
+    (is (submaps? [{:name "disc" :type "STRING"} {:name "new" :type "LONG"}]
+                  (->>
+                   (merge-cubes [{:name "sales" :measures [{:name "disc" :type "STRING"}]}]
+                                [{:name "sales" :measures [{:name "new" :type "LONG"}]}])
+                   first :measures))))
+
+  (testing "should keep discovered dimensions not configured, and should allow to add new ones"
+    (is (submaps? [{:name "disc" :type "STRING"} {:name "new" :type "LONG"}]
+                  (->>
+                   (merge-cubes [{:name "sales" :dimensions [{:name "disc" :type "STRING"}]}]
+                                [{:name "sales" :dimensions [{:name "new" :type "LONG"}]}])
+                   first :dimensions))))
+
+  (testing "changing a measure type"
+    (is (submaps? [{:name "m" :type "LONG"}]
+                  (->>
+                   (merge-cubes [{:name "sales" :measures [{:name "m" :type "STRING"}]}]
+                                [{:name "sales" :measures [{:name "m" :type "LONG"}]}])
+                   first :measures))))
+
+  (testing "should allow to hide discovered dimensions"
+    (is (submaps? [{:name "d2"}]
+                  (->>
+                   (merge-cubes [{:name "sales" :dimensions [{:name "d1"} {:name "d2"}]}]
+                                [{:name "sales" :dimensions [{:name "d1" :hidden true}]}])
+                   first :dimensions))))
+
+  (testing "should allow to hide discovered measures"
+    (is (submaps? [{:name "m2"}]
+                  (->>
+                   (merge-cubes [{:name "sales" :measures [{:name "m1"} {:name "m2"}]}]
+                                [{:name "sales" :measures [{:name "m1" :hidden true}]}])
+                   first :measures)))
+    (is (submaps? []
+                  (->>
+                   (merge-cubes []
+                                [{:name "sales" :measures [{:name "m1" :hidden true}]}])
+                   first :measures))))
+
+  ; In the latest Druid there is no way (that I know of) to reliable determine measures, because in the ingestion task the measuresSpec is optional if no rollup is specified.
+  (testing "if a configured measure exists as a discovered dimension, should keep it only as a measure"
+    (let [merged (merge-cubes [{:name "c" :dimensions [{:name "m1" :type "LONG"}] :measures []}]
+                              [{:name "c" :dimensions [] :measures [{:name "m1"}]}])]
+      (is (= [] (-> merged first :dimensions)))
+      (is (submaps? [{:name "m1" :type "LONG"}] (->> merged first :measures))))))
+
+(deftest update-cubes!-tests
+  (it "should update existing cubes"
+    (make! Cube {:name "sales" :min-time "x"})
+    (update-cubes! db [{:name "sales" :title "Changed"}])
+    (is (submaps? [{:name "sales" :min-time "x" :title "Changed"}] (find-cubes db)))))
+
+(deftest seed-schema!-tests
+  (it "should save all cubes with their dimensions and metrics"
     (f/with-fakes
       (let [dw (f/reify-fake Engine
                  (cubes :fake [[] ["wikipedia" "vtol_stats"]])
@@ -24,83 +88,14 @@
                                        ["vtol_stats"]
                                        {:dimensions [{:name "path" :type "LONG"}]
                                         :measures [{:name "requests" :type "hyperUnique"}]}]))]
-        (let [cubes (do (discover! dw db) (find-cubes db))]
+        (let [cubes (do
+                      (seed-schema! db dw {:discover? true})
+                      (find-cubes db))]
           (is (submaps? [{:name "wikipedia"} {:name "vtol_stats"}] cubes))
-          (is (submaps? [{:name "__time"}
-                         {:name "region" :type "STRING"}
-                         {:name "__time"}
+          (is (submaps? [{:name "region" :type "STRING"}
                          {:name "path" :type "LONG"}]
                         (mapcat :dimensions cubes)))
           (is (submaps? [{:name "added" :type "longSum"}
                          {:name "requests" :type "hyperUnique"}]
                         (mapcat :measures cubes)))
           (is (= 2 (->> cubes (map :id) (filter identity) count))))))))
-
-(deftest update-cubes-tests
-  (testing "discovery use cases"
-    (it "discovery of a new cube"
-      (let [c1 (make! Cube {:name "c1"
-                            :dimensions [{:name "__time"} {:name "d1" :type "STRING"}]
-                            :measures [{:name "m1" :type "count"}]})]
-        (update-cubes db [(dissoc c1 :id)
-                          {:name "c2"
-                           :dimensions [{:name "d2" :type "STRING"}]
-                           :measures [{:name "m2" :type "count"}]}])
-        (let [cubes (find-cubes db)]
-          (is (= ["c1" "c2"] (map :name cubes)))
-          (is (= (:id c1) (:id (first cubes))))
-          (is (= ["__time" "d1" "__time" "d2"] (select [ALL :dimensions ALL :name] cubes)))
-          (is (= ["m1" "m2"] (select [ALL :measures ALL :name] cubes))))))
-
-    (it "existing cube with a new dimension (d2), a deleted one (d1) and a changed measure type"
-      (let [c1 (make! Cube {:name "c1" :title "C1"
-                            :dimensions [{:name "__time" :title "T"} {:name "d1" :type "STRING" :title "D1"}]
-                            :measures [{:name "m1" :type "count" :title "M1"}]})]
-        (update-cubes db [{:name "c1"
-                           :dimensions [{:name "d2" :type "STRING"}]
-                           :measures [{:name "m1" :type "longSum"}]}])
-        (let [cubes (find-cubes db)]
-          (is (= [["c1" "C1"]] (map (juxt :name :title) cubes)))
-          (is (= (:id c1) (:id (first cubes))))
-          (is (= [["__time" "T"] ["d1" "D1"] ["d2" "D2"]] (map (juxt :name :title) (select [ALL :dimensions ALL] cubes))))
-          (is (= [["m1" "M1" "longSum"]] (map (juxt :name :title :type) (select [ALL :measures ALL] cubes))))))))
-
-  (testing "seed use cases"
-    (it "updating cube title"
-      (make! Cube {:name "stats"})
-      (update-cubes db [{:name "stats" :title "Statistics"}])
-      (is (= "Statistics" (-> (find-cubes db) first :title)))
-      (update-cubes db [{:name "stats" :title "Statistics 2"}])
-      (is (= "Statistics 2" (-> (find-cubes db) first :title))))
-
-    (it "changing the default measure expression and format"
-      (make! Cube {:name "sales" :measures [{:name "amount" :expression "(sum $amount)"}]})
-      (update-cubes db [{:name "sales" :measures [{:name "amount" :expression "(/ (sum $amount) 100)" :format "$0.00"}]}])
-      (is (submaps? [{:expression "(/ (sum $amount) 100)" :format "$0.00"}] (-> (find-cubes db) first :measures))))
-
-    (it "adding new derived measure"
-      (make! Cube {:name "sales" :measures []})
-      (update-cubes db [{:name "sales" :measures [{:name "amount" :expression "(/ (sum $amount) 100)"}]}])
-      (is (submaps? [{:name "amount" :expression "(/ (sum $amount) 100)"}] (-> (find-cubes db) first :measures))))
-
-    (it "adding new derived dimension"
-      (make! Cube {:name "sales" :dimensions [{:name "__time"}]})
-      (update-cubes db [{:name "sales" :dimensions [{:name "year" :extraction [{:type "timeFormat" :format "Y"}]}]}])
-      (is (submaps? [{:name "__time"} {:name "year" :extraction [{:type "timeFormat" :format "Y"}] :type "STRING"}]
-                    (-> (find-cubes db) first :dimensions))))
-
-    (it "a hidden dimension should be deleted"
-      (make! Cube {:name "sales" :dimensions [{:name "__time"} {:name "year"}]})
-      (update-cubes db [{:name "sales" :dimensions [{:name "year" :hidden true}]}])
-      (is (submaps? [{:name "__time"}] (-> (find-cubes db) first :dimensions))))
-
-    (it "when a field is removed from the config"
-      (make! Cube {:name "sales"
-                   :dimensions [{:name "__time"}
-                                {:name "year" :column "__time" :title "Año" :type "STRING"
-                                 :extraction [{:type "timeFormat" :format "MMMM" :locale "es"}]}]})
-      (update-cubes db [{:name "sales"
-                         :dimensions [{:name "__time"}
-                                      {:name "year" :expression "timestamp_extract(...)"}]}])
-      (is (= {:name "year" :expression "timestamp_extract(...)" :title "Year" :type "STRING"}
-             (-> (find-cubes db) first :dimensions last))))))

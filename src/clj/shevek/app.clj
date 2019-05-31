@@ -20,8 +20,8 @@
   (mount/stop-except #'nrepl))
 
 (defn restart []
-  (mount/stop)
-  (mount/start))
+  (stop)
+  (start))
 
 (defn -main [& args]
   (start)

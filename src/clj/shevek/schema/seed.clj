@@ -12,17 +12,17 @@
     (users/create-or-update-by db :username {:username "admin" :fullname "Administrator"
                                              :password "secret123" :admin true})))
 
-(defn cubes [db]
+(defn cubes [db dw]
   (debug "Seeding schema.")
-  (m/update-cubes db (config :cubes)))
+  (let [discover? (pos? (config :datasources-discovery-interval))]
+    (m/seed-schema! db dw {:discover? discover?})))
 
-(defn seed! [db]
+(defn seed! [db dw]
   (users db)
-  (cubes db))
+  (cubes db dw))
 
 (defn db-reset!
   "DO NOT use on production!"
   [db]
   (db/clean! db)
-  (m/discover! dw db)
-  (seed! db))
+  (seed! db dw))

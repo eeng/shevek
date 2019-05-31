@@ -19,19 +19,15 @@
 (defn- every [interval fun pool & args]
   (apply at/every interval #(wrap-error fun) pool args))
 
-(defn- refresh-schema []
-  (m/discover! dw db)
-  (seed/cubes db))
-
 (defn- configure-datasources-discovery-task [pool]
   (let [interval (config :datasources-discovery-interval)]
     (if (pos? interval)
       (do
         (info "Starting auto discovery task, will execute every" interval "secs")
-        (every (* interval 1000) refresh-schema pool))
+        (every (* interval 1000) #(m/seed-schema! db dw {:discover? true}) pool))
       (do
         (info "Auto discovery disabled")
-        (seed/cubes db)))))
+        (m/seed-schema! db dw {:discover? false})))))
 
 (defn- configure-time-boundary-updating-task [pool]
   (let [interval (config :time-boundary-update-interval)]
@@ -60,5 +56,3 @@
 (defstate scheduler
   :start (start!)
   :stop (stop-and-reset-pool! scheduler))
-
-#_(refresh-schema)

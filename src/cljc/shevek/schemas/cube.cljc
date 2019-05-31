@@ -33,7 +33,7 @@
 (s/defschema Cube
   (assoc NTD
          :dimensions (s/constrained [Dimension] at-least-one-time-dim?)
-         :measures [Measure]
+         :measures (s/constrained [Measure] #(some? %))
          (s/optional-key :id) s/Str
          (s/optional-key :default-time-zone) s/Str
          (s/optional-key :created-at) s/Any

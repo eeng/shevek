@@ -1,10 +1,9 @@
 (ns shevek.schema.manager
   (:require [shevek.engine.protocol :refer [cubes cube-metadata time-boundary]]
-            [shevek.engine.druid-native.metadata :refer [only-used-keys]]
             [shevek.schema.repository :refer [save-cube find-cubes]]
             [shevek.lib.collections :refer [detect]]
             [shevek.lib.logging :refer [benchmark]]
-            [shevek.domain.dimension :refer [time-dimension]]
+            [shevek.config :refer [config]]
             [cuerdas.core :as str]))
 
 (defn- discover-cubes [dw]
@@ -17,16 +16,10 @@
 (defn- corresponding [field coll]
   (detect #(same-name? field %) coll))
 
-(defn- update-dimension [old new]
-  (if new
-    (merge (only-used-keys old) new)
-    old))
-
 (defn- merge-dimensions [old-coll new-coll]
-  (let [old-updated-fields (map #(update-dimension % (corresponding % new-coll)) old-coll)
+  (let [old-updated-fields (map #(merge % (corresponding % new-coll)) old-coll)
         new-fields (remove #(corresponding % old-coll) new-coll)]
-    (->> (concat old-updated-fields new-fields)
-         (remove :hidden))))
+    (concat old-updated-fields new-fields)))
 
 (defn- set-default-title [{:keys [name title] :or {title (str/title name)} :as record}]
   (assoc record :title title))
@@ -34,38 +27,63 @@
 (defn- set-default-type [dimension]
   (merge {:type "STRING"} dimension))
 
-(defn set-defaults [{:keys [dimensions measures] :as cube}]
+(defn set-defaults [cube]
   (-> (set-default-title cube)
-      (assoc :dimensions (mapv (comp set-default-type set-default-title) dimensions))
-      (assoc :measures (mapv set-default-title measures))))
+      (update :dimensions #(mapv (comp set-default-type set-default-title) %))
+      (update :measures #(mapv set-default-title %))))
 
-(defn- add-time-dimension [{:keys [dimensions] :as cube}]
-  (cond-> cube
-          (not (time-dimension dimensions)) (update :dimensions conj {:name "__time"})))
+(defn- remove-hidden-dimensions [cube]
+  (-> cube
+      (update :dimensions #(remove :hidden %))
+      (update :measures #(remove :hidden %))))
 
-(defn- update-cube [old new]
-  (-> (merge old (dissoc new :dimensions :measures))
-      (assoc :dimensions (merge-dimensions (:dimensions old) (:dimensions new)))
-      (assoc :measures (merge-dimensions (:measures old) (:measures new)))
-      add-time-dimension
-      set-defaults))
+(defn- merge-cube [{discovered-dimensions :dimensions discovered-measures :measures :as discovered-cube}
+                   {configured-dimensions :dimensions configured-measures :measures :as configured-cube}]
+  (let [configured-measure? #(corresponding % configured-measures)
+        discovered-measures (concat discovered-measures (filter configured-measure? discovered-dimensions))
+        discovered-dimensions (remove configured-measure? discovered-dimensions)]
+    (-> (merge discovered-cube (dissoc configured-cube :dimensions :measures))
+        (assoc :dimensions (merge-dimensions discovered-dimensions configured-dimensions))
+        (assoc :measures (merge-dimensions discovered-measures configured-measures)))))
 
-(defn update-cubes [db new-cubes]
+(defn merge-cubes [discovered-cubes configured-cubes]
+  (let [discovered-configured (map #(merge-cube % (corresponding % configured-cubes)) discovered-cubes)
+        non-discovered (remove #(corresponding % discovered-cubes) configured-cubes)]
+    (->> (concat discovered-configured non-discovered)
+         (map remove-hidden-dimensions)
+         (map set-defaults))))
+
+(defn update-cubes! [db new-cubes]
   (let [existing-cubes (find-cubes db)]
-    (doseq [new-cube new-cubes]
-      (save-cube db (update-cube (corresponding new-cube existing-cubes) new-cube)))))
+    (doseq [new-cube new-cubes :let [existing-cube (corresponding new-cube existing-cubes)]]
+      (save-cube db (merge existing-cube new-cube)))))
 
-(defn discover! [dw db]
-  (benchmark {:after "Cube discovering done (%.0f ms)"}
-    (update-cubes db (discover-cubes dw))))
+(defn seed-schema!
+  "Retrieves the cubes config, optionally performing auto-discovery of the schema, and saves it to the database (updating it if already exists)."
+  [db dw {:keys [discover?] :or {discover? false}}]
+  (benchmark {:after "Schema seeding done (%.0f ms)"}
+    (let [discovered (if discover? (discover-cubes dw) [])
+          configured (config :cubes)]
+      (->> (merge-cubes discovered configured)
+           (update-cubes! db)))))
+
+; Time boundary
 
 (defn update-time-boundary! [dw db]
-  (benchmark {:after "Updated time boundary (%.0f ms)"}
+  (benchmark {:after "Time boundary updated (%.0f ms)"}
     (doseq [{:keys [name] :as cube} (find-cubes db)]
       (->> (time-boundary dw name)
            (merge cube)
            (save-cube db)))))
 
-#_(discover-cubes shevek.engine.state/dw)
+; Examples
+
+#_(find-cubes shevek.db/db)
+#_(->>
+   (merge-cubes
+    (discover-cubes shevek.engine.state/dw)
+    (config :cubes))
+   (detect #(= (:name %) "wikipedia")))
+#_(seed-schema! shevek.db/db shevek.engine.state/dw {:discover? true})
 #_(discover! shevek.engine.state/dw shevek.db/db)
 #_(update-time-boundary! shevek.engine.state/dw shevek.db/db)
