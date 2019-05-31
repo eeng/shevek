@@ -1,7 +1,6 @@
 (ns shevek.components.form
   (:require [reagent.core :as r]
             [shevek.lib.collections :refer [detect wrap-coll]]
-            [shevek.lib.react :refer [with-react-keys]]
             [shevek.lib.string :refer [regex-escape split]]
             [cuerdas.core :as str]
             [shevek.i18n :refer [t]]))
@@ -27,10 +26,11 @@
                 ^{:key val} [:div.item {:data-value val} title])]]
     [:div.ui.dropdown {:class class :ref bind-events}
      [:input {:type "hidden" :value (or selected "")}]
-     (with-react-keys (if (seq content)
-                        content
-                        [[:div.text (first (detect #(= selected (second %)) coll))]
-                         [:i.dropdown.icon]]))
+     (into [:<>]
+           (if (seq content)
+             content
+             [[:div.text (first (detect #(= selected (second %)) coll))]
+              [:i.dropdown.icon]]))
      (if in-menu-search
        [:div.menu
         [:div.ui.icon.search.input
