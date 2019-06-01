@@ -1,17 +1,12 @@
 (ns shevek.pages.error
   (:require [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.reflow.db :as db]
-            [shevek.navigation :refer [navigate]]
             [shevek.rpc :as rpc]))
 
 (defevh :errors/show-page [db error]
-  (navigate "/error")
-  (-> (assoc db :error error)
-      (rpc/loaded db)))
-
-(defevh :errors/show-without-url-change [db error]
   (dispatch :navigate :error)
-  (assoc db :error error))
+  (-> (assoc db :error error)
+      (rpc/loaded)))
 
 (defn page []
   (let [{:keys [title message] :or {title "Oops!"}} (db/get :error)]

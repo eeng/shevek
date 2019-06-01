@@ -22,7 +22,7 @@
   (dispatch :sessions/expired))
 
 (defn show-page-404 []
-  (dispatch :errors/show-without-url-change {:title "Error 404" :message (t :errors/page-not-found)}))
+  (dispatch :errors/show-page {:title "Error 404" :message (t :errors/page-not-found)}))
 
 (defevh :errors/from-server [db {:keys [status status-text response] :as error}]
   (case status
@@ -54,7 +54,7 @@
       (.addEventListener js/window "error" #(uncaught-error-handler (.-error %))))
     :done))
 
-(defevh :errors/unexpected-error [db error]
+(defevh :reflow/unexpected-error [db error]
   (log/error error)
   (when-not debug?
     (js/setTimeout #(uncaught-error-handler error) 500) ; Otherwise StackTrace.JS delays the transition to the error page
