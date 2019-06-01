@@ -16,8 +16,8 @@
 (defn delete-reports [db user-id]
   (m/delete-by db "reports" {:owner-id user-id}))
 
-(defn find-by-id [db id]
-  (m/find-by-id db "reports" id))
+(defn find-by-id! [db id]
+  (m/find-by-id! db "reports" id))
 
 (defn create-or-update-by-sharing-digest [db {:keys [sharing-digest] :as report}]
   {:pre [sharing-digest]}

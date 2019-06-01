@@ -8,11 +8,11 @@
 
 (s/defn save [{:keys [user-id] :as req} {:keys [id] :as report} :- Report]
   (when id
-    (authorize-to-owner req (r/find-by-id db id)))
+    (authorize-to-owner req (r/find-by-id! db id)))
   (r/save-report db (assoc report :owner-id user-id)))
 
 (defn delete [req id]
-  (authorize-to-owner req (r/find-by-id db id))
+  (authorize-to-owner req (r/find-by-id! db id))
   (r/delete-report db id))
 
 (defn find-all [{:keys [user-id]}]
@@ -22,7 +22,7 @@
   (some? sharing-digest))
 
 (defn find-by-id [_ id]
-  (let [report (r/find-by-id db id)]
+  (let [report (r/find-by-id! db id)]
     (if (shared? report)
       (dissoc report :id :shared-by-id :sharing-digest)
       report)))
