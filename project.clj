@@ -1,8 +1,8 @@
-(defproject shevek "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+(defproject shevek "0.1.0"
+  :description "Druid analytics web interface for end users"
+  :url "https://github.com/eeng/shevek"
+  :license {:name "MIT License"
+            :url "https://opensource.org/licenses/MIT"}
 
   :dependencies [;; Backend
                  [org.clojure/clojure "1.10.0"]
