@@ -12,7 +12,7 @@
             [shevek.rpc :as rpc]
             [shevek.pages.designer.helpers :refer [panel-header send-designer-query send-query highlight current-cube send-pinboard-queries]]
             [shevek.domain.dw :refer [format-dimension format-dim-value dimension-value]]
-            [shevek.components.form :refer [select checkbox toggle-checkbox-inside dropdown input-field search-input filter-matching]]
+            [shevek.components.form :refer [select checkbox dropdown input-field search-input filter-matching]]
             [shevek.components.popup :refer [show-popup close-popup tooltip]]
             [shevek.components.drag-and-drop :refer [draggable droppable]]
             [shevek.components.calendar :refer [build-range-calendar]]
@@ -163,11 +163,12 @@
 
 (defn- dimension-value-item [{:keys [name] :as dim} result filter search]
   (let [value (dimension-value dim result)
-        label (format-dimension dim result)]
-    [:div.item.has-checkbox {:on-click toggle-checkbox-inside :title label}
+        label (format-dimension dim result)
+        checked (some #(= value %) (@filter :value))
+        on-change #(swap! filter update :value (toggle-filter-value (not checked)) value)]
+    [:div.item.has-checkbox {:on-click on-change :title label}
      [checkbox (str "cb-filter-" name "-" (str/slug label)) (highlight label search)
-      {:checked (some #(= value %) (@filter :value))
-       :on-change #(swap! filter update :value (toggle-filter-value %) value)}]]))
+      {:checked checked :on-change on-change}]]))
 
 (defn filter-operators []
   [[(t :designer.operator/include) "include"]

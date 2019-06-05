@@ -99,7 +99,7 @@
                            :npm-deps {:semantic-ui-calendar "0.0.8"
                                       :stacktrace-js "2.0.0"
                                       :semantic-ui-css "2.4.1"
-                                      :jquery "3.3.1"
+                                      :jquery "3.4.1"
                                       :simplebar "3.1.3"}}}}}
 
   :test-selectors {:default (complement :acceptance)

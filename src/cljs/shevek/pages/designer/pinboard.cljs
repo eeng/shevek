@@ -6,7 +6,7 @@
             [shevek.domain.dimension :refer [find-dimension time-dimension? add-dimension remove-dimension replace-dimension clean-dim]]
             [shevek.lib.time.ext :refer [default-granularity]]
             [shevek.i18n :refer [t]]
-            [shevek.components.form :refer [dropdown checkbox toggle-checkbox-inside search-input filter-matching]]
+            [shevek.components.form :refer [dropdown checkbox search-input filter-matching]]
             [shevek.components.drag-and-drop :refer [droppable]]
             [shevek.pages.designer.filters :refer [filter-operators]]
             [shevek.pages.designer.helpers :refer [current-cube panel-header format-measure format-dimension search-button highlight debounce-dispatch dimension-value send-pinned-dim-query send-pinboard-queries notify-designer-changes]]
@@ -45,15 +45,13 @@
   (let [formatted-value (format-dimension dim result)
         highlighted-value (highlight formatted-value search)
         value (dimension-value dim result)
-        toggle-item #(dispatch :designer/pinned-dimension-item-toggled filter-dim value %)
+        checked (includes? (:value filter-dim) value)
+        toggle-item #(dispatch :designer/pinned-dimension-item-toggled filter-dim value (not checked))
         show-checkbox? (seq (:value filter-dim))]
-    [:div.item {:title formatted-value :on-click (cond
-                                                   (time-dimension? dim) identity
-                                                   show-checkbox? toggle-checkbox-inside
-                                                   :else #(toggle-item true))}
+    [:div.item {:title formatted-value :on-click (if (time-dimension? dim) identity toggle-item)}
      (if show-checkbox?
       [checkbox (str "cb-pinboard-item-" name "-" value) highlighted-value
-       {:checked (includes? (:value filter-dim) value) :on-change toggle-item}]
+       {:checked checked :on-change toggle-item}]
       highlighted-value)
      [:div.measure-value (format-measure measure result)]]))
 

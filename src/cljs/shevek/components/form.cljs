@@ -105,9 +105,6 @@
 
 ;; Other components
 
-(defn toggle-checkbox-inside [e]
-  (-> e .-target js/$ (.find ".checkbox input") .click))
-
 (def Keys {13 :enter 27 :escape})
 
 (defn- handle-keypressed [shortcuts e]
