@@ -67,8 +67,6 @@
   :uberjar-name "shevek.jar"
   :main shevek.app
 
-  :clean-targets ^{:protect false} [:target-path "out" "resources/private"]
-
   :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
 
   :cooper {"backend" ["lein" "run" "-m" "shevek.app/start"]
@@ -107,7 +105,7 @@
   :aliases {"frontend-testing" ["doo" "chrome-headless" "test" "auto"]
             "backend-testing" ["with-profile" "+ultra" "test-refresh"]
             "build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
-            "package" ["do" "build-frontend" "uberjar"]
+            "package" ["do" ["with-profile" "prod" "clean"] "build-frontend" "uberjar"]
             "ci" ["do" "test" ["doo" "chrome-headless" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
 
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
@@ -144,7 +142,8 @@
                                             :optimizations :whitespace
                                             :verbose false
                                             :pretty-print true}}}}
-                   :less {:target-path "out/dev/public/css"}}
+                   :less {:target-path "out/dev/public/css"}
+                   :clean-targets ^{:protect false} ["target/dev" "out/dev" "out/test" "resources/private"]}
              :prod {:resource-paths ["out/prod"]
                     :cljsbuild {:builds
                                 {:app
@@ -162,7 +161,8 @@
                                                        "src/externs/calendar.js"]}}}}
                     :less {:target-path "out/prod/public/css"
                            :source-map false
-                           :compression true}}
+                           :compression true}
+                    :clean-targets ^{:protect false} ["out/prod" "target/uberjar" "target/prod"]}
              :uberjar {:aot :all
                        :auto-clean false}
              ; Put ultra into a separate profile to active it only during clj testing, otherwise cljs testing throws an error due to this bug: https://github.com/emezeske/lein-cljsbuild/issues/469
