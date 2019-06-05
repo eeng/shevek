@@ -10,11 +10,19 @@ TODO
 
 * Java 1.8
 * [MongoDB](https://www.mongodb.com/)
-* [Druid](http://druid.io/)
 
 ## Getting Started
 
-TODO
+1. [Download the latest release](https://github.com/eeng/shevek/releases/latest) and extract the package.
+
+2. Edit the `config.edn` if necessary to point to your Druid and MongoDB hosts.
+
+3. Change directory to the extracted folder and start the application:
+```
+java -Dconf=config.edn -jar shevek.jar
+```
+
+4. Open http://localhost:4000 in your browser, you should see the login page. Enter with user `admin` and password `secret123`.
 
 ## Development
 
@@ -42,11 +50,10 @@ lein build-frontend
 lein run -m shevek.app/start
 ```
 
-### Building
+### Building from Source
 
 ```
-lein package
-java -Dconf=path/to/config.edn -jar target/uberjar/shevek.jar
+bin/build.sh
 ```
 
 ### Acceptance Testing
