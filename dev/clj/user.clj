@@ -12,10 +12,12 @@
 #_(shevek.app/stop)
 #_(shevek.app/restart)
 
+; Restores the database to its initial state
+#_(do
+    (shevek.app/restart) ; Reload config
+    (shevek.schema.seed/db-reset! shevek.db/db))
+
 #_(tns/refresh)
 
 ; To start a ClojureScript REPL connect to the figwheel nREPL (port 4002) and then eval this
 #_(cljs-repl)
-
-; Restores the database to its initial state
-#_(shevek.schema.seed/db-reset! shevek.db/db)

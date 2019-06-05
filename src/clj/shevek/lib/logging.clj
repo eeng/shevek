@@ -31,7 +31,7 @@
                :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS" :timezone (TimeZone/getDefault)} ; By default msecs are missing and uses UTC
                :appenders (when (not= "stdout" (config [:log :to]))
                             {:println {:enabled? false} :spit (appenders/spit-appender {:fname (config [:log :to])})})))
-    (log/info "Starting app in" (env) "environment")
+    (log/info "Starting Shevek in" (env) "environment")
     :ok))
 
 (defn pp-str [& args]

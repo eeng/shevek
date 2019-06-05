@@ -1,6 +1,24 @@
+# Shevek
+
+TODO
+
+## Features
+
+TODO
+
+## Requirements
+
+* Java 1.8
+* [MongoDB](https://www.mongodb.com/)
+* [Druid](http://druid.io/)
+
+## Getting Started
+
+TODO
+
 ## Development
 
-Make sure to have Druid and MongoDB running on localhost or point to their respective locations in the config.edn file, and then execute the following command on the project folder:
+Make sure to have Druid and MongoDB running on localhost, or point to their respective locations in the `dev/resources/config.edn` file, and then execute the following command on the project folder:
 
 ```
 lein cooper
@@ -24,7 +42,7 @@ lein build-frontend
 lein run -m shevek.app/start
 ```
 
-### Packaging
+### Building
 
 ```
 lein package
