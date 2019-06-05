@@ -67,10 +67,7 @@
   :uberjar-name "shevek.jar"
   :main shevek.app
 
-  :clean-targets ^{:protect false} ["resources/public/js"
-                                    "resources/public/css"
-                                    "resources/private"
-                                    :target-path]
+  :clean-targets ^{:protect false} [:target-path "out" "resources/private"]
 
   :jvm-opts ["-Djava.awt.headless=true"] ; Otherwise optimus would show the dock java icon
 
@@ -79,10 +76,9 @@
            "figwheel" ["lein" "figwheel"]}
 
   :less {:source-paths ["src/less"]
-         :target-path "resources/public/css"
          :source-map true}
 
-  :figwheel {:css-dirs ["resources/public/css"]
+  :figwheel {:css-dirs ["out/dev/public/css"]
              :server-logfile "log/figwheel.log"
              :repl false ; So we can start figwheel through cooper
              :nrepl-port 4002
@@ -93,9 +89,7 @@
   :cljsbuild {:builds
               {:app
                {:source-paths ["src/cljs"]
-                :compiler {:output-dir "resources/public/js/out"
-                           :output-to "resources/public/js/app.js"
-                           :install-deps true
+                :compiler {:install-deps true
                            :npm-deps {:semantic-ui-calendar "0.0.8"
                                       :stacktrace-js "2.0.0"
                                       :semantic-ui-css "2.4.1"
@@ -113,13 +107,10 @@
   :aliases {"frontend-testing" ["doo" "chrome-headless" "test" "auto"]
             "backend-testing" ["with-profile" "+ultra" "test-refresh"]
             "build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
-            "package" ["do" ["clean"] "build-frontend" "uberjar"]
-            "ci" ["do" ["clean"] "test" ["doo" "chrome-headless" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
+            "package" ["do" "build-frontend" "uberjar"]
+            "ci" ["do" "test" ["doo" "chrome-headless" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
 
-  :profiles {:dev {:source-paths ["dev/clj"]
-                   :jvm-opts ["-Dconf=dev/resources/config.edn"]
-                   :resource-paths ["test/resources"]
-                   :dependencies [[org.clojure/tools.namespace "0.2.11"]
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [proto-repl "0.3.1"]
                                   [binaryage/devtools "0.9.10"]
                                   [cider/piggieback "0.3.8"] ; ClojureScript REPL on top of nREPL
@@ -133,23 +124,33 @@
                                   [cljsjs/jquery "3.2.1-0"]]
                    :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
                              [lein-doo "0.1.10"]]
+                   :jvm-opts ["-Dconf=dev/resources/config.edn"]
+                   :source-paths ["dev/clj"]
+                   :resource-paths ["test/resources" "out/dev"]
                    :cljsbuild {:builds
                                {:app
                                 {:figwheel {:on-jsload "shevek.app/reload"}
                                  :compiler {:main shevek.app
+                                            :output-dir "out/dev/public/js/out"
+                                            :output-to "out/dev/public/js/app.js"
                                             :asset-path "/js/out"
                                             :source-map-timestamp true
                                             :preloads [devtools.preload]}}
                                 :test
                                 {:source-paths ["src/cljs" "test/cljs"]
-                                 :compiler {:output-to "resources/private/js/unit-test.js"
+                                 :compiler {:output-to "out/test/unit-test.js"
+                                            :output-dir "out/test/public/js/out"
                                             :main shevek.runner
                                             :optimizations :whitespace
                                             :verbose false
-                                            :pretty-print true}}}}}
-             :prod {:cljsbuild {:builds
+                                            :pretty-print true}}}}
+                   :less {:target-path "out/dev/public/css"}}
+             :prod {:resource-paths ["out/prod"]
+                    :cljsbuild {:builds
                                 {:app
-                                 {:compiler {:source-map "resources/public/js/app.js.map"
+                                 {:compiler {:output-dir "out/prod/public/js/out"
+                                             :output-to "out/prod/public/js/app.js"
+                                             :source-map "out/prod/public/js/app.js.map"
                                              :optimizations :advanced
                                              :pretty-print false
                                              :source-map-timestamp false
@@ -159,7 +160,8 @@
                                              :externs ["src/externs/jquery.js"
                                                        "src/externs/semantic-ui.js"
                                                        "src/externs/calendar.js"]}}}}
-                    :less {:source-map false
+                    :less {:target-path "out/prod/public/css"
+                           :source-map false
                            :compression true}}
              :uberjar {:aot :all
                        :auto-clean false}

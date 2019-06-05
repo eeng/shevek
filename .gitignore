@@ -8,8 +8,6 @@
 .DS_Store
 log
 .rebel_readline_history
-resources/public/css
-resources/public/js
 resources/private
 resources/node_modules/**
 node_modules
