@@ -36,8 +36,7 @@
 (defn report-error-to-server [message stacktrace app-db]
   (POST "/error" {:params {:message message
                            :stacktrace stacktrace
-                           :app-db (log/pp-str app-db)} ; Send a string representation instead of the real object because it could be not serializable
-                  :headers (rpc/auth-header)}))
+                           :app-db (log/pp-str app-db)}})) ; Send a string representation instead of the real object because it could be not serializable
 
 (defn uncaught-error-handler [error]
   (-> (js/StackTrace.fromError error)

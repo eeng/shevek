@@ -1,7 +1,7 @@
 (ns shevek.users.api
   (:require [shevek.users.repository :as r]
             [shevek.db :refer [db]]
-            [shevek.lib.auth :refer [authenticate authorize generate-token]]
+            [shevek.lib.auth :refer [authenticate authorize public-user-data]]
             [shevek.schemas.user :refer [admin?]]))
 
 (defn find-all [{:keys [user]}]
@@ -19,5 +19,8 @@
     (as-> (dissoc user :password) user
           (merge user (select-keys new-fields [:fullname :email :password]))
           (r/save-user db user)
-          {:token (generate-token user)})
+          {:user (public-user-data user)})
     {:error :invalid-current-password}))
+
+(defn me [{:keys [user]}]
+  (public-user-data user))

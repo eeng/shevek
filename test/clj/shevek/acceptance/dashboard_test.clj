@@ -87,7 +87,6 @@
       (is (has-css? ".panel" :text "SuperReport"))
       (is (has-css? ".topbar-header" :text "MegaDash"))))
 
-  ; TODO if we had text panels, these test wouldn't require the fake-druid
   (it "sharing a dashboard as a link"
     (with-fake-druid
       {(query-req-matching #"queryType.*timeseries") (druid-res "acceptance/totals")}

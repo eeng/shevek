@@ -3,9 +3,7 @@
             [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login login-admin click click-text visit fill has-css? has-title? has-text? has-no-text? click-tid]]
             [etaoin.keys :as k]
             [shevek.schemas.user :refer [User]]
-            [shevek.makers :refer [make!]]
-            [shevek.lib.auth :refer [token-expiration]]
-            [clj-time.core :as t]))
+            [shevek.makers :refer [make!]]))
 
 (use-fixtures :once wrap-acceptance-tests)
 
@@ -24,13 +22,4 @@
     (login)
     (click-tid "sidebar-logout")
     (is (has-css? "#login"))
-    (is (has-no-text? "Logout")))
-
-  (it "session expired"
-    (with-redefs [token-expiration (t/seconds 1)]
-      (login-admin))
-    (Thread/sleep 1100)
-    (when (has-text? "Welcome")
-      (click-tid "sidebar-reports"))
-    (is (has-text? "Session expired"))
-    (is (has-css? "#login"))))
+    (is (has-no-text? "Logout"))))

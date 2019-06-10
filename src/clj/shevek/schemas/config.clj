@@ -14,7 +14,7 @@
    :nrepl-port s/Int
    :mongodb-uri s/Str
    :druid-uri s/Str
-   :jwt-secret s/Str
+   :session {:key s/Str :timeout s/Int}
    :datasources-discovery-interval s/Int
    :time-boundary-update-interval s/Int
    :log {:level s/Keyword :timestamp s/Bool :to s/Str}

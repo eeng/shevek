@@ -1,6 +1,6 @@
 (ns shevek.acceptance.profile-test
   (:require [clojure.test :refer [deftest use-fixtures is]]
-            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login click click-text visit fill has-css? has-text? click-tid select]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login click click-text visit fill has-css? has-text? click-tid select refresh]]
             [etaoin.keys :as k]))
 
 (use-fixtures :once wrap-acceptance-tests)
@@ -12,7 +12,11 @@
     (select {:data-tid "lang"} "Español")
     (click-text "Save")
     (is (has-css? "#notification" :text "Preferences saved!"))
-    (is (has-text? "Preferencias")))
+    (is (has-text? "Preferencias"))
+    (refresh)
+    (select {:data-tid "lang"} "English")
+    (click-text "Guardar")
+    (is (has-css? "#notification" :text "Preferencias guardadas!")))
 
   (it "the current password mast match"
     (login {:username "max" :fullname "Max" :password "secret999"})

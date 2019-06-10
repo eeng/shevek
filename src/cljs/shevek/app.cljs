@@ -13,7 +13,7 @@
 (defn init-reflow []
   (reflow/init (-> (router) (recorder) (logger) (schema/checker)))
   (reflow/dispatch :preferences/loaded)
-  (reflow/dispatch :sessions/user-restored))
+  (reflow/dispatch :sessions/restore))
 
 (defn remove-loader []
   (-> ".preloader" js/$ (.fadeOut "slow")))

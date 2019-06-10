@@ -10,7 +10,7 @@
                  [cprop "0.1.11"]
                  [http-kit "2.2.0"]
                  [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
-                 [ring/ring-defaults "0.2.3"]
+                 [ring/ring-defaults "0.3.2"]
                  [ring-middleware-format "0.7.2" :exclusions [org.clojure/tools.reader]] ; La exclusion es xq clojurescript 1.10 necesita una versión mas nueva
                  [buddy/buddy-sign "1.5.0"]
                  [buddy/buddy-auth "1.4.1"]
@@ -40,7 +40,6 @@
                  [com.andrewmcveigh/cljs-time "0.5.1"]
                  [tongue "0.2.6"]
                  [cljsjs/numeral "2.0.6-0"]
-                 [cljsjs/jwt-decode "2.1.0-0"]
                  [cljsjs/clipboard "1.6.1-1"]
                  [cljsjs/chartjs "2.7.3-0"]
                  [org.slf4j/slf4j-nop "1.7.12"] ; To disable monger log messages
@@ -120,7 +119,7 @@
                                   ;; Testing cljs
                                   [pjstadig/humane-test-output "0.8.3"]
                                   [cljsjs/jquery "3.2.1-0"]]
-                   :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
                              [lein-doo "0.1.10"]]
                    :jvm-opts ["-Dconf=dev/resources/config.edn"]
                    :source-paths ["dev/clj"]

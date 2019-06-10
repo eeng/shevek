@@ -139,6 +139,20 @@
 (defn drag-and-drop [& args]
   (apply e/drag-and-drop page args))
 
+(defn- logout []
+  (if (e/exists? page {:data-tid "sidebar-logout"})
+    (do
+      (e/js-execute page "$('.ui.modals.active').remove()")
+      (e/click page {:data-tid "sidebar-logout"})
+      true)
+    false))
+
+(defn logout-if-necessary []
+  (when-not (logout)
+    (visit "/")
+    (e/wait-exists page {:css ".layout"})
+    (logout)))
+
 (defn login
   ([] (login {}))
   ([{:keys [username password fullname]
@@ -147,8 +161,7 @@
    (let [user (merge {:username username :password password :fullname fullname} user)
          user (or (users/find-by-username db username)
                   (make! User user))]
-     (e/js-execute page "try { localStorage.clear() } catch (e) {}") ; Clear session
-     (visit "/")
+     (logout-if-necessary)
      (has-css? "input[name=username]")
      (e/clear page {:name "username"} {:name "password"})
      (fill {:name "username"} username)

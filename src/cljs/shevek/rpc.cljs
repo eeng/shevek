@@ -1,8 +1,7 @@
 (ns shevek.rpc
   (:require [ajax.core :refer [POST]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.reflow.db :as db]
-            [shevek.lib.local-storage :as local-storage]))
+            [shevek.reflow.db :as db]))
 
 (defn loading?
   ([] (seq (db/get :loading)))
@@ -15,15 +14,12 @@
   ([db] (assoc db :loading {}))
   ([db key] (update db :loading (fnil dissoc {}) key)))
 
-(defn auth-header []
-  {"Authorization" (str "Token " (local-storage/get-item "access-token"))})
-
-(defn call [fid & {:keys [args handler] :or {args []}}]
+(defn call [fid & {:keys [args handler error-handler]
+                   :or {args [] error-handler #(dispatch :errors/from-server %)}}]
   {:pre [(vector? args)]}
   (POST "/rpc" {:params {:fn fid :args args}
                 :handler handler
-                :error-handler #(dispatch :errors/from-server %)
-                :headers (auth-header)}))
+                :error-handler error-handler}))
 
 (defevh :data-arrived [db db-key data db-handler]
   (let [db-handler (or db-handler #(assoc % db-key data))]

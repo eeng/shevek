@@ -1,14 +1,12 @@
 (ns shevek.pages.login
   (:require [reagent.core :as r]
             [ajax.core :refer [POST]]
-            [cljsjs.jwt-decode]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.rpc :as rpc]
             [shevek.components.form :refer [text-input input-field]]
             [shevek.components.shortcuts :refer [shortcuts]]
-            [shevek.lib.local-storage :as local-storage]
             [shevek.navigation :refer [navigate]]
             [shevek.components.notification :refer [notify]]))
 
@@ -18,9 +16,8 @@
       (js->clj (js/jwt_decode token) :keywordize-keys true)
       (catch js/Error _ {}))))
 
-(defevh :sessions/login-successful [db {:keys [token]}]
-  (local-storage/set-item! "access-token" token)
-  (-> (assoc db :current-user (extract-user token))
+(defevh :sessions/login-successful [db {:keys [user]}]
+  (-> (assoc db :current-user user)
       (rpc/loaded :logging-in)))
 
 (defevh :sessions/login-failed [db]
@@ -37,17 +34,25 @@
                                      (dispatch :errors/from-server response)))})
   (rpc/loading db :logging-in))
 
-(defevh :sessions/logout [db]
-  (local-storage/remove-item! "access-token")
+(defn- reset-db-and-go-to-login [db]
   (navigate "/")
   (select-keys db [:preferences :page :initialized]))
 
+(defevh :sessions/logout [db]
+  (POST "/logout" :handler identity)
+  (reset-db-and-go-to-login db))
+
 (defevh :sessions/expired [db]
   (notify (t :users/session-expired) :type :info)
-  (dispatch :sessions/logout))
+  (reset-db-and-go-to-login db))
 
-(defevh :sessions/user-restored [db]
-  (assoc db :current-user (extract-user (local-storage/get-item "access-token")) :initialized true))
+(defevh :sessions/restored [db user]
+  (assoc db :current-user user :initialized true))
+
+(defevh :sessions/restore [db]
+  (rpc/call "users/me"
+            :handler #(dispatch :sessions/restored %)
+            :error-handler #(dispatch :sessions/restored nil)))
 
 (defn- login-form []
   (let [user (r/atom {})
