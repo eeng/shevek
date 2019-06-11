@@ -1,4 +1,4 @@
-(defproject shevek "0.5.0"
+(defproject shevek "0.5.1"
   :description "Druid analytics web interface for end users"
   :url "https://github.com/eeng/shevek"
   :license {:name "MIT License"
