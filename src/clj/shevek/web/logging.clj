@@ -23,12 +23,12 @@
   (not-any? #(str/starts-with? uri %) ["/public" "/js/out"]))
 
 (defn wrap-request-logging [handler]
-  (fn [{:keys [request-method uri query-string params identity uuid] :as req}]
+  (fn [{:keys [request-method uri query-string params user uuid] :as req}]
     (let [ps (filtered-params params [:password :password-confirmation :current-password :stacktrace :app-db])
           method (-> request-method name str/upper-case)
           full-uri (str uri (when query-string (str "?" query-string)))
           req-id (subs uuid 0 8)
-          user (or (:username identity) "guest")
+          user (or (:username user) "guest")
           prefix (str (tag req-id) " " (tag user))]
       (if (log-request? full-uri)
         (do

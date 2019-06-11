@@ -161,7 +161,7 @@
                     :less {:target-path "out/prod/public/css"
                            :source-map false
                            :compression true}
-                    :clean-targets ^{:protect false} ["out/prod" "target/uberjar" "target/prod"]}
+                    :clean-targets ^{:protect false} ["out/prod" "target"]}
              :uberjar {:aot :all
                        :auto-clean false}
              ; Put ultra into a separate profile to active it only during clj testing, otherwise cljs testing throws an error due to this bug: https://github.com/emezeske/lein-cljsbuild/issues/469
