@@ -53,7 +53,7 @@
 
 (defn- user-row [{:keys [username fullname email admin id] :as user} edited-user]
   [:tr
-   [:td [avatar user]]
+   [:td.collapsing [avatar user]]
    [:td username]
    [:td
     [:div fullname]

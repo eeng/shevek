@@ -8,7 +8,8 @@
  :druid-uri "http://localhost:8082"
 
  ; You should change this key, preferably with an environment variable SESSION__KEY
- :session {:key "9you3altsufu84w5" :timeout 3600}
+ ; Sessions expire in 24 hs by default
+ :session {:key "9you3altsufu84w5" :timeout 86400}
 
  ; Set to 0 to disable auto discovery (in seconds)
  :datasources-discovery-interval 60
