@@ -8,10 +8,12 @@
   (authorize (admin? user))
   (r/find-users db))
 
-(defn save [_ user]
-  (r/save-user db user))
+(defn save [{:keys [user]} user-to-save]
+  (authorize (admin? user))
+  (r/save-user db user-to-save))
 
-(defn delete [_ id]
+(defn delete [{:keys [user]} id]
+  (authorize (admin? user))
   (r/delete-user db id))
 
 (defn save-account [{:keys [user]} {:keys [current-password] :as new-fields}]
