@@ -81,7 +81,7 @@
      :count (waiting #(= (count (e/query-all page {:css selector})) value)))))
 
 (defn has-no-css? [selector]
-  (waiting #(not (has-css? selector))))
+  (waiting #(not (e/exists? page {:css selector}))))
 
 (defn has-title? [title]
   (has-css? "h1.header" :text title))
@@ -139,20 +139,6 @@
 (defn drag-and-drop [& args]
   (apply e/drag-and-drop page args))
 
-(defn- logout []
-  (if (e/exists? page {:data-tid "sidebar-logout"})
-    (do
-      (e/js-execute page "$('.ui.modals.active').remove()")
-      (e/click page {:data-tid "sidebar-logout"})
-      true)
-    false))
-
-(defn logout-if-necessary []
-  (when-not (logout)
-    (visit "/")
-    (e/wait-exists page {:css ".layout"})
-    (logout)))
-
 (defn login
   ([] (login {}))
   ([{:keys [username password fullname]
@@ -161,7 +147,8 @@
    (let [user (merge {:username username :password password :fullname fullname} user)
          user (or (users/find-by-username db username)
                   (make! User user))]
-     (logout-if-necessary)
+     (e/delete-cookies page)
+     (visit "/")
      (has-css? "input[name=username]")
      (e/clear page {:name "username"} {:name "password"})
      (fill {:name "username"} username)

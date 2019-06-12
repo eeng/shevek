@@ -23,7 +23,7 @@
     (click-text "Save")
     (is (has-css? "#notification" :text "Dashboard saved!"))
     (is (has-css? ".topbar-header" :text "Superdash"))
-    (is (has-no-css? ".modal.visible"))
+    (is (has-no-css? ".dimmer.active"))
     (click-tid "sidebar-dashboards")
     (is (has-text? "Superdash")))
 
