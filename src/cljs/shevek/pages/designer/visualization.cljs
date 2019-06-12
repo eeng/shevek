@@ -10,10 +10,10 @@
             [shevek.pages.designer.visualizations.pivot-table :refer [table-visualization]]
             [shevek.pages.designer.visualizations.chart :refer [chart-visualization]]))
 
-(defn refreshing-indicator [{:keys [refreshing?] :or {refreshing? (constantly false)}}]
-  [:div.ui.right.corner.label
-   {:class (when-not (refreshing?) "hideme")}
-   [:i.sync.loading.icon]])
+(defn refreshing-indicator [{:keys [refreshing?]}]
+  (when refreshing?
+    [:div.ui.right.corner.label
+     [:i.sync.loading.icon]]))
 
 (defn visualization [results {:keys [cube] :as report} & [opts]]
   (when results ; Results are nil until query finish, and the cube could not exists yet when the user loads the page

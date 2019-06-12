@@ -107,7 +107,7 @@
   (dispatch :dashboard/report-query report id)
   (fn []
     (if-let [results (db/get-in [:current-dashboard :reports-results id])]
-      [visualization results report {:refreshing? #(rpc/loading? [:current-dashboard :reports-results id])}]
+      [visualization results report {:refreshing? (rpc/loading? [:current-dashboard :reports-results id])}]
       [:div.ui.active.loader])))
 
 (defn- cube-selector [{:keys [id]}]
