@@ -81,8 +81,6 @@
              :nrepl-port 4002
              :nrepl-middleware ["cider.piggieback/wrap-cljs-repl"]}
 
-  :doo {:paths {:karma "./node_modules/karma/bin/karma"}}
-
   :cljsbuild {:builds
               {:app
                {:source-paths ["src/cljs"]
@@ -101,68 +99,114 @@
                  :changes-only true
                  :notify-command ["terminal-notifier" "-title" "Tests" "-message"]}
 
-  :aliases {"frontend-testing" ["doo" "chrome-headless" "test" "auto"]
-            "backend-testing" ["with-profile" "+ultra" "test-refresh"]
-            "build-frontend" ["with-profile" "prod" "do" ["cljsbuild" "once"] ["less4j" "once"]]
-            "package" ["do" ["with-profile" "prod" "clean"] "build-frontend" "uberjar"]
-            "ci" ["do" "test" ["doo" "chrome-headless" "test" "once"] "build-frontend" ["test" ":acceptance"]]}
+  :aliases {"build-frontend" ["do" ["cljsbuild" "once"] ["less4j" "once"]]
+            "package" ["with-profile" "prod" "do" "clean," "build-frontend," "uberjar"]
+            "backend-tests" ["with-profile" "backend-tests" "test"]
+            "backend-testing" ["with-profile" "backend-tests" "test-refresh"]
+            "frontend-tests" ["with-profile" "frontend-tests" "doo" "chrome-headless" "once"]
+            "frontend-testing" ["with-profile" "frontend-tests" "doo" "chrome-headless" "auto"]
+            "acceptance-tests" ["with-profile" "acceptance-tests" "do" "build-frontend" ["test" ":acceptance"]]
+            "acceptance-tests-repl" ["with-profile" "dev-acceptance-tests" "repl" ":start" ":port" "4101"]
+            "ci" ["do" "backend-tests," "frontend-tests," "acceptance-tests"]}
 
-  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
-                                  [proto-repl "0.3.1"]
-                                  [binaryage/devtools "0.9.10"]
-                                  [cider/piggieback "0.3.8"] ; ClojureScript REPL on top of nREPL
-                                  [figwheel-sidecar "0.5.16"] ; ClojureScript REPL on top of nREPL
-                                  ;; Testing clj
-                                  [etaoin "0.3.2"]
-                                  [se.haleby/stub-http "0.2.7"]
-                                  [prismatic/schema-generators "0.1.2"]
-                                  ;; Testing cljs
-                                  [pjstadig/humane-test-output "0.8.3"]
-                                  [cljsjs/jquery "3.2.1-0"]]
-                   :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
-                             [lein-doo "0.1.10"]]
-                   :jvm-opts ["-Dconf=dev/resources/config.edn"]
-                   :source-paths ["dev/clj"]
-                   :resource-paths ["test/resources" "out/dev"]
-                   :cljsbuild {:builds
-                               {:app
-                                {:figwheel {:on-jsload "shevek.app/reload"}
-                                 :compiler {:main shevek.app
-                                            :output-dir "out/dev/public/js/out"
-                                            :output-to "out/dev/public/js/app.js"
-                                            :asset-path "/js/out"
-                                            :source-map-timestamp true
-                                            :preloads [devtools.preload]}}
-                                :test
-                                {:source-paths ["src/cljs" "test/cljs"]
-                                 :compiler {:output-to "out/test/unit-test.js"
-                                            :output-dir "out/test/public/js/out"
-                                            :main shevek.runner
-                                            :optimizations :whitespace
-                                            :verbose false
-                                            :pretty-print true}}}}
-                   :less {:target-path "out/dev/public/css"}
-                   :clean-targets ^{:protect false} ["target/dev" "out/dev" "out/test" "resources/private"]}
-             :prod {:resource-paths ["out/prod"]
-                    :cljsbuild {:builds
-                                {:app
-                                 {:compiler {:output-dir "out/prod/public/js/out"
-                                             :output-to "out/prod/public/js/app.js"
-                                             :source-map "out/prod/public/js/app.js.map"
-                                             :optimizations :advanced
-                                             :pretty-print false
-                                             :source-map-timestamp false
-                                             :infer-externs true
-                                             :closure-warnings {:externs-validation :off :non-standard-jsdoc :off}
-                                             :closure-defines {"goog.DEBUG" false}
-                                             :externs ["src/externs/jquery.js"
-                                                       "src/externs/semantic-ui.js"
-                                                       "src/externs/calendar.js"]}}}}
-                    :less {:target-path "out/prod/public/css"
-                           :source-map false
-                           :compression true}
-                    :clean-targets ^{:protect false} ["out/prod" "target"]}
-             :uberjar {:aot :all
-                       :auto-clean false}
-             ; Put ultra into a separate profile to active it only during clj testing, otherwise cljs testing throws an error due to this bug: https://github.com/emezeske/lein-cljsbuild/issues/469
-             :ultra {:plugins [[venantius/ultra "0.5.2"]]}})
+  :profiles {:dev
+             {:dependencies [[org.clojure/tools.namespace "0.2.11"]
+                             [proto-repl "0.3.1"]
+                             [binaryage/devtools "0.9.10"]
+                             ; ClojureScript REPL on top of nREPL
+                             [cider/piggieback "0.3.8"]
+                             [figwheel-sidecar "0.5.16"]]
+              :jvm-opts ["-Dconf=dev/resources/config.edn"]
+              :source-paths ["dev/clj"]
+              :resource-paths ["out/dev"]
+              :cljsbuild {:builds
+                          {:app
+                           {:figwheel {:on-jsload "shevek.app/reload"}
+                            :compiler {:main shevek.app
+                                       :output-dir "out/dev/public/js/out"
+                                       :output-to "out/dev/public/js/app.js"
+                                       :asset-path "/js/out"
+                                       :source-map-timestamp true
+                                       :preloads [devtools.preload]}}
+                           :test
+                           {:source-paths ["src/cljs" "test/cljs"]
+                            :compiler {:output-to "out/test/unit-test.js"
+                                       :output-dir "out/test/public/js/out"
+                                       :main shevek.runner
+                                       :optimizations :whitespace
+                                       :verbose false
+                                       :pretty-print true}}}}
+              :less {:target-path "out/dev/public/css"}
+              :clean-targets ^{:protect false} ["target/dev" "out/dev"]}
+
+             :minimized-frontend
+             {:cljsbuild {:builds
+                          {:app
+                           {:compiler {:optimizations :advanced
+                                       :pretty-print false
+                                       :source-map-timestamp false
+                                       :infer-externs true
+                                       :closure-warnings {:externs-validation :off :non-standard-jsdoc :off}
+                                       :closure-defines {"goog.DEBUG" false}
+                                       :externs ["src/externs/jquery.js"
+                                                 "src/externs/semantic-ui.js"
+                                                 "src/externs/calendar.js"]}}}}
+              :less {:source-map false
+                     :compression true}}
+
+             :shared-test
+             {:resource-paths ["test/resources"]
+              :dependencies [[etaoin "0.3.2"]
+                             [se.haleby/stub-http "0.2.7"]
+                             [prismatic/schema-generators "0.1.2"]]}
+
+             :backend-tests
+             [:shared-test
+              {:plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
+                         [venantius/ultra "0.5.2"]]}]
+
+             :frontend-tests
+             {:plugins [[lein-doo "0.1.10"]]
+              :dependencies [[pjstadig/humane-test-output "0.8.3"]
+                             [cljsjs/jquery "3.2.1-0"]]
+              :cljsbuild {:builds
+                          {:app
+                           {:source-paths ["src/cljs" "test/cljs"]
+                            :compiler {:output-to "out/utest/unit-test.js"
+                                       :output-dir "out/utest/public/js/out"
+                                       :main shevek.runner
+                                       :optimizations :whitespace
+                                       :verbose false
+                                       :pretty-print true}}}}
+              :doo {:paths {:karma "./node_modules/karma/bin/karma"}
+                    :build "app"}}
+
+             :acceptance-tests
+             [:shared-test
+              :minimized-frontend
+              {:cljsbuild {:builds
+                           {:app
+                            {:compiler {:output-dir "out/atest/public/js/out"
+                                        :output-to "out/atest/public/js/app.js"
+                                        :source-map "out/atest/public/js/app.js.map"}}}}
+               :less {:target-path "out/atest/public/css"}
+               :resource-paths ["test/resources" "out/atest"]}]
+
+             ; Allows to run individual acceptance tests from the repl, using the dev frontend
+             :dev-acceptance-tests
+             [:shared-test
+              :dev
+              :base] ; Otherwise an error is raised when opening the repl
+
+             :prod
+             [:minimized-frontend
+              {:resource-paths ["out/prod"]
+               :cljsbuild {:builds
+                           {:app
+                            {:compiler {:output-dir "out/prod/public/js/out"
+                                        :output-to "out/prod/public/js/app.js"
+                                        :source-map "out/prod/public/js/app.js.map"}}}}
+               :less {:target-path "out/prod/public/css"}
+               :clean-targets ^{:protect false} ["out/prod" "target/prod" "target/prod+f27bb53b" "target/uberjar" "target/uberjar+prod"]}]
+
+             :uberjar {:aot :all :auto-clean false}})
