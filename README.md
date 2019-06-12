@@ -1,6 +1,6 @@
 # Shevek
 
-TODO
+Shevek is an interactive data exploration UI for Druid, aimed at end users.
 
 ## Features
 
@@ -24,9 +24,11 @@ java -Dconf=config.edn -jar shevek.jar
 
 4. Open http://localhost:4000 in your browser, you should see the login page. Enter with user `admin` and password `secret123`.
 
-## Development
+## Contributing
 
-Make sure to have Druid and MongoDB running on localhost, or point to their respective locations in the `dev/resources/config.edn` file, and then execute the following command on the project folder:
+We welcome everyone to contribute to this project. To do so, please read the following instructions:
+
+First, make sure to have Druid and MongoDB running on localhost, or point to their respective locations in the `dev/resources/config.edn` file, and then execute the following command on the project folder:
 
 ```
 lein cooper
@@ -51,13 +53,13 @@ bin/build.sh
 
 ### Acceptance Testing
 
-To run the whole suite do:
+To run the whole acceptance tests suite do:
 ```
-lein test :acceptance
+lein acceptance-tests
 ```
 
 To run each test one at a time do:
 ```
-lein repl :start :port 4101
+lein acceptance-tests-repl
 ```
 Then connect to it, eval the `(ns)` and `(start-system)` forms, and finally eval the test blocks. It should run against the test database and web server.
