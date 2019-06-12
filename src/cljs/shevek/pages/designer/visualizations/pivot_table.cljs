@@ -21,56 +21,55 @@
     (find-dimension default-sort-by (current-cube :dimensions))
     dim))
 
-(defn- designer-visible? []
-  (some? (db/get :designer)))
-
-(defn- sortable-th [title sorting-mapping opts]
-  (if (designer-visible?)
+(defn- sortable-th [title sorting-mapping html-opts {:keys [in-designer?]}]
+  (if in-designer?
     (let [sorting-mapping (transform [MAP-VALS] translate-to-default-sort-by sorting-mapping)
           requested-sort-bys (map :name (vals sorting-mapping))
           current-sort-bys (map (comp :name :sort-by) (keys sorting-mapping))
           descendings (->> (keys sorting-mapping) (map (comp :descending :sort-by)) distinct)
           show-icon? (and (= current-sort-bys requested-sort-bys)
                           (= (count descendings) 1))
-          icon-after? (= (:class opts) "right aligned")
+          icon-after? (= (:class html-opts) "right aligned")
           desc (first descendings)]
-      [:th (assoc opts :on-click #(dispatch :designer/splits-sorted-by sorting-mapping (if show-icon? (not desc) true)))
+      [:th (assoc html-opts :on-click #(dispatch :designer/splits-sorted-by sorting-mapping (if show-icon? (not desc) true)))
        (when-not icon-after? [:span title])
        (when show-icon?
          [:i.icon.caret {:class (if desc "down" "up")}])
        (when icon-after? [:span title])])
-    [:th opts title]))
+    [:th html-opts title]))
 
 (defprotocol ReagentCell
-  (as-component [this]))
+  (as-component [this context]))
 
 (extend-protocol ReagentCell
   EmptyCell
-  (as-component [cell]
+  (as-component [cell _]
     [:th])
 
   SplitsCell
-  (as-component [{:keys [dimensions in-columns col-span]}]
+  (as-component [{:keys [dimensions in-columns col-span]} context]
     [sortable-th
      (->> dimensions (map :title) (str/join ", "))
      (zipmap dimensions dimensions)
-     {:class (when in-columns "right aligned") :col-span (when (> col-span 1) col-span)}])
+     {:class (when in-columns "right aligned") :col-span (when (> col-span 1) col-span)}
+     context])
 
   MeasureCell
-  (as-component [{:keys [measure splits top-left-corner]}]
+  (as-component [{:keys [measure splits top-left-corner]} context]
     [sortable-th
      (:title measure)
      (zipmap splits (repeat measure))
-     (when-not top-left-corner {:class "right aligned"})])
+     (when-not top-left-corner {:class "right aligned"})
+     context])
 
   DimensionValueCell
-  (as-component [{:keys [text depth in-columns col-span]}]
+  (as-component [{:keys [text depth in-columns col-span]} _]
     [(if in-columns :th.dim-value :td.dim-value)
      {:class (when in-columns "right aligned") :col-span (when (> col-span 1) col-span)}
      [:span {:class (str "depth-" depth)} text]])
 
   MeasureValueCell
-  (as-component [{:keys [value text proportion participation]}]
+  (as-component [{:keys [value text proportion participation]} _]
     (let [show-proportion? (> proportion 0.01)]
       [:td.right.aligned
        (when show-proportion? [proportion-bg value proportion])
@@ -96,12 +95,12 @@
 ; The slice can't be used directly for the hash because it fails when the values are floats, as they are hash as ints and can produce duplicate values
 (defn- body-row []
   (let [selected (r/atom false)]
-    (fn [{:keys [cells slice grand-total? subtotal?]} row-key]
+    (fn [{:keys [cells slice grand-total? subtotal?]} row-key {:keys [in-designer?] :as context}]
       (into
        [:tr {:class [(when grand-total? "grand-total")
                      (when @selected "active")
                      (when subtotal? "subtotal")]
-             :on-click (when (and (not grand-total?) (designer-visible?))
+             :on-click (when (and (not grand-total?) in-designer?)
                          (fn [event]
                            (let [tr (-> (.-target event) js/$ (.closest "tr"))
                                  relative-x-coord (- (.-pageX event) (-> tr .offset .-left))
@@ -112,16 +111,25 @@
                                           :setFluidWidth true
                                           :class "pivot-table-popup"
                                           :on-toggle #(reset! selected %)}))))}]
-       (map as-component cells)))))
+       (map #(as-component % context) cells)))))
 
-(defn- head-row [row]
-  (into [:tr] (map as-component row)))
+(defn- head-row [row context]
+  (into [:tr] (map #(as-component % context) row)))
+
+(defn- calculate-row-key [row]
+  (->> (:slice row)
+       (map #(if (:grand-total? row)
+               "_grand_"
+               (or (:value %) "_empty_")))
+       (str/join "")
+       hash))
 
 (defn table-visualization [viz]
-  (let [{:keys [head body]} (pivot-table/generate viz)]
+  (let [{:keys [head body]} (pivot-table/generate viz)
+        context {:in-designer? (some? (db/get :designer))}]
     [:table.ui.very.basic.compact.table.pivot-table
      (into [:thead]
-           (for [row head] [head-row row]))
-     (into [:tbody]
-           (for [[i row] (map-indexed vector body)]
-             ^{:key i} [body-row row i]))]))
+           (for [row head] [head-row row context]))
+     [:tbody
+      (for [row body :let [key (calculate-row-key row)]]
+        ^{:key key} [body-row row key context])]]))
