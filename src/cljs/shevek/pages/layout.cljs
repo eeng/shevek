@@ -15,12 +15,14 @@
             [shevek.pages.designer.page :as designer]
             [shevek.pages.profile.page :as profile]
             [shevek.pages.configuration.page :as configuration]
-            [shevek.components.notification :refer [notification]]))
+            [shevek.components.notification :refer [notification]]
+            [shevek.components.virtualized-examples :refer [example-page]]))
 
 (defn page-component-for [page]
   (case page
     :login #'login/page
-    :home #'home/page
+    ; :home #'home/page
+    :home #'example-page
     :designer #'designer/page
     :dashboard #'dashboard/page
     :dashboards #'dashboards/page
