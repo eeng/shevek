@@ -16,7 +16,7 @@
             [shevek.pages.profile.page :as profile]
             [shevek.pages.configuration.page :as configuration]
             [shevek.components.notification :refer [notification]]
-            [shevek.components.virtualized-examples :refer [example-page]]))
+            [shevek.components.examples.virtualized :refer [example-page]]))
 
 (defn page-component-for [page]
   (case page
