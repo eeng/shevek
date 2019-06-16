@@ -22,4 +22,6 @@
 
       :reagent-render
       (fn [render-fn]
-        (render-fn @dimensions))})))
+        (if (pos? (:width @dimensions))
+          (render-fn @dimensions)
+          [:div]))})))

@@ -1,6 +1,5 @@
 (ns shevek.components.examples.virtualized
   (:require [shevek.components.virtualized :refer [virtual-table]]
-            [shevek.components.auto-sizer :refer [auto-sizer]]
             [clojure.string :as str]
             [shevek.components.benchmark :refer [benchmark]]))
 
@@ -13,23 +12,21 @@
         data (vec (repeatedly rows #(vec (repeatedly columns rand-str))))]
     [benchmark
      [:div#example-page {:style {:width "500px" :height "400px" :margin "3em" :background-color "#ffff0055"}}
-      [auto-sizer
-       (fn [{:keys [height]}]
-         [virtual-table
-          {:class "pivot-table"
-           :height height
-           :row-height 40
-           :window-buffer 3
-           :header-count 1
-           :header-renderer
-           (fn [{:keys [row-idx style]}]
-             [:tr
-              (for [col-idx (range columns)]
-                [:th {:key col-idx :style style} (str "Header " row-idx "-" col-idx)])])
-           :row-count rows
-           :row-renderer
-           (fn [{:keys [row-idx style]}]
-             [:tr {:key row-idx}
-              (for [[col-idx cell] (map-indexed vector (get data row-idx))]
-                [:td {:key col-idx :style (merge style {:background-color "#b4bcf1" :padding ".5em"})}
-                 (str row-idx ": " cell)])])}])]]]))
+      [virtual-table
+       {:class "pivot-table"
+        :row-height 40
+        :window-buffer 3
+        :header-count 1
+        :header-renderer
+        (fn [{:keys [row-idx style]}]
+          [:tr
+           (for [col-idx (range columns)]
+             [:th {:key col-idx :style (merge style {:padding ".5em" :text-align "left"})}
+              (str "Header " row-idx "-" col-idx)])])
+        :row-count rows
+        :row-renderer
+        (fn [{:keys [row-idx style]}]
+          [:tr {:key row-idx}
+           (for [[col-idx cell] (map-indexed vector (get data row-idx))]
+             [:td {:key col-idx :style (merge style {:background-color "#b4bcf1" :padding ".5em"})}
+              (str row-idx ": " cell)])])}]]]))
