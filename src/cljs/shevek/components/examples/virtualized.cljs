@@ -7,7 +7,7 @@
 
 (defn example-page []
   (let [rows 100
-        columns 3
+        columns 10
         rand-str #(-> lorem (str/split #" ") rand-nth)
         data (vec (repeatedly rows #(vec (repeatedly columns rand-str))))]
     [benchmark

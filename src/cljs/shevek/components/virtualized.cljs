@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [shevek.components.auto-sizer :refer [auto-sizer]]))
 
-(defn- handle-scroll [first-window-row row-count event]
+(defn- calculate-first-window-row [first-window-row row-count event]
   (let [element (.-target event)
         scroll-height (.-scrollHeight element)
         scroll-top (.-scrollTop element)]
@@ -10,18 +10,20 @@
 
 (defn- window-provider []
   (let [inner-window-start (r/atom 0)]
-    (fn [{:keys [item-count item-height window-buffer window-height]} render-fn]
-      (let [on-scroll (partial handle-scroll inner-window-start item-count)]
-        [:div.scroll-area {:on-scroll on-scroll}
-         (let [content-height (* item-height item-count)
-               window-size (Math/ceil (* (/ window-height content-height) item-count))
-               outer-window-start (max (- @inner-window-start window-buffer) 0)
-               outer-window-end (min (+ @inner-window-start window-size window-buffer) item-count)
-               window (range outer-window-start outer-window-end)
-               spacer-height (* outer-window-start item-height)]
-           [:div {:style {:height content-height}} ; Fake the full content so the scroll remaining is consistent
-            [:div.spacer {:style {:height spacer-height}}]
-            [render-fn window]])]))))
+    (fn [{:keys [item-count item-height window-buffer window-height on-scroll]} render-fn]
+      [:div.scroll-area
+       {:on-scroll #(do
+                      (calculate-first-window-row inner-window-start item-count %)
+                      (on-scroll %))}
+       (let [content-height (* item-height item-count)
+             window-size (Math/ceil (* (/ window-height content-height) item-count))
+             outer-window-start (max (- @inner-window-start window-buffer) 0)
+             outer-window-end (min (+ @inner-window-start window-size window-buffer) item-count)
+             window (range outer-window-start outer-window-end)
+             spacer-height (* outer-window-start item-height)]
+         [:div {:style {:height content-height}} ; Fake the full content so the scroll remaining is consistent
+          [:div.spacer {:style {:height spacer-height}}]
+          [render-fn window]])])))
 
 (defn- sync-column-widths
   [vt-node]
@@ -35,10 +37,25 @@
               :when content-width]
         (-> header-cell js/$ (.width content-width))))))
 
+(defn- copy-content-width
+  [node]
+  "Sets the headers table width to the same content table width. This is needed so the individual cell's widths sets by the sync-column-widths are respected when content overflows horizontally."
+  (when node
+    (let [vt (-> node js/$ (.closest ".virtual-table"))
+          content-width (-> vt (.find ".content-table") .width)]
+      (-> vt (.find ".headers-table") (.width content-width)))))
+
+(defn- sync-headers-position
+  [event]
+  "As the user scroll horizontally, the headers' table needs to move as well to mantain the illusion that there is one table."
+  (let [scroll-area (-> event .-target)]
+    (.css (-> scroll-area js/$ (.closest ".virtual-table") (.find ".headers-table"))
+          "margin-left" (-> scroll-area .-scrollLeft -))))
+
 (defn headers [{:keys [header-count header-renderer row-height]}]
   (when header-renderer
-    [:div
-     [:table
+    [:div.headers-area
+     [:table.headers-table {:ref copy-content-width}
       [:thead
        (for [row-idx (range header-count)]
          ^{:key row-idx} [header-renderer {:row-idx row-idx :style {:height row-height}}])]]]))
@@ -49,7 +66,7 @@
 
     :reagent-render
     (fn [{:keys [row-renderer row-height window]}]
-      [:table
+      [:table.content-table
        [:tbody
         (for [row-idx window]
           ^{:key row-idx} [row-renderer {:row-idx row-idx :style {:height row-height}}])]])}))
@@ -71,7 +88,8 @@
              {:item-count row-count
               :item-height row-height
               :window-buffer window-buffer
-              :window-height window-height}
+              :window-height window-height
+              :on-scroll sync-headers-position}
              (fn [window]
                [windowed-content {:window window
                                   :row-renderer row-renderer
