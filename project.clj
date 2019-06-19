@@ -127,15 +127,7 @@
                                        :output-to "out/dev/public/js/app.js"
                                        :asset-path "/js/out"
                                        :source-map-timestamp true
-                                       :preloads [devtools.preload]}}
-                           :test
-                           {:source-paths ["src/cljs" "test/cljs"]
-                            :compiler {:output-to "out/test/unit-test.js"
-                                       :output-dir "out/test/public/js/out"
-                                       :main shevek.runner
-                                       :optimizations :whitespace
-                                       :verbose false
-                                       :pretty-print true}}}}
+                                       :preloads [devtools.preload]}}}}
               :less {:target-path "out/dev/public/css"}
               :clean-targets ^{:protect false} ["target/dev" "out/dev"]}
 
