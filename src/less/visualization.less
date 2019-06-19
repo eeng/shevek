@@ -38,18 +38,18 @@
     .pivot-table {
       margin: 0;
 
-      table { width: 100% }
+      .content-table {
+        width: 100%;
+
+        td { text-overflow: ellipsis; }
+      }
 
       th, td {
         white-space: nowrap;
         height: 34px; // Needed to be in sync with the row-height in the virtual-table component
         text-align: left;
         padding: .5em .7em;
-
         max-width: 30em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
         &.right.aligned { text-align: right }
       }
       th:first-child, td:first-child { padding-left: 0.5em; }

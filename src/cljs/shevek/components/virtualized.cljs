@@ -27,16 +27,15 @@
           [:div.spacer {:style {:height spacer-height}}]
           [render-fn window]])])))
 
-(defn- sync-table-widths [vt]
-  (let [content-table-width (-> vt (.find ".content-table") .outerWidth)]
-    (-> vt (.find ".headers-table") (.width content-table-width))))
+(defn- set-width [node width]
+  (-> node js/$
+      (.css "min-width" width)
+      (.css "max-width" width)))
 
 (defn- clear-column-widths
   "When the table updates with more header rows, the top ones could have the previous (no longer valid) widths"
   [vt]
-  (let [non-last-header-rows (-> vt (.find "thead tr:not(:last)") .children .toArray)]
-    (doseq [header-cell non-last-header-rows]
-      (-> header-cell js/$ (.width "")))))
+  (-> vt (.find "thead tr:not(:last)") .children (.each #(set-width %2 ""))))
 
 (defn- sync-column-widths
   "As two independent tables are used for headers and content, we need to programmatically fit the header column widths to the content."
@@ -44,16 +43,15 @@
   (let [first-content-row (-> vt (.find "tbody tr:first") .children .toArray)
         last-header-row (-> vt (.find "thead tr:last") .children .toArray)]
     (doseq [[content-cell header-cell] (map vector first-content-row last-header-row)
-            :let [content-cell-width (-> content-cell js/$ .width)]
+            :let [content-cell-width (-> content-cell js/$ .outerWidth)]
             :when content-cell-width]
-      (-> header-cell js/$ (.width content-cell-width)))))
+      (set-width header-cell content-cell-width))))
 
 (defn- sync-headers-and-content [vt-node]
   (when vt-node
     (let [vt (js/$ vt-node)]
       (clear-column-widths vt)
-      (sync-column-widths vt)
-      (sync-table-widths vt))))
+      (sync-column-widths vt))))
 
 (defn- sync-headers-position
   [event]
