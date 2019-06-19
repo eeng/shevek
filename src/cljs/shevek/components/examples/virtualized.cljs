@@ -19,7 +19,7 @@
         :header-count 1
         :header-renderer
         (fn [{:keys [row-idx style]}]
-          [:tr
+          [:tr {:key row-idx}
            (for [col-idx (range columns)]
              [:th {:key col-idx :style (merge style {:padding ".5em" :text-align "left"})}
               (str "Header " row-idx "-" col-idx)])])

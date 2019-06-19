@@ -54,7 +54,7 @@
      [:table.headers-table
       [:thead
        (for [row-idx (range header-count)]
-         ^{:key row-idx} [header-renderer {:row-idx row-idx :style {:height row-height}}])]]]))
+         (header-renderer {:row-idx row-idx :style {:height row-height}}))]]]))
 
 (defn windowed-content [{:keys [on-change]}]
   (r/create-class
@@ -65,12 +65,12 @@
       [:table.content-table
        [:tbody
         (for [row-idx window]
-          ^{:key row-idx} [row-renderer {:row-idx row-idx :style {:height row-height}}])]])}))
+          (row-renderer {:row-idx row-idx :style {:height row-height}}))]])}))
 
 (defn virtual-table [_]
   (let [vt (r/atom nil)]
     (fn [{:keys [class header-count header-renderer row-count row-renderer row-height window-buffer]
-          :or {header-count 1 window-buffer 10}}]
+          :or {header-count 1 window-buffer 5}}]
       [auto-sizer
        (fn [{:keys [height]}]
          (let [window-height (- height (* header-count row-height))]
