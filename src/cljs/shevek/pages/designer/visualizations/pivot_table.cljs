@@ -6,8 +6,8 @@
             [shevek.domain.dimension :refer [find-dimension]]
             [shevek.pages.designer.helpers :refer [current-cube]]
             [shevek.components.popup :refer [show-popup close-popup]]
+            [shevek.components.virtualized :refer [virtual-table]]
             [shevek.domain.pivot-table :as pivot-table :refer [SplitsCell MeasureCell DimensionValueCell MeasureValueCell EmptyCell]]
-            [shevek.lib.number :as number]
             [clojure.string :as str]
             [com.rpl.specter :refer [transform MAP-VALS]]))
 
@@ -69,12 +69,11 @@
      [:span {:class (str "depth-" depth)} text]])
 
   MeasureValueCell
-  (as-component [{:keys [value text proportion participation]} _]
+  (as-component [{:keys [value text proportion]} _]
     (let [show-proportion? (> proportion 0.01)]
       [:td.right.aligned
        (when show-proportion? [proportion-bg value proportion])
-       [:span (when show-proportion? {:title (number/format participation "0.0%")})
-        text]])))
+       text])))
 
 (defn- row-popup [slice]
   (let [simplified-slice (map (juxt :dimension :value) slice)]
@@ -92,44 +91,44 @@
        (t :raw-data/button)]
       [:button.ui.compact.button {:on-click close-popup} (t :actions/cancel)]]]))
 
-; The slice can't be used directly for the hash because it fails when the values are floats, as they are hash as ints and can produce duplicate values
-(defn- body-row []
+(defn- header-renderer [context {:keys [row-idx]}]
+  (let [row (get-in context [:pivot-table :head row-idx])]
+    (into [:tr]
+          (map #(as-component % context) row))))
+
+(defn- show-row-popup [event row-key slice selected]
+  (let [tr (-> (.-target event) js/$ (.closest "tr"))
+        relative-x-coord (- (.-pageX event) (-> tr .offset .-left))
+        offset (- relative-x-coord (/ (.width tr) 2))]
+    (show-popup event ^{:key row-key} [row-popup slice]
+                {:position "top center"
+                 :offset offset
+                 :setFluidWidth true
+                 :class "pivot-table-popup"
+                 :on-toggle #(reset! selected %)})))
+
+(defn- row-renderer []
   (let [selected (r/atom false)]
-    (fn [{:keys [cells slice grand-total? subtotal?]} row-key {:keys [in-designer?] :as context}]
-      (into
-       [:tr {:class [(when grand-total? "grand-total")
-                     (when @selected "active")
-                     (when subtotal? "subtotal")]
-             :on-click (when (and (not grand-total?) in-designer?)
-                         (fn [event]
-                           (let [tr (-> (.-target event) js/$ (.closest "tr"))
-                                 relative-x-coord (- (.-pageX event) (-> tr .offset .-left))
-                                 offset (- relative-x-coord (/ (.width tr) 2))]
-                             (show-popup event ^{:key row-key} [row-popup slice]
-                                         {:position "top center"
-                                          :offset offset
-                                          :setFluidWidth true
-                                          :class "pivot-table-popup"
-                                          :on-toggle #(reset! selected %)}))))}]
-       (map #(as-component % context) cells)))))
-
-(defn- head-row [row context]
-  (into [:tr] (map #(as-component % context) row)))
-
-(defn- calculate-row-key [row]
-  (->> (:slice row)
-       (map #(if (:grand-total? row)
-               "_grand_"
-               (or (:value %) "_empty_")))
-       (str/join "")
-       hash))
+    (fn [{:keys [in-designer?] :as context} {:keys [row-idx]}]
+      (let [row (get-in context [:pivot-table :body row-idx])
+            {:keys [cells slice grand-total? subtotal?]} row]
+        (into [:tr {:class [(when grand-total? "grand-total")
+                            (when @selected "active")
+                            (when subtotal? "subtotal")]
+                    :on-click (when (and (not grand-total?) in-designer?)
+                                #(show-row-popup % row-idx slice selected))}]
+              (map #(as-component % context) cells))))))
 
 (defn table-visualization [viz]
-  (let [{:keys [head body]} (pivot-table/generate viz)
-        context {:in-designer? (some? (db/get :designer))}]
-    [:table.ui.very.basic.compact.table.pivot-table
-     (into [:thead]
-           (for [row head] [head-row row context]))
-     [:tbody
-      (for [row body :let [key (calculate-row-key row)]]
-        ^{:key key} [body-row row key context])]]))
+  (let [{:keys [head body] :as pt} (time (pivot-table/generate viz))
+        context {:pivot-table pt
+                 :in-designer? (some? (db/get :designer))}]
+    [virtual-table
+     {:class "pivot-table"
+      :row-height 34
+      :header-count (count head)
+      :header-renderer (fn [{:keys [row-idx] :as props}]
+                         ^{:key row-idx} [header-renderer context props])
+      :row-count (count body)
+      :row-renderer (fn [{:keys [row-idx] :as props}]
+                      ^{:key row-idx} [row-renderer context props])}]))

@@ -145,6 +145,8 @@
         [row-splits col-splits] (partition-splits splits)
         max-values (calculate-max-values measures results)
         viz (assoc viz :row-splits row-splits :col-splits col-splits :max-values max-values)]
-    {:head (concat (top-header-rows viz)
-                   (bottom-header-rows col-splits (child-cols-and-self grand-total) [] viz))
-     :body (mapcat #(results-rows % viz row-splits []) results)}))
+    {:head (vec
+            (concat (top-header-rows viz)
+                    (bottom-header-rows col-splits (child-cols-and-self grand-total) [] viz)))
+     :body (vec
+            (mapcat #(results-rows % viz row-splits []) results))}))

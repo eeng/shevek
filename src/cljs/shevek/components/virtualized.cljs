@@ -32,14 +32,21 @@
   "As two independent tables are used for headers and content, we need to programmatically fit the header column widths to the content."
   (when vt-node
     (let [vt (js/$ vt-node)
-          content-width (-> vt (.find ".content-table") .width)
+          content-table-width (-> vt (.find ".content-table") .outerWidth)
           first-content-row (-> vt (.find "tbody tr:first") .children .toArray)
-          last-header-row (-> vt (.find "thead tr:last") .children .toArray)]
-      (-> vt (.find ".headers-table") (.width content-width))
+          last-header-row (-> vt (.find "thead tr:last") .children .toArray)
+          non-last-header-rows (-> vt (.find "thead tr:not(:last)") .children .toArray)]
+
+      (-> vt (.find ".headers-table") (.width content-table-width))
+
+      ; When the table updates with more header rows, the top ones could have the previous (no longer valid) widths
+      (doseq [header-cell non-last-header-rows]
+        (-> header-cell js/$ (.width "")))
+
       (doseq [[content-cell header-cell] (map vector first-content-row last-header-row)
-              :let [content-width (-> content-cell js/$ .width)]
-              :when content-width]
-        (-> header-cell js/$ (.width content-width))))))
+              :let [content-cell-width (-> content-cell js/$ .width)]
+              :when content-cell-width]
+        (-> header-cell js/$ (.width content-cell-width))))))
 
 (defn- sync-headers-position
   [event]
@@ -67,7 +74,8 @@
         (for [row-idx window]
           (row-renderer {:row-idx row-idx :style {:height row-height}}))]])}))
 
-(defn virtual-table [_]
+(defn virtual-table [{:keys [row-count row-renderer]}]
+  {:pre [row-count row-renderer]}
   (let [vt (r/atom nil)]
     (fn [{:keys [class header-count header-renderer row-count row-renderer row-height window-buffer]
           :or {header-count 1 window-buffer 5}}]

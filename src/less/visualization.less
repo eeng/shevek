@@ -1,4 +1,3 @@
-// TODO faltaria agregarle el overflow-shadow en el designer (creo que no andaba xq debe ir en el container, xq en el dashboard funco en el container. y dejar fijo el header al scrollear
 #designer, #dashboard {
   .icon-hint {
     color: #ccc;
@@ -18,6 +17,9 @@
   .visualization {
     .ui.corner.label {
       border-color: #e8e8e873;
+      margin-right: -@panel-horizontal-padding;
+      margin-top: -@panel-horizontal-padding;
+      z-index: -1;
 
       // Make the icon a little smaller
       i {
@@ -35,9 +37,27 @@
 
     .pivot-table {
       margin: 0;
-      th, td { white-space: nowrap; }
+
+      table { width: 100% }
+
+      th, td {
+        white-space: nowrap;
+        height: 34px; // Needed to be in sync with the row-height in the virtual-table component
+        text-align: left;
+        padding: .5em .7em;
+
+        max-width: 30em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.right.aligned { text-align: right }
+      }
       th:first-child, td:first-child { padding-left: 0.5em; }
       th:last-child, td:last-child { padding-right: 0.5em }
+
+      th, td { border-bottom: 1px solid rgba(34, 36, 38, .1); }
+      tbody tr:last-child td { border-bottom: 0 }
+
       thead {
         th:not(.dim-value) {
           .icon { margin-right: 0; }
@@ -45,6 +65,7 @@
         }
         th.dim-value { font-weight: normal }
       }
+
       tbody tr {
         opacity: .999;
         td {
@@ -64,6 +85,13 @@
           }
           .generate-depths(5);
         }
+
+        &.subtotal td { font-weight: bold; }
+      }
+
+      .scroll-area {
+        margin-right: -@panel-horizontal-padding;
+        padding-right: @panel-horizontal-padding;
       }
     }
 
@@ -92,7 +120,6 @@
 
     tbody tr {
       &:not(.grand-total) { .selectable };
-      &.subtotal td { font-weight: bold; }
     }
   }
 }
