@@ -145,8 +145,7 @@
       :actions [[fullscreen-panel-button panel already-fullscreen?]
                 (when modifiable? [edit-panel-button panel])
                 (when modifiable? [duplicate-panel-button panel])
-                (when modifiable? [remove-panel-button panel])]
-      :scrollable true}
+                (when modifiable? [remove-panel-button panel])]}
      (case type
        "cube-selector" [cube-selector panel]
        "report" [report-visualization panel])]))

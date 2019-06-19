@@ -19,6 +19,8 @@
     .panel-content {
       // The following lines center the content vertically. Need to use margin auto because centering with justify-content clips the content when is large.
       height: 100%;
+      overflow: hidden;
+
       .visualization.totals, .visualization.warning {
         display: flex;
         flex-direction: column;
@@ -58,7 +60,7 @@
 
     &.resizing {
       // Fix a bug in Chrome where when resizing would make the div scroll at the same time
-      .scrollable { overflow: hidden }
+      .scroll-area { overflow: hidden }
     }
   }
 }

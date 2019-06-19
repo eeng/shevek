@@ -44,15 +44,13 @@
    (assets/load-bundle "node_modules"
                        "libs.css"
                        ["/semantic-ui-css/semantic.min.css"
-                        "/semantic-ui-calendar/dist/calendar.min.css"
-                        "/simplebar/dist/simplebar.min.css"])
+                        "/semantic-ui-calendar/dist/calendar.min.css"])
    (assets/load-bundle "node_modules"
                        "libs.js"
                        ["/jquery/dist/jquery.min.js"
                         "/semantic-ui-css/semantic.min.js"
                         "/semantic-ui-calendar/dist/calendar.min.js"
                         "/stacktrace-js/dist/stacktrace.min.js"
-                        "/simplebar/dist/simplebar.min.js"
                         "/javascript-detect-element-resize/detect-element-resize.js"])
    (assets/load-assets "node_modules" ["/stacktrace-js/dist/stacktrace.min.js.map"])
    (assets/load-bundle "public" "app.css" ["/css/app.css"])
