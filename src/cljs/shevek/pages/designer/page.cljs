@@ -24,7 +24,8 @@
             [shevek.pages.designer.actions.rename :refer [report-name]]
             [shevek.schemas.conversion :refer [report->designer]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.rpc :as rpc]))
+            [shevek.rpc :as rpc]
+            [shevek.lib.react :refer [hot-reloading?]]))
 
 (defonce requested-report (r/atom nil))
 
@@ -78,8 +79,8 @@
    {:reagent-render (fn []
                       (when-let [designer (db/get :designer)]
                         (render-fn designer)))
-    :component-did-mount #(dispatch :designer/build props)
-    :component-will-unmount #(dispatch :designer/unbuild)}))
+    :component-did-mount #(when-not (hot-reloading?) (dispatch :designer/build props))
+    :component-will-unmount #(when-not (hot-reloading?) (dispatch :designer/unbuild))}))
 
 (defn- designer
   "To render the designer we need a report, and to build a report we need the full cube,
