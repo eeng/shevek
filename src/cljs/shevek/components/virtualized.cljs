@@ -23,8 +23,8 @@
              outer-window-end (min (+ @inner-window-start window-size window-buffer) item-count)
              window (range outer-window-start outer-window-end)
              spacer-height (* outer-window-start item-height)]
-         [:div {:style {:height content-height}} ; Fake the full content so the scroll remaining is consistent
-          [:div.spacer {:style {:height spacer-height}}]
+         [:div {:style {:height content-height ; Fake the full content so the scroll remaining is consistent
+                        :padding-top spacer-height}}
           [render-fn window]])])))
 
 (defn- set-width [node width]
