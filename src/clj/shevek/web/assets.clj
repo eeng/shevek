@@ -50,8 +50,7 @@
                        ["/jquery/dist/jquery.min.js"
                         "/semantic-ui-css/semantic.min.js"
                         "/semantic-ui-calendar/dist/calendar.min.js"
-                        "/stacktrace-js/dist/stacktrace.min.js"
-                        "/javascript-detect-element-resize/detect-element-resize.js"])
+                        "/stacktrace-js/dist/stacktrace.min.js"])
    (assets/load-assets "node_modules" ["/stacktrace-js/dist/stacktrace.min.js.map"])
    (assets/load-bundle "public" "app.css" ["/css/app.css"])
    (assets/load-bundle "public" "app.js" ["/js/app.js"])

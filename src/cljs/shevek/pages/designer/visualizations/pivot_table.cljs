@@ -120,7 +120,7 @@
               (map #(as-component % context) cells))))))
 
 (defn table-visualization [viz]
-  (let [{:keys [head body] :as pt} (time (pivot-table/generate viz))
+  (let [{:keys [head body] :as pt} (pivot-table/generate viz)
         context {:pivot-table pt
                  :in-designer? (some? (db/get :designer))}]
     [virtual-table

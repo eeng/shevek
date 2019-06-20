@@ -89,7 +89,7 @@
                                       :stacktrace-js "2.0.0"
                                       :semantic-ui-css "2.4.1"
                                       :jquery "3.4.1"
-                                      :javascript-detect-element-resize "0.5.3"}}}}}
+                                      :add-resize-listener "2.0.1"}}}}}
 
   :test-selectors {:default (complement :acceptance)
                    :acceptance :acceptance
