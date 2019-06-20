@@ -62,4 +62,4 @@ To run each test one at a time do:
 ```
 lein acceptance-tests-repl
 ```
-Then connect to it, eval the `(ns)` and `(start-system)` forms, and finally eval the test blocks. It should run against the test database and web server.
+Then connect to it on port 4101, eval the `(start-system)` forms, and finally eval the test blocks. It should run against the test database and web server.

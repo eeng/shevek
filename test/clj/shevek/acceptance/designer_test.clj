@@ -28,7 +28,6 @@
       (is (has-css? ".split .button" :count 0))
       (click {:data-tid "add-split"})
       (is (has-css? ".split .button" :count 1))
-      (is (has-css? ".visualization table tbody tr" :count 51))
       (is (has-css? ".visualization" :text "City Name"))
       (is (has-css? ".visualization" :text "Buenos Aires"))))
 

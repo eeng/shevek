@@ -9,7 +9,6 @@
             [shevek.lib.validation-test]
             [shevek.schemas.conversion-test]
             [shevek.pages.designer.visualizations.chart-test]
-            [shevek.pages.designer.visualizations.pivot-table-test]
             [shevek.pages.dashboards.show-test]
             [shevek.domain.exporters.csv-test]
             [shevek.domain.pivot-table-test]))
@@ -22,7 +21,6 @@
  'shevek.lib.validation-test
  'shevek.schemas.conversion-test
  'shevek.pages.designer.visualizations.chart-test
- 'shevek.pages.designer.visualizations.pivot-table-test
  'shevek.domain.exporters.csv-test
  'shevek.domain.pivot-table-test
  'shevek.pages.dashboards.show-test)
