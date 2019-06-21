@@ -2,27 +2,48 @@
   (:require [reagent.core :as r]
             [shevek.components.auto-sizer :refer [auto-sizer]]))
 
-(defn- calculate-inner-window-start [inner-window-start row-count event]
+(defn- calculate-inner-window-start [event {:keys [item-count]}]
   (let [element (.-target event)
         scroll-height (.-scrollHeight element)
         scroll-top (.-scrollTop element)]
-    (reset! inner-window-start (Math/floor (* (/ scroll-top scroll-height) row-count)))))
+    (Math/floor (* (/ scroll-top scroll-height) item-count))))
+
+(defn- calculate-window-size [{:keys [item-count item-height window-height]}]
+  (let [content-height (* item-height item-count)]
+    (Math/ceil (* (/ window-height content-height) item-count))))
+
+(defn- calculate-inner-window [inner-window-start props]
+  (let [window-size (calculate-window-size props)
+        inner-window-end (+ inner-window-start window-size)]
+    {:start inner-window-start :end inner-window-end}))
+
+(defn- calculate-outer-window [inner-window {:keys [window-buffer]}]
+  {:start (- (inner-window :start) window-buffer)
+   :end (+ (inner-window :end) window-buffer)})
+
+(defn- update-outer-window [outer-window inner-window {:keys [window-buffer slide-window-at] :as props}]
+  (let [buffer-remining (- window-buffer slide-window-at)]
+    (if (or (nil? outer-window)
+            (>= (inner-window :end) (- (outer-window :end) buffer-remining))
+            (<= (inner-window :start) (+ (outer-window :start) buffer-remining)))
+      (calculate-outer-window inner-window props)
+      outer-window)))
 
 (defn- window-provider []
-  (let [inner-window-start (r/atom 0)]
-    (fn [{:keys [item-count item-height window-buffer window-height on-scroll]
-          :or {on-scroll identity}}
-         render-fn]
+  (let [outer-window (r/atom nil)]
+    (fn [{:keys [item-count item-height on-scroll] :or {on-scroll identity} :as props} render-fn]
       [:div.scroll-area
-       {:on-scroll #(do
-                      (calculate-inner-window-start inner-window-start item-count %)
+       {:on-scroll #(let [inner-window-start (calculate-inner-window-start % props)
+                          inner-window (calculate-inner-window inner-window-start props)]
+                      (swap! outer-window update-outer-window inner-window props)
                       (on-scroll %))}
-       (let [content-height (* item-height item-count)
-             window-size (Math/ceil (* (/ window-height content-height) item-count))
-             outer-window-start (max (- @inner-window-start window-buffer) 0)
-             outer-window-end (min (+ @inner-window-start window-size window-buffer) item-count)
-             window (range outer-window-start outer-window-end)
-             spacer-height (* outer-window-start item-height)]
+       (let [{:keys [start end]} (or @outer-window
+                                     (-> (calculate-inner-window 0 props) (calculate-outer-window props)))
+             start (max start 0)
+             end (min end item-count)
+             window (range start end)
+             content-height (* item-height item-count)
+             spacer-height (* start item-height)]
          [:div {:style {:height content-height ; Fake the full content so the scroll remaining is consistent
                         :padding-top spacer-height}}
           [render-fn window]])])))
@@ -82,8 +103,8 @@
 (defn virtual-table [{:keys [row-count row-renderer]}]
   {:pre [row-count row-renderer]}
   (let [vt (r/atom nil)]
-    (fn [{:keys [class header-count header-renderer row-count row-renderer row-height window-buffer]
-          :or {header-count 1 window-buffer 5}}]
+    (fn [{:keys [class header-count header-renderer row-count row-renderer row-height window-buffer slide-window-at]
+          :or {header-count 1 window-buffer 10 slide-window-at (Math/round (* window-buffer 0.8))}}]
       [auto-sizer
        (fn [{:keys [height]}]
          (let [window-height (- height (* header-count row-height))]
@@ -97,6 +118,7 @@
              {:item-count row-count
               :item-height row-height
               :window-buffer window-buffer
+              :slide-window-at slide-window-at
               :window-height window-height
               :on-scroll sync-headers-position}
              (fn [window]

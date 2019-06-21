@@ -14,8 +14,9 @@
      [:div#example-page {:style {:width "500px" :height "400px" :margin "3em" :background-color "#ffff0055"}}
       [virtual-table
        {:class "pivot-table"
-        :row-height 40
-        :window-buffer 3
+        :row-height 50
+        :window-buffer 10
+        :slide-window-at 5
         :header-count 1
         :header-renderer
         (fn [{:keys [row-idx style]}]
