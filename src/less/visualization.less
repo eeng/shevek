@@ -15,11 +15,12 @@
   }
 
   .visualization {
+    position: relative; // So the .corner.label get correctly positioned
+
     .ui.corner.label {
       border-color: #e8e8e873;
       margin-right: -@panel-horizontal-padding;
       margin-top: -@panel-horizontal-padding;
-      z-index: -1;
 
       // Make the icon a little smaller
       i {
