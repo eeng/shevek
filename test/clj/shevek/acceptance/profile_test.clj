@@ -1,9 +1,11 @@
 (ns shevek.acceptance.profile-test
   (:require [clojure.test :refer [deftest use-fixtures is]]
-            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login click click-text visit fill has-css? has-text? click-tid select refresh]]
+            [shevek.acceptance.test-helper :refer [wrap-acceptance-tests it login click click-text visit fill has-css? has-text? click-tid select clear-preferences]]
             [etaoin.keys :as k]))
 
 (use-fixtures :once wrap-acceptance-tests)
+
+(use-fixtures :once {:after clear-preferences})
 
 (deftest ^:acceptance profile-tests
   (it "changing the app language"
@@ -12,11 +14,7 @@
     (select {:data-tid "lang"} "Español")
     (click-text "Save")
     (is (has-css? "#notification" :text "Preferences saved!"))
-    (is (has-text? "Preferencias"))
-    (refresh)
-    (select {:data-tid "lang"} "English")
-    (click-text "Guardar")
-    (is (has-css? "#notification" :text "Preferencias guardadas!")))
+    (is (has-text? "Preferencias")))
 
   (it "the current password mast match"
     (login {:username "max" :fullname "Max" :password "secret999"})

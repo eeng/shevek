@@ -159,5 +159,8 @@
 (defn login-admin []
   (login {:username "adm" :fullname "Admin" :admin true}))
 
+(defn clear-preferences []
+  (e/js-execute page "try { localStorage.clear() } catch (e) {}"))
+
 #_(start-system)
 #_(stop-system)
