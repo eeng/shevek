@@ -61,14 +61,13 @@
                  (build-new-report cube))]
     (render-fn report)))
 
-(defevh :designer/build [db {:keys [report cube report-results on-report-change] :or {on-report-change identity}}]
+(defevh :designer/build [db {:keys [report cube on-report-change] :or {on-report-change identity}}]
   (let [designer (-> (report->designer report cube)
                      (assoc :report report
-                            :on-report-change on-report-change
-                            :report-results report-results))]
-    (cond-> (assoc db :designer designer)
-            (not report-results) (send-designer-query) ; No need to send the query again if we already have the results (which come from the dashboard)
-            true (send-pinboard-queries))))
+                            :on-report-change on-report-change))]
+    (-> (assoc db :designer designer)
+        (send-designer-query)
+        (send-pinboard-queries))))
 
  ; We need to unbuild it so the next time the user enters, the previous designer doesn't show until the new one is built
 (defevh :designer/unbuild [db]

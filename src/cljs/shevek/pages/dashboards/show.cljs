@@ -225,7 +225,6 @@
          (cond ; Could not be a panel when working with a new one, the URL is updated and then the user reload the page
            (and panel edit)
            [slave-designer {:report report
-                            :report-results (db/get-in [:current-dashboard :reports-results id])
                             :on-report-change #(dispatch :dashboard/report-changed % id)}]
 
            (and panel fullscreen)
