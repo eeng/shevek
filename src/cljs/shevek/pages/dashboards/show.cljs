@@ -6,7 +6,7 @@
             [shevek.pages.cubes.list :refer [cubes-list]]
             [shevek.pages.cubes.helpers :refer [cubes-fetcher get-cube]]
             [shevek.pages.designer.page :refer [slave-designer]]
-            [shevek.pages.designer.helpers :refer [send-report-query build-new-report]]
+            [shevek.pages.designer.helpers :refer [build-new-report report->query]]
             [shevek.pages.designer.visualization :refer [visualization]]
             [shevek.pages.dashboards.actions.rename :refer [dashboard-name]]
             [shevek.pages.dashboards.actions.save :refer [save-button]]
@@ -78,8 +78,7 @@
              db))
 
 (defevh :dashboard/remove-panel [db id]
-  (-> (setval [:current-dashboard :panels ALL (same-id id)] NONE db)
-      (update-in [:current-dashboard :reports-results] (fnil dissoc {}) id)))
+  (setval [:current-dashboard :panels ALL (same-id id)] NONE db))
 
 (defevh :dashboard/duplicate-panel [{{:keys [panels]} :current-dashboard :as db} panel]
   (let [new-panel (assoc panel
@@ -100,15 +99,31 @@
 (defevh :dashboard/report-changed [db report panel-id]
   (setval [:current-dashboard :panels ALL (same-id panel-id) :report] report db))
 
-(defevh :dashboard/report-query [db report panel-id]
-  (send-report-query db report [:current-dashboard :reports-results panel-id]))
+(defevh :dashboard/report-query [db report panel-id state]
+  (swap! state assoc :loading? true)
+  (rpc/call "querying/query"
+            :args [(report->query report)]
+            :handler #(reset! state {:loading? false :results %})))
 
 (defn- report-visualization [{:keys [report id]}]
-  (dispatch :dashboard/report-query report id)
-  (fn []
-    (if-let [results (db/get-in [:current-dashboard :reports-results id])]
-      [visualization results report {:refreshing? (rpc/loading? [:current-dashboard :reports-results id])}]
-      [:div.ui.active.loader])))
+  (let [state (r/atom {:results nil :loading? false})]
+    (r/create-class
+     {:component-did-mount
+      (fn [_]
+        (dispatch :dashboard/report-query report id state))
+
+      :component-did-update ; Handles refreshing
+      (fn [this [_ prev-props]]
+        (when (and (not= (:last-refresh-at prev-props) (:last-refresh-at (r/props this)))
+                   (not (:loading? @state))) ; Do not send the refreshing query if the previous is still running
+          (dispatch :dashboard/report-query report id state)))
+
+      :reagent-render
+      (fn [{:keys [report]}]
+        (let [{:keys [results loading?]} @state]
+          (if results
+            [visualization results report {:refreshing? loading?}]
+            [:div.ui.active.loader])))})))
 
 (defn- cube-selector [{:keys [id]}]
   [cubes-list {:on-click #(dispatch :dashboard/panel-cube-selected id %)}])
@@ -136,7 +151,9 @@
        :ref (tooltip (t :dashboard/duplicate-panel))}
    [:i.copy.icon]])
 
-(defn- dashboard-panel [{:keys [type report id] :as panel} dashboard & [{:keys [already-fullscreen?]}]]
+(defn- dashboard-panel [{:keys [type report id] :as panel}
+                        {:keys [last-refresh-at] :as dashboard}
+                        & [{:keys [already-fullscreen?]}]]
   (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report
         modifiable? (modifiable? dashboard)]
     [l/panel
@@ -148,7 +165,7 @@
                 (when modifiable? [remove-panel-button panel])]}
      (case type
        "cube-selector" [cube-selector panel]
-       "report" [report-visualization panel])]))
+       "report" [report-visualization (assoc panel :last-refresh-at last-refresh-at)])]))
 
 ; Normally panels should have a grid-pos but during testing we usually create them without it.
 ; Also, the grid-pos was added after some user's dashboards already existed, so this could would have been alternately on a migration

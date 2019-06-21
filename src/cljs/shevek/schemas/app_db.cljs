@@ -2,7 +2,6 @@
   (:require [schema.core :as s]
             [schema-tools.core :as st]
             [shevek.schemas.cube :refer [Cube]]
-            [shevek.schemas.query :refer [Results]]
             [shevek.schemas.designer :refer [Designer]]
             [shevek.schemas.report :refer [Report]]
             [shevek.schemas.dashboard :refer [Dashboard Panel]]))
@@ -21,7 +20,7 @@
 (s/defschema CurrentDashboard
   (st/assoc Dashboard
             :panels [(st/assoc Panel :id s/Int)]
-            (s/optional-key :reports-results) {s/Int Results}))
+            (s/optional-key :last-refresh-at) s/Any))
 
 (s/defschema SelectedPanel
   {:id s/Int :fullscreen s/Bool :edit s/Bool})

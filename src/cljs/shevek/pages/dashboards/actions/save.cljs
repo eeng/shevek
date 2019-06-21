@@ -25,7 +25,6 @@
 (defevh :dashboards/save [{:keys [current-dashboard] :as db} form-data]
   (let [dashboard (as-> current-dashboard d
                         (merge d form-data)
-                        (dissoc d :reports-results)
                         (setval [:panels ALL cube-selector?] NONE d)
                         (transform [:panels ALL] #(dissoc % :id) d))]
     (rpc/call "dashboards/save"
