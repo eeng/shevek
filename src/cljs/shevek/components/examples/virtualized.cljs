@@ -30,4 +30,6 @@
           [:tr {:key row-idx}
            (for [[col-idx cell] (map-indexed vector (get data row-idx))]
              [:td {:key col-idx :style (merge style {:background-color "#b4bcf1" :padding ".5em"})}
-              (str row-idx ": " cell)])])}]]]))
+              (if (= col-idx 1)
+                "x"
+                (str row-idx ": " cell))])])}]]]))

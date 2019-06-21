@@ -2,6 +2,39 @@
   (:require [reagent.core :as r]
             [shevek.components.auto-sizer :refer [auto-sizer]]))
 
+(defn- set-width [node width]
+  (-> node js/$
+      (.css "min-width" width)
+      (.css "max-width" width)))
+
+(defn- clear-previous-column-widths [vt-node]
+  (-> vt-node (.find "thead tr") .children (.each #(set-width %2 ""))))
+
+(defn- read-column-widths [vt-node]
+  (let [first-content-row (-> vt-node (.find "tbody tr:first") .children .toArray)
+        last-header-row (-> vt-node (.find "thead tr:last") .children .toArray)]
+    (vec
+     (for [[content-cell header-cell] (map vector first-content-row last-header-row)
+           :let [content-cell-width (-> content-cell js/$ .outerWidth)
+                 header-cell-width (-> header-cell js/$ .outerWidth)]]
+       (max header-cell-width content-cell-width)))))
+
+(defn- set-column-widths
+  [{:keys [vt-node column-widths]}]
+  "Every time the window change we need to resize the columns to the initial widths to prevent the browser's automatic resizing which would produce a bad user experience."
+  (let [first-content-row (-> vt-node (.find "tbody tr:first") .children .toArray)
+        last-header-row (-> vt-node (.find "thead tr:last") .children .toArray)]
+    (doseq [[header-cell content-cell width] (map vector last-header-row first-content-row column-widths)]
+      (set-width header-cell width)
+      (set-width content-cell width))))
+
+(defn- sync-headers-position
+  [event]
+  "As the user scroll horizontally, the headers' table needs to move as well to mantain the illusion that there is one table."
+  (let [scroll-area (-> event .-target)]
+    (.css (-> scroll-area js/$ (.closest ".virtual-table") (.find ".headers-table"))
+          "margin-left" (-> scroll-area .-scrollLeft -))))
+
 (defn- calculate-inner-window-start [event {:keys [item-count]}]
   (let [element (.-target event)
         scroll-height (.-scrollHeight element)
@@ -48,48 +81,7 @@
                         :padding-top spacer-height}}
           [render-fn window]])])))
 
-(defn- set-width [node width]
-  (-> node js/$
-      (.css "min-width" width)
-      (.css "max-width" width)))
-
-(defn- clear-column-widths
-  "When the table updates with more header rows, the top ones could have the previous (no longer valid) widths"
-  [vt]
-  (-> vt (.find "thead tr:not(:last)") .children (.each #(set-width %2 ""))))
-
-(defn- sync-column-widths
-  "As two independent tables are used for headers and content, we need to programmatically fit the header column widths to the content."
-  [vt]
-  (let [first-content-row (-> vt (.find "tbody tr:first") .children .toArray)
-        last-header-row (-> vt (.find "thead tr:last") .children .toArray)]
-    (doseq [[content-cell header-cell] (map vector first-content-row last-header-row)
-            :let [content-cell-width (-> content-cell js/$ .outerWidth)]
-            :when content-cell-width]
-      (set-width header-cell content-cell-width))))
-
-(defn- sync-headers-and-content [vt-node]
-  (when vt-node
-    (let [vt (js/$ vt-node)]
-      (clear-column-widths vt)
-      (sync-column-widths vt))))
-
-(defn- sync-headers-position
-  [event]
-  "As the user scroll horizontally, the headers' table needs to move as well to mantain the illusion that there is one table."
-  (let [scroll-area (-> event .-target)]
-    (.css (-> scroll-area js/$ (.closest ".virtual-table") (.find ".headers-table"))
-          "margin-left" (-> scroll-area .-scrollLeft -))))
-
-(defn headers [{:keys [header-count header-renderer row-height]}]
-  (when header-renderer
-    [:div.headers-area
-     [:table.headers-table
-      [:thead
-       (for [row-idx (range header-count)]
-         (header-renderer {:row-idx row-idx :style {:height row-height}}))]]]))
-
-(defn windowed-content [{:keys [on-change]}]
+(defn windowed-content [{:keys [on-change] :or {on-change identity}}]
   (r/create-class
    {:component-did-update on-change
 
@@ -100,29 +92,55 @@
         (for [row-idx window]
           (row-renderer {:row-idx row-idx :style {:height row-height}}))]])}))
 
-(defn virtual-table [{:keys [row-count row-renderer]}]
-  {:pre [row-count row-renderer]}
-  (let [vt (r/atom nil)]
-    (fn [{:keys [class header-count header-renderer row-count row-renderer row-height window-buffer slide-window-at]
-          :or {header-count 1 window-buffer 10 slide-window-at (Math/round (* window-buffer 0.8))}}]
-      [auto-sizer
-       (fn [{:keys [height]}]
-         (let [window-height (- height (* header-count row-height))]
-           [:div.virtual-table {:style {:height height}
-                                :class class
-                                :ref #(sync-headers-and-content (reset! vt %))}
-            [headers {:header-count header-count
-                      :header-renderer header-renderer
-                      :row-height row-height}]
-            [window-provider
-             {:item-count row-count
-              :item-height row-height
-              :window-buffer window-buffer
-              :slide-window-at slide-window-at
-              :window-height window-height
-              :on-scroll sync-headers-position}
-             (fn [window]
-               [windowed-content {:window window
-                                  :row-renderer row-renderer
-                                  :row-height row-height
-                                  :on-change #(sync-headers-and-content @vt)}])]]))])))
+(defn headers [{:keys [header-count header-renderer row-height]}]
+  (when header-renderer
+    [:div.headers-area
+     [:table.headers-table
+      [:thead
+       (for [row-idx (range header-count)]
+         (header-renderer {:row-idx row-idx :style {:height row-height}}))]]]))
+
+(defn auto-sized-virtual-table
+  "When the virtual table mounts and updates (but not when scrolling) we store the column automatically calculated by the browser so afterwards when the window changes, we can used those instead of the newly calculated by the browser. Otherwise the columns would move around while scrolling. This works because the pivot table contains as a first row the biggest values, which should prevent most text overflows."
+  []
+  (let [state (r/atom {:vt-node nil :column-widths []})]
+    (r/create-class
+     {:component-did-mount
+      (fn [this]
+        (let [vt (-> this r/dom-node js/$)]
+          (reset! state {:vt-node vt :column-widths (read-column-widths vt)})
+          (set-column-widths @state)))
+
+      :component-did-update
+      (fn [this]
+        (clear-previous-column-widths (:vt-node @state))
+        (swap! state assoc :column-widths (read-column-widths (:vt-node @state)))
+        (set-column-widths @state))
+
+      :reagent-render
+      (fn [{:keys [height class header-count header-renderer row-count row-renderer row-height window-buffer slide-window-at]
+            :or {header-count 1 window-buffer 10 slide-window-at (Math/round (* window-buffer 0.8))}}]
+        {:pre [row-count row-renderer (<= slide-window-at window-buffer)]}
+        (let [window-height (- height (* header-count row-height))]
+          [:div.virtual-table {:style {:height height}
+                               :class class}
+           [headers {:header-count header-count
+                     :header-renderer header-renderer
+                     :row-height row-height}]
+           [window-provider
+            {:item-count row-count
+             :item-height row-height
+             :window-buffer window-buffer
+             :slide-window-at slide-window-at
+             :window-height window-height
+             :on-scroll sync-headers-position}
+            (fn [window]
+              [windowed-content {:window window
+                                 :row-renderer row-renderer
+                                 :row-height row-height
+                                 :on-change #(set-column-widths @state)}])]]))})))
+
+(defn virtual-table [props]
+  [auto-sizer
+   (fn [dimensions]
+     [auto-sized-virtual-table (merge props dimensions)])])
