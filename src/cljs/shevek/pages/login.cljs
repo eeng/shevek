@@ -10,12 +10,6 @@
             [shevek.navigation :refer [navigate]]
             [shevek.components.notification :refer [notify]]))
 
-(defn extract-user [token]
-  (when token
-    (try
-      (js->clj (js/jwt_decode token) :keywordize-keys true)
-      (catch js/Error _ {}))))
-
 (defevh :sessions/login-successful [db {:keys [user]}]
   (-> (assoc db :current-user user)
       (rpc/loaded :logging-in)))
