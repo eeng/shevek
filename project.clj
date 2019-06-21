@@ -1,4 +1,4 @@
-(defproject shevek "0.5.1"
+(defproject shevek "0.5.2"
   :description "Interactive data exploration UI for Druid, aimed at end users."
   :url "https://github.com/eeng/shevek"
   :license {:name "MIT License"
