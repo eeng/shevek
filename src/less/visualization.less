@@ -89,9 +89,14 @@
         &.subtotal td { font-weight: bold; }
       }
 
-      .scroll-area {
+      .scroll-area, .headers-area {
         margin-right: -@panel-horizontal-padding;
         padding-right: @panel-horizontal-padding;
+        margin-left: -@panel-horizontal-padding;
+        padding-left: @panel-horizontal-padding;
+      }
+      .scroll-area {
+        height: 100%;
         margin-bottom: -@panel-horizontal-padding;
         padding-bottom: @panel-horizontal-padding;
       }
