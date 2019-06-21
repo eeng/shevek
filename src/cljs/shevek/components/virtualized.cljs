@@ -118,11 +118,11 @@
         (set-column-widths @state))
 
       :reagent-render
-      (fn [{:keys [height class header-count header-renderer row-count row-renderer row-height window-buffer slide-window-at]
+      (fn [{:keys [height width class header-count header-renderer row-count row-renderer row-height window-buffer slide-window-at]
             :or {header-count 1 window-buffer 10 slide-window-at (Math/round (* window-buffer 0.8))}}]
         {:pre [row-count row-renderer (<= slide-window-at window-buffer)]}
         (let [window-height (- height (* header-count row-height))]
-          [:div.virtual-table {:style {:height height}
+          [:div.virtual-table {:style {:height height :width width} ; The width prevents the table from expanding outside the window when maximizing the panel on the dashboard
                                :class class}
            [headers {:header-count header-count
                      :header-renderer header-renderer
