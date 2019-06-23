@@ -4,29 +4,34 @@
 
 (defn- set-width [node width]
   (-> node js/$
-      (.css "min-width" width)
-      (.css "max-width" width)))
+      (.css "width" width) ; Works in tandem with table-layout fixed
+      (.css "min-width" width))) ; Otherwise the header would not stretch when content overflowed horizontally
 
-(defn- clear-previous-column-widths [vt-node]
-  (-> vt-node (.find "thead tr") .children (.each #(set-width %2 ""))))
+(defn- read-columns-widths
+  "Measures the columns' widths after the browser has done the layout so then we can set explicit widths to match
+  thead and tbody cells widths, and use table-layout fixed to prevent the columns from moving around when the window slides.
+  In order to take similar measures to those which would be produced by using a normal html table, I insert a copy
+  of the last header row into the tbody, just in case the headers are larger than its body content."
+  [vt-node]
+  (-> vt-node (.find ".content-table") (.css "table-layout" "auto"))
+  (-> vt-node (.find "thead tr") .children (.each #(set-width %2 "")))
+  (let [measured-row (-> vt-node (.find "thead tr:last") .clone
+                         (.addClass "measured-row")
+                         (.prependTo (.find vt-node "tbody")))
+        widths (mapv #(-> % js/$ .outerWidth) (-> measured-row .children .toArray))]
+    (.remove measured-row)
+    widths))
 
-(defn- read-column-widths [vt-node]
+(defn- set-explicit-columns-widths
+  "Every time the table window changes, this resize the columns to the initial widths to prevent the columns from moving."
+  [{:keys [vt-node columns-widths]}]
   (let [first-content-row (-> vt-node (.find "tbody tr:first") .children .toArray)
         last-header-row (-> vt-node (.find "thead tr:last") .children .toArray)]
-    (vec
-     (for [[content-cell header-cell] (map vector first-content-row last-header-row)
-           :let [content-cell-width (-> content-cell js/$ .outerWidth)
-                 header-cell-width (-> header-cell js/$ .outerWidth)]]
-       (max header-cell-width content-cell-width)))))
-
-(defn- set-column-widths
-  [{:keys [vt-node column-widths]}]
-  "Every time the window change we need to resize the columns to the initial widths to prevent the browser's automatic resizing which would produce a bad user experience."
-  (let [first-content-row (-> vt-node (.find "tbody tr:first") .children .toArray)
-        last-header-row (-> vt-node (.find "thead tr:last") .children .toArray)]
-    (doseq [[header-cell content-cell width] (map vector last-header-row first-content-row column-widths)]
+    (doseq [[header-cell content-cell width] (map vector last-header-row first-content-row columns-widths)]
       (set-width header-cell width)
-      (set-width content-cell width))))
+      (set-width content-cell width))
+    ; Set the table-layout fixed to prevent new rows with larger content from expanding the columns' widths
+    (-> vt-node (.find ".content-table") (.css "table-layout" "fixed"))))
 
 (defn- sync-headers-position
   [event]
@@ -101,24 +106,26 @@
          (header-renderer {:row-idx row-idx :style {:height row-height}}))]]]))
 
 (defn auto-sized-virtual-table
-  "When the virtual table mounts and updates (but not when scrolling) we store the column automatically calculated by the browser so afterwards when the window changes, we can used those instead of the newly calculated by the browser. Otherwise the columns would move around while scrolling. This works because the pivot table contains as a first row the biggest values, which should prevent most text overflows."
+  "When the virtual table mounts and updates (but not when scrolling) we store the column automatically
+  calculated by the browser so afterwards when the window changes, we can used those instead of the
+  newly calculated by the browser. Otherwise the columns would move around while scrolling.
+  This works because the pivot table contains as a first row the biggest values, which should prevent most text overflows."
   []
-  (let [state (r/atom {:vt-node nil :column-widths []})]
-    (r/create-class
-     {:component-did-mount
-      (fn [this]
-        (let [vt (-> this r/dom-node js/$)]
-          (reset! state {:vt-node vt :column-widths (read-column-widths vt)})
-          (set-column-widths @state)))
+  (let [state (r/atom {:vt-node nil :columns-widths []})
 
-      :component-did-update
-      (fn [this]
-        (clear-previous-column-widths (:vt-node @state))
-        (swap! state assoc :column-widths (read-column-widths (:vt-node @state)))
-        (set-column-widths @state))
+        measure-and-set-columns-widths
+        (fn [this]
+          (let [vt (-> this r/dom-node js/$)]
+            (reset! state {:vt-node vt :columns-widths (read-columns-widths vt)})
+            (set-explicit-columns-widths @state)))]
+
+    (r/create-class
+     {:component-did-mount measure-and-set-columns-widths
+      :component-did-update measure-and-set-columns-widths
 
       :reagent-render
-      (fn [{:keys [height width class header-count header-renderer row-count row-renderer row-height window-buffer slide-window-at]
+      (fn [{:keys [height width class header-count header-renderer row-count
+                   row-renderer row-height window-buffer slide-window-at]
             :or {header-count 1 window-buffer 10 slide-window-at (Math/round (* window-buffer 0.8))}}]
         {:pre [row-count row-renderer (<= slide-window-at window-buffer)]}
         (let [window-height (- height (* header-count row-height))]
@@ -138,7 +145,7 @@
               [windowed-content {:window window
                                  :row-renderer row-renderer
                                  :row-height row-height
-                                 :on-change #(set-column-widths @state)}])]]))})))
+                                 :on-change #(set-explicit-columns-widths @state)}])]]))})))
 
 (defn virtual-table [props]
   [auto-sizer
