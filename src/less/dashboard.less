@@ -60,7 +60,7 @@
 
     &.resizing {
       // Fix a bug in Chrome where when resizing would make the div scroll at the same time
-      .scroll-area { overflow: hidden }
+      .scroll-area { pointer-events: none; }
     }
   }
 }
