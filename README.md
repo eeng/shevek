@@ -4,7 +4,15 @@ Shevek is an interactive data exploration UI for Druid, aimed at end users.
 
 ## Features
 
-TODO
+* Easy to use report designer. End users can build their own reports without any knowledge of a query language, by using drag and drop in a similar way to pivot tables in Excel.
+* Automatic chart generation.
+* Multiple dashboards support. Related reports can be grouped into dashboards to provide at-a-glance views of key performance indicators.
+* Multi-user support. Each user can have their own reports and dashboards.
+* Fine-grained authorization. An administrator can configure which cubes, dimensions or measures a user is allowed to view. It's also possible to define filters based on dimension values (e.g. when a user can only view data from certain region).
+* Possibility to share dashboards or individual reports between users.
+* Automatic discovery of Druid datasources. Upon start, the application will search the available cubes and its dimensions and measures, which can be customized afterwards.
+
+*WARNING: Please bear in mind this software is still in **beta status**. It's actively used in production, but it is under development and could change at any time.*
 
 ## Requirements
 
@@ -36,9 +44,17 @@ lein cooper
 
 After a while the UI should be accesible through http://localhost:4000.
 
-Also, in the file `dev/clj/user.clj` there are some useful functions used during development.
+This command it's a convenient alias to start both the backend (Clojure) and frontend (ClojureScript with Figwheel and less support) in the same terminal window.
 
-### Connecting to the ClojureScript REPL
+### Connecting to the Clojure REPL (backend)
+
+You can connect to the nREPL server (port 4001 by default) with your favorite editor to evaluate expressions on the running backend. In the file `dev/clj/user.clj` there are some useful functions used during development.
+
+```
+lein repl :connect :4001
+```
+
+### Connecting to the ClojureScript REPL (frontend)
 
 ```
 lein repl :connect :4002
