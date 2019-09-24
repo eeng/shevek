@@ -4,7 +4,7 @@
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [compojure.core :refer [defroutes GET POST]]
-            [compojure.route :refer [resources not-found]]
+            [compojure.route :refer [resources]]
             [shevek.web.logging :refer [wrap-request-logging wrap-uuid]]
             [shevek.web.error :refer [wrap-server-error client-error]]
             [shevek.web.pages :as pages]
@@ -30,8 +30,12 @@
 (defn not-authorized [request _]
   {:status 403 :body "Not authorized"})
 
+(defn not-found [request]
+  {:status 404 :body "Not found"})
+
 (defroutes app-routes
   (resources "/public")
+  (GET "/bundles/*" [] not-found) ; Otherwise stacktrace-js throws an error when a source map doesn't exists (happens with react-grid-layout)
   (GET "/*" [] pages/index)
   (POST "/login" [] auth/login)
   (POST "/logout" [] auth/logout)
