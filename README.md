@@ -36,15 +36,14 @@ java -Dconf=config.edn -jar shevek.jar
 
 We welcome everyone to contribute to this project. To do so, please read the following instructions:
 
-First, make sure to have Druid and MongoDB running on localhost, or point to their respective locations in the `dev/resources/config.edn` file, and then execute the following command on the project folder:
+1. Copy `dev/resources/config.edn.example` to `dev/resources/config.edn`
 
-```
-lein cooper
-```
+2. Make sure you have Druid and MongoDB running on localhost, or point to their respective locations in the previous file.
 
-After a while the UI should be accesible through http://localhost:4000.
-
+3. Execute the following command on the project folder: `lein cooper`
 This command it's a convenient alias to start both the backend (Clojure) and frontend (ClojureScript with Figwheel and less support) in the same terminal window.
+
+4. After a while the UI should be accesible through http://localhost:4000.
 
 ### Connecting to the Clojure REPL (backend)
 
