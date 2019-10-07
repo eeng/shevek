@@ -5,17 +5,17 @@
 (defn auto-sizer [render-fn]
   (let [dimensions (r/atom {:width 0 :height 0})
         on-resize (fn [event]
-                    (let [parent (-> event .-target .-parentNode)]
-                      (reset! dimensions {:width (.-offsetWidth parent)
-                                          :height (.-offsetHeight parent)})))
+                    (let [target (-> event .-target)]
+                      (reset! dimensions {:width (.-offsetWidth target)
+                                          :height (.-offsetHeight target)})))
         unsubscribe-listener (r/atom nil)]
     (r/create-class
      {:display-name "auto-sizer"
 
       :component-did-mount
       (fn [this]
-        (let [parent (-> this r/dom-node .-parentNode)]
-          (reset! unsubscribe-listener (add-resize-listener parent on-resize))))
+        (let [resizing-container (-> this r/dom-node)]
+          (reset! unsubscribe-listener (add-resize-listener resizing-container on-resize))))
 
       :component-will-unmount
       (fn [this]
@@ -23,6 +23,6 @@
 
       :reagent-render
       (fn [render-fn]
-        (if (pos? (:width @dimensions))
-          (render-fn @dimensions)
-          [:div]))})))
+        [:div.auto-sizer {:style {:height "100%"}} ; To attach (on mount) and detach (on unmount) the resize-listener. Previously we use the parent node so this wasn't needed but if the parent changed (do to changing the viztype for example) the unsubscribe couldn't find it anymore.
+         (when (pos? (:width @dimensions))
+           (render-fn @dimensions))])})))
