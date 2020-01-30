@@ -2,8 +2,8 @@
   (:require [reagent.core :as r]
             [shevek.i18n :refer [t]]
             [shevek.reflow.db :as db]
-            [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
-            [shevek.components.popup :refer [show-popup close-popup tooltip]]
+            [shevek.reflow.core :refer [dispatch]]
+            [shevek.components.popup :refer [show-popup close-popup]]
             [shevek.components.form :refer [select]]
             [cuerdas.core :as str]))
 
@@ -47,8 +47,8 @@
                                {:position "bottom right"})}
        (when (pos? every)
          [:span.current-refresh
-           (t :preferences/refresh-every) " "
-           (get (t :preferences/refresh-every-opts) every)])
+          (t :preferences/refresh-every) " "
+          (get (t :preferences/refresh-every-opts) every)])
        [:i.refresh.icon {:class (when (loading?) "loading")}]])
     (finally
       (clear-auto-refresh-interval!))))

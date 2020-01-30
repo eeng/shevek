@@ -1,9 +1,9 @@
 (ns shevek.domain.dw
   (:require [cuerdas.core :as str]
             [goog.string :as gstr]
-            [shevek.lib.time.ext :refer [format-interval format-time-according-to-period]]
+            [shevek.lib.time.ext :refer [format-time-according-to-period]]
             [shevek.lib.number :as num]
-            [shevek.lib.string :refer [format-bool regex-escape]]
+            [shevek.lib.string :refer [format-bool]]
             [shevek.i18n :refer [translation]]
             [shevek.domain.dimension :refer [time-dimension?]]
             [shevek.reflow.db :as db]))

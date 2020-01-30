@@ -1,8 +1,6 @@
 (ns shevek.app
   (:require [mount.core :as mount]
-            [taoensso.timbre :as log]
             [schema.core :as schema]
-            [shevek.env :refer [env]]
             [shevek.lib.logging]
             [shevek.web.server]
             [shevek.nrepl :refer [nrepl]]
@@ -23,6 +21,6 @@
   (stop)
   (start))
 
-(defn -main [& args]
+(defn -main [& _args]
   (start)
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop)))

@@ -13,3 +13,4 @@ resources/node_modules/**
 node_modules
 doo-index.html
 dev/resources/config.edn
+.clj-kondo/.cache

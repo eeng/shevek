@@ -1,5 +1,5 @@
 (ns shevek.engine.druid-native.raw-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is testing]]
             [shevek.asserts :refer [submap?]]
             [shevek.engine.druid-native.raw :refer [to-druid-query from-druid-results]]))
 
