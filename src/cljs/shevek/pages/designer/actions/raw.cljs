@@ -10,6 +10,7 @@
             [shevek.pages.designer.filters :refer [slice->filters filter-title]]
             [shevek.domain.dimension :refer [time-dimension? merge-dimensions]]
             [shevek.lib.time.ext :refer [format-time]]
+            [shevek.lib.collections :refer [includes?]]
             [cuerdas.core :as str]
             [reagent.core :as r]))
 
@@ -24,25 +25,29 @@
       :else value)))
 
 (defn raw-data-table []
-  (let [results (get-in @raw-data [:response :results])
-        {:keys [dimensions measures]} (current-cube)]
+  (let [results (get-in @raw-data [:response :results])]
     (if (seq results)
-      [:table.ui.compact.single.line.table
-       [:thead>tr
-        (for [{:keys [name title]} dimensions]
-          [:th {:key name} title])
-        (for [{:keys [name title]} measures]
-          [:th.measure {:key name} title])]
-       [:tbody
-        (doall
-         (for [result results]
-           [:tr {:key (hash result)}
-            (doall
-             (for [{:keys [name] :as d} dimensions]
-               [:td {:key name} (format-dimension d result)]))
-            (doall
-             (for [{:keys [name] :as m} measures]
-               [:td.measure {:key name} (measure-value m result)]))]))]]
+      (let [result-columns (->> results first keys (map name))
+            raw-column? #(includes? result-columns (:name %))
+            {:keys [dimensions measures]} (current-cube)
+            dimensions (filter raw-column? dimensions)
+            measures (filter raw-column? measures)]
+        [:table.ui.compact.single.line.table
+         [:thead>tr
+          (for [{:keys [name title]} dimensions]
+            [:th {:key name} title])
+          (for [{:keys [name title]} measures]
+            [:th.measure {:key name} title])]
+         [:tbody
+          (doall
+           (for [result results]
+             [:tr {:key (hash result)}
+              (doall
+               (for [{:keys [name] :as d} dimensions]
+                 [:td {:key name} (format-dimension d result)]))
+              (doall
+               (for [{:keys [name] :as m} measures]
+                 [:td.measure {:key name} (measure-value m result)]))]))]])
       [:div.large.tip (t :errors/no-results)])))
 
 (defn filters->str [filters]

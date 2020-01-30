@@ -1,5 +1,5 @@
 (ns shevek.lib.collections
-  (:require [com.rpl.specter :refer [transform setval MAP-KEYS NONE ALL keypath]]))
+  (:require [com.rpl.specter :refer [transform MAP-KEYS]]))
 
 (defn reverse-merge [m1 m2]
   (merge m2 m1))
@@ -26,7 +26,7 @@
 (defn assoc-if-seq [m & entries]
   (reduce (fn [m [key val]]
             (cond-> m
-                    (seq val) (assoc key val)))
+              (seq val) (assoc key val)))
           m
           (partition 2 entries)))
 
@@ -55,7 +55,7 @@
   (some #(= % x) coll))
 
 (defn index-of [coll value]
-  (some (fn [[idx item]] (if (= value item) idx))
+  (some (fn [[idx item]] (when (= value item) idx))
         (map-indexed vector coll)))
 
 (defn stringify-keys [m]
