@@ -26,22 +26,24 @@
 (defn raw-data-table []
   (let [results (get-in @raw-data [:response :results])
         {:keys [dimensions measures]} (current-cube)]
-    [:table.ui.compact.single.line.table
-     [:thead>tr
-      (for [{:keys [name title]} dimensions]
-        [:th {:key name} title])
-      (for [{:keys [name title]} measures]
-        [:th.measure {:key name} title])]
-     [:tbody
-      (doall
-       (for [result results]
-         [:tr {:key (hash result)}
-          (doall
-           (for [{:keys [name] :as d} dimensions]
-             [:td {:key name} (format-dimension d result)]))
-          (doall
-           (for [{:keys [name] :as m} measures]
-             [:td.measure {:key name} (measure-value m result)]))]))]]))
+    (if (seq results)
+      [:table.ui.compact.single.line.table
+       [:thead>tr
+        (for [{:keys [name title]} dimensions]
+          [:th {:key name} title])
+        (for [{:keys [name title]} measures]
+          [:th.measure {:key name} title])]
+       [:tbody
+        (doall
+         (for [result results]
+           [:tr {:key (hash result)}
+            (doall
+             (for [{:keys [name] :as d} dimensions]
+               [:td {:key name} (format-dimension d result)]))
+            (doall
+             (for [{:keys [name] :as m} measures]
+               [:td.measure {:key name} (measure-value m result)]))]))]]
+      [:div.large.tip (t :errors/no-results)])))
 
 (defn filters->str [filters]
   (into [:span.filters]
