@@ -33,7 +33,8 @@
  [{:name "wikipedia"
    :description "Druid quickstart sample of Wikipedia stats"
    :dimensions
-   [{:name "isMinor" :format "boolean"}
+   [{:name "__time" :title "Date"}
+    {:name "isMinor" :format "boolean"}
     {:name "isUnpatrolled" :format "boolean"}
     {:name "isAnonymous" :format "boolean"}
     {:name "isRobot" :format "boolean"

@@ -1,6 +1,7 @@
 /target
 /dist
 /out
+/tmp
 *.jar
 *.class
 /.lein-*

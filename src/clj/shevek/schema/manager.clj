@@ -6,7 +6,7 @@
             [shevek.config :refer [config]]
             [cuerdas.core :as str]))
 
-(defn- discover-cubes [dw]
+(defn discover-cubes [dw]
   (for [cube-name (cubes dw)]
     (merge {:name cube-name} (cube-metadata dw cube-name))))
 
@@ -62,28 +62,16 @@
   "Retrieves the cubes config, optionally performing auto-discovery of the schema, and saves it to the database (updating it if already exists)."
   [db dw {:keys [discover?] :or {discover? false}}]
   (benchmark {:after "Schema seeding done (%.0f ms)"}
-    (let [discovered (if discover? (discover-cubes dw) [])
-          configured (config :cubes)]
-      (->> (merge-cubes discovered configured)
-           (update-cubes! db)))))
+             (let [discovered (if discover? (discover-cubes dw) [])
+                   configured (config :cubes)]
+               (->> (merge-cubes discovered configured)
+                    (update-cubes! db)))))
 
 ; Time boundary
 
 (defn update-time-boundary! [dw db]
   (benchmark {:after "Time boundary updated (%.0f ms)"}
-    (doseq [{:keys [name] :as cube} (find-cubes db)]
-      (->> (time-boundary dw name)
-           (merge cube)
-           (save-cube db)))))
-
-; Examples
-
-#_(find-cubes shevek.db/db)
-#_(->>
-   (merge-cubes
-    (discover-cubes shevek.engine.state/dw)
-    (config :cubes))
-   (detect #(= (:name %) "wikipedia")))
-#_(seed-schema! shevek.db/db shevek.engine.state/dw {:discover? true})
-#_(discover! shevek.engine.state/dw shevek.db/db)
-#_(update-time-boundary! shevek.engine.state/dw shevek.db/db)
+             (doseq [{:keys [name] :as cube} (find-cubes db)]
+               (->> (time-boundary dw name)
+                    (merge cube)
+                    (save-cube db)))))

@@ -1,0 +1,112 @@
+version: "3"
+services:
+  shevek:
+    build: .
+    depends_on:
+      - mongo
+      - broker
+    ports:
+      - "${SHEVEK_PORT}:4000"
+    environment:
+      - MONGODB_URI=mongodb://mongo/shevek
+      - DRUID_URI=http://broker:8082
+      - SESSION__KEY=KkwmvPqo91TvTaTW
+
+  mongo:
+    image: mongo:4.2
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./tmp/mongo:/data/db
+
+  postgres:
+    image: postgres:11.6-alpine
+    volumes:
+      - ./tmp/druid/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres-pass
+      - POSTGRES_USER=druid
+      - POSTGRES_DB=druid
+
+  zookeeper:
+    image: zookeeper:3.5
+    restart: always
+    environment:
+      - ZOO_MY_ID=1
+
+  coordinator:
+    image: ${DRUID_IMAGE}
+    volumes:
+      - ./tmp/druid/storage:/opt/data
+      - ./tmp/druid/coordinator:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+    ports:
+      - "8081:8081"
+    command: coordinator
+    env_file:
+      - docker/druid/common.env
+      - docker/druid/coordinator.env
+
+  broker:
+    image: ${DRUID_IMAGE}
+    volumes:
+      - ./tmp/druid/broker:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8082:8082"
+    command: broker
+    env_file:
+      - docker/druid/common.env
+      - docker/druid/broker.env
+
+  historical:
+    image: ${DRUID_IMAGE}
+    volumes:
+      - ./tmp/druid/storage:/opt/data
+      - ./tmp/druid/historical:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8083:8083"
+    command: historical
+    env_file:
+      - docker/druid/common.env
+      - docker/druid/historical.env
+
+  middle:
+    image: ${DRUID_IMAGE}
+    volumes:
+      - ./tmp/druid/storage:/opt/data
+      - ./tmp/druid/middle:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8091:8091"
+    command: middleManager
+    env_file:
+      - docker/druid/common.env
+      - docker/druid/middle.env
+
+  router:
+    image: ${DRUID_IMAGE}
+    volumes:
+      - ./tmp/druid/router:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8888:8888"
+    command: router
+    env_file:
+      - docker/druid/common.env
+      - docker/druid/router.env

@@ -1,0 +1,11 @@
+.clj-kondo
+.git
+.vscode
+bin
+dist
+log
+node_modules
+resources/node_modules
+out
+target
+tmp

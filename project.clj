@@ -21,7 +21,7 @@
                  [overtone/at-at "1.2.0"]
                  [com.draines/postal "2.0.2"]
                  [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]] ; Without the exclusion it would use guava 18 which is not compatible with cljs 1.10
-                 [org.clojure/tools.nrepl "0.2.13"]
+                 [nrepl "0.3.1"]
                  [clj-http "2.3.0"]
                  [org.clojure/core.match "0.3.0"]
                  [ns-tracker "0.3.1"] ; For the reloader
