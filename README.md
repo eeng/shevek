@@ -1,23 +1,23 @@
 # Shevek
 
-Shevek is an interactive data exploration UI for Druid, aimed at end users.
+Shevek is an interactive data exploration UI for Druid, aimed at end-users.
 
 ## Features
 
-* Easy to use report designer. End users can build their own reports without any knowledge of a query language, by using drag and drop in a similar way to pivot tables in Excel.
-* Automatic chart generation.
-* Multiple dashboards support. Related reports can be grouped into dashboards to provide at-a-glance views of key performance indicators.
-* Multi-user support. Each user can have their own reports and dashboards.
-* Fine-grained authorization. An administrator can configure which cubes, dimensions or measures a user is allowed to view. It's also possible to define filters based on dimension values (e.g. when a user can only view data from certain region).
-* Possibility to share dashboards or individual reports between users.
-* Automatic discovery of Druid datasources. Upon start, the application will search the available cubes and its dimensions and measures, which can be customized afterwards.
+- Easy to use report designer. End-users can build their own reports without any knowledge of a query language, by using drag and drop in a similar way to pivot tables in Excel.
+- Automatic chart generation.
+- Multiple dashboards support. Related reports can be grouped into dashboards to provide at-a-glance views of key performance indicators.
+- Multi-user support. Each user can have their own reports and dashboards.
+- Fine-grained authorization. An administrator can configure which cubes, dimensions or measures a user is allowed to view. It's also possible to define filters based on dimension values (e.g. when a user can only view data from a certain region).
+- Possibility to share dashboards or individual reports between users.
+- Automatic discovery of Druid data sources. Upon start, the application will search the available cubes and its dimensions and measures, which can be customized afterward.
 
-*WARNING: Please bear in mind this software is still in **beta status**. It's actively used in production, but it is under development and could change at any time.*
+_WARNING: Please bear in mind this software is still in **beta status**. It's actively used in production, but it is under development and could change at any time._
 
 ## Requirements
 
-* Java 1.8
-* [MongoDB](https://www.mongodb.com/)
+- Java 1.8
+- [MongoDB](https://www.mongodb.com/)
 
 ## Getting Started
 
@@ -26,6 +26,7 @@ Shevek is an interactive data exploration UI for Druid, aimed at end users.
 2. Edit the `config.edn` if necessary to point to your Druid and MongoDB hosts.
 
 3. Change directory to the extracted folder and start the application:
+
 ```
 java -Dconf=config.edn -jar shevek.jar
 ```
@@ -41,9 +42,9 @@ We welcome everyone to contribute to this project. To do so, please read the fol
 2. Make sure you have Druid and MongoDB running on localhost, or point to their respective locations in the previous file.
 
 3. Execute the following command on the project folder: `lein cooper`
-This command it's a convenient alias to start both the backend (Clojure) and frontend (ClojureScript with Figwheel and less support) in the same terminal window.
+   This command is a convenient alias to start both the backend (Clojure) and frontend (ClojureScript with Figwheel and less support) in the same terminal window.
 
-4. After a while the UI should be accesible through http://localhost:4000.
+4. After a while, the UI should be accessible through http://localhost:4000.
 
 ### Connecting to the Clojure REPL (backend)
 
@@ -69,12 +70,15 @@ bin/build.sh
 ### Acceptance Testing
 
 To run the whole acceptance tests suite do:
+
 ```
 lein acceptance-tests
 ```
 
 To run each test one at a time do:
+
 ```
 lein acceptance-tests-repl
 ```
+
 Then connect to it on port 4101, eval the `(start-system)` forms, and finally eval the test blocks. It should run against the test database and web server.

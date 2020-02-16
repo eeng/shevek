@@ -11,7 +11,7 @@
                  [http-kit "2.2.0"]
                  [cheshire "5.7.0"] ; Needed for the :as :json option of clj-http
                  [ring/ring-defaults "0.3.2"]
-                 [ring-middleware-format "0.7.2" :exclusions [org.clojure/tools.reader]] ; La exclusion es xq clojurescript 1.10 necesita una versión mas nueva
+                 [ring-middleware-format "0.7.2" :exclusions [org.clojure/tools.reader]] ; The exclusion is due to cljs 1.10 needing a newer version
                  [buddy/buddy-sign "1.5.0"]
                  [buddy/buddy-auth "1.4.1"]
                  [bcrypt-clj "0.3.3"]
@@ -20,7 +20,7 @@
                  [compojure "1.5.2"]
                  [overtone/at-at "1.2.0"]
                  [com.draines/postal "2.0.2"]
-                 [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]] ; Sin la exclusion usaba guava 18 con el cual no es compatible clojurescript 1.10
+                 [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]] ; Without the exclusion it would use guava 18 which is not compatible with cljs 1.10
                  [org.clojure/tools.nrepl "0.2.13"]
                  [clj-http "2.3.0"]
                  [org.clojure/core.match "0.3.0"]
