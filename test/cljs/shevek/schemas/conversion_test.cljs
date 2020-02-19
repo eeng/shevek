@@ -1,8 +1,8 @@
 (ns shevek.schemas.conversion-test
-  (:require-macros [cljs.test :refer [deftest testing is are]])
-  (:require [shevek.asserts :refer [submap? submaps? without?]]
+  (:require-macros [cljs.test :refer [deftest testing is]])
+  (:require [shevek.asserts :refer [without?]]
             [shevek.schemas.conversion :refer [designer->report report->designer]]
-            [shevek.lib.time :refer [date-time]]))
+            [shevek.lib.time :as t]))
 
 (defn designer [fields]
   (merge {:report {:cube "c"}
@@ -27,9 +27,12 @@
            (-> {:filters [{:name "time" :type "..." :period "current-day"}
                           {:name "page" :type "..." :operator "exclude" :value #{nil}}]}
                designer designer->report :filters)))
-    (is (= [{:interval ["2018-04-04T03:00:00.000Z" "2018-04-06T02:59:59.999Z"]}]
-           (-> {:filters [{:interval [(date-time 2018 4 4) (date-time 2018 4 5)]}]}
-               designer designer->report :filters))))
+
+    (let [from (t/date-time 2018 4 4)
+          to (t/date-time 2018 4 5)]
+      (is (= [{:interval [(t/to-iso8601 from) (-> to t/end-of-day t/to-iso8601)]}]
+             (-> {:filters [{:interval [from to]}]}
+                 designer designer->report :filters)))))
 
   (testing "in each split should store only the dimension name besides its own fields"
     (is (= [{:name "page" :limit 10 :sort-by {:name "page" :descending true}}
@@ -56,16 +59,18 @@
 
 (deftest report->designer-tests
   (testing "should convert back to dates and sets and add title and other fields"
-    (is (= [{:name "time" :title "Fecha" :period "current-day"}
-            {:name "time2" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}
-            {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
-           (-> {:filters [{:name "time" :period "current-day"}
-                          {:name "time2" :interval ["2018-04-04T03:00:00.000Z" "2018-04-05T03:00:00.000Z"]}
-                          {:name "page" :operator "exclude" :value [nil]}]}
-               (report->designer {:dimensions [{:name "time" :title "Fecha"}
-                                               {:name "time2"}
-                                               {:name "page" :title "Pag"}]})
-               :filters))))
+    (let [from (t/date-time 2018 4 4)
+          to (t/date-time 2018 4 5)]
+      (is (= [{:name "time" :title "Fecha" :period "current-day"}
+              {:name "time2" :interval [from to]}
+              {:name "page" :title "Pag" :operator "exclude" :value #{nil}}]
+             (-> {:filters [{:name "time" :period "current-day"}
+                            {:name "time2" :interval [(t/to-iso8601 from) (t/to-iso8601 to)]}
+                            {:name "page" :operator "exclude" :value [nil]}]}
+                 (report->designer {:dimensions [{:name "time" :title "Fecha"}
+                                                 {:name "time2"}
+                                                 {:name "page" :title "Pag"}]})
+                 :filters)))))
 
   (testing "should converted back the pinboard with the info in the cube"
     (is (= {:measure {:name "count" :type "longSum"}

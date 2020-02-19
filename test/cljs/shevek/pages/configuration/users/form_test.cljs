@@ -4,7 +4,7 @@
             [shevek.pages.configuration.users.form :refer [user-validations adapt-for-client adapt-for-server]]
             [shevek.lib.validation :as v]
             [shevek.pages.cubes.helpers :refer [cubes-list]]
-            [shevek.lib.time :refer [date-time]]))
+            [shevek.lib.time :as t]))
 
 (defn validate-user [user]
   (v/validate user user-validations))
@@ -74,12 +74,14 @@
                               :cubes [{:name "c1" :selected false} {:name "c2" :selected true}]}))))
 
   (testing "should simplify the filters"
-    (is (= [{:name "d" :operator "include" :value ["v"]}
-            {:name "t" :period "latest-day"}
-            {:name "a" :interval ["2018-04-04T03:00:00.000Z" "2018-04-06T02:59:59.999Z"]}]
-           (-> (adapt-for-server {:only-cubes-selected true
-                                  :cubes [{:name "c1" :selected true
-                                           :filters [{:name "d" :operator "include" :value #{"v"} :title "D" :type "..."}
-                                                     {:name "t" :title "T" :period "latest-day"}
-                                                     {:name "a" :title "A" :interval [(date-time 2018 4 4) (date-time 2018 4 5)]}]}]})
-               :allowed-cubes first :filters)))))
+    (let [from (t/date-time 2018 4 4)
+          to (t/date-time 2018 4 5)]
+      (is (= [{:name "d" :operator "include" :value ["v"]}
+              {:name "t" :period "latest-day"}
+              {:name "a" :interval [(t/to-iso8601 from) (-> to t/end-of-day t/to-iso8601)]}]
+             (-> (adapt-for-server {:only-cubes-selected true
+                                    :cubes [{:name "c1" :selected true
+                                             :filters [{:name "d" :operator "include" :value #{"v"} :title "D" :type "..."}
+                                                       {:name "t" :title "T" :period "latest-day"}
+                                                       {:name "a" :title "A" :interval [from to]}]}]})
+                 :allowed-cubes first :filters))))))

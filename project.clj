@@ -150,7 +150,9 @@
              {:resource-paths ["test/resources"]
               :dependencies [[etaoin "0.3.2"]
                              [se.haleby/stub-http "0.2.7"]
-                             [prismatic/schema-generators "0.1.2"]]}
+                             [prismatic/schema-generators "0.1.2"]]
+              ; So the same default timezone is used no matter where the tests are run
+              :jvm-opts ["-Duser.timezone=America/Argentina/Buenos_Aires"]}
 
              :backend-tests
              [:shared-test

@@ -1,0 +1,7 @@
+version: "3"
+services:
+  shevek:
+    build:
+      dockerfile: Dockerfile.ci
+    # TODO Make the acceptance tests work and then remove this command as the dockerfile already does lein ci
+    command: lein do backend-tests, frontend-tests

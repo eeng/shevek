@@ -2,6 +2,8 @@
 
 Shevek is an interactive data exploration UI for Druid, aimed at end-users.
 
+[![Build Status](https://travis-ci.com/eeng/shevek.svg?branch=master)](https://travis-ci.com/eeng/shevek)
+
 ## Features
 
 - **Easy to use report designer**. End-users can build their own reports without any knowledge of a query language, by using drag and drop in a similar way to pivot tables in Excel.
@@ -23,7 +25,7 @@ _NOTE: Druid is quite heavy because it starts several JVM processes, so make sur
 Clone the repo, open the folder in a terminal, and then execute:
 
 ```sh
-docker-compose up
+make demo.start
 ```
 
 Go grab a cup of coffee while Docker does its thing. After a while, if you see the following messages it means everything went well:
@@ -35,7 +37,7 @@ Go grab a cup of coffee while Docker does its thing. After a while, if you see t
 Now, let's load the sample data provided by Druid to have something to play with:
 
 ```sh
-docker-compose exec coordinator cat quickstart/tutorial/wikipedia-index.json | curl -X 'POST' -H 'Content-Type:application/json' -d @- http://localhost:8081/druid/indexer/v1/task
+make demo.druid.seed
 # => {"task":"index_wikipedia..."}
 ```
 
