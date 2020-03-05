@@ -73,6 +73,15 @@
            (adapt-for-server {:only-cubes-selected true
                               :cubes [{:name "c1" :selected false} {:name "c2" :selected true}]}))))
 
+  ; This is because the designer expects at least one measure for the pinboard
+  (testing "is no measure is selected we turn it into all"
+    (is (= {:allowed-cubes [{:name "c1" :measures "all" :filters []}]}
+           (adapt-for-server {:only-cubes-selected true
+                              :cubes [{:name "c1" :selected true :only-measures-selected true :allowed-measures []}]})))
+    (is (= {:allowed-cubes [{:name "c2" :measures ["count"] :filters []}]}
+           (adapt-for-server {:only-cubes-selected true
+                              :cubes [{:name "c2" :selected true :only-measures-selected true :allowed-measures ["count"]}]}))))
+
   (testing "should simplify the filters"
     (let [from (t/date-time 2018 4 4)
           to (t/date-time 2018 4 5)]

@@ -33,7 +33,9 @@
 (defn adapt-for-server [{:keys [only-cubes-selected cubes] :as user}]
   (let [adapt-cube (fn [{:keys [name only-measures-selected allowed-measures filters]}]
                      (-> {:name name}
-                         (assoc :measures (if only-measures-selected allowed-measures "all")
+                         (assoc :measures (if (and only-measures-selected (seq allowed-measures))
+                                            allowed-measures
+                                            "all")
                                 :filters (unparse-filters filters))
                          (st/select-schema CubePermissions)))
         allowed-cubes (if only-cubes-selected
