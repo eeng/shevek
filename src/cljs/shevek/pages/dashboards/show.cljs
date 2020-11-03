@@ -40,7 +40,7 @@
                  :selected-panel (when panel {:id (str/parse-int panel)
                                               :edit (str/to-bool edit)
                                               :fullscreen (str/to-bool fullscreen)}))
-          (or (not current-dashboard) (not= id (:id current-dashboard))) (init-current-dashboard)))
+    (or (not current-dashboard) (not= id (:id current-dashboard))) (init-current-dashboard)))
 
 (defevh :dashboards/new [{:keys [current-dashboard] :as db} query-params]
   (init-page db nil query-params #(assoc % :current-dashboard {:name (t :dashboards/new)

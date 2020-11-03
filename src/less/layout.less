@@ -3,7 +3,11 @@ body {
 }
 
 // Required for the designer page so that we can set there the full height too
-#app, .layout, .page-container { height: 100%; }
+#app,
+.layout,
+.page-container {
+  height: 100%;
+}
 
 .layout {
   display: flex;
@@ -16,9 +20,16 @@ body {
     &.compact {
       background: transparent;
     }
-    .top.divider { height: 3.85em }
-    .middle.divider { flex: 1 }
-    .bottom.divider { height: 1em; padding: 0 }
+    .top.divider {
+      height: 3.85em;
+    }
+    .middle.divider {
+      flex: 1;
+    }
+    .bottom.divider {
+      height: 1em;
+      padding: 0;
+    }
     .item {
       padding: 1.3em;
       color: #ffffffdd;
@@ -27,11 +38,21 @@ body {
       padding-top: 1.1em;
       padding-bottom: 1.1em;
     }
-    .item > i { font-size: 1.4em }
+    .item > i {
+      font-size: 1.4em;
+    }
 
     .profile {
       padding: 9px;
-      .user-avatar { width: 40px; }
+      img.user-avatar,
+      i.user {
+        width: 40px;
+        height: 40px;
+      }
+      i.user {
+        margin: 0;
+        padding-top: 9px;
+      }
     }
   }
 
@@ -42,7 +63,7 @@ body {
       padding: 2em;
       padding-bottom: 1.7em;
       background-color: @primary-color;
-      border-bottom: .5em solid darken(@primary-color, 5%);
+      border-bottom: 0.5em solid darken(@primary-color, 5%);
       margin-bottom: 3em;
     }
 
@@ -50,10 +71,11 @@ body {
       background-color: @primary-color;
       display: flex;
       justify-content: space-between;
-      padding: .5em;
+      padding: 0.5em;
       height: 50px; // Keep always the same height even when there are no buttons
 
-      .left, .right {
+      .left,
+      .right {
         align-self: center;
         .button.default {
           color: #eee;
@@ -62,9 +84,11 @@ body {
             color: #fff;
             background-color: darken(@primary-color, 10%);
           }
-          &:active { background-color: darken(@primary-color, 15%) }
+          &:active {
+            background-color: darken(@primary-color, 15%);
+          }
           .current-refresh {
-            padding-right: .7em;
+            padding-right: 0.7em;
             color: #ffa42b;
           }
         }
@@ -80,11 +104,13 @@ body {
 
           .text {
             .pencil {
-              margin-left: .5em;
+              margin-left: 0.5em;
               opacity: 0;
               transition: opacity 0.2s ease;
             }
-            &:hover .pencil { opacity: 1; }
+            &:hover .pencil {
+              opacity: 1;
+            }
           }
 
           .transparent.input {
@@ -100,7 +126,7 @@ body {
 
       .divider {
         display: inline-block;
-        width: .5em;
+        width: 0.5em;
       }
     }
 
@@ -115,13 +141,20 @@ body {
   }
   #sidebar.compact + .page-container {
     .topbar {
-      .left { margin-left: @sidebar-width; }
+      .left {
+        margin-left: @sidebar-width;
+      }
     }
   }
 }
 
-.preloader { pointer-events: none; } // So acceptance test can click through
+.preloader {
+  pointer-events: none;
+} // So acceptance test can click through
 
 .app-error.modal {
-  .content, .actions { text-align: center }
+  .content,
+  .actions {
+    text-align: center;
+  }
 }
