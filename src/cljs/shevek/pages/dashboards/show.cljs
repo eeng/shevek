@@ -13,6 +13,7 @@
             [shevek.pages.dashboards.actions.share :refer [share-button]]
             [shevek.pages.dashboards.actions.refresh :refer [refresh-button]]
             [shevek.pages.dashboards.actions.importd :refer [import-button]]
+            [shevek.pages.designer.actions.download :refer [download-csv-button]]
             [shevek.pages.dashboards.helpers :refer [modifiable? master?]]
             [shevek.reflow.core :refer [dispatch] :refer-macros [defevh]]
             [shevek.i18n :refer [t]]
@@ -105,41 +106,38 @@
             :args [(report->query report)]
             :handler #(reset! state {:loading? false :results %})))
 
-(defn- report-visualization [{:keys [report]}]
-  (let [state (r/atom {:results nil :loading? false})]
-    (r/create-class
-     {:component-did-mount
-      (fn [_]
-        (dispatch :dashboard/report-query report state))
+(defn- report-visualization [{:keys [report]} state]
+  (r/create-class
+   {:component-did-mount
+    (fn [_]
+      (dispatch :dashboard/report-query report state))
 
-      :component-did-update ; Handles refreshing
-      (fn [this [_ prev-props]]
-        (when (and (not= (:last-refresh-at prev-props) (:last-refresh-at (r/props this)))
-                   (not (:loading? @state))) ; Do not send the refreshing query if the previous is still running
-          (dispatch :dashboard/report-query report state)))
+    :component-did-update ; Handles refreshing
+    (fn [this [_ prev-props]]
+      (when (and (not= (:last-refresh-at prev-props) (:last-refresh-at (r/props this)))
+                 (not (:loading? @state))) ; Do not send the refreshing query if the previous is still running
+        (dispatch :dashboard/report-query report state)))
 
-      :reagent-render
-      (fn [{:keys [report]}]
-        (let [{:keys [results loading?]} @state]
-          (if results
-            [visualization results report {:refreshing? loading?}]
-            [:div.ui.active.loader])))})))
+    :reagent-render
+    (fn [{:keys [report]}]
+      (let [{:keys [results loading?]} @state]
+        (if results
+          [visualization results report {:refreshing? loading?}]
+          [:div.ui.active.loader])))}))
 
 (defn- cube-selector [{:keys [id]}]
   [cubes-list {:on-click #(dispatch :dashboard/panel-cube-selected id %)}])
 
-(defn- edit-panel-button [{:keys [type id]}]
-  (when (= type "report")
-    [:a {:href (current-url-with-params {:panel id :edit true})
-         :ref (tooltip (t :dashboard/edit-panel))
-         :data-tid "edit-panel"}
-     [:i.pencil.alternate.icon]]))
+(defn- edit-panel-button [{:keys [id]}]
+  [:a {:href (current-url-with-params {:panel id :edit true})
+       :ref (tooltip (t :dashboard/edit-panel))
+       :data-tid "edit-panel"}
+   [:i.pencil.alternate.icon]])
 
-(defn- fullscreen-panel-button [{:keys [type id]} already-fullscreen?]
-  (when (= type "report")
-    [:a {:href (current-url-with-params {:panel id :fullscreen (not already-fullscreen?)})
-         :ref (tooltip (t :dashboard/fullscreen-panel))}
-     [:i.expand.icon]]))
+(defn- fullscreen-panel-button [{:keys [id]} already-fullscreen?]
+  [:a {:href (current-url-with-params {:panel id :fullscreen (not already-fullscreen?)})
+       :ref (tooltip (t :dashboard/fullscreen-panel))}
+   [:i.expand.icon]])
 
 (defn- remove-panel-button [{:keys [id]}]
   [:a {:on-click #(dispatch :dashboard/remove-panel id)
@@ -151,21 +149,25 @@
        :ref (tooltip (t :dashboard/duplicate-panel))}
    [:i.copy.icon]])
 
-(defn- dashboard-panel [{:keys [type report id] :as panel}
-                        {:keys [last-refresh-at] :as dashboard}
-                        & [{:keys [already-fullscreen?]}]]
-  (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report
-        modifiable? (modifiable? dashboard)]
-    [l/panel
-     {:title name
-      :id (str "panel-" id) ; For scrolling to
-      :actions [[fullscreen-panel-button panel already-fullscreen?]
-                (when modifiable? [edit-panel-button panel])
-                (when modifiable? [duplicate-panel-button panel])
-                (when modifiable? [remove-panel-button panel])]}
-     (case type
-       "cube-selector" [cube-selector panel]
-       "report" [report-visualization (assoc panel :last-refresh-at last-refresh-at)])]))
+(defn- dashboard-panel []
+  (let [state (r/atom {:results nil :loading? false})]
+    (fn [{:keys [type report id] :as panel}
+         {:keys [last-refresh-at] :as dashboard}
+         & [{:keys [already-fullscreen?]}]]
+      (let [{:keys [name] :or {name (t :dashboard/select-cube)}} report
+            modifiable? (modifiable? dashboard)
+            report? (= type "report")]
+        [l/panel
+         {:title name
+          :id (str "panel-" id) ; For scrolling to
+          :actions [(when report? [fullscreen-panel-button panel already-fullscreen?])
+                    (when report? [download-csv-button report (:results @state) {:as [:a]}])
+                    (when (and report? modifiable?) [edit-panel-button panel])
+                    (when modifiable? [duplicate-panel-button panel])
+                    (when modifiable? [remove-panel-button panel])]}
+         (case type
+           "cube-selector" [cube-selector panel]
+           "report" [report-visualization (assoc panel :last-refresh-at last-refresh-at) state])]))))
 
 ; Normally panels should have a grid-pos but during testing we usually create them without it.
 ; Also, the grid-pos was added after some user's dashboards already existed, so this could would have been alternately on a migration

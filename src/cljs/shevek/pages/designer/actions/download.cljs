@@ -25,10 +25,10 @@
      (reset! loading false))
    0))
 
-(defn download-csv-button [report report-results]
+(defn download-csv-button [report report-results & [{:keys [as] :or {as [:button.ui.default.icon.button]}}]]
   (r/with-let [loading (r/atom false)]
-    [:button.ui.default.icon.button
-     {:ref (tooltip (t :reports/download-csv))
-      :on-click #(download-csv report report-results loading)
-      :class (when @loading "loading disabled")}
-     [:i.download.icon]]))
+    (into as
+          [{:ref (tooltip (t :reports/download-csv))
+            :on-click #(download-csv report report-results loading)
+            :class (when @loading "loading disabled")}
+           [:i.download.icon]])))
