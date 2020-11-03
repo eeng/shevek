@@ -14,7 +14,7 @@
 (defevh :dashboards/fetch [db]
   (rpc/fetch db :dashboards "dashboards/find-all"))
 
-(defevh :dashboards/delete [db {:keys [id name]}]
+(defevh :dashboards/delete [_db {:keys [id name]}]
   (rpc/call "dashboards/delete" :args [id] :handler #(do
                                                        (dispatch :dashboards/fetch)
                                                        (notify (t :dashboards/deleted name)))))

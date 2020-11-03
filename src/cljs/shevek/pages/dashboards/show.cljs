@@ -42,12 +42,12 @@
                                               :fullscreen (str/to-bool fullscreen)}))
     (or (not current-dashboard) (not= id (:id current-dashboard))) (init-current-dashboard)))
 
-(defevh :dashboards/new [{:keys [current-dashboard] :as db} query-params]
+(defevh :dashboards/new [db query-params]
   (init-page db nil query-params #(assoc % :current-dashboard {:name (t :dashboards/new)
                                                                :panels []
                                                                :owner-id (current-user :id)})))
 
-(defevh :dashboards/show [{:keys [current-dashboard] :as db} id query-params]
+(defevh :dashboards/show [db id query-params]
   (init-page db id query-params #(rpc/fetch % :current-dashboard "dashboards/find-by-id" :args [id] :handler set-panels-ids)))
 
 (defn- calculate-new-grid-position [panels]
@@ -99,24 +99,24 @@
 (defevh :dashboard/report-changed [db report panel-id]
   (setval [:current-dashboard :panels ALL (same-id panel-id) :report] report db))
 
-(defevh :dashboard/report-query [db report panel-id state]
+(defevh :dashboard/report-query [_db report state]
   (swap! state assoc :loading? true)
   (rpc/call "querying/query"
             :args [(report->query report)]
             :handler #(reset! state {:loading? false :results %})))
 
-(defn- report-visualization [{:keys [report id]}]
+(defn- report-visualization [{:keys [report]}]
   (let [state (r/atom {:results nil :loading? false})]
     (r/create-class
      {:component-did-mount
       (fn [_]
-        (dispatch :dashboard/report-query report id state))
+        (dispatch :dashboard/report-query report state))
 
       :component-did-update ; Handles refreshing
       (fn [this [_ prev-props]]
         (when (and (not= (:last-refresh-at prev-props) (:last-refresh-at (r/props this)))
                    (not (:loading? @state))) ; Do not send the refreshing query if the previous is still running
-          (dispatch :dashboard/report-query report id state)))
+          (dispatch :dashboard/report-query report state)))
 
       :reagent-render
       (fn [{:keys [report]}]
